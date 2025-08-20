@@ -1,0 +1,419 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["hackathon_schema"]
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String?  @unique
+  password  String?
+  avatarUrl String?
+  bio       String?
+  walletAddress String? @unique
+  reputationScore Int @default(0)
+  ipfsProfileHash String?
+  socialLinks Json?
+  privacySettings Json @default("{}")
+  notificationSettings Json @default("{}")
+  preferences Json @default("{}")
+  emailVerified Boolean @default(false)
+  role      String   @default("user") // 用户角色: admin, moderator, user
+  status    String   @default("active") // 用户状态: active, suspended, banned
+  lastLoginAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 关系
+  organizedHackathons Hackathon[] @relation("Organizer")
+  participations      Participation[]
+  teamMemberships     TeamMember[]
+  projects            Project[]
+  notifications       Notification[]
+  feedback            Feedback[]
+  projectLikes        ProjectLike[]
+  ledTeams            Team[]        @relation("TeamLeader")
+  judgeRoles          Judge[]
+  communityPosts      CommunityPost[] @relation("CommunityPosts")
+  communityReplies    CommunityReply[] @relation("CommunityReplies")
+  
+  // Web3 相关关系
+  daoProposals        DAOProposal[] @relation("DAOProposalCreator")
+  daoVotes            DAOVote[]
+  nfts                NFT[] @relation("NFTOwner")
+  staking             Staking?
+  stakingTransactions StakingTransaction[]
+
+  @@map("users")
+  @@schema("hackathon_schema")
+}
+
+model Hackathon {
+  id                  String   @id @default(cuid())
+  title               String
+  description         String?
+  startDate           DateTime
+  endDate             DateTime
+  registrationDeadline DateTime?
+  maxParticipants     Int?
+  prizePool           Decimal? @db.Decimal(15,2)
+  categories          Json     @default("[]")
+  tags                Json     @default("[]")
+  requirements        String?
+  rules               String?
+  isPublic            Boolean  @default(true)
+  featured            Boolean  @default(false)
+  status              String   @default("draft")
+  organizerId         String
+  ipfsHash            String?
+  metadata            Json?
+  prizes              Json?
+  tracks              Json?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  // 关系
+  organizer           User     @relation("Organizer", fields: [organizerId], references: [id])
+  participations      Participation[]
+  projects            Project[]
+  teams               Team[]
+  judges              Judge[]
+
+  @@map("hackathons")
+  @@schema("hackathon_schema")
+}
+
+model Project {
+  id            String   @id @default(cuid())
+  title         String
+  description   String?
+  hackathonId   String
+  teamId        String?
+  creatorId     String
+  technologies  Json     @default("[]")
+  tags          Json     @default("[]")
+  githubUrl     String?
+  demoUrl       String?
+  videoUrl      String?
+  presentationUrl String?
+  ipfsHash      String?
+  status        String   @default("draft")
+  isPublic      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // 关系
+  hackathon     Hackathon @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  team          Team?     @relation(fields: [teamId], references: [id])
+  creator       User      @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  scores        Score[]
+  feedback      Feedback[]
+  projectLikes  ProjectLike[]
+
+  @@map("projects")
+  @@schema("hackathon_schema")
+}
+
+model Team {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  hackathonId String
+  leaderId    String
+  maxMembers  Int      @default(5)
+  skills      Json     @default("[]")
+  tags        Json     @default("[]")
+  isPublic    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // 关系
+  hackathon   Hackathon @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  leader      User     @relation("TeamLeader", fields: [leaderId], references: [id])
+  members     TeamMember[]
+  projects    Project[]
+
+  @@map("teams")
+  @@schema("hackathon_schema")
+}
+
+model TeamMember {
+  id        String   @id @default(cuid())
+  teamId    String
+  userId    String
+  role      String   @default("member")
+  joinedAt  DateTime @default(now())
+
+  // 关系
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, userId])
+  @@map("team_members")
+  @@schema("hackathon_schema")
+}
+
+model Participation {
+  id           String   @id @default(cuid())
+  hackathonId  String
+  userId       String
+  status       String   @default("registered")
+  joinedAt     DateTime @default(now())
+
+  // 关系
+  hackathon    Hackathon @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([hackathonId, userId])
+  @@map("participations")
+  @@schema("hackathon_schema")
+}
+
+model Judge {
+  id              String   @id @default(cuid())
+  hackathonId     String
+  userId          String
+  role            String   @default("main")
+  expertise       Json     @default("[]")
+  assignedProjects Json    @default("[]")
+  createdAt       DateTime @default(now())
+
+  // 关系
+  hackathon       Hackathon @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  user            User     @relation(fields: [userId], references: [id])
+  scores          Score[]
+
+  @@map("judges")
+  @@schema("hackathon_schema")
+}
+
+model Score {
+  id                  String   @id @default(cuid())
+  projectId           String
+  judgeId             String
+  innovation          Decimal? @db.Decimal(3,1)
+  technicalComplexity Decimal? @db.Decimal(3,1)
+  userExperience      Decimal? @db.Decimal(3,1)
+  businessPotential   Decimal? @db.Decimal(3,1)
+  presentation        Decimal? @db.Decimal(3,1)
+  totalScore          Decimal? @db.Decimal(4,1)
+  comments            String?
+  ipfsHash            String?
+  createdAt           DateTime @default(now())
+
+  // 关系
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  judge     Judge    @relation(fields: [judgeId], references: [id], onDelete: Cascade)
+
+  @@map("scores")
+  @@schema("hackathon_schema")
+}
+
+model Feedback {
+  id        String   @id @default(cuid())
+  projectId String
+  userId    String
+  rating    Int
+  comment   String?
+  ipfsHash  String?
+  createdAt DateTime @default(now())
+
+  // 关系
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("feedbacks")
+  @@schema("hackathon_schema")
+}
+
+model ProjectLike {
+  id        String   @id @default(cuid())
+  projectId String
+  userId    String
+  ipfsHash  String?
+  createdAt DateTime @default(now())
+
+  // 关系
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@map("project_likes")
+  @@schema("hackathon_schema")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  type      String
+  title     String
+  message   String
+  data      Json?
+  read      Boolean  @default(false)
+  userId    String
+  createdAt DateTime @default(now())
+
+  // 关系
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+  @@schema("hackathon_schema")
+}
+
+model CommunityPost {
+  id            String   @id @default(cuid())
+  title         String
+  content       String
+  excerpt       String?
+  category      String   @default("general")
+  tags          Json     @default("[]")
+  authorId      String
+  views         Int      @default(0)
+  likes         Int      @default(0)
+  replies       Int      @default(0)
+  isPinned      Boolean  @default(false)
+  isLocked      Boolean  @default(false)
+  isDeleted     Boolean  @default(false)
+  lastReplyAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // 关系
+  author        User     @relation("CommunityPosts", fields: [authorId], references: [id], onDelete: Cascade)
+  communityReplies CommunityReply[]
+
+  @@map("community_posts")
+  @@schema("hackathon_schema")
+}
+
+model CommunityReply {
+  id        String   @id @default(cuid())
+  postId    String
+  content   String
+  authorId  String
+  parentId  String?
+  likes     Int      @default(0)
+  isDeleted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 关系
+  post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author    User          @relation("CommunityReplies", fields: [authorId], references: [id], onDelete: Cascade)
+  parent    CommunityReply? @relation("ReplyReplies", fields: [parentId], references: [id])
+  replies   CommunityReply[] @relation("ReplyReplies")
+
+  @@map("community_replies")
+  @@schema("hackathon_schema")
+}
+
+// ========================================
+// Web3 相关模型
+// ========================================
+
+model DAOProposal {
+  id            String   @id @default(cuid())
+  title         String
+  description   String
+  proposalType  String   // governance, funding, technical, community
+  targetAmount  Decimal? @db.Decimal(15,2)
+  executionTime DateTime
+  status        String   @default("active") // active, passed, rejected, executed
+  forVotes      Int      @default(0)
+  againstVotes  Int      @default(0)
+  creatorId     String
+  ipfsHash      String?
+  metadata      Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // 关系
+  creator       User     @relation("DAOProposalCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  votes         DAOVote[]
+
+  @@map("dao_proposals")
+  @@schema("hackathon_schema")
+}
+
+model DAOVote {
+  id          String   @id @default(cuid())
+  proposalId  String
+  userId      String
+  vote        String   // for, against
+  votingPower Int
+  ipfsHash    String?
+  createdAt   DateTime @default(now())
+
+  // 关系
+  proposal    DAOProposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([proposalId, userId])
+  @@map("dao_votes")
+  @@schema("hackathon_schema")
+}
+
+model NFT {
+  id          String   @id @default(cuid())
+  tokenId     Int      @unique
+  name        String
+  description String
+  imageUrl    String
+  category    String   // certificate, achievement, collectible
+  metadata    Json?
+  ownerId     String
+  ipfsHash    String?
+  mintTime    DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // 关系
+  owner       User     @relation("NFTOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@map("nfts")
+  @@schema("hackathon_schema")
+}
+
+model Staking {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  stakedAmount    Decimal  @db.Decimal(15,2) @default(0)
+  rewards         Decimal  @db.Decimal(15,2) @default(0)
+  apy             Decimal  @db.Decimal(5,2) @default(12.5)
+  lastRewardTime  DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // 关系
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions    StakingTransaction[]
+
+  @@map("staking")
+  @@schema("hackathon_schema")
+}
+
+model StakingTransaction {
+  id          String   @id @default(cuid())
+  stakingId   String
+  userId      String
+  type        String   // stake, unstake, claim_rewards
+  amount      Decimal  @db.Decimal(15,2)
+  txHash      String?
+  status      String   @default("pending") // pending, completed, failed
+  createdAt   DateTime @default(now())
+
+  // 关系
+  staking     Staking  @relation(fields: [stakingId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("staking_transactions")
+  @@schema("hackathon_schema")
+} 

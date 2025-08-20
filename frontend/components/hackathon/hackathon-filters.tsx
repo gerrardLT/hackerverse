@@ -1,0 +1,207 @@
+'use client'
+
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Label } from '@/components/ui/label'
+import { Badge } from '@/components/ui/badge'
+import { X } from 'lucide-react'
+
+interface Filters {
+  status: string
+  technologies: string[]
+  prizeRange: string
+  dateRange: string
+}
+
+interface HackathonFiltersProps {
+  filters: Filters
+  onFiltersChange: (filters: Filters) => void
+}
+
+const technologies = [
+  'React', 'Vue.js', 'Angular', 'Node.js', 'Python', 'Java',
+  'Solidity', 'Rust', 'Go', 'TypeScript', 'JavaScript',
+  'AI/ML', 'Blockchain', 'DeFi', 'NFT', 'Web3', 'IPFS'
+]
+
+export function HackathonFilters({ filters, onFiltersChange }: HackathonFiltersProps) {
+  const updateFilters = (key: keyof Filters, value: any) => {
+    onFiltersChange({ ...filters, [key]: value })
+  }
+
+  const toggleTechnology = (tech: string) => {
+    const newTechnologies = filters.technologies.includes(tech)
+      ? filters.technologies.filter(t => t !== tech)
+      : [...filters.technologies, tech]
+    updateFilters('technologies', newTechnologies)
+  }
+
+  const clearAllFilters = () => {
+    onFiltersChange({
+      status: 'all',
+      technologies: [],
+      prizeRange: 'all',
+      dateRange: 'all'
+    })
+  }
+
+  const hasActiveFilters = filters.status !== 'all' || 
+    filters.technologies.length > 0 || 
+    filters.prizeRange !== 'all' || 
+    filters.dateRange !== 'all'
+
+  return (
+    <div className="space-y-4">
+      {hasActiveFilters && (
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">已选筛选条件</span>
+          <button
+            onClick={clearAllFilters}
+            className="text-sm text-primary hover:underline"
+          >
+            清除全部
+          </button>
+        </div>
+      )}
+
+      {/* Active Filters */}
+      {hasActiveFilters && (
+        <div className="flex flex-wrap gap-2">
+          {filters.status !== 'all' && (
+            <Badge variant="secondary" className="text-xs">
+              {filters.status === 'upcoming' ? '即将开始' : 
+               filters.status === 'ongoing' ? '进行中' : '已结束'}
+              <X 
+                className="ml-1 h-3 w-3 cursor-pointer" 
+                onClick={() => updateFilters('status', 'all')}
+              />
+            </Badge>
+          )}
+          {filters.technologies.map(tech => (
+            <Badge key={tech} variant="secondary" className="text-xs">
+              {tech}
+              <X 
+                className="ml-1 h-3 w-3 cursor-pointer" 
+                onClick={() => toggleTechnology(tech)}
+              />
+            </Badge>
+          ))}
+        </div>
+      )}
+
+      {/* Status Filter */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm">活动状态</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <RadioGroup 
+            value={filters.status} 
+            onValueChange={(value) => updateFilters('status', value)}
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="all" id="status-all" />
+              <Label htmlFor="status-all" className="text-sm">全部</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="upcoming" id="status-upcoming" />
+              <Label htmlFor="status-upcoming" className="text-sm">即将开始</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="ongoing" id="status-ongoing" />
+              <Label htmlFor="status-ongoing" className="text-sm">进行中</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="ended" id="status-ended" />
+              <Label htmlFor="status-ended" className="text-sm">已结束</Label>
+            </div>
+          </RadioGroup>
+        </CardContent>
+      </Card>
+
+      {/* Technology Filter */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm">技术栈</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <div className="max-h-48 overflow-y-auto space-y-2">
+            {technologies.map(tech => (
+              <div key={tech} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`tech-${tech}`}
+                  checked={filters.technologies.includes(tech)}
+                  onCheckedChange={() => toggleTechnology(tech)}
+                />
+                <Label htmlFor={`tech-${tech}`} className="text-sm">
+                  {tech}
+                </Label>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Prize Range Filter */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm">奖金范围</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <RadioGroup 
+            value={filters.prizeRange} 
+            onValueChange={(value) => updateFilters('prizeRange', value)}
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="all" id="prize-all" />
+              <Label htmlFor="prize-all" className="text-sm">全部</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="0-1000" id="prize-low" />
+              <Label htmlFor="prize-low" className="text-sm">$0 - $1,000</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="1000-10000" id="prize-mid" />
+              <Label htmlFor="prize-mid" className="text-sm">$1,000 - $10,000</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="10000+" id="prize-high" />
+              <Label htmlFor="prize-high" className="text-sm">$10,000+</Label>
+            </div>
+          </RadioGroup>
+        </CardContent>
+      </Card>
+
+      {/* Date Range Filter */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm">时间范围</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <RadioGroup 
+            value={filters.dateRange} 
+            onValueChange={(value) => updateFilters('dateRange', value)}
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="all" id="date-all" />
+              <Label htmlFor="date-all" className="text-sm">全部</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="this-week" id="date-week" />
+              <Label htmlFor="date-week" className="text-sm">本周</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="this-month" id="date-month" />
+              <Label htmlFor="date-month" className="text-sm">本月</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="next-month" id="date-next" />
+              <Label htmlFor="date-next" className="text-sm">下个月</Label>
+            </div>
+          </RadioGroup>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}

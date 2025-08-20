@@ -1,0 +1,17 @@
+{
+  "name": "hackx-subgraph",
+  "version": "1.0.0",
+  "description": "HackX Platform Subgraph",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ hackx-platform",
+    "create-local": "graph create --node http://localhost:8020/ hackx-platform",
+    "remove-local": "graph remove --node http://localhost:8020/ hackx-platform",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 hackx-platform"
+  },
+  "devDependencies": {
+    "@graphprotocol/graph-cli": "^0.60.0",
+    "@graphprotocol/graph-ts": "^0.31.0"
+  }
+} 

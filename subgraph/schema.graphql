@@ -1,0 +1,100 @@
+type User @entity {
+  id: ID!
+  address: Bytes!
+  profileCID: String!
+  profileData: UserProfile
+  hackathons: [HackathonParticipant!]! @derivedFrom(field: "user")
+  projects: [Project!]! @derivedFrom(field: "creator")
+  scores: [Score!]! @derivedFrom(field: "judge")
+  createdAt: BigInt!
+  updatedAt: BigInt!
+}
+
+type UserProfile @entity {
+  id: ID!
+  user: User!
+  username: String!
+  email: String!
+  avatar: String
+  bio: String
+  skills: [String!]!
+  socialLinks: [SocialLink!]!
+  version: String!
+  timestamp: String!
+}
+
+type SocialLink @entity {
+  id: ID!
+  platform: String!
+  url: String!
+  userProfile: UserProfile!
+}
+
+type Hackathon @entity {
+  id: ID!
+  hackathonId: BigInt!
+  organizer: User!
+  dataCID: String!
+  hackathonData: HackathonData
+  participants: [HackathonParticipant!]! @derivedFrom(field: "hackathon")
+  projects: [Project!]! @derivedFrom(field: "hackathon")
+  createdAt: BigInt!
+  updatedAt: BigInt!
+}
+
+type HackathonData @entity {
+  id: ID!
+  hackathon: Hackathon!
+  title: String!
+  description: String!
+  startDate: String!
+  endDate: String!
+  prizePool: BigInt!
+  categories: [String!]!
+  requirements: String!
+  rules: String!
+  status: String!
+  version: String!
+  timestamp: String!
+}
+
+type HackathonParticipant @entity {
+  id: ID!
+  hackathon: Hackathon!
+  user: User!
+  joinedAt: BigInt!
+}
+
+type Project @entity {
+  id: ID!
+  projectId: BigInt!
+  creator: User!
+  hackathon: Hackathon!
+  dataCID: String!
+  projectData: ProjectData
+  scores: [Score!]! @derivedFrom(field: "project")
+  createdAt: BigInt!
+  updatedAt: BigInt!
+}
+
+type ProjectData @entity {
+  id: ID!
+  project: Project!
+  title: String!
+  description: String!
+  demoUrl: String
+  githubUrl: String
+  techStack: [String!]!
+  teamMembers: [String!]!
+  screenshots: [String!]!
+  version: String!
+  timestamp: String!
+}
+
+type Score @entity {
+  id: ID!
+  project: Project!
+  judge: User!
+  score: BigInt!
+  submittedAt: BigInt!
+} 
