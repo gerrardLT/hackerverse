@@ -5,7 +5,13 @@
   "scripts": {
     "test": "npx hardhat test",
     "compile": "npx hardhat compile",
-    "deploy": "npx hardhat run scripts/deploy.js --network localhost"
+    "deploy": "npx hardhat run scripts/deploy.js --network localhost",
+    "deploy:production": "npx hardhat run scripts/deploy-production.js --network $DEPLOY_NETWORK",
+    "deploy:polygon": "npx hardhat run scripts/deploy-production.js --network polygon",
+    "deploy:mainnet": "npx hardhat run scripts/deploy-production.js --network mainnet",
+    "deploy:sepolia": "npx hardhat run scripts/deploy-production.js --network sepolia",
+    "verify": "node scripts/verify-contract.js",
+    "update-config": "node scripts/update-config.js"
   },
   "keywords": [],
   "author": "",
@@ -19,6 +25,8 @@
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",
     "@nomicfoundation/hardhat-ethers": "^3.0.0",
     "@openzeppelin/contracts": "^5.0.0",
-    "chai": "^4.3.0"
+    "chai": "^4.3.0",
+    "dotenv": "^17.2.1",
+    "ethers": "^6.15.0"
   }
 }

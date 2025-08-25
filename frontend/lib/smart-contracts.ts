@@ -2,24 +2,78 @@
 
 import { ethers } from 'ethers'
 
-// 合约地址 (测试网)
+// 合约地址 (BSC 测试网)
 export const CONTRACT_ADDRESSES = {
-  HACKATHON: '0x1234567890123456789012345678901234567890',
-  DAO: '0x2345678901234567890123456789012345678901',
-  TOKEN: '0x3456789012345678901234567890123456789012',
-  NFT: '0x4567890123456789012345678901234567890123'
+  HACKX_CORE: '0x4BcFE52B6f38881d888b595E201E56B2cde93699',
+  // 注意：目前只部署了 HackXCore 核心合约
+  // 其他合约地址将在后续部署时更新
+  DAO: '0x2345678901234567890123456789012345678901', // 待部署
+  TOKEN: '0x3456789012345678901234567890123456789012', // 待部署
+  NFT: '0x4567890123456789012345678901234567890123' // 待部署
 }
 
-// 合约ABI (简化版)
-export const HACKATHON_ABI = [
-  'function createHackathon(string memory name, uint256 startTime, uint256 endTime, uint256 prizePool) external',
-  'function joinHackathon(uint256 hackathonId) external',
-  'function submitProject(uint256 hackathonId, string memory projectHash) external',
-  'function getHackathon(uint256 id) external view returns (tuple(string name, uint256 startTime, uint256 endTime, uint256 prizePool, address organizer, bool active))',
+// 网络配置
+export const NETWORK_CONFIG = {
+  chainId: 97, // BSC Testnet
+  name: 'BSC Testnet',
+  rpcUrls: [
+    'https://data-seed-prebsc-1-s1.bnbchain.org:8545',
+    'https://data-seed-prebsc-2-s1.bnbchain.org:8545',
+    'https://data-seed-prebsc-1-s2.bnbchain.org:8545',
+    'https://data-seed-prebsc-2-s2.bnbchain.org:8545',
+    'https://data-seed-prebsc-1-s3.bnbchain.org:8545',
+    'https://bsc-testnet.public.blastapi.io',
+    'https://bsc-testnet-rpc.publicnode.com'
+  ],
+  rpcUrl: 'https://data-seed-prebsc-1-s1.bnbchain.org:8545', // 保持向后兼容
+  blockExplorer: 'https://testnet.bscscan.com',
+  nativeCurrency: {
+    name: 'tBNB',
+    symbol: 'tBNB',
+    decimals: 18
+  }
+}
+
+// HackXCore 合约 ABI (简化版)
+export const HACKX_CORE_ABI = [
+  // 用户管理
+  'function registerUser(string memory profileCID) external',
+  'function getUser(address userAddress) external view returns (tuple(address userAddress, string profileCID, uint256 registrationTime, bool active))',
+  'function getUserCount() external view returns (uint256)',
+  
+  // 黑客松管理
+  'function createHackathon(string memory dataCID) external returns (uint256)',
+  'function updateHackathon(uint256 hackathonId, string memory dataCID) external',
+  'function getHackathon(uint256 hackathonId) external view returns (tuple(uint256 id, address organizer, string dataCID, uint256 creationTime, bool active))',
+  'function getHackathonCount() external view returns (uint256)',
+  
+  // 参与者管理  
+  'function addParticipant(uint256 hackathonId, address participant) external',
+  'function removeParticipant(uint256 hackathonId, address participant) external',
   'function getParticipants(uint256 hackathonId) external view returns (address[])',
-  'event HackathonCreated(uint256 indexed id, string name, address organizer)',
-  'event ParticipantJoined(uint256 indexed hackathonId, address participant)',
-  'event ProjectSubmitted(uint256 indexed hackathonId, address participant, string projectHash)'
+  'function isParticipant(uint256 hackathonId, address participant) external view returns (bool)',
+  
+  // 项目提交
+  'function submitProject(uint256 hackathonId, string memory projectDataCID) external returns (uint256)',
+  'function updateProject(uint256 projectId, string memory projectDataCID) external',
+  'function getProject(uint256 projectId) external view returns (tuple(uint256 id, uint256 hackathonId, address creator, string projectDataCID, uint256 submissionTime))',
+  'function getProjectsByHackathon(uint256 hackathonId) external view returns (uint256[])',
+  'function getProjectCount() external view returns (uint256)',
+  
+  // 评分系统
+  'function submitScore(uint256 projectId, uint256 score, string memory feedbackCID) external',
+  'function getProjectScores(uint256 projectId) external view returns (tuple(address judge, uint256 score, string feedbackCID, uint256 submissionTime)[])',
+  'function getAverageScore(uint256 projectId) external view returns (uint256)',
+  
+  // 事件
+  'event UserRegistered(address indexed userAddress, string profileCID)',
+  'event HackathonCreated(uint256 indexed hackathonId, address indexed organizer, string dataCID)',
+  'event HackathonUpdated(uint256 indexed hackathonId, string dataCID)',
+  'event ParticipantAdded(uint256 indexed hackathonId, address indexed participant)',
+  'event ParticipantRemoved(uint256 indexed hackathonId, address indexed participant)',
+  'event ProjectSubmitted(uint256 indexed projectId, uint256 indexed hackathonId, address indexed creator, string projectDataCID)',
+  'event ProjectUpdated(uint256 indexed projectId, string projectDataCID)',
+  'event ScoreSubmitted(uint256 indexed projectId, address indexed judge, uint256 score, string feedbackCID)'
 ]
 
 export const DAO_ABI = [
@@ -60,70 +114,201 @@ export class SmartContractService {
   private provider: ethers.BrowserProvider | null = null
   private signer: ethers.Signer | null = null
   private contracts: { [key: string]: ethers.Contract } = {}
+  private maxRetries = 3
+  private retryDelay = 1000
 
-  async initialize() {
-    if (typeof window !== 'undefined' && window.ethereum) {
-      this.provider = new ethers.BrowserProvider(window.ethereum)
-      this.signer = await this.provider.getSigner()
+  async initialize(provider?: ethers.BrowserProvider, signer?: ethers.JsonRpcSigner) {
+    try {
+      // 如果提供了外部的provider和signer，优先使用它们
+      if (provider && signer) {
+        this.provider = provider
+        this.signer = signer
+      } else if (typeof window !== 'undefined' && window.ethereum) {
+        // 否则尝试创建新的连接
+        this.provider = new ethers.BrowserProvider(window.ethereum)
+        this.signer = await this.provider.getSigner()
+      } else {
+        console.warn('没有可用的钱包provider')
+        return
+      }
       
-      // 初始化合约实例
-      this.contracts.hackathon = new ethers.Contract(
-        CONTRACT_ADDRESSES.HACKATHON,
-        HACKATHON_ABI,
+      // 初始化合约实例 - 只初始化已部署的合约
+      this.contracts.hackxCore = new ethers.Contract(
+        CONTRACT_ADDRESSES.HACKX_CORE,
+        HACKX_CORE_ABI,
         this.signer
       )
       
-      this.contracts.dao = new ethers.Contract(
-        CONTRACT_ADDRESSES.DAO,
-        DAO_ABI,
-        this.signer
-      )
+      // 其他合约暂时不初始化，因为还没有部署
+      // this.contracts.dao = new ethers.Contract(
+      //   CONTRACT_ADDRESSES.DAO,
+      //   DAO_ABI,
+      //   this.signer
+      // )
       
-      this.contracts.token = new ethers.Contract(
-        CONTRACT_ADDRESSES.TOKEN,
-        TOKEN_ABI,
-        this.signer
-      )
-      
-      this.contracts.nft = new ethers.Contract(
-        CONTRACT_ADDRESSES.NFT,
-        NFT_ABI,
-        this.signer
-      )
+      console.log('智能合约服务初始化成功')
+    } catch (error) {
+      console.warn('智能合约初始化失败:', error)
+      // 不抛出错误，允许应用继续运行
     }
   }
 
-  // 黑客松合约方法
-  async createHackathon(name: string, startTime: number, endTime: number, prizePool: string) {
-    if (!this.contracts.hackathon) throw new Error('Contract not initialized')
+  // 重试机制
+  private async retryContractCall<T>(operation: () => Promise<T>): Promise<T> {
+    let lastError: Error | null = null
     
-    const tx = await this.contracts.hackathon.createHackathon(
-      name,
-      startTime,
-      endTime,
-      ethers.parseEther(prizePool)
-    )
+    for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
+      try {
+        console.log(`智能合约调用尝试 ${attempt}/${this.maxRetries}`)
+        return await operation()
+      } catch (error: any) {
+        lastError = error
+        console.warn(`智能合约调用失败 (尝试 ${attempt}/${this.maxRetries}):`, error.message)
+        
+        // 如果是最后一次尝试，直接抛出错误
+        if (attempt === this.maxRetries) {
+          break
+        }
+        
+        // 等待一段时间后重试
+        await new Promise(resolve => setTimeout(resolve, this.retryDelay * attempt))
+      }
+    }
+    
+    // 所有重试都失败了
+    console.error('智能合约调用重试全部失败:', lastError)
+    throw lastError || new Error('智能合约调用失败')
+  }
+
+  // HackXCore 合约方法 - 用户管理
+  async registerUser(profileCID: string) {
+    if (!this.contracts.hackxCore) throw new Error('Contract not initialized')
+    
+    const tx = await this.contracts.hackxCore.registerUser(profileCID)
     return await tx.wait()
   }
 
-  async joinHackathon(hackathonId: number) {
-    if (!this.contracts.hackathon) throw new Error('Contract not initialized')
+  async getUser(address: string) {
+    if (!this.contracts.hackxCore) throw new Error('Contract not initialized')
     
-    const tx = await this.contracts.hackathon.joinHackathon(hackathonId)
+    return await this.contracts.hackxCore.getUser(address)
+  }
+
+  async getUserCount() {
+    if (!this.contracts.hackxCore) throw new Error('Contract not initialized')
+    
+    return await this.contracts.hackxCore.getUserCount()
+  }
+
+  // HackXCore 合约方法 - 黑客松管理
+  async createHackathon(dataCID: string) {
+    if (!this.contracts.hackxCore) throw new Error('Contract not initialized')
+    
+    const tx = await this.contracts.hackxCore.createHackathon(dataCID)
     return await tx.wait()
   }
 
-  async submitProject(hackathonId: number, projectHash: string) {
-    if (!this.contracts.hackathon) throw new Error('Contract not initialized')
+  async updateHackathon(hackathonId: number, dataCID: string) {
+    if (!this.contracts.hackxCore) throw new Error('Contract not initialized')
     
-    const tx = await this.contracts.hackathon.submitProject(hackathonId, projectHash)
+    const tx = await this.contracts.hackxCore.updateHackathon(hackathonId, dataCID)
     return await tx.wait()
   }
 
-  async getHackathon(id: number) {
-    if (!this.contracts.hackathon) throw new Error('Contract not initialized')
+  async getHackathon(hackathonId: number) {
+    if (!this.contracts.hackxCore) throw new Error('Contract not initialized')
     
-    return await this.contracts.hackathon.getHackathon(id)
+    return await this.contracts.hackxCore.getHackathon(hackathonId)
+  }
+
+  async getHackathonCount() {
+    if (!this.contracts.hackxCore) throw new Error('Contract not initialized')
+    
+    return await this.retryContractCall(async () => {
+      return await this.contracts.hackxCore!.getHackathonCount()
+    })
+  }
+
+  // HackXCore 合约方法 - 参与者管理
+  async addParticipant(hackathonId: number, participant: string) {
+    if (!this.contracts.hackxCore) throw new Error('Contract not initialized')
+    
+    const tx = await this.contracts.hackxCore.addParticipant(hackathonId, participant)
+    return await tx.wait()
+  }
+
+  async removeParticipant(hackathonId: number, participant: string) {
+    if (!this.contracts.hackxCore) throw new Error('Contract not initialized')
+    
+    const tx = await this.contracts.hackxCore.removeParticipant(hackathonId, participant)
+    return await tx.wait()
+  }
+
+  async getParticipants(hackathonId: number) {
+    if (!this.contracts.hackxCore) throw new Error('Contract not initialized')
+    
+    return await this.contracts.hackxCore.getParticipants(hackathonId)
+  }
+
+  async isParticipant(hackathonId: number, participant: string) {
+    if (!this.contracts.hackxCore) throw new Error('Contract not initialized')
+    
+    return await this.contracts.hackxCore.isParticipant(hackathonId, participant)
+  }
+
+  // HackXCore 合约方法 - 项目提交
+  async submitProject(hackathonId: number, projectDataCID: string) {
+    if (!this.contracts.hackxCore) throw new Error('Contract not initialized')
+    
+    const tx = await this.contracts.hackxCore.submitProject(hackathonId, projectDataCID)
+    return await tx.wait()
+  }
+
+  async updateProject(projectId: number, projectDataCID: string) {
+    if (!this.contracts.hackxCore) throw new Error('Contract not initialized')
+    
+    const tx = await this.contracts.hackxCore.updateProject(projectId, projectDataCID)
+    return await tx.wait()
+  }
+
+  async getProject(projectId: number) {
+    if (!this.contracts.hackxCore) throw new Error('Contract not initialized')
+    
+    return await this.contracts.hackxCore.getProject(projectId)
+  }
+
+  async getProjectsByHackathon(hackathonId: number) {
+    if (!this.contracts.hackxCore) throw new Error('Contract not initialized')
+    
+    return await this.contracts.hackxCore.getProjectsByHackathon(hackathonId)
+  }
+
+  async getProjectCount() {
+    if (!this.contracts.hackxCore) throw new Error('Contract not initialized')
+    
+    return await this.retryContractCall(async () => {
+      return await this.contracts.hackxCore!.getProjectCount()
+    })
+  }
+
+  // HackXCore 合约方法 - 评分系统
+  async submitScore(projectId: number, score: number, feedbackCID: string) {
+    if (!this.contracts.hackxCore) throw new Error('Contract not initialized')
+    
+    const tx = await this.contracts.hackxCore.submitScore(projectId, score, feedbackCID)
+    return await tx.wait()
+  }
+
+  async getProjectScores(projectId: number) {
+    if (!this.contracts.hackxCore) throw new Error('Contract not initialized')
+    
+    return await this.contracts.hackxCore.getProjectScores(projectId)
+  }
+
+  async getAverageScore(projectId: number) {
+    if (!this.contracts.hackxCore) throw new Error('Contract not initialized')
+    
+    return await this.contracts.hackxCore.getAverageScore(projectId)
   }
 
   // DAO合约方法
@@ -229,26 +414,46 @@ export class SmartContractService {
 
   // 事件监听
   setupEventListeners(callbacks: {
+    onUserRegistered?: (event: any) => void
     onHackathonCreated?: (event: any) => void
-    onParticipantJoined?: (event: any) => void
+    onHackathonUpdated?: (event: any) => void
+    onParticipantAdded?: (event: any) => void
+    onParticipantRemoved?: (event: any) => void
     onProjectSubmitted?: (event: any) => void
+    onProjectUpdated?: (event: any) => void
+    onScoreSubmitted?: (event: any) => void
     onProposalCreated?: (event: any) => void
     onVoteCast?: (event: any) => void
     onStaked?: (event: any) => void
     onRewardsClaimed?: (event: any) => void
     onCertificateMinted?: (event: any) => void
   }) {
-    if (!this.contracts.hackathon) return
+    if (!this.contracts.hackxCore) return
 
-    // 黑客松事件
-    if (callbacks.onHackathonCreated) {
-      this.contracts.hackathon.on('HackathonCreated', callbacks.onHackathonCreated)
+    // HackXCore 事件
+    if (callbacks.onUserRegistered) {
+      this.contracts.hackxCore.on('UserRegistered', callbacks.onUserRegistered)
     }
-    if (callbacks.onParticipantJoined) {
-      this.contracts.hackathon.on('ParticipantJoined', callbacks.onParticipantJoined)
+    if (callbacks.onHackathonCreated) {
+      this.contracts.hackxCore.on('HackathonCreated', callbacks.onHackathonCreated)
+    }
+    if (callbacks.onHackathonUpdated) {
+      this.contracts.hackxCore.on('HackathonUpdated', callbacks.onHackathonUpdated)
+    }
+    if (callbacks.onParticipantAdded) {
+      this.contracts.hackxCore.on('ParticipantAdded', callbacks.onParticipantAdded)
+    }
+    if (callbacks.onParticipantRemoved) {
+      this.contracts.hackxCore.on('ParticipantRemoved', callbacks.onParticipantRemoved)
     }
     if (callbacks.onProjectSubmitted) {
-      this.contracts.hackathon.on('ProjectSubmitted', callbacks.onProjectSubmitted)
+      this.contracts.hackxCore.on('ProjectSubmitted', callbacks.onProjectSubmitted)
+    }
+    if (callbacks.onProjectUpdated) {
+      this.contracts.hackxCore.on('ProjectUpdated', callbacks.onProjectUpdated)
+    }
+    if (callbacks.onScoreSubmitted) {
+      this.contracts.hackxCore.on('ScoreSubmitted', callbacks.onScoreSubmitted)
     }
 
     // DAO事件
@@ -282,3 +487,8 @@ export class SmartContractService {
 }
 
 export const smartContractService = new SmartContractService()
+
+
+export const HACKX_CORE_ADDRESS: { [key: number]: string } = {
+  [97]: '0x4BcFE52B6f38881d888b595E201E56B2cde93699'  // BSC Testnet
+};

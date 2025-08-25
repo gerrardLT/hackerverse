@@ -237,11 +237,25 @@ export default function CreateHackathonPage() {
       if (response.success && response.data) {
         toast({
           title: '黑客松创建成功！',
-          description: '你的黑客松已经创建并等待审核',
+          description: (
+            <div className="space-y-1">
+              <p>黑客松已在区块链上创建</p>
+              <p className="text-xs text-muted-foreground">
+                合约ID: {response.data.hackathon.contractId}
+              </p>
+              {response.data.hackathon.txHash && (
+                <p className="text-xs text-muted-foreground">
+                  交易哈希: {response.data.hackathon.txHash?.slice(0, 10)}...
+                </p>
+              )}
+            </div>
+          ),
+          duration: 5000, // 延长显示时间
         })
         
-        // 跳转到新创建的黑客松详情页
-        router.push(`/hackathons/${response.data.hackathon.id}`)
+        // ⭐ 使用智能合约ID跳转
+        const hackathonId = response.data.hackathon.contractId || response.data.hackathon.id
+        router.push(`/hackathons/${hackathonId}`)
       } else {
         // 处理具体的验证错误
         const errorMessage = formatValidationError(response)

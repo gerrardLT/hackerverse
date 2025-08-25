@@ -158,21 +158,68 @@ export async function PUT(request: NextRequest) {
       }
     }
 
-    // 上传用户资料到IPFS（可选）
-    let ipfsHash = null
+    // ⭐ 上传用户资料到IPFS（必须成功）
+    let ipfsCID
     try {
       // 动态导入IPFS服务
       const { IPFSService } = await import('@/lib/ipfs')
-      ipfsHash = await IPFSService.uploadJSON(userProfileMetadata, {
+      ipfsCID = await IPFSService.uploadJSON(userProfileMetadata, {
         name: `user-profile-${currentUser.username || currentUser.email}.json`,
         description: `用户资料: ${currentUser.username || currentUser.email}`,
         tags: ['user-profile', 'hackathon', 'developer'],
         version: '1.0.0',
         author: currentUser.username || currentUser.email
       })
+      console.log('📦 用户资料IPFS上传成功:', ipfsCID)
     } catch (ipfsError) {
       console.error('IPFS上传失败:', ipfsError)
-      // 即使IPFS上传失败，也继续更新用户信息
+      return NextResponse.json({
+        error: 'IPFS上传失败，无法更新用户资料',
+        details: ipfsError instanceof Error ? ipfsError.message : '未知错误'
+      }, { status: 500 })
+    }
+    
+    // ⭐ 调用智能合约更新用户资料
+    let contractResult
+    try {
+      const { smartContractService } = await import('@/lib/smart-contracts')
+      await smartContractService.initialize()
+      
+      // 检查用户是否已注册
+      const userOnChain = await smartContractService.getUser(currentUser.walletAddress || '0x0')
+      
+      if (!userOnChain.isRegistered) {
+        // 首次注册用户
+        const tx = await smartContractService.registerUser(ipfsCID)
+        const receipt = await tx.wait()
+        
+        contractResult = {
+          action: 'register',
+          txHash: tx.hash,
+          blockNumber: Number(receipt.blockNumber),
+          gasUsed: Number(receipt.gasUsed)
+        }
+        console.log('⛓️ 智能合约用户注册成功:', contractResult)
+      } else {
+        // 更新用户资料
+        const tx = await smartContractService.updateProfile(ipfsCID)
+        const receipt = await tx.wait()
+        
+        contractResult = {
+          action: 'update',
+          txHash: tx.hash,
+          blockNumber: Number(receipt.blockNumber),
+          gasUsed: Number(receipt.gasUsed)
+        }
+        console.log('⛓️ 智能合约用户资料更新成功:', contractResult)
+      }
+      
+    } catch (contractError) {
+      console.error('智能合约调用失败:', contractError)
+      return NextResponse.json({
+        error: '智能合约调用失败，用户资料更新失败',
+        details: contractError instanceof Error ? contractError.message : '未知错误'
+      }, { status: 500 })
     }
     
     // 更新用户信息
@@ -185,7 +232,13 @@ export async function PUT(request: NextRequest) {
         walletAddress: validatedData.walletAddress,
         notificationSettings: validatedData.notificationSettings,
         privacySettings: validatedData.privacySettings,
-        ipfsProfileHash: ipfsHash, // 存储IPFS哈希
+        
+        // ⭐ 更新区块链相关字段
+        ipfsProfileHash: ipfsCID, // 存储IPFS哈希
+        lastTxHash: contractResult.txHash,
+        lastBlockNumber: contractResult.blockNumber,
+        lastGasUsed: contractResult.gasUsed,
+        profileSyncStatus: 'SYNCED',
       },
       select: {
         id: true,

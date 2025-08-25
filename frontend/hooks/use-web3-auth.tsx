@@ -3,6 +3,8 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { ethers } from 'ethers'
 import { useToast } from '@/hooks/use-toast'
+import { smartContractService } from '@/lib/smart-contracts'
+import { apiService } from '@/lib/api'
 
 interface Web3User {
   address: string
@@ -46,8 +48,8 @@ const HACKX_CORE_ABI = [
   "event ProjectSubmitted(uint256 indexed hackathonId, address indexed participant, string projectCID)"
 ]
 
-// 合约地址 (需要替换为实际部署的地址)
-const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '0x0000000000000000000000000000000000000000'
+// 合约地址 - BSC Testnet 部署地址
+const CONTRACT_ADDRESS = '0x4BcFE52B6f38881d888b595E201E56B2cde93699'
 
 export function Web3AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<Web3User | null>(null)
@@ -71,6 +73,60 @@ export function Web3AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [signer])
 
+  // ⭐ 同步Web3用户到传统认证系统
+  const syncWithTraditionalAuth = async (walletAddress: string, profileCID?: string) => {
+    try {
+      console.log('🔄 正在同步Web3用户到传统认证系统...')
+      
+      // 1. 尝试通过钱包地址登录/注册
+      const response = await apiService.signInWithWallet(walletAddress)
+      
+      if (response.success && response.data) {
+        // 用户已存在，设置认证状态
+        console.log('✅ 找到现有用户，已设置认证状态')
+        
+        // 触发useAuth的状态更新（通过事件或直接调用）
+        const authEvent = new CustomEvent('web3-auth-success', {
+          detail: {
+            user: response.data.user,
+            token: response.data.token
+          }
+        })
+        window.dispatchEvent(authEvent)
+        
+      } else {
+        console.log('📝 用户不存在，需要创建新用户')
+        
+        // 2. 用户不存在，创建新的Web3用户
+        const createResponse = await apiService.createWeb3User({
+          walletAddress,
+          profileCID,
+          username: `user_${walletAddress.slice(0, 8)}`, // 默认用户名
+          bio: profileCID ? '通过Web3连接的用户' : '新的Web3用户'
+        })
+        
+        if (createResponse.success && createResponse.data) {
+          console.log('✅ 新用户创建成功')
+          
+          // 设置认证状态
+          const authEvent = new CustomEvent('web3-auth-success', {
+            detail: {
+              user: createResponse.data.user,
+              token: createResponse.data.token
+            }
+          })
+          window.dispatchEvent(authEvent)
+        } else {
+          console.warn('⚠️ 创建新用户失败:', createResponse.error)
+        }
+      }
+      
+    } catch (error) {
+      console.error('❌ 同步认证系统失败:', error)
+      // 即使同步失败，Web3连接仍然有效
+    }
+  }
+
   const initializeWeb3 = async () => {
     try {
       // 检查是否安装了MetaMask
@@ -92,28 +148,50 @@ export function Web3AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const connectWallet = async (): Promise<boolean> => {
-    if (!provider) {
-      toast({
-        title: "错误",
-        description: "请先安装MetaMask钱包",
-        variant: "destructive"
-      })
-      return false
-    }
-
     try {
       setConnecting(true)
       
+      // 检查是否有钱包可用
+      if (!window.ethereum) {
+        toast({
+          title: "错误",
+          description: "请先安装支持的钱包 (MetaMask, Trust Wallet, 等)",
+          variant: "destructive"
+        })
+        return false
+      }
+
+      // 创建或更新provider
+      const newProvider = new ethers.BrowserProvider(window.ethereum)
+      setProvider(newProvider)
+      
       // 请求连接钱包
-      const accounts = await provider.send("eth_requestAccounts", [])
-      const signer = await provider.getSigner()
+      const accounts = await newProvider.send("eth_requestAccounts", [])
+      const signer = await newProvider.getSigner()
       setSigner(signer)
 
       const address = accounts[0]
       
-      // 检查用户是否已注册
-      const isRegistered = await checkUserRegistration(address)
-      const profileCID = isRegistered ? await getUserProfile(address) : undefined
+      // 检查网络
+      const network = await newProvider.getNetwork()
+      console.log('当前网络:', network)
+      
+      // 检查用户是否已注册 (需要合约实例化后才能检查)
+      let isRegistered = false
+      let profileCID = undefined
+      
+      try {
+        if (CONTRACT_ADDRESS !== '0x0000000000000000000000000000000000000000') {
+          const contractInstance = new ethers.Contract(CONTRACT_ADDRESS, HACKX_CORE_ABI, signer)
+          setContract(contractInstance)
+          
+          isRegistered = await contractInstance.isUserRegistered(address)
+          profileCID = isRegistered ? await contractInstance.getUserProfile(address) : undefined
+        }
+      } catch (contractError) {
+        console.warn('合约交互失败:', contractError)
+        // 即使合约交互失败，我们仍然允许钱包连接
+      }
 
       const web3User: Web3User = {
         address,
@@ -123,17 +201,31 @@ export function Web3AuthProvider({ children }: { children: React.ReactNode }) {
 
       setUser(web3User)
 
+      // 同步更新SmartContractService
+      await smartContractService.initialize(newProvider, signer)
+
+      // ⭐ 新增：同步到传统认证系统
+      await syncWithTraditionalAuth(address, profileCID)
+
       toast({
         title: "连接成功",
         description: `钱包地址: ${address.slice(0, 6)}...${address.slice(-4)}`,
       })
 
       return true
-    } catch (error) {
+    } catch (error: any) {
       console.error('连接钱包失败:', error)
+      
+      let errorMessage = "请检查钱包是否已解锁"
+      if (error.code === 4001) {
+        errorMessage = "用户拒绝了连接请求"
+      } else if (error.code === -32002) {
+        errorMessage = "请先完成钱包中的待处理请求"
+      }
+      
       toast({
         title: "连接失败",
-        description: "请检查MetaMask是否已解锁",
+        description: errorMessage,
         variant: "destructive"
       })
       return false

@@ -151,19 +151,54 @@ export async function POST(
       }
     }
 
-    // 上传评分数据到IPFS
-    let ipfsHash = null
+    // ⭐ 上传评分数据到IPFS（必须成功）
+    let ipfsCID
     try {
-      ipfsHash = await IPFSService.uploadJSON(scoreMetadata, {
+      ipfsCID = await IPFSService.uploadJSON(scoreMetadata, {
         name: `project-score-${project.id}-${judge.id}.json`,
         description: `项目评分: ${project.title} by ${judge.username}`,
         tags: ['project-score', 'hackathon', 'judging'],
         version: '1.0.0',
         author: judge.username || judge.email
       })
+      console.log('📦 评分IPFS上传成功:', ipfsCID)
     } catch (ipfsError) {
       console.error('IPFS上传失败:', ipfsError)
-      // 即使IPFS上传失败，也继续保存评分
+      return NextResponse.json({
+        error: 'IPFS上传失败，无法提交评分',
+        details: ipfsError instanceof Error ? ipfsError.message : '未知错误'
+      }, { status: 500 })
+    }
+    
+    // ⭐ 调用智能合约提交评分
+    let contractResult
+    try {
+      const { smartContractService } = await import('@/lib/smart-contracts')
+      await smartContractService.initialize()
+      
+      // 注意：需要使用智能合约中的项目ID，而不是数据库ID
+      const projectContractId = project.contractId || 1 // 如果没有contractId，使用默认值
+      
+      const tx = await smartContractService.submitScore(
+        projectContractId,
+        Math.round(totalScore * 100) // 智能合约使用整数，乘以100保持精度
+      )
+      const receipt = await tx.wait()
+      
+      contractResult = {
+        txHash: tx.hash,
+        blockNumber: Number(receipt.blockNumber),
+        gasUsed: Number(receipt.gasUsed)
+      }
+      
+      console.log('⛓️ 智能合约评分提交成功:', contractResult)
+      
+    } catch (contractError) {
+      console.error('智能合约调用失败:', contractError)
+      return NextResponse.json({
+        error: '智能合约调用失败，评分提交失败',
+        details: contractError instanceof Error ? contractError.message : '未知错误'
+      }, { status: 500 })
     }
 
     // 保存评分到数据库
@@ -178,7 +213,13 @@ export async function POST(
         presentation: validatedData.presentation,
         totalScore: totalScore,
         comments: validatedData.comments,
-        ipfsHash: ipfsHash
+        
+        // ⭐ 区块链相关字段
+        ipfsHash: ipfsCID,
+        txHash: contractResult.txHash,
+        blockNumber: contractResult.blockNumber,
+        gasUsed: contractResult.gasUsed,
+        syncStatus: 'SYNCED',
       },
       select: {
         id: true,

@@ -25,6 +25,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // 初始化时检查认证状态
   useEffect(() => {
     checkAuthStatus()
+    
+    // ⭐ 监听Web3认证成功事件
+    const handleWeb3AuthSuccess = (event: CustomEvent) => {
+      const { user: userData, token } = event.detail
+      console.log('🔗 接收到Web3认证成功事件', userData)
+      
+      setUser(userData)
+      apiService.setToken(token)
+      localStorage.setItem('hackx-token', token)
+      localStorage.setItem('hackx-user', JSON.stringify(userData))
+    }
+    
+    window.addEventListener('web3-auth-success', handleWeb3AuthSuccess as EventListener)
+    
+    return () => {
+      window.removeEventListener('web3-auth-success', handleWeb3AuthSuccess as EventListener)
+    }
   }, [])
 
   const checkAuthStatus = async () => {

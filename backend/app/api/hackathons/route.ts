@@ -263,24 +263,80 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 上传黑客松元数据到IPFS（可选）
-    let ipfsHash = null
+    // ⭐ 上传黑客松元数据到IPFS（必须成功）
+    let ipfsCID
     try {
       // 动态导入IPFS服务
       const { IPFSService } = await import('@/lib/ipfs')
-      ipfsHash = await IPFSService.uploadJSON(hackathonMetadata, {
+      ipfsCID = await IPFSService.uploadJSON(hackathonMetadata, {
         name: `hackathon-${validatedData.title.replace(/\s+/g, '-').toLowerCase()}.json`,
         description: `黑客松详情: ${validatedData.title}`,
         tags: ['hackathon', 'metadata', ...validatedData.categories],
         version: '1.0.0',
         author: organizer.username || organizer.email
       })
+      console.log('📦 IPFS上传成功:', ipfsCID)
     } catch (ipfsError) {
       console.error('IPFS上传失败:', ipfsError)
-      // 即使IPFS上传失败，也继续创建黑客松，但记录错误
+      return NextResponse.json({
+        error: 'IPFS上传失败，无法创建黑客松',
+        details: ipfsError instanceof Error ? ipfsError.message : '未知错误'
+      }, { status: 500 })
     }
     
-    // 创建黑客松
+    // ⭐ 调用智能合约创建黑客松
+    let contractResult
+    try {
+      // 动态导入智能合约服务
+      const { smartContractService } = await import('@/lib/smart-contracts')
+      
+      // 初始化智能合约服务
+      await smartContractService.initialize()
+      
+      // 调用智能合约创建黑客松
+      const tx = await smartContractService.createHackathon(ipfsCID)
+      const receipt = await tx.wait()
+      
+      // 获取黑客松ID（从事件中解析）
+      const hackathonCreatedEvent = receipt.logs?.find((log: any) => {
+        try {
+          const parsedLog = smartContractService.contracts.hackxCore.interface.parseLog(log)
+          return parsedLog?.name === 'HackathonCreated'
+        } catch {
+          return false
+        }
+      })
+      
+      let contractHackathonId = 1 // 默认值
+      if (hackathonCreatedEvent) {
+        try {
+          const parsedLog = smartContractService.contracts.hackxCore.interface.parseLog(hackathonCreatedEvent)
+          if (parsedLog && parsedLog.args) {
+            contractHackathonId = Number(parsedLog.args.hackathonId)
+          }
+        } catch (parseError) {
+          console.warn('解析事件失败，使用默认ID:', parseError)
+        }
+      }
+      
+      contractResult = {
+        hackathonId: contractHackathonId,
+        txHash: tx.hash,
+        blockNumber: Number(receipt.blockNumber),
+        gasUsed: Number(receipt.gasUsed)
+      }
+      
+      console.log('⛓️ 智能合约创建成功:', contractResult)
+      
+    } catch (contractError) {
+      console.error('智能合约调用失败:', contractError)
+      return NextResponse.json({
+        error: '智能合约调用失败，黑客松创建失败',
+        details: contractError instanceof Error ? contractError.message : '未知错误'
+      }, { status: 500 })
+    }
+    
+    // ⭐ 创建黑客松（写入数据库作为缓存）
     const hackathon = await prisma.hackathon.create({
       data: {
         title: validatedData.title,
@@ -297,7 +353,15 @@ export async function POST(request: NextRequest) {
         isPublic: validatedData.isPublic,
         featured: validatedData.featured,
         organizerId: user.id,
-        ipfsHash, // 存储IPFS哈希
+        
+        // ⭐ 新增区块链相关字段
+        contractId: contractResult.hackathonId,  // 智能合约中的ID
+        ipfsHash: ipfsCID,                       // IPFS哈希
+        txHash: contractResult.txHash,           // 交易哈希
+        blockNumber: contractResult.blockNumber, // 区块号
+        gasUsed: contractResult.gasUsed,         // Gas消耗
+        syncStatus: 'SYNCED',                    // 同步状态
+        
         metadata: {
           prizes: validatedData.prizes || [],
           tracks: validatedData.tracks || [],
@@ -334,11 +398,37 @@ export async function POST(request: NextRequest) {
       }
     })
     
-        return NextResponse.json({      success: true,      message: '黑客松创建成功',      data: {        hackathon: {          ...hackathon,          ipfsUrl: ipfsHash ? `${process.env.IPFS_GATEWAY}/ipfs/${ipfsHash}` : null        }      }    }, { status: 201 })
+    return NextResponse.json({
+      success: true,
+      message: '黑客松创建成功',
+      data: {
+        hackathon: {
+          ...hackathon,
+          // ⭐ 确保返回智能合约相关信息
+          contractId: contractResult.hackathonId,
+          ipfsCID,
+          txHash: contractResult.txHash,
+          blockNumber: contractResult.blockNumber,
+          gasUsed: contractResult.gasUsed,
+          ipfsUrl: ipfsCID ? `${process.env.IPFS_GATEWAY}/ipfs/${ipfsCID}` : null
+        }
+      }
+    }, { status: 201 })
     
   } catch (error) {
     console.error('创建黑客松错误:', error)
     
-        if (error instanceof z.ZodError) {      return NextResponse.json(        { success: false, error: '请求数据验证失败', details: error.errors },        { status: 400 }      )    }        return NextResponse.json(      { success: false, error: '创建黑客松失败' },      { status: 500 }    )
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({
+        success: false,
+        error: '请求数据验证失败',
+        details: error.errors
+      }, { status: 400 })
+    }
+    
+    return NextResponse.json({
+      success: false,
+      error: '创建黑客松失败'
+    }, { status: 500 })
   }
 } 

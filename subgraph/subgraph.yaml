@@ -4,10 +4,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: HackXCore
-    network: mainnet
+    network: chapel  # BSC Testnet
     source:
-      address: "0x0000000000000000000000000000000000000000"  # 需要替换为实际部署的合约地址
+      address: "0x4BcFE52B6f38881d888b595E201E56B2cde93699"  # HackXCore 合约地址
       abi: HackXCore
+      startBlock: 62560756  # 部署区块号
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -17,6 +18,7 @@ dataSources:
         - Hackathon
         - Project
         - Score
+        - HackathonParticipant
       abis:
         - name: HackXCore
           file: ./abis/HackXCore.json

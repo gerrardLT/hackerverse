@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react'
 import { ProjectCard } from './project-card'
 import { Button } from '@/components/ui/button'
 import { Loader2, AlertCircle } from 'lucide-react'
-import { apiService, type Project } from '@/lib/api'
+import { dataService } from '@/lib/data-service'
+import { ProjectData } from '@/lib/ipfs-data-service'
 import { useToast } from '@/hooks/use-toast'
 
 interface ProjectGridProps {
@@ -14,12 +15,12 @@ interface ProjectGridProps {
 }
 
 export function ProjectGrid({ searchQuery, filters, category }: ProjectGridProps) {
-  const [projects, setProjects] = useState<Project[]>([])
+  const [projects, setProjects] = useState<ProjectData[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
-  const [totalPages, setTotalPages] = useState(1)
+  const [total, setTotal] = useState(0)
   const { toast } = useToast()
 
   const fetchProjects = async (pageNum: number = 1, append: boolean = false) => {
@@ -64,27 +65,20 @@ export function ProjectGrid({ searchQuery, filters, category }: ProjectGridProps
           break
       }
 
-      const response = await apiService.getProjects(params)
-      console.log(response)
-      if (response.success && response.data) {
-        const { projects: newProjects, pagination } = response.data
+      const result = await dataService.getProjects(params)
+      console.log(`ProjectGrid: Loaded ${result.projects.length} projects`)
+      
+      const newProjects = result.projects
         
-        if (append) {
-          setProjects(prev => [...prev, ...newProjects])
-        } else {
-          setProjects(newProjects)
-        }
-        
-        setTotalPages(pagination.totalPages)
-        setHasMore(pageNum < pagination.totalPages)
+      if (append) {
+        setProjects(prev => [...prev, ...newProjects])
       } else {
-        setError(response.error || '获取项目列表失败')
-        toast({
-          title: '加载失败',
-          description: response.error || '无法获取项目列表',
-          variant: 'destructive'
-        })
+        setProjects(newProjects)
       }
+      
+      // 设置分页信息
+      setTotal(result.total)
+      setHasMore(result.hasMore)
     } catch (error) {
       console.error('获取项目列表错误:', error)
       setError('网络错误，请检查网络连接')

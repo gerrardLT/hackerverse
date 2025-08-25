@@ -269,12 +269,122 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    // 创建项目
+    // ⭐ 创建项目元数据用于IPFS存储
+    const projectMetadata = {
+      version: '1.0',
+      type: 'project',
+      timestamp: new Date().toISOString(),
+      data: {
+        title: validatedData.title,
+        description: validatedData.description,
+        hackathonId: validatedData.hackathonId,
+        teamId: validatedData.teamId,
+        technologies: validatedData.technologies,
+        tags: validatedData.tags,
+        githubUrl: validatedData.githubUrl,
+        demoUrl: validatedData.demoUrl,
+        videoUrl: validatedData.videoUrl,
+        presentationUrl: validatedData.presentationUrl,
+        isPublic: validatedData.isPublic,
+        createdAt: new Date().toISOString()
+      },
+      metadata: {
+        creator: payload.userId,
+        hackathonTitle: hackathon.title,
+        platform: 'HackX',
+        network: 'BSC Testnet'
+      }
+    }
+
+    // ⭐ 上传项目元数据到IPFS（必须成功）
+    let ipfsCID
+    try {
+      const { IPFSService } = await import('@/lib/ipfs')
+      ipfsCID = await IPFSService.uploadJSON(projectMetadata, {
+        name: `project-${validatedData.title.replace(/\s+/g, '-').toLowerCase()}.json`,
+        description: `项目详情: ${validatedData.title}`,
+        tags: ['project', 'hackathon', ...validatedData.tags],
+        version: '1.0.0',
+        author: payload.userId
+      })
+      console.log('📦 项目IPFS上传成功:', ipfsCID)
+    } catch (ipfsError) {
+      console.error('IPFS上传失败:', ipfsError)
+      return NextResponse.json({
+        error: 'IPFS上传失败，无法创建项目',
+        details: ipfsError instanceof Error ? ipfsError.message : '未知错误'
+      }, { status: 500 })
+    }
+
+    // ⭐ 调用智能合约提交项目
+    let contractResult
+    try {
+      const { smartContractService } = await import('@/lib/smart-contracts')
+      await smartContractService.initialize()
+      
+      // 创建创建者信息CID（简化版）
+      const creatorsCID = await IPFSService.uploadJSON({
+        creators: [payload.userId],
+        timestamp: new Date().toISOString()
+      })
+      
+      const tx = await smartContractService.submitProject(
+        Number(validatedData.hackathonId), // 注意：需要确保这是智能合约中的黑客松ID
+        ipfsCID,
+        creatorsCID
+      )
+      const receipt = await tx.wait()
+      
+      // 解析项目ID
+      const projectSubmittedEvent = receipt.logs?.find((log: any) => {
+        try {
+          const parsedLog = smartContractService.contracts.hackxCore.interface.parseLog(log)
+          return parsedLog?.name === 'ProjectSubmitted'
+        } catch {
+          return false
+        }
+      })
+      
+      let contractProjectId = 1 // 默认值
+      if (projectSubmittedEvent) {
+        try {
+          const parsedLog = smartContractService.contracts.hackxCore.interface.parseLog(projectSubmittedEvent)
+          contractProjectId = Number(parsedLog.args.projectId)
+        } catch (parseError) {
+          console.warn('解析项目事件失败，使用默认ID:', parseError)
+        }
+      }
+      
+      contractResult = {
+        projectId: contractProjectId,
+        txHash: tx.hash,
+        blockNumber: Number(receipt.blockNumber),
+        gasUsed: Number(receipt.gasUsed)
+      }
+      
+      console.log('⛓️ 智能合约项目提交成功:', contractResult)
+      
+    } catch (contractError) {
+      console.error('智能合约调用失败:', contractError)
+      return NextResponse.json({
+        error: '智能合约调用失败，项目创建失败',
+        details: contractError instanceof Error ? contractError.message : '未知错误'
+      }, { status: 500 })
+    }
+
+    // ⭐ 创建项目（写入数据库作为缓存）
     const project = await prisma.project.create({
       data: {
         ...validatedData,
         creatorId: payload.userId,
         status: 'draft',
+        // ⭐ 新增区块链相关字段
+        contractId: contractResult.projectId,  // 智能合约中的ID
+        ipfsHash: ipfsCID,                     // IPFS哈希
+        txHash: contractResult.txHash,         // 交易哈希
+        blockNumber: contractResult.blockNumber, // 区块号
+        gasUsed: contractResult.gasUsed,         // Gas消耗
+        syncStatus: 'SYNCED',                    // 同步状态
       },
       select: {
         id: true,
@@ -308,7 +418,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: '项目创建成功',
-      project,
+      data: {
+        project: {
+          ...project,
+          // ⭐ 确保返回智能合约相关信息
+          contractId: contractResult.projectId,
+          ipfsCID,
+          txHash: contractResult.txHash,
+          blockNumber: contractResult.blockNumber,
+          gasUsed: contractResult.gasUsed,
+          ipfsUrl: ipfsCID ? `${process.env.IPFS_GATEWAY}/ipfs/${ipfsCID}` : null
+        }
+      }
     }, { status: 201 })
     
   } catch (error) {

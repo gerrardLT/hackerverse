@@ -919,6 +919,7 @@ class ApiService {
   }
 
   // ============ IPFS API ============
+  // 注意：这些方法现在通过后端API调用，不再直接调用Pinata
   async uploadFile(file: File): Promise<ApiResponse<{ file: any }>> {
     const formData = new FormData()
     formData.append('file', file)
@@ -939,8 +940,35 @@ class ApiService {
 
   async uploadJSON(data: any, metadata?: any): Promise<ApiResponse<{ hash: string; url: string }>> {
     return this.request('/ipfs/upload', {
-      method: 'PUT',
+      method: 'PUT', // JSON数据使用PUT方法
       body: JSON.stringify({ data, metadata }),
+    })
+  }
+
+  // ⭐ ============ Web3 认证 API ============
+  
+  /**
+   * 通过钱包地址登录
+   */
+  async signInWithWallet(walletAddress: string): Promise<ApiResponse<{ user: User; token: string }>> {
+    return this.request('/auth/wallet-signin', {
+      method: 'POST',
+      body: JSON.stringify({ walletAddress }),
+    })
+  }
+
+  /**
+   * 创建Web3用户
+   */
+  async createWeb3User(data: {
+    walletAddress: string
+    profileCID?: string
+    username?: string
+    bio?: string
+  }): Promise<ApiResponse<{ user: User; token: string }>> {
+    return this.request('/auth/wallet-signup', {
+      method: 'POST',
+      body: JSON.stringify(data),
     })
   }
 }

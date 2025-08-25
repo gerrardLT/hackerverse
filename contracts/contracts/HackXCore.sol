@@ -137,8 +137,8 @@ contract HackXCore is Ownable {
      */
     function updateHackathon(uint256 hackathonId, string memory newDataCID) 
         external 
+        hackathonExists(hackathonId)
         onlyHackathonOrganizer(hackathonId) 
-        hackathonExists(hackathonId) 
     {
         require(bytes(newDataCID).length > 0, "Hackathon data CID cannot be empty");
         
@@ -201,13 +201,21 @@ contract HackXCore is Ownable {
      * @dev 提交项目
      * @param hackathonId 黑客松ID
      * @param projectCID 项目IPFS CID
+     * @return projectId 项目ID
      */
-    function submitProject(uint256 hackathonId, string memory projectCID) external onlyRegisteredUser hackathonExists(hackathonId) {
+    function submitProject(uint256 hackathonId, string memory projectCID) external onlyRegisteredUser hackathonExists(hackathonId) returns (uint256) {
         require(bytes(projectCID).length > 0, "Project CID cannot be empty");
         
+        _projectIds++;
+        uint256 projectId = _projectIds;
+        
+        projectData[projectId] = projectCID;
+        projectCreators[projectId] = msg.sender;
         projectSubmissions[hackathonId][msg.sender] = projectCID;
         
         emit ProjectSubmitted(hackathonId, msg.sender, projectCID);
+        
+        return projectId;
     }
 
     /**

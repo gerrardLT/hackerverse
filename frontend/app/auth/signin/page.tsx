@@ -10,12 +10,16 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Separator } from '@/components/ui/separator'
 import { Github, Mail, Wallet, Loader2 } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
+import { useWeb3Auth } from '@/hooks/use-web3-auth'
+import { ConnectWalletDialog } from '@/components/auth/connect-wallet-dialog'
 
 export default function SignInPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [walletDialogOpen, setWalletDialogOpen] = useState(false)
   const { signIn, loading } = useAuth()
+  const { connectWallet, connecting, user } = useWeb3Auth()
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -31,6 +35,23 @@ export default function SignInPage() {
       console.error('登录错误:', error)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleWalletLogin = () => {
+    setWalletDialogOpen(true)
+  }
+
+  const handleWalletConnect = async (address: string, chainId: number) => {
+    console.log('钱包连接成功:', { address, chainId })
+  }
+
+  const handleWalletConnected = async () => {
+    // 钱包底层连接成功后，调用Web3Auth进行状态同步
+    const success = await connectWallet()
+    if (success) {
+      // 连接成功，跳转到仪表板
+      router.push('/dashboard')
     }
   }
 
@@ -53,9 +74,12 @@ export default function SignInPage() {
               <Github className="mr-2 h-4 w-4" />
               GitHub
             </Button>
-            <Button variant="outline" disabled>
+            <Button 
+              variant="outline" 
+              onClick={handleWalletLogin}
+            >
               <Wallet className="mr-2 h-4 w-4" />
-              钱包
+              钱包登录
             </Button>
           </div>
           
@@ -130,6 +154,13 @@ export default function SignInPage() {
           </div>
         </CardFooter>
       </Card>
+
+      <ConnectWalletDialog
+        open={walletDialogOpen}
+        onOpenChange={setWalletDialogOpen}
+        onConnect={handleWalletConnect}
+        onWalletConnected={handleWalletConnected}
+      />
     </div>
   )
 }

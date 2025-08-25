@@ -164,7 +164,26 @@ export default function SubmitProjectPage() {
         videoUrl
       })
 
-      const result = await ipfsService.uploadJSON(metadata)
+      // 通过后端API上传到IPFS
+      const token = typeof window !== 'undefined' ? localStorage.getItem('hackx-token') : null
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      }
+      if (token) {
+        headers.Authorization = `Bearer ${token}`
+      }
+      
+      const response = await fetch('/api/ipfs/upload', {
+        method: 'PUT', // JSON数据使用PUT方法
+        headers,
+        body: JSON.stringify({ data: metadata, metadata: { name: 'project-metadata.json' } })
+      })
+      
+      const result = await response.json()
+      if (!result.success) {
+        throw new Error(result.error || '上传失败')
+      }
+      
       setProjectMetadataHash(result.hash)
       
       toast({

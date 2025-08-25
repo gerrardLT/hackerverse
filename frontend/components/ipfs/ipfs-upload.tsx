@@ -56,8 +56,35 @@ export function IPFSUpload({
       for (let i = 0; i < validFiles.length; i++) {
         const file = validFiles[i]
         try {
-          const result = await ipfsService.uploadFile(file)
-          results.push(result)
+                  // 通过后端API上传到IPFS
+        const formData = new FormData()
+        formData.append('file', file)
+        
+        // 添加认证头
+        const token = typeof window !== 'undefined' ? localStorage.getItem('hackx-token') : null
+        const headers: HeadersInit = {}
+        if (token) {
+          headers.Authorization = `Bearer ${token}`
+        }
+        
+        const response = await fetch('/api/ipfs/upload', {
+          method: 'POST',
+          headers,
+          body: formData
+        })
+        
+        const result = await response.json()
+        if (!result.success) {
+          throw new Error(result.error || '上传失败')
+        }
+        
+        // 后端返回的结构：{ success: true, file: { hash, url, ... } }
+        results.push({
+          hash: result.file.hash,
+          path: file.name,
+          size: file.size,
+          url: result.file.url || `https://gateway.pinata.cloud/ipfs/${result.file.hash}`
+        })
           setUploadProgress(((i + 1) / validFiles.length) * 100)
         } catch (error) {
           setErrors(prev => [...prev, `${file.name} 上传失败`])

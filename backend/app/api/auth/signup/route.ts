@@ -61,6 +61,28 @@ export async function POST(request: NextRequest) {
     // 哈希密码
     const hashedPassword = await AuthService.hashPassword(validatedData.password)
     
+    // ⭐ 使用统一的IPFS服务创建用户资料
+    let ipfsCID
+    try {
+      const { UserProfileIPFSService } = await import('@/lib/user-profile-ipfs')
+      
+      ipfsCID = await UserProfileIPFSService.uploadProfile({
+        email: validatedData.email,
+        username: validatedData.username,
+        walletAddress: validatedData.walletAddress,
+        bio: '新注册用户',
+        createdAt: new Date().toISOString()
+      }, 'email')
+      
+    } catch (ipfsError) {
+      console.error('IPFS上传失败:', ipfsError)
+      return NextResponse.json({
+        success: false,
+        error: 'IPFS上传失败，无法创建用户',
+        details: ipfsError instanceof Error ? ipfsError.message : '未知错误'
+      }, { status: 500 })
+    }
+    
     // 创建用户
     const user = await prisma.user.create({
       data: {
@@ -68,6 +90,10 @@ export async function POST(request: NextRequest) {
         username: validatedData.username,
         password: hashedPassword,
         walletAddress: validatedData.walletAddress,
+        
+        // ⭐ IPFS相关字段
+        ipfsProfileHash: ipfsCID,
+        profileSyncStatus: 'SYNCED',
         notificationSettings: {
           emailNotifications: true,
           pushNotifications: true,

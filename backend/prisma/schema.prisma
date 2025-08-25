@@ -22,6 +22,13 @@ model User {
   walletAddress String? @unique
   reputationScore Int @default(0)
   ipfsProfileHash String?
+  
+  // ⭐ 区块链相关字段
+  lastTxHash         String?  // 最近交易哈希
+  lastBlockNumber    BigInt?  // 最近区块号
+  lastGasUsed        BigInt?  // 最近Gas消耗
+  profileSyncStatus  String   @default("PENDING") // 资料同步状态: PENDING, SYNCED, FAILED
+  
   socialLinks Json?
   privacySettings Json @default("{}")
   notificationSettings Json @default("{}")
@@ -75,6 +82,14 @@ model Hackathon {
   status              String   @default("draft")
   organizerId         String
   ipfsHash            String?
+  
+  // ⭐ 区块链相关字段
+  contractId          Int?     // 智能合约中的ID
+  txHash              String?  // 交易哈希
+  blockNumber         BigInt?  // 区块号
+  gasUsed             BigInt?  // Gas消耗
+  syncStatus          String   @default("PENDING") // 同步状态: PENDING, SYNCED, FAILED
+  
   metadata            Json?
   prizes              Json?
   tracks              Json?
@@ -106,6 +121,14 @@ model Project {
   videoUrl      String?
   presentationUrl String?
   ipfsHash      String?
+  
+  // ⭐ 区块链相关字段
+  contractId    Int?     // 智能合约中的ID
+  txHash        String?  // 交易哈希
+  blockNumber   BigInt?  // 区块号
+  gasUsed       BigInt?  // Gas消耗
+  syncStatus    String   @default("PENDING") // 同步状态: PENDING, SYNCED, FAILED
+  
   status        String   @default("draft")
   isPublic      Boolean  @default(true)
   createdAt     DateTime @default(now())
@@ -208,6 +231,13 @@ model Score {
   totalScore          Decimal? @db.Decimal(4,1)
   comments            String?
   ipfsHash            String?
+  
+  // ⭐ 区块链相关字段
+  txHash              String?  // 交易哈希
+  blockNumber         BigInt?  // 区块号
+  gasUsed             BigInt?  // Gas消耗
+  syncStatus          String   @default("PENDING") // 同步状态: PENDING, SYNCED, FAILED
+  
   createdAt           DateTime @default(now())
 
   // 关系
@@ -225,6 +255,11 @@ model Feedback {
   rating    Int
   comment   String?
   ipfsHash  String?
+  
+  // ⭐ 区块链相关字段（未来扩展用）
+  txHash    String?  // 交易哈希
+  syncStatus String  @default("PENDING") // 同步状态: PENDING, SYNCED, FAILED
+  
   createdAt DateTime @default(now())
 
   // 关系
@@ -240,6 +275,11 @@ model ProjectLike {
   projectId String
   userId    String
   ipfsHash  String?
+  
+  // ⭐ 区块链相关字段（未来扩展用）
+  txHash    String?  // 交易哈希
+  syncStatus String  @default("PENDING") // 同步状态: PENDING, SYNCED, FAILED
+  
   createdAt DateTime @default(now())
 
   // 关系

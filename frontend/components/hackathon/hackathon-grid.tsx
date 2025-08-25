@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react'
 import { HackathonCard } from './hackathon-card'
 import { Button } from '@/components/ui/button'
 import { Loader2, AlertCircle } from 'lucide-react'
-import { apiService, type Hackathon } from '@/lib/api'
+import { dataService } from '@/lib/data-service'
+import { HackathonData } from '@/lib/ipfs-data-service'
 import { useToast } from '@/hooks/use-toast'
 
 interface HackathonGridProps {
@@ -18,12 +19,12 @@ interface HackathonGridProps {
 }
 
 export function HackathonGrid({ searchQuery, filters }: HackathonGridProps) {
-  const [hackathons, setHackathons] = useState<Hackathon[]>([])
+  const [hackathons, setHackathons] = useState<HackathonData[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
-  const [totalPages, setTotalPages] = useState(0)
+  const [total, setTotal] = useState(0)
   const { toast } = useToast()
 
   // 获取黑客松数据
@@ -32,57 +33,40 @@ export function HackathonGrid({ searchQuery, filters }: HackathonGridProps) {
       setLoading(true)
       setError(null)
 
-      // 构建API参数
+      // 构建参数
       const params: any = {
         page: pageNum,
         limit: 12,
         search: searchQuery || undefined,
-        sortBy: 'createdAt',
-        sortOrder: 'desc'
+        sortBy: 'createdAt'
       }
 
       // 处理状态筛选
       if (filters.status !== 'all') {
-        // 转换状态值以匹配后端期望
-        if (filters.status === 'ended') {
-          params.status = 'completed'
-        } else {
         params.status = filters.status
-        }
       }
 
-      // 处理技术栈筛选（这里简化处理，实际可能需要后端支持）
+      // 处理技术栈筛选
       if (filters.technologies.length > 0) {
-        // 可以将技术栈作为搜索关键词
-        params.search = filters.technologies.join(' ')
+        // 可以将技术栈作为分类筛选
+        params.category = filters.technologies[0]
       }
 
-      // 处理精选筛选
-      if (filters.dateRange === 'featured') {
-        params.featured = 'true'
-      }
-
-      const response = await apiService.getHackathons(params)
-
-      if (response.success && response.data) {
-        const { hackathons: newHackathons, pagination } = response.data
-        
-        if (append) {
-          setHackathons(prev => [...prev, ...newHackathons])
-        } else {
-          setHackathons(newHackathons)
-        }
-
-        setTotalPages(pagination.totalPages)
-        setHasMore(pageNum < pagination.totalPages)
+      // 调用统一数据服务
+      const result = await dataService.getHackathons(params)
+      
+      const newHackathons = result.hackathons
+      
+      if (append) {
+        setHackathons(prev => [...prev, ...newHackathons])
       } else {
-        setError(response.error || '获取黑客松列表失败')
-        toast({
-          title: '加载失败',
-          description: response.error || '无法获取黑客松列表',
-          variant: 'destructive',
-        })
+        setHackathons(newHackathons)
       }
+
+      setTotal(result.total)
+      setHasMore(result.hasMore)
+      
+      console.log(`HackathonGrid: Loaded ${newHackathons.length} hackathons`)
     } catch (error) {
       console.error('获取黑客松列表错误:', error)
       setError('网络错误，请检查网络连接')

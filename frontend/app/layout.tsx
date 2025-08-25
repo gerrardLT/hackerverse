@@ -5,6 +5,9 @@ import { Toaster } from '@/components/ui/toaster'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Header } from '@/components/layout/header'
 import { AuthProvider } from '@/hooks/use-auth'
+import { Web3AuthProvider } from '@/hooks/use-web3-auth'
+import { NetworkStatus } from '@/components/web3/network-status'
+import { IPFSConfigProvider } from '@/components/providers/ipfs-config-provider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -29,11 +32,16 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthProvider>
-            <Header />
-            <main>
-              {children}
-            </main>
-            <Toaster />
+            <Web3AuthProvider>
+              <IPFSConfigProvider>
+                <Header />
+                <NetworkStatus className="mx-4 mt-4" />
+                <main>
+                  {children}
+                </main>
+                <Toaster />
+              </IPFSConfigProvider>
+            </Web3AuthProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

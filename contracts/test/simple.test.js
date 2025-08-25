@@ -1,5 +1,5 @@
 const { expect } = require("chai");
-const { ethers } = require("hardhat");
+const hre = require("hardhat");
 
 describe("Simple Test", function () {
   it("should work", function () {
@@ -7,8 +7,8 @@ describe("Simple Test", function () {
   });
 
   it("should deploy contract", async function () {
-    const [owner] = await ethers.getSigners();
-    const HackXCoreFactory = await ethers.getContractFactory("HackXCore");
+    const [owner] = await hre.ethers.getSigners();
+    const HackXCoreFactory = await hre.ethers.getContractFactory("HackXCore");
     const hackXCore = await HackXCoreFactory.deploy();
     await hackXCore.waitForDeployment();
     

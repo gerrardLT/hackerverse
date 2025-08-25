@@ -19,6 +19,8 @@ import { Menu, User, Settings, LogOut, Wallet, Trophy, Users, Calendar, FolderOp
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/hooks/use-auth'
+import { useWeb3Auth } from '@/hooks/use-web3-auth'
+import { WalletConnect } from '@/components/ui/wallet-connect'
 
 const navigation = [
   { name: '首页', href: '/', icon: null },
@@ -33,6 +35,7 @@ export function Header() {
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { user, signOut } = useAuth()
+  const { user: web3User } = useWeb3Auth()
 
   const handleSignOut = () => {
     signOut()
@@ -148,8 +151,9 @@ export function Header() {
                 </DropdownMenu>
               </div>
             ) : (
-              // 用户未登录：显示登录/注册按钮
+              // 用户未登录：显示登录/注册按钮和钱包连接
             <div className="flex items-center gap-2">
+              <WalletConnect />
               <Button variant="ghost" asChild>
                 <Link href="/auth/signin">登录</Link>
               </Button>
