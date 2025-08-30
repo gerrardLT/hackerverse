@@ -10,7 +10,7 @@ const createProjectSchema = z.object({
   description: z.string().min(10, '项目描述至少10个字符'),
   hackathonId: z.string().min(1, '黑客松ID不能为空'),
   teamId: z.string().optional(),
-  technologies: z.array(z.string()).min(1, '至少选择一种技术'),
+  technologies: z.array(z.string()).min(1, '至少选择一种技术'), // 保持与techStack一致
   tags: z.array(z.string()).optional(),
   githubUrl: z.string().url('GitHub链接格式不正确').optional(),
   demoUrl: z.string().url('演示链接格式不正确').optional(),
@@ -269,48 +269,46 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    // ⭐ 创建项目元数据用于IPFS存储
-    const projectMetadata = {
-      version: '1.0',
-      type: 'project',
-      timestamp: new Date().toISOString(),
-      data: {
-        title: validatedData.title,
-        description: validatedData.description,
-        hackathonId: validatedData.hackathonId,
-        teamId: validatedData.teamId,
-        technologies: validatedData.technologies,
-        tags: validatedData.tags,
-        githubUrl: validatedData.githubUrl,
-        demoUrl: validatedData.demoUrl,
-        videoUrl: validatedData.videoUrl,
-        presentationUrl: validatedData.presentationUrl,
-        isPublic: validatedData.isPublic,
-        createdAt: new Date().toISOString()
-      },
-      metadata: {
-        creator: payload.userId,
-        hackathonTitle: hackathon.title,
-        platform: 'HackX',
-        network: 'BSC Testnet'
-      }
-    }
-
-    // ⭐ 上传项目元数据到IPFS（必须成功）
+    // ⭐ 使用统一的IPFSService上传项目数据到IPFS（必须成功）
     let ipfsCID
     try {
-      const { IPFSService } = await import('@/lib/ipfs')
-      ipfsCID = await IPFSService.uploadJSON(projectMetadata, {
-        name: `project-${validatedData.title.replace(/\s+/g, '-').toLowerCase()}.json`,
-        description: `项目详情: ${validatedData.title}`,
-        tags: ['project', 'hackathon', ...validatedData.tags],
+      // 导入IPFS服务和类型定义
+      const { IPFSService, IPFSProjectData } = await import('@/lib/ipfs')
+      
+      // 构建标准化的项目数据结构
+      const projectData: IPFSProjectData = {
         version: '1.0.0',
-        author: payload.userId
-      })
-      console.log('📦 项目IPFS上传成功:', ipfsCID)
+        timestamp: new Date().toISOString(),
+        data: {
+          title: validatedData.title,
+          description: validatedData.description,
+          techStack: validatedData.technologies, // 统一字段名
+          demoUrl: validatedData.demoUrl,
+          githubUrl: validatedData.githubUrl,
+          videoUrl: validatedData.videoUrl,
+          presentationUrl: validatedData.presentationUrl,
+          team: validatedData.teamId || '',
+          hackathonId: validatedData.hackathonId,
+          teamId: validatedData.teamId,
+          tags: validatedData.tags || [],
+          isPublic: validatedData.isPublic,
+          createdAt: new Date().toISOString()
+        },
+        metadata: {
+          creator: payload.userId,
+          hackathonTitle: hackathon.title,
+          platform: 'HackX',
+          network: 'BSC Testnet'
+        }
+      }
+      
+      // 使用专用的项目数据上传方法
+      ipfsCID = await IPFSService.uploadProjectData(projectData)
+      console.log('📦 IPFS项目数据上传成功:', ipfsCID)
     } catch (ipfsError) {
       console.error('IPFS上传失败:', ipfsError)
       return NextResponse.json({
+        success: false,
         error: 'IPFS上传失败，无法创建项目',
         details: ipfsError instanceof Error ? ipfsError.message : '未知错误'
       }, { status: 500 })
@@ -375,12 +373,22 @@ export async function POST(request: NextRequest) {
     // ⭐ 创建项目（写入数据库作为缓存）
     const project = await prisma.project.create({
       data: {
-        ...validatedData,
+        title: validatedData.title,
+        description: validatedData.description,
+        hackathonId: validatedData.hackathonId,
+        teamId: validatedData.teamId,
+        technologies: validatedData.technologies, // 数据库使用technologies字段
+        tags: validatedData.tags || [],
+        githubUrl: validatedData.githubUrl,
+        demoUrl: validatedData.demoUrl,
+        videoUrl: validatedData.videoUrl,
+        presentationUrl: validatedData.presentationUrl,
+        ipfsHash: ipfsCID,
+        isPublic: validatedData.isPublic,
         creatorId: payload.userId,
         status: 'draft',
         // ⭐ 新增区块链相关字段
         contractId: contractResult.projectId,  // 智能合约中的ID
-        ipfsHash: ipfsCID,                     // IPFS哈希
         txHash: contractResult.txHash,         // 交易哈希
         blockNumber: contractResult.blockNumber, // 区块号
         gasUsed: contractResult.gasUsed,         // Gas消耗

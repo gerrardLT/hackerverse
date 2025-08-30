@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Upload, File, Image, Video, FileText, X, Check, AlertCircle, Copy } from 'lucide-react'
+import { Upload, File, Image, Video, FileText, X, Check, AlertCircle, Copy, Clock, CheckCircle, XCircle, RefreshCw } from 'lucide-react'
 import { ipfsService, IPFSUploadResult } from '@/lib/ipfs'
 import { useToast } from '@/hooks/use-toast'
 
@@ -17,6 +17,16 @@ interface IPFSUploadProps {
   maxFiles?: number
   maxFileSize?: number // MB
   showPreview?: boolean
+}
+
+// 文件上传状态接口
+interface FileUploadStatus {
+  file: File
+  status: 'pending' | 'uploading' | 'success' | 'error' | 'retrying'
+  progress: number
+  result?: IPFSUploadResult
+  error?: string
+  retryCount: number
 }
 
 export function IPFSUpload({
@@ -29,87 +39,204 @@ export function IPFSUpload({
   const { toast } = useToast()
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
+  const [fileStatuses, setFileStatuses] = useState<FileUploadStatus[]>([])
   const [uploadedFiles, setUploadedFiles] = useState<IPFSUploadResult[]>([])
-  const [errors, setErrors] = useState<string[]>([])
+  const [errors, setErrors] = useState<string[]>([])  
+
+  // 重试文件上传
+  const retryFile = async (fileStatus: FileUploadStatus) => {
+    if (fileStatus.retryCount >= 3) {
+      toast({
+        title: '重试失败',
+        description: `${fileStatus.file.name} 已达到最大重试次数`,
+        variant: 'destructive',
+      })
+      return
+    }
+
+    const updatedStatus = {
+      ...fileStatus,
+      status: 'retrying' as const,
+      retryCount: fileStatus.retryCount + 1
+    }
+    
+    setFileStatuses(prev => prev.map(fs => 
+      fs.file.name === fileStatus.file.name ? updatedStatus : fs
+    ))
+
+    await uploadSingleFile(updatedStatus)
+  }
+
+  // 单个文件上传函数
+  const uploadSingleFile = async (fileStatus: FileUploadStatus) => {
+    try {
+      // 更新状态为上传中
+      setFileStatuses(prev => prev.map(fs => 
+        fs.file.name === fileStatus.file.name ? 
+        { ...fs, status: 'uploading', progress: 0 } : fs
+      ))
+
+      // 模拟上传进度
+      const progressInterval = setInterval(() => {
+        setFileStatuses(prev => prev.map(fs => {
+          if (fs.file.name === fileStatus.file.name && fs.status === 'uploading') {
+            const newProgress = Math.min(fs.progress + Math.random() * 15, 90)
+            return { ...fs, progress: newProgress }
+          }
+          return fs
+        }))
+      }, 200)
+
+      // 通过后端API上传到IPFS
+      const formData = new FormData()
+      formData.append('file', fileStatus.file)
+      
+      // 添加认证头
+      const token = typeof window !== 'undefined' ? localStorage.getItem('hackx-token') : null
+      const headers: HeadersInit = {}
+      if (token) {
+        headers.Authorization = `Bearer ${token}`
+      }
+      
+      const response = await fetch('/api/ipfs/upload', {
+        method: 'POST',
+        headers,
+        body: formData
+      })
+      
+      clearInterval(progressInterval)
+      
+      const result = await response.json()
+      if (!result.success) {
+        throw new Error(result.error || '上传失败')
+      }
+      
+      // 上传成功
+      const uploadResult: IPFSUploadResult = {
+        hash: result.file.hash,
+        path: fileStatus.file.name,
+        size: fileStatus.file.size,
+        url: result.file.url || `https://gateway.pinata.cloud/ipfs/${result.file.hash}`
+      }
+      
+      setFileStatuses(prev => prev.map(fs => 
+        fs.file.name === fileStatus.file.name ? 
+        { ...fs, status: 'success', progress: 100, result: uploadResult } : fs
+      ))
+      
+      setUploadedFiles(prev => [...prev, uploadResult])
+      
+    } catch (error) {
+      clearInterval(progressInterval!)
+      const errorMessage = error instanceof Error ? error.message : '未知错误'
+      
+      setFileStatuses(prev => prev.map(fs => 
+        fs.file.name === fileStatus.file.name ? 
+        { ...fs, status: 'error', error: errorMessage } : fs
+      ))
+      
+      setErrors(prev => [...prev, `${fileStatus.file.name}: ${errorMessage}`])
+    }
+  }
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     setErrors([])
     setUploading(true)
     setUploadProgress(0)
 
+    // 验证文件
+    const validFiles = acceptedFiles.filter(file => {
+      if (file.size > maxFileSize * 1024 * 1024) {
+        setErrors(prev => [...prev, `${file.name} 超过最大文件大小 ${maxFileSize}MB`])
+        return false
+      }
+      return true
+    })
+
+    if (validFiles.length === 0) {
+      setUploading(false)
+      return
+    }
+
+    // 初始化文件状态
+    const initialStatuses: FileUploadStatus[] = validFiles.map(file => ({
+      file,
+      status: 'pending',
+      progress: 0,
+      retryCount: 0
+    }))
+    
+    setFileStatuses(initialStatuses)
+
+    // 并发上传文件（最多3个同时进行）
+    const uploadPromises = initialStatuses.map(status => uploadSingleFile(status))
+    
     try {
-      const validFiles = acceptedFiles.filter(file => {
-        if (file.size > maxFileSize * 1024 * 1024) {
-          setErrors(prev => [...prev, `${file.name} 超过最大文件大小 ${maxFileSize}MB`])
-          return false
-        }
-        return true
-      })
-
-      if (validFiles.length === 0) {
-        setUploading(false)
-        return
-      }
-
-      const results: IPFSUploadResult[] = []
+      await Promise.allSettled(uploadPromises)
       
-      for (let i = 0; i < validFiles.length; i++) {
-        const file = validFiles[i]
-        try {
-                  // 通过后端API上传到IPFS
-        const formData = new FormData()
-        formData.append('file', file)
+      // 统计结果
+      const successCount = fileStatuses.filter(fs => fs.status === 'success').length
+      const errorCount = fileStatuses.filter(fs => fs.status === 'error').length
+      
+      if (successCount > 0) {
+        const successResults = fileStatuses
+          .filter(fs => fs.status === 'success' && fs.result)
+          .map(fs => fs.result!)
         
-        // 添加认证头
-        const token = typeof window !== 'undefined' ? localStorage.getItem('hackx-token') : null
-        const headers: HeadersInit = {}
-        if (token) {
-          headers.Authorization = `Bearer ${token}`
-        }
+        onUploadComplete(successResults)
         
-        const response = await fetch('/api/ipfs/upload', {
-          method: 'POST',
-          headers,
-          body: formData
+        toast({
+          title: '上传完成',
+          description: `成功: ${successCount} 个, 失败: ${errorCount} 个`,
+          variant: errorCount > 0 ? 'destructive' : 'default'
         })
-        
-        const result = await response.json()
-        if (!result.success) {
-          throw new Error(result.error || '上传失败')
-        }
-        
-        // 后端返回的结构：{ success: true, file: { hash, url, ... } }
-        results.push({
-          hash: result.file.hash,
-          path: file.name,
-          size: file.size,
-          url: result.file.url || `https://gateway.pinata.cloud/ipfs/${result.file.hash}`
-        })
-          setUploadProgress(((i + 1) / validFiles.length) * 100)
-        } catch (error) {
-          setErrors(prev => [...prev, `${file.name} 上传失败`])
-        }
       }
-
-      setUploadedFiles(prev => [...prev, ...results])
-      onUploadComplete(results)
-
-      toast({
-        title: '上传成功',
-        description: `${results.length} 个文件已上传到 IPFS`,
-      })
     } catch (error) {
       toast({
         title: '上传失败',
-        description: '文件上传过程中出现错误',
+        description: '批量上传过程中出现错误',
         variant: 'destructive',
       })
     } finally {
       setUploading(false)
       setUploadProgress(0)
     }
-  }, [maxFileSize, onUploadComplete, toast])
+  }, [maxFileSize, onUploadComplete, toast, fileStatuses])
 
+  // 获取文件状态图标
+  const getStatusIcon = (status: FileUploadStatus['status']) => {
+    switch (status) {
+      case 'pending':
+        return <Clock className="h-4 w-4 text-yellow-500" />
+      case 'uploading':
+      case 'retrying':
+        return <RefreshCw className="h-4 w-4 text-blue-500 animate-spin" />
+      case 'success':
+        return <CheckCircle className="h-4 w-4 text-green-500" />
+      case 'error':
+        return <XCircle className="h-4 w-4 text-red-500" />
+      default:
+        return <Clock className="h-4 w-4 text-gray-500" />
+    }
+  }
+
+  // 获取状态文本
+  const getStatusText = (fileStatus: FileUploadStatus) => {
+    switch (fileStatus.status) {
+      case 'pending':
+        return '等待上传'
+      case 'uploading':
+        return `上传中 ${Math.round(fileStatus.progress)}%`
+      case 'retrying':
+        return `重试中 (${fileStatus.retryCount}/3)`
+      case 'success':
+        return '上传成功'
+      case 'error':
+        return `失败: ${fileStatus.error}`
+      default:
+        return '未知状态'
+    }
+  }
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     maxFiles,
@@ -182,8 +309,73 @@ export function IPFSUpload({
           )}
         </div>
 
+        {/* 文件上传状态 */}
+        {fileStatuses.length > 0 && (
+          <div className="space-y-4">
+            <h4 className="font-medium">文件上传状态 ({fileStatuses.length})</h4>
+            <div className="space-y-3">
+              {fileStatuses.map((fileStatus, index) => (
+                <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div className="flex items-center gap-3 flex-1">
+                    {getFileIcon(fileStatus.file.name)}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium truncate">{fileStatus.file.name}</p>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <span>{(fileStatus.file.size / 1024 / 1024).toFixed(2)} MB</span>
+                        <span className="text-xs">{getStatusText(fileStatus)}</span>
+                      </div>
+                      {fileStatus.status === 'uploading' && (
+                        <Progress value={fileStatus.progress} className="mt-2 h-1" />
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    {getStatusIcon(fileStatus.status)}
+                    {fileStatus.status === 'error' && fileStatus.retryCount < 3 && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => retryFile(fileStatus)}
+                        title="重试上传"
+                      >
+                        <RefreshCw className="h-3 w-3" />
+                      </Button>
+                    )}
+                    {fileStatus.status === 'success' && fileStatus.result && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => copyToClipboard(fileStatus.result!.hash)}
+                        title="复制 IPFS 哈希"
+                      >
+                        <Copy className="h-3 w-3" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {/* 总体进度 */}
+            {uploading && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">总体进度</span>
+                  <span className="text-sm text-muted-foreground">
+                    {fileStatuses.filter(fs => fs.status === 'success').length} / {fileStatuses.length} 完成
+                  </span>
+                </div>
+                <Progress 
+                  value={(fileStatuses.filter(fs => fs.status === 'success').length / fileStatuses.length) * 100} 
+                />
+              </div>
+            )}
+          </div>
+        )}
+
         {/* 上传进度 */}
-        {uploading && (
+        {uploading && fileStatuses.length === 0 && (
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">上传进度</span>

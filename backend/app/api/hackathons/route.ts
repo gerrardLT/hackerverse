@@ -229,56 +229,40 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 创建黑客松元数据用于IPFS存储
-    const hackathonMetadata = {
-      version: '1.0',
-      type: 'hackathon',
-      timestamp: new Date().toISOString(),
-      hackathon: {
-        title: validatedData.title,
-        description: validatedData.description,
-        organizer: {
-          id: organizer.id,
-          username: organizer.username,
-          email: organizer.email,
-          avatarUrl: organizer.avatarUrl
-        },
-        startDate: validatedData.startDate,
-        endDate: validatedData.endDate,
-        registrationDeadline: validatedData.registrationDeadline,
-        maxParticipants: validatedData.maxParticipants,
-        prizePool: validatedData.prizePool,
-        categories: validatedData.categories,
-        tags: validatedData.tags || [],
-        requirements: validatedData.requirements,
-        rules: validatedData.rules,
-        prizes: validatedData.prizes || [],
-        tracks: validatedData.tracks || [],
-        schedule: validatedData.schedule || [],
-        sponsors: validatedData.sponsors || [],
-        judgingCriteria: validatedData.judgingCriteria || [],
-        isPublic: validatedData.isPublic,
-        featured: validatedData.featured,
-        createdAt: new Date().toISOString()
-      }
-    }
-
-    // ⭐ 上传黑客松元数据到IPFS（必须成功）
+    // ⭐ 使用统一的IPFSService上传黑客松数据到IPFS（必须成功）
     let ipfsCID
     try {
-      // 动态导入IPFS服务
-      const { IPFSService } = await import('@/lib/ipfs')
-      ipfsCID = await IPFSService.uploadJSON(hackathonMetadata, {
-        name: `hackathon-${validatedData.title.replace(/\s+/g, '-').toLowerCase()}.json`,
-        description: `黑客松详情: ${validatedData.title}`,
-        tags: ['hackathon', 'metadata', ...validatedData.categories],
+      // 导入IPFS服务和类型定义
+      const { IPFSService, IPFSHackathonData } = await import('@/lib/ipfs')
+      
+      // 构建标准化的黑客松数据结构
+      const hackathonData: IPFSHackathonData = {
         version: '1.0.0',
-        author: organizer.username || organizer.email
-      })
-      console.log('📦 IPFS上传成功:', ipfsCID)
+        timestamp: new Date().toISOString(),
+        data: {
+          title: validatedData.title,
+          description: validatedData.description,
+          startDate: validatedData.startDate,
+          endDate: validatedData.endDate,
+          prizePool: validatedData.prizePool || 0,
+          categories: validatedData.categories,
+          requirements: validatedData.requirements || '',
+          rules: validatedData.rules || ''
+        },
+        metadata: {
+          organizer: organizer.id,
+          status: 'active',
+          previousVersion: undefined
+        }
+      }
+      
+      // 使用专用的黑客松数据上传方法
+      ipfsCID = await IPFSService.uploadHackathonData(hackathonData)
+      console.log('📦 IPFS黑客松数据上传成功:', ipfsCID)
     } catch (ipfsError) {
       console.error('IPFS上传失败:', ipfsError)
       return NextResponse.json({
+        success: false,
         error: 'IPFS上传失败，无法创建黑客松',
         details: ipfsError instanceof Error ? ipfsError.message : '未知错误'
       }, { status: 500 })

@@ -244,17 +244,293 @@ export class SmartContractService {
     })
   }
 
-  async getProjectScore(projectId: number) {
+  // ===== 新增DAO治理方法 =====
+
+  // DAO提案管理
+  async createDAOProposal(proposalCID: string, votingDeadline: number, executionDelay: number = 24) {
     if (!this.contracts.hackxCore) throw new Error('Contract not initialized')
 
     return await this.retryContractCall(async () => {
-      const result = await this.contracts.hackxCore!.getProjectScore(projectId)
+      const tx = await this.contracts.hackxCore!.createProposal(
+        proposalCID,
+        Math.floor(Date.now() / 1000) + votingDeadline * 3600, // 转换为秒
+        executionDelay * 3600 // 转换为秒
+      )
+      console.log('创建DAO提案交易已发送:', tx.hash)
+      return tx
+    })
+  }
+
+  async voteOnProposal(proposalId: number, support: boolean, votingPower: number, reasonCID?: string) {
+    if (!this.contracts.hackxCore) throw new Error('Contract not initialized')
+
+    return await this.retryContractCall(async () => {
+      const tx = await this.contracts.hackxCore!.vote(
+        proposalId,
+        support,
+        votingPower,
+        reasonCID || ''
+      )
+      console.log('DAO投票交易已发送:', tx.hash)
+      return tx
+    })
+  }
+
+  async delegateVoting(delegatee: string, amount: number) {
+    if (!this.contracts.hackxCore) throw new Error('Contract not initialized')
+
+    return await this.retryContractCall(async () => {
+      const tx = await this.contracts.hackxCore!.delegateVoting(delegatee, amount)
+      console.log('委托投票交易已发送:', tx.hash)
+      return tx
+    })
+  }
+
+  async executeDAOProposal(proposalId: number) {
+    if (!this.contracts.hackxCore) throw new Error('Contract not initialized')
+
+    return await this.retryContractCall(async () => {
+      const tx = await this.contracts.hackxCore!.executeProposal(proposalId)
+      console.log('执行DAO提案交易已发送:', tx.hash)
+      return tx
+    })
+  }
+
+  async getDAOProposal(proposalId: number) {
+    if (!this.contracts.hackxCore) throw new Error('Contract not initialized')
+
+    return await this.retryContractCall(async () => {
+      const result = await this.contracts.hackxCore!.getProposal(proposalId)
       return {
-        totalScore: Number(result[0]),
-        voteCount: Number(result[1]),
-        averageScore: Number(result[2])
+        proposer: result[0],
+        proposalCID: result[1],
+        forVotes: Number(result[2]),
+        againstVotes: Number(result[3]),
+        deadline: Number(result[4]),
+        status: Number(result[5]) // 0: Pending, 1: Active, 2: Succeeded, 3: Defeated, 4: Executed
       }
     })
+  }
+
+  // ===== 质押功能方法 =====
+
+  async stakeTokens(amount: number, lockPeriod: number = 30) {
+    if (!this.contracts.hackxCore) throw new Error('Contract not initialized')
+
+    return await this.retryContractCall(async () => {
+      const tx = await this.contracts.hackxCore!.stake(
+        ethers.parseEther(amount.toString()),
+        lockPeriod * 24 * 3600 // 转换为秒
+      )
+      console.log('质押代币交易已发送:', tx.hash)
+      return tx
+    })
+  }
+
+  async unstakeTokens(amount: number) {
+    if (!this.contracts.hackxCore) throw new Error('Contract not initialized')
+
+    return await this.retryContractCall(async () => {
+      const tx = await this.contracts.hackxCore!.unstake(
+        ethers.parseEther(amount.toString())
+      )
+      console.log('解除质押交易已发送:', tx.hash)
+      return tx
+    })
+  }
+
+  async claimStakingRewards() {
+    if (!this.contracts.hackxCore) throw new Error('Contract not initialized')
+
+    return await this.retryContractCall(async () => {
+      const tx = await this.contracts.hackxCore!.claimRewards()
+      console.log('领取质押奖励交易已发送:', tx.hash)
+      return tx
+    })
+  }
+
+  async getStakingInfo(userAddress: string) {
+    if (!this.contracts.hackxCore) throw new Error('Contract not initialized')
+
+    return await this.retryContractCall(async () => {
+      const result = await this.contracts.hackxCore!.getStakingInfo(userAddress)
+      return {
+        stakedAmount: ethers.formatEther(result[0]),
+        rewards: ethers.formatEther(result[1]),
+        lockUntil: Number(result[2]),
+        tier: Number(result[3]) // 0: Bronze, 1: Silver, 2: Gold, 3: Platinum
+      }
+    })
+  }
+
+  // ===== 声誉系统方法 =====
+
+  async updateUserReputation(userAddress: string, points: number, action: string) {
+    if (!this.contracts.hackxCore) throw new Error('Contract not initialized')
+
+    return await this.retryContractCall(async () => {
+      const tx = await this.contracts.hackxCore!.updateReputation(
+        userAddress,
+        points,
+        action
+      )
+      console.log('更新用户声誉交易已发送:', tx.hash)
+      return tx
+    })
+  }
+
+  async getUserReputation(userAddress: string) {
+    if (!this.contracts.hackxCore) throw new Error('Contract not initialized')
+
+    return await this.retryContractCall(async () => {
+      const result = await this.contracts.hackxCore!.getReputation(userAddress)
+      return {
+        score: Number(result[0]),
+        lastUpdate: Number(result[1])
+      }
+    })
+  }
+
+  // ===== NFT证书功能方法 =====
+
+  async mintAchievementCertificate(to: string, tokenURI: string, achievementType: number) {
+    if (!this.contracts.hackxCore) throw new Error('Contract not initialized')
+
+    return await this.retryContractCall(async () => {
+      const tx = await this.contracts.hackxCore!.mintCertificate(
+        to,
+        tokenURI,
+        achievementType // 0: Participation, 1: Winner, 2: Judge, 3: Organizer
+      )
+      console.log('铸造成就证书交易已发送:', tx.hash)
+      return tx
+    })
+  }
+
+  async getCertificate(tokenId: number) {
+    if (!this.contracts.hackxCore) throw new Error('Contract not initialized')
+
+    return await this.retryContractCall(async () => {
+      const result = await this.contracts.hackxCore!.getCertificate(tokenId)
+      return {
+        owner: result[0],
+        tokenURI: result[1],
+        achievementType: Number(result[2]),
+        mintTime: Number(result[3])
+      }
+    })
+  }
+
+  // ===== 跨链功能方法 =====
+
+  async bridgeToChain(targetChainId: number, targetAddress: string, amount: number) {
+    if (!this.contracts.hackxCore) throw new Error('Contract not initialized')
+
+    return await this.retryContractCall(async () => {
+      const tx = await this.contracts.hackxCore!.bridgeToChain(
+        targetChainId,
+        targetAddress,
+        ethers.parseEther(amount.toString())
+      )
+      console.log('跨链桥接交易已发送:', tx.hash)
+      return tx
+    })
+  }
+
+  async validateCrossChainTransaction(txHash: string, sourceChainId: number) {
+    if (!this.contracts.hackxCore) throw new Error('Contract not initialized')
+
+    return await this.retryContractCall(async () => {
+      return await this.contracts.hackxCore!.validateCrossChainTx(txHash, sourceChainId)
+    })
+  }
+
+  // ===== 批量操作方法 =====
+
+  async batchExecute(operations: Array<{
+    method: string
+    params: any[]
+  }>) {
+    if (!this.contracts.hackxCore) throw new Error('Contract not initialized')
+
+    const results = []
+    for (const op of operations) {
+      try {
+        const result = await this.retryContractCall(async () => {
+          return await (this.contracts.hackxCore as any)[op.method](...op.params)
+        })
+        results.push({ success: true, result })
+      } catch (error) {
+        results.push({ success: false, error: error instanceof Error ? error.message : '未知错误' })
+      }
+    }
+    return results
+  }
+
+  // ===== 跨链网络管理 =====
+
+  async switchToChain(chainId: number) {
+    if (!this.provider) throw new Error('Provider not initialized')
+
+    try {
+      // 更新网络配置
+      const chainConfig = this.getSupportedChainConfig(chainId)
+      if (!chainConfig) {
+        throw new Error(`不支持的链ID: ${chainId}`)
+      }
+
+      // 创建新的provider
+      this.provider = new ethers.JsonRpcProvider(chainConfig.rpcUrl)
+      
+      // 更新signer
+      if (this.signer) {
+        this.signer = this.signer.connect(this.provider)
+      }
+
+      // 重新初始化合约
+      await this.initializeContracts()
+      
+      console.log(`已切换到链 ${chainId}: ${chainConfig.name}`)
+    } catch (error) {
+      console.error('切换网络失败:', error)
+      throw error
+    }
+  }
+
+  private getSupportedChainConfig(chainId: number) {
+    const configs: Record<number, any> = {
+      97: { // BSC Testnet
+        name: 'BSC Testnet',
+        rpcUrl: 'https://data-seed-prebsc-1-s1.bnbchain.org:8545',
+        contractAddress: CONTRACT_ADDRESSES.HACKX_CORE
+      },
+      56: { // BSC Mainnet
+        name: 'BSC Mainnet',
+        rpcUrl: 'https://bsc-dataseed1.binance.org',
+        contractAddress: '0x...' // 主网合约地址
+      },
+      80001: { // Polygon Mumbai
+        name: 'Polygon Mumbai',
+        rpcUrl: 'https://rpc-mumbai.maticvigil.com',
+        contractAddress: '0x...' // Polygon合约地址
+      },
+      11155111: { // Sepolia
+        name: 'Ethereum Sepolia',
+        rpcUrl: 'https://sepolia.infura.io/v3/YOUR_KEY',
+        contractAddress: '0x...' // Sepolia合约地址
+      }
+    }
+    return configs[chainId]
+  }
+
+  private async initializeContracts() {
+    if (!this.signer) throw new Error('Signer not initialized')
+
+    this.contracts.hackxCore = new ethers.Contract(
+      CONTRACT_ADDRESSES.HACKX_CORE,
+      HACKX_CORE_ABI,
+      this.signer
+    )
   }
 }
 

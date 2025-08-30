@@ -27,9 +27,12 @@ export default function SignInPage() {
     setIsLoading(true)
 
     try {
-      const success = await signIn(email, password)
-      if (success) {
+      const result = await signIn(email, password)
+      if (result.success) {
         router.push('/dashboard')
+      } else {
+        // 显示错误信息（signIn函数已经处理toast）
+        console.error('登录失败:', result.error)
       }
     } catch (error) {
       console.error('登录错误:', error)
@@ -48,10 +51,19 @@ export default function SignInPage() {
 
   const handleWalletConnected = async () => {
     // 钱包底层连接成功后，调用Web3Auth进行状态同步
-    const success = await connectWallet()
-    if (success) {
-      // 连接成功，跳转到仪表板
-      router.push('/dashboard')
+    try {
+      const success = await connectWallet()
+      if (success) {
+        // Web3认证成功，由authStateManager统一处理跳转
+        // 等待稍片容认证状态同步完成
+        setTimeout(() => {
+          router.push('/dashboard')
+        }, 500)
+      } else {
+        console.warn('钱包认证失败')
+      }
+    } catch (error) {
+      console.error('钱包连接处理错误:', error)
     }
   }
 
@@ -63,26 +75,29 @@ export default function SignInPage() {
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl text-center">登录 HackX</CardTitle>
           <CardDescription className="text-center">
-            选择你的登录方式
+            使用 Web3 钱包安全登录
           </CardDescription>
         </CardHeader>
         
-        <CardContent className="space-y-4">
-          {/* Social Login Buttons */}
-          <div className="grid grid-cols-2 gap-4">
-            <Button variant="outline" disabled>
-              <Github className="mr-2 h-4 w-4" />
-              GitHub
-            </Button>
+        <CardContent className="space-y-6">
+          {/* 钱包登录 - 主要登录方式 */}
+          <div className="space-y-4">
             <Button 
-              variant="outline" 
+              size="lg"
+              className="w-full" 
               onClick={handleWalletLogin}
             >
-              <Wallet className="mr-2 h-4 w-4" />
-              钱包登录
+              <Wallet className="mr-2 h-5 w-5" />
+              连接钱包登录
             </Button>
+            
+            <p className="text-center text-sm text-muted-foreground">
+              支持 MetaMask、WalletConnect 等主流钱包
+            </p>
           </div>
           
+          {/* 暂时隐藏的邮箱登录部分 */}
+          {/* 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <Separator className="w-full" />
@@ -94,7 +109,6 @@ export default function SignInPage() {
             </div>
           </div>
 
-          {/* Email Login Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">邮箱</Label>
@@ -142,15 +156,13 @@ export default function SignInPage() {
               忘记密码？
             </Link>
           </div>
+          */}
         </CardContent>
 
         <CardFooter className="flex flex-col space-y-4">
           <Separator />
           <div className="text-center text-sm text-muted-foreground">
-            还没有账号？{' '}
-            <Link href="/auth/signup" className="text-primary hover:underline">
-              立即注册
-            </Link>
+            第一次使用？连接钱包即可自动创建账户
           </div>
         </CardFooter>
       </Card>

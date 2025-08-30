@@ -37,7 +37,11 @@ export async function POST(request: NextRequest) {
     
     if (!user) {
       return NextResponse.json(
-        { success: false, error: '邮箱或密码错误' },
+        { 
+          success: false, 
+          error: '邮箱或密码错误',
+          code: 'INVALID_CREDENTIALS'
+        },
         { status: 401 }
       )
     }
@@ -50,7 +54,11 @@ export async function POST(request: NextRequest) {
     
     if (!isValidPassword) {
       return NextResponse.json(
-        { success: false, error: '邮箱或密码错误' },
+        { 
+          success: false, 
+          error: '邮箱或密码错误',
+          code: 'INVALID_CREDENTIALS'
+        },
         { status: 401 }
       )
     }

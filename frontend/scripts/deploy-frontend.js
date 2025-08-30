@@ -17,13 +17,9 @@ async function deployFrontend() {
     }
     const contractInfo = JSON.parse(fs.readFileSync(contractDeploymentFile, 'utf8'));
 
-    // 2. 读取子图部署信息
-    console.log("读取子图部署信息...");
-    const subgraphDeploymentFile = path.join(__dirname, '../../subgraph/deployments', `${network}.json`);
-    let subgraphInfo = null;
-    if (fs.existsSync(subgraphDeploymentFile)) {
-      subgraphInfo = JSON.parse(fs.readFileSync(subgraphDeploymentFile, 'utf8'));
-    }
+    // 2.（跳过）读取子图部署信息 - 已移除 subgraph 依赖
+    console.log("跳过子图部署信息读取（已移除 subgraph 依赖）...");
+    const subgraphInfo = null;
 
     // 3. 创建生产环境配置
     console.log("创建生产环境配置...");
@@ -75,7 +71,7 @@ async function deployFrontend() {
     const frontendDeploymentInfo = {
       network: network,
       contractAddress: contractInfo.contractAddress,
-      subgraphUrl: subgraphInfo ? subgraphInfo.queryUrl : null,
+      subgraphUrl: null,
       buildTime: new Date().toISOString(),
       environment: 'production',
       vercelDeployed: !!vercelToken
@@ -115,9 +111,8 @@ NEXT_PUBLIC_RPC_URL=${rpcUrl}
 # 智能合约配置
 NEXT_PUBLIC_HACKX_CORE_ADDRESS=${contractInfo.contractAddress}
 
-# The Graph配置
-${subgraphInfo ? `NEXT_PUBLIC_SUBGRAPH_URL=${subgraphInfo.queryUrl}` : '# NEXT_PUBLIC_SUBGRAPH_URL=待配置'}
-
+# The Graph配置（已停用）
+# NEXT_PUBLIC_SUBGRAPH_URL=已移除
 # IPFS配置
 NEXT_PUBLIC_IPFS_GATEWAY=https://ipfs.io/ipfs/
 NEXT_PUBLIC_PINATA_GATEWAY=请配置您的Pinata专用网关域名
@@ -270,7 +265,7 @@ function createVercelEnvVars(network, contractInfo, subgraphInfo) {
     NEXT_PUBLIC_CHAIN_ID: chainId.toString(),
     NEXT_PUBLIC_NETWORK_NAME: network,
     NEXT_PUBLIC_HACKX_CORE_ADDRESS: contractInfo.contractAddress,
-    NEXT_PUBLIC_SUBGRAPH_URL: subgraphInfo ? subgraphInfo.queryUrl : '',
+    // NEXT_PUBLIC_SUBGRAPH_URL: '',
     NEXT_PUBLIC_RPC_URL: getRpcUrl(network)
   };
 }

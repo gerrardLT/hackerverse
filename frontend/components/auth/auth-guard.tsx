@@ -62,10 +62,10 @@ export function AuthGuard({
               </Button>
               <div className="text-center">
                 <p className="text-sm text-muted-foreground">
-                  还没有账户？{' '}
-                  <Link href="/auth/signup" className="text-primary hover:underline">
-                    立即注册
-                  </Link>
+                  第一次使用？{' '}
+                  <span className="text-primary">
+                    连接钱包即可自动创建账户
+                  </span>
                 </p>
               </div>
             </CardContent>

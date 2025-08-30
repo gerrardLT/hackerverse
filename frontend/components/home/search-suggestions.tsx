@@ -12,32 +12,48 @@ interface SearchSuggestionsProps {
 
 export function SearchSuggestions({ onSuggestionClick, currentQuery }: SearchSuggestionsProps) {
   const [searchHistory, setSearchHistory] = useState<string[]>([])
+  const [popularSearches, setPopularSearches] = useState<string[]>([])
+  const [loading, setLoading] = useState(false)
 
-  // 热门搜索词
-  const popularSearches = [
-    'Web3',
-    'AI',
-    'DeFi',
-    'NFT',
-    '区块链',
-    '智能合约',
-    '元宇宙',
-    'GameFi',
-    'DAO',
-    'Layer2'
-  ]
-
-  // 从localStorage获取搜索历史
+  // 从 localStorage 获取搜索历史和加载热门搜索词
   useEffect(() => {
-    const history = localStorage.getItem('hackathon-search-history')
-    if (history) {
+    // 加载搜索历史
+    const loadSearchHistory = () => {
       try {
-        const parsedHistory = JSON.parse(history)
-        setSearchHistory(parsedHistory.slice(0, 5)) // 只显示最近5个
+        const history = localStorage.getItem('hackathon-search-history')
+        if (history) {
+          const parsedHistory = JSON.parse(history)
+          setSearchHistory(parsedHistory.slice(0, 5)) // 只显示最近5个
+        }
       } catch (error) {
         console.error('解析搜索历史失败:', error)
       }
     }
+      
+    // 加载热门搜索词
+    const loadPopularSearches = async () => {
+      try {
+        setLoading(true)
+        const response = await fetch('/api/search/suggestions')
+        const result = await response.json()
+          
+        if (result.success && result.data?.popularSearches) {
+          setPopularSearches(result.data.popularSearches)
+        } else {
+          // 使用后备数据
+          setPopularSearches(['Web3', 'DeFi', 'NFT', '区块链', 'AI', '智能合约', '元宇宙', 'GameFi', 'DAO', 'Layer2'])
+        }
+      } catch (error) {
+        console.error('获取热门搜索词失败:', error)
+        // 使用后备数据
+        setPopularSearches(['Web3', 'DeFi', 'NFT', '区块链', 'AI', '智能合约', '元宇宙', 'GameFi', 'DAO', 'Layer2'])
+      } finally {
+        setLoading(false)
+      }
+    }
+      
+    loadSearchHistory()
+    loadPopularSearches()
   }, [])
 
   // 保存搜索历史
@@ -120,6 +136,7 @@ export function SearchSuggestions({ onSuggestionClick, currentQuery }: SearchSug
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <TrendingUp className="h-4 w-4" />
             <span>热门搜索</span>
+            {loading && <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />}
           </div>
           <div className="flex flex-wrap gap-2">
             {popularSearches.map((item, index) => (

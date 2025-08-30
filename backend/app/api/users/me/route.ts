@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
       data: {
         user: {
           ...userInfo,
-          ipfsUrl: userInfo.ipfsProfileHash ? `${process.env.IPFS_GATEWAY}/ipfs/${userInfo.ipfsProfileHash}` : null
+          ipfsUrl: userInfo.ipfsProfileHash ? `${process.env.PINATA_GATEWAY}/ipfs/${userInfo.ipfsProfileHash}` : null
         }
       }
     })
@@ -263,7 +263,7 @@ export async function PUT(request: NextRequest) {
       data: {
         user: {
           ...updatedUser,
-          ipfsUrl: ipfsHash ? `${process.env.IPFS_GATEWAY}/ipfs/${ipfsHash}` : null
+          ipfsUrl: updatedUser.ipfsProfileHash ? `${process.env.PINATA_GATEWAY}/ipfs/${updatedUser.ipfsProfileHash}` : null
         }
       },
     })

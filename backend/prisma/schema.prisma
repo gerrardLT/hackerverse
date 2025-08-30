@@ -1,8 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["multiSchema"]
 }
 
@@ -13,172 +10,159 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  username  String?  @unique
-  password  String?
-  avatarUrl String?
-  bio       String?
-  walletAddress String? @unique
-  reputationScore Int @default(0)
-  ipfsProfileHash String?
-  
-  // ⭐ 区块链相关字段
-  lastTxHash         String?  // 最近交易哈希
-  lastBlockNumber    BigInt?  // 最近区块号
-  lastGasUsed        BigInt?  // 最近Gas消耗
-  profileSyncStatus  String   @default("PENDING") // 资料同步状态: PENDING, SYNCED, FAILED
-  
-  socialLinks Json?
-  privacySettings Json @default("{}")
-  notificationSettings Json @default("{}")
-  preferences Json @default("{}")
-  emailVerified Boolean @default(false)
-  role      String   @default("user") // 用户角色: admin, moderator, user
-  status    String   @default("active") // 用户状态: active, suspended, banned
-  lastLoginAt DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // 关系
-  organizedHackathons Hackathon[] @relation("Organizer")
-  participations      Participation[]
-  teamMemberships     TeamMember[]
-  projects            Project[]
-  notifications       Notification[]
-  feedback            Feedback[]
-  projectLikes        ProjectLike[]
-  ledTeams            Team[]        @relation("TeamLeader")
-  judgeRoles          Judge[]
-  communityPosts      CommunityPost[] @relation("CommunityPosts")
-  communityReplies    CommunityReply[] @relation("CommunityReplies")
-  
-  // Web3 相关关系
-  daoProposals        DAOProposal[] @relation("DAOProposalCreator")
-  daoVotes            DAOVote[]
-  nfts                NFT[] @relation("NFTOwner")
-  staking             Staking?
-  stakingTransactions StakingTransaction[]
+  id                   String               @id @default(cuid())
+  email                String               @unique
+  username             String?              @unique
+  password             String?
+  avatarUrl            String?
+  bio                  String?
+  walletAddress        String?              @unique
+  reputationScore      Int                  @default(0)
+  ipfsProfileHash      String?
+  socialLinks          Json?
+  privacySettings      Json                 @default("{}")
+  notificationSettings Json                 @default("{}")
+  preferences          Json                 @default("{}")
+  emailVerified        Boolean              @default(false)
+  role                 String               @default("user")
+  status               String               @default("active")
+  lastLoginAt          DateTime?
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+  lastBlockNumber      BigInt?
+  lastGasUsed          BigInt?
+  lastTxHash           String?
+  profileSyncStatus    String               @default("PENDING")
+  encryptedProfile     Json?                // 加密的敏感信息
+  publicKey            String?              // 用户公钥
+  dataConsent          Json                 @default("{}") // 数据使用同意记录
+  communityPosts       CommunityPost[]      @relation("CommunityPosts")
+  communityReplies     CommunityReply[]     @relation("CommunityReplies")
+  daoProposals         DAOProposal[]        @relation("DAOProposalCreator")
+  daoVotes             DAOVote[]
+  reputationRecords    ReputationRecord[]   @relation("UserReputation")
+  votingDelegations    VotingDelegation[]   @relation("Delegator")
+  delegatedVotes       VotingDelegation[]   @relation("Delegatee")
+  communityIncentives  CommunityIncentive[] @relation("IncentiveUser")
+  didCredentials       DIDCredential[]      @relation("UserDID")
+  feedback             Feedback[]
+  organizedHackathons  Hackathon[]          @relation("Organizer")
+  judgeRoles           Judge[]
+  nfts                 NFT[]                @relation("NFTOwner")
+  notifications        Notification[]
+  participations       Participation[]
+  projectLikes         ProjectLike[]
+  projects             Project[]
+  staking              Staking?
+  stakingTransactions  StakingTransaction[]
+  teamMemberships      TeamMember[]
+  ledTeams             Team[]               @relation("TeamLeader")
 
   @@map("users")
   @@schema("hackathon_schema")
 }
 
 model Hackathon {
-  id                  String   @id @default(cuid())
-  title               String
-  description         String?
-  startDate           DateTime
-  endDate             DateTime
+  id                   String          @id @default(cuid())
+  title                String
+  description          String?
+  startDate            DateTime
+  endDate              DateTime
   registrationDeadline DateTime?
-  maxParticipants     Int?
-  prizePool           Decimal? @db.Decimal(15,2)
-  categories          Json     @default("[]")
-  tags                Json     @default("[]")
-  requirements        String?
-  rules               String?
-  isPublic            Boolean  @default(true)
-  featured            Boolean  @default(false)
-  status              String   @default("draft")
-  organizerId         String
-  ipfsHash            String?
-  
-  // ⭐ 区块链相关字段
-  contractId          Int?     // 智能合约中的ID
-  txHash              String?  // 交易哈希
-  blockNumber         BigInt?  // 区块号
-  gasUsed             BigInt?  // Gas消耗
-  syncStatus          String   @default("PENDING") // 同步状态: PENDING, SYNCED, FAILED
-  
-  metadata            Json?
-  prizes              Json?
-  tracks              Json?
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-
-  // 关系
-  organizer           User     @relation("Organizer", fields: [organizerId], references: [id])
-  participations      Participation[]
-  projects            Project[]
-  teams               Team[]
-  judges              Judge[]
+  maxParticipants      Int?
+  prizePool            Decimal?        @db.Decimal(15, 2)
+  categories           Json            @default("[]")
+  tags                 Json            @default("[]")
+  requirements         String?
+  rules                String?
+  isPublic             Boolean         @default(true)
+  featured             Boolean         @default(false)
+  status               String          @default("draft")
+  organizerId          String
+  ipfsHash             String?
+  metadata             Json?
+  prizes               Json?
+  tracks               Json?
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+  blockNumber          BigInt?
+  contractId           Int?
+  gasUsed              BigInt?
+  syncStatus           String          @default("PENDING")
+  txHash               String?
+  organizer            User            @relation("Organizer", fields: [organizerId], references: [id])
+  judges               Judge[]
+  participations       Participation[]
+  projects             Project[]
+  teams                Team[]
 
   @@map("hackathons")
   @@schema("hackathon_schema")
 }
 
 model Project {
-  id            String   @id @default(cuid())
-  title         String
-  description   String?
-  hackathonId   String
-  teamId        String?
-  creatorId     String
-  technologies  Json     @default("[]")
-  tags          Json     @default("[]")
-  githubUrl     String?
-  demoUrl       String?
-  videoUrl      String?
+  id              String        @id @default(cuid())
+  title           String
+  description     String?
+  hackathonId     String
+  teamId          String?
+  creatorId       String
+  technologies    Json          @default("[]")
+  tags            Json          @default("[]")
+  githubUrl       String?
+  demoUrl         String?
+  videoUrl        String?
   presentationUrl String?
-  ipfsHash      String?
-  
-  // ⭐ 区块链相关字段
-  contractId    Int?     // 智能合约中的ID
-  txHash        String?  // 交易哈希
-  blockNumber   BigInt?  // 区块号
-  gasUsed       BigInt?  // Gas消耗
-  syncStatus    String   @default("PENDING") // 同步状态: PENDING, SYNCED, FAILED
-  
-  status        String   @default("draft")
-  isPublic      Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  // 关系
-  hackathon     Hackathon @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
-  team          Team?     @relation(fields: [teamId], references: [id])
-  creator       User      @relation(fields: [creatorId], references: [id], onDelete: Cascade)
-  scores        Score[]
-  feedback      Feedback[]
-  projectLikes  ProjectLike[]
+  ipfsHash        String?
+  status          String        @default("draft")
+  isPublic        Boolean       @default(true)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  blockNumber     BigInt?
+  contractId      Int?
+  gasUsed         BigInt?
+  syncStatus      String        @default("PENDING")
+  txHash          String?
+  feedback        Feedback[]
+  projectLikes    ProjectLike[]
+  creator         User          @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  hackathon       Hackathon     @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  team            Team?         @relation(fields: [teamId], references: [id])
+  scores          Score[]
 
   @@map("projects")
   @@schema("hackathon_schema")
 }
 
 model Team {
-  id          String   @id @default(cuid())
+  id          String       @id @default(cuid())
   name        String
   description String?
   hackathonId String
   leaderId    String
-  maxMembers  Int      @default(5)
-  skills      Json     @default("[]")
-  tags        Json     @default("[]")
-  isPublic    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // 关系
-  hackathon   Hackathon @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
-  leader      User     @relation("TeamLeader", fields: [leaderId], references: [id])
-  members     TeamMember[]
+  maxMembers  Int          @default(5)
+  skills      Json         @default("[]")
+  tags        Json         @default("[]")
+  isPublic    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
   projects    Project[]
+  members     TeamMember[]
+  hackathon   Hackathon    @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  leader      User         @relation("TeamLeader", fields: [leaderId], references: [id])
 
   @@map("teams")
   @@schema("hackathon_schema")
 }
 
 model TeamMember {
-  id        String   @id @default(cuid())
-  teamId    String
-  userId    String
-  role      String   @default("member")
-  joinedAt  DateTime @default(now())
-
-  // 关系
-  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id       String   @id @default(cuid())
+  teamId   String
+  userId   String
+  role     String   @default("member")
+  joinedAt DateTime @default(now())
+  team     Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([teamId, userId])
   @@map("team_members")
@@ -186,15 +170,13 @@ model TeamMember {
 }
 
 model Participation {
-  id           String   @id @default(cuid())
-  hackathonId  String
-  userId       String
-  status       String   @default("registered")
-  joinedAt     DateTime @default(now())
-
-  // 关系
-  hackathon    Hackathon @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id          String    @id @default(cuid())
+  hackathonId String
+  userId      String
+  status      String    @default("registered")
+  joinedAt    DateTime  @default(now())
+  hackathon   Hackathon @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([hackathonId, userId])
   @@map("participations")
@@ -202,18 +184,16 @@ model Participation {
 }
 
 model Judge {
-  id              String   @id @default(cuid())
-  hackathonId     String
-  userId          String
-  role            String   @default("main")
-  expertise       Json     @default("[]")
-  assignedProjects Json    @default("[]")
-  createdAt       DateTime @default(now())
-
-  // 关系
-  hackathon       Hackathon @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
-  user            User     @relation(fields: [userId], references: [id])
-  scores          Score[]
+  id               String    @id @default(cuid())
+  hackathonId      String
+  userId           String
+  role             String    @default("main")
+  expertise        Json      @default("[]")
+  assignedProjects Json      @default("[]")
+  createdAt        DateTime  @default(now())
+  hackathon        Hackathon @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  user             User      @relation(fields: [userId], references: [id])
+  scores           Score[]
 
   @@map("judges")
   @@schema("hackathon_schema")
@@ -223,68 +203,53 @@ model Score {
   id                  String   @id @default(cuid())
   projectId           String
   judgeId             String
-  innovation          Decimal? @db.Decimal(3,1)
-  technicalComplexity Decimal? @db.Decimal(3,1)
-  userExperience      Decimal? @db.Decimal(3,1)
-  businessPotential   Decimal? @db.Decimal(3,1)
-  presentation        Decimal? @db.Decimal(3,1)
-  totalScore          Decimal? @db.Decimal(4,1)
+  innovation          Decimal? @db.Decimal(3, 1)
+  technicalComplexity Decimal? @db.Decimal(3, 1)
+  userExperience      Decimal? @db.Decimal(3, 1)
+  businessPotential   Decimal? @db.Decimal(3, 1)
+  presentation        Decimal? @db.Decimal(3, 1)
+  totalScore          Decimal? @db.Decimal(4, 1)
   comments            String?
   ipfsHash            String?
-  
-  // ⭐ 区块链相关字段
-  txHash              String?  // 交易哈希
-  blockNumber         BigInt?  // 区块号
-  gasUsed             BigInt?  // Gas消耗
-  syncStatus          String   @default("PENDING") // 同步状态: PENDING, SYNCED, FAILED
-  
   createdAt           DateTime @default(now())
-
-  // 关系
-  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  judge     Judge    @relation(fields: [judgeId], references: [id], onDelete: Cascade)
+  blockNumber         BigInt?
+  gasUsed             BigInt?
+  syncStatus          String   @default("PENDING")
+  txHash              String?
+  judge               Judge    @relation(fields: [judgeId], references: [id], onDelete: Cascade)
+  project             Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@map("scores")
   @@schema("hackathon_schema")
 }
 
 model Feedback {
-  id        String   @id @default(cuid())
-  projectId String
-  userId    String
-  rating    Int
-  comment   String?
-  ipfsHash  String?
-  
-  // ⭐ 区块链相关字段（未来扩展用）
-  txHash    String?  // 交易哈希
-  syncStatus String  @default("PENDING") // 同步状态: PENDING, SYNCED, FAILED
-  
-  createdAt DateTime @default(now())
-
-  // 关系
-  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id         String   @id @default(cuid())
+  projectId  String
+  userId     String
+  rating     Int
+  comment    String?
+  ipfsHash   String?
+  createdAt  DateTime @default(now())
+  syncStatus String   @default("PENDING")
+  txHash     String?
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("feedbacks")
   @@schema("hackathon_schema")
 }
 
 model ProjectLike {
-  id        String   @id @default(cuid())
-  projectId String
-  userId    String
-  ipfsHash  String?
-  
-  // ⭐ 区块链相关字段（未来扩展用）
-  txHash    String?  // 交易哈希
-  syncStatus String  @default("PENDING") // 同步状态: PENDING, SYNCED, FAILED
-  
-  createdAt DateTime @default(now())
-
-  // 关系
-  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id         String   @id @default(cuid())
+  projectId  String
+  userId     String
+  ipfsHash   String?
+  createdAt  DateTime @default(now())
+  syncStatus String   @default("PENDING")
+  txHash     String?
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([projectId, userId])
   @@map("project_likes")
@@ -300,8 +265,6 @@ model Notification {
   read      Boolean  @default(false)
   userId    String
   createdAt DateTime @default(now())
-
-  // 关系
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("notifications")
@@ -309,25 +272,23 @@ model Notification {
 }
 
 model CommunityPost {
-  id            String   @id @default(cuid())
-  title         String
-  content       String
-  excerpt       String?
-  category      String   @default("general")
-  tags          Json     @default("[]")
-  authorId      String
-  views         Int      @default(0)
-  likes         Int      @default(0)
-  replies       Int      @default(0)
-  isPinned      Boolean  @default(false)
-  isLocked      Boolean  @default(false)
-  isDeleted     Boolean  @default(false)
-  lastReplyAt   DateTime?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  // 关系
-  author        User     @relation("CommunityPosts", fields: [authorId], references: [id], onDelete: Cascade)
+  id               String           @id @default(cuid())
+  title            String
+  content          String
+  excerpt          String?
+  category         String           @default("general")
+  tags             Json             @default("[]")
+  authorId         String
+  views            Int              @default(0)
+  likes            Int              @default(0)
+  replies          Int              @default(0)
+  isPinned         Boolean          @default(false)
+  isLocked         Boolean          @default(false)
+  isDeleted        Boolean          @default(false)
+  lastReplyAt      DateTime?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  author           User             @relation("CommunityPosts", fields: [authorId], references: [id], onDelete: Cascade)
   communityReplies CommunityReply[]
 
   @@map("community_posts")
@@ -335,66 +296,73 @@ model CommunityPost {
 }
 
 model CommunityReply {
-  id        String   @id @default(cuid())
+  id        String           @id @default(cuid())
   postId    String
   content   String
   authorId  String
   parentId  String?
-  likes     Int      @default(0)
-  isDeleted Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // 关系
-  post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
-  author    User          @relation("CommunityReplies", fields: [authorId], references: [id], onDelete: Cascade)
-  parent    CommunityReply? @relation("ReplyReplies", fields: [parentId], references: [id])
+  likes     Int              @default(0)
+  isDeleted Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  author    User             @relation("CommunityReplies", fields: [authorId], references: [id], onDelete: Cascade)
+  parent    CommunityReply?  @relation("ReplyReplies", fields: [parentId], references: [id])
   replies   CommunityReply[] @relation("ReplyReplies")
+  post      CommunityPost    @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@map("community_replies")
   @@schema("hackathon_schema")
 }
 
-// ========================================
-// Web3 相关模型
-// ========================================
-
 model DAOProposal {
-  id            String   @id @default(cuid())
-  title         String
-  description   String
-  proposalType  String   // governance, funding, technical, community
-  targetAmount  Decimal? @db.Decimal(15,2)
-  executionTime DateTime
-  status        String   @default("active") // active, passed, rejected, executed
-  forVotes      Int      @default(0)
-  againstVotes  Int      @default(0)
-  creatorId     String
-  ipfsHash      String?
-  metadata      Json?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  // 关系
-  creator       User     @relation("DAOProposalCreator", fields: [creatorId], references: [id], onDelete: Cascade)
-  votes         DAOVote[]
+  id               String    @id @default(cuid())
+  title            String
+  description      String
+  proposalType     String    // treasury, governance, protocol, emergency
+  targetAmount     Decimal?  @db.Decimal(15, 2)
+  executionTime    DateTime
+  status           String    @default("active") // active, passed, rejected, executed, expired
+  forVotes         Int       @default(0)
+  againstVotes     Int       @default(0)
+  abstainVotes     Int       @default(0)
+  totalVotingPower Decimal   @default(0) @db.Decimal(15, 2)
+  minVotingPower   Decimal?  @db.Decimal(15, 2) // 最低投票权要求
+  quorum           Int       @default(20)       // 法定投票人数比例(%)
+  votingDeadline   DateTime                     // 投票截止时间
+  executionDelay   Int       @default(24)       // 执行延迟（小时）
+  proposalCategory String    @default("general") // general, technical, economic, governance
+  priority         String    @default("normal")  // low, normal, high, critical
+  creatorId        String
+  ipfsHash         String?
+  metadata         Json?
+  isExecuted       Boolean   @default(false)
+  executedAt       DateTime?
+  executedBy       String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  creator          User      @relation("DAOProposalCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  votes            DAOVote[]
+  multiSigProposal MultiSigProposal?
 
   @@map("dao_proposals")
   @@schema("hackathon_schema")
 }
 
 model DAOVote {
-  id          String   @id @default(cuid())
-  proposalId  String
-  userId      String
-  vote        String   // for, against
-  votingPower Int
-  ipfsHash    String?
-  createdAt   DateTime @default(now())
-
-  // 关系
-  proposal    DAOProposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
-  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String      @id @default(cuid())
+  proposalId   String
+  userId       String
+  vote         String      // for, against, abstain
+  votingPower  Decimal     @db.Decimal(15, 2)
+  delegatedBy  String?     // 如果是委托投票，记录委托人ID
+  reason       String?     // 投票理由
+  ipfsHash     String?
+  blockNumber  BigInt?     // 投票时的区块高度
+  txHash       String?     // 链上投票交易哈希
+  isValid      Boolean     @default(true)
+  createdAt    DateTime    @default(now())
+  proposal     DAOProposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([proposalId, userId])
   @@map("dao_votes")
@@ -407,15 +375,13 @@ model NFT {
   name        String
   description String
   imageUrl    String
-  category    String   // certificate, achievement, collectible
+  category    String
   metadata    Json?
   ownerId     String
   ipfsHash    String?
   mintTime    DateTime @default(now())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
-  // 关系
   owner       User     @relation("NFTOwner", fields: [ownerId], references: [id], onDelete: Cascade)
 
   @@map("nfts")
@@ -423,17 +389,24 @@ model NFT {
 }
 
 model Staking {
-  id              String   @id @default(cuid())
-  userId          String   @unique
-  stakedAmount    Decimal  @db.Decimal(15,2) @default(0)
-  rewards         Decimal  @db.Decimal(15,2) @default(0)
-  apy             Decimal  @db.Decimal(5,2) @default(12.5)
-  lastRewardTime  DateTime @default(now())
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  // 关系
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id              String               @id @default(cuid())
+  userId          String               @unique
+  stakedAmount    Decimal              @default(0) @db.Decimal(15, 2)
+  rewards         Decimal              @default(0) @db.Decimal(15, 2)
+  apy             Decimal              @default(12.5) @db.Decimal(5, 2)
+  lockPeriod      Int                  @default(30)     // 锁定天数
+  lockUntil       DateTime?                             // 锁定到期时间
+  boostMultiplier Decimal              @default(1.0) @db.Decimal(3, 2) // 加成倍数
+  penaltyRate     Decimal              @default(0.1) @db.Decimal(3, 2) // 提前解锁惩罚率
+  stakingTier     String               @default("bronze") // bronze, silver, gold, platinum
+  autoCompound    Boolean              @default(true)    // 自动复投
+  lastRewardTime  DateTime             @default(now())
+  stakingStarted  DateTime             @default(now())
+  isLocked        Boolean              @default(false)
+  emergencyUnlock Boolean              @default(false)   // 紧急解锁标志
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+  user            User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
   transactions    StakingTransaction[]
 
   @@map("staking")
@@ -444,16 +417,175 @@ model StakingTransaction {
   id          String   @id @default(cuid())
   stakingId   String
   userId      String
-  type        String   // stake, unstake, claim_rewards
-  amount      Decimal  @db.Decimal(15,2)
+  type        String   // stake, unstake, claim_reward, compound, emergency_unlock
+  amount      Decimal  @db.Decimal(15, 2)
+  fee         Decimal  @default(0) @db.Decimal(15, 2) // 交易手续费
+  penalty     Decimal  @default(0) @db.Decimal(15, 2) // 提前解锁惩罚
   txHash      String?
-  status      String   @default("pending") // pending, completed, failed
+  blockNumber BigInt?
+  gasUsed     BigInt?
+  status      String   @default("pending") // pending, confirmed, failed
+  reason      String?  // 交易原因或失败原因
   createdAt   DateTime @default(now())
-
-  // 关系
+  confirmedAt DateTime?
   staking     Staking  @relation(fields: [stakingId], references: [id], onDelete: Cascade)
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId, type])
+  @@index([status, createdAt])
   @@map("staking_transactions")
   @@schema("hackathon_schema")
-} 
+}
+
+// 多重签名提案模型
+model MultiSigProposal {
+  id             String      @id @default(cuid())
+  proposalId     String      @unique
+  requiredSigs   Int         @default(3)       // 需要的签名数量
+  currentSigs    Int         @default(0)       // 当前签名数量
+  timelock       DateTime                      // 时间锁
+  executed       Boolean     @default(false)   // 是否已执行
+  signers        Json        @default("[]")    // 签名者地址列表
+  signatures     Json        @default("[]")    // 已收集的签名
+  threshold      Decimal     @db.Decimal(5, 2) // 签名阈值百分比
+  isEmergency    Boolean     @default(false)   // 是否紧急提案
+  emergencyDelay Int         @default(6)       // 紧急提案延迟时间（小时）
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  proposal       DAOProposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+
+  @@map("multisig_proposals")
+  @@schema("hackathon_schema")
+}
+
+// 声誉积分记录模型
+model ReputationRecord {
+  id           String    @id @default(cuid())
+  userId       String
+  action       String    // submit_project, vote, judge, organize, participate等
+  points       Int       // 获得积分
+  multiplier   Decimal   @default(1.0) @db.Decimal(3, 2) // 质押加成倍数
+  hackathonId  String?
+  projectId    String?
+  description  String?   // 行为描述
+  category     String    @default("general") // general, technical, community, governance
+  season       String?   // 积分赛季
+  isValid      Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  user         User      @relation("UserReputation", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, season])
+  @@index([action, createdAt])
+  @@map("reputation_records")
+  @@schema("hackathon_schema")
+}
+
+// 零知识证明投票模型
+model PrivateVote {
+  id             String   @id @default(cuid())
+  proposalId     String
+  commitHash     String   // 投票承诺哈希
+  nullifierHash  String   @unique // 防止双重投票的nullifier
+  proof          Json     // ZK证明数据
+  publicSignals  Json     // 公开信号
+  votingPower    Decimal  @db.Decimal(15, 2)
+  isVerified     Boolean  @default(false)
+  verifiedAt     DateTime?
+  createdAt      DateTime @default(now())
+
+  @@index([proposalId, nullifierHash])
+  @@map("private_votes")
+  @@schema("hackathon_schema")
+}
+
+// 跨链支持配置模型
+model CrossChainSupport {
+  id                  String   @id @default(cuid())
+  chainId             Int      @unique
+  chainName           String
+  rpcUrl              String
+  explorerUrl         String?
+  contractAddress     String
+  isActive            Boolean  @default(true)
+  gasPriceMultiplier  Decimal  @default(1.0) @db.Decimal(3, 2)
+  blockTime           Int      @default(3)     // 平均出块时间（秒）
+  confirmations       Int      @default(12)    // 确认块数
+  nativeToken         String   // 原生代币符号
+  decimals            Int      @default(18)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@map("crosschain_support")
+  @@schema("hackathon_schema")
+}
+
+// DID去中心化身份凭证模型
+model DIDCredential {
+  id                    String    @id @default(cuid())
+  userId                String
+  didDocument           Json      // DID文档
+  verifiableCredentials Json      @default("[]") // 可验证凭证列表
+  issuer                String    // 颁发者DID
+  subject               String    // 主体DID
+  credentialType        String    // 凭证类型
+  expiryDate            DateTime?
+  isVerified            Boolean   @default(false)
+  verificationMethod    String?   // 验证方法
+  proofType             String?   // 证明类型
+  proofValue            String?   // 证明值
+  revoked               Boolean   @default(false)
+  revokedAt             DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  user                  User      @relation("UserDID", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, credentialType])
+  @@index([issuer, isVerified])
+  @@map("did_credentials")
+  @@schema("hackathon_schema")
+}
+
+// 委托投票模型
+model VotingDelegation {
+  id          String    @id @default(cuid())
+  delegatorId String    // 委托人
+  delegateeId String    // 被委托人
+  scope       String    @default("all") // all, category, specific
+  category    String?   // 委托范围的具体分类
+  validUntil  DateTime? // 委托有效期
+  isActive    Boolean   @default(true)
+  votingPower Decimal   @db.Decimal(15, 2) // 委托的投票权
+  autoRenew   Boolean   @default(false)     // 是否自动续期
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  delegator   User      @relation("Delegator", fields: [delegatorId], references: [id], onDelete: Cascade)
+  delegatee   User      @relation("Delegatee", fields: [delegateeId], references: [id], onDelete: Cascade)
+
+  @@unique([delegatorId, delegateeId, scope])
+  @@index([delegateeId, isActive])
+  @@map("voting_delegations")
+  @@schema("hackathon_schema")
+}
+
+// 社区激励模型
+model CommunityIncentive {
+  id           String   @id @default(cuid())
+  userId       String
+  actionType   String   // project_submit, vote_cast, judge_review, community_post等
+  rewardAmount Decimal  @db.Decimal(15, 2)
+  tokenType    String   @default("HACKX") // 代币类型
+  multiplier   Decimal  @default(1.0) @db.Decimal(3, 2) // 激励倍数
+  distributed  Boolean  @default(false)
+  distributedAt DateTime?
+  txHash       String?  // 分发交易哈希
+  reason       String?  // 激励原因
+  season       String?  // 激励季度
+  isValid      Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  user         User     @relation("IncentiveUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, distributed])
+  @@index([actionType, season])
+  @@map("community_incentives")
+  @@schema("hackathon_schema")
+}

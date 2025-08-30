@@ -73,12 +73,41 @@ export function FeaturedHackathons() {
     }
   }
 
+  const getHackathonImage = (hackathon: Hackathon) => {
+    // 优先使用黑客松的封面图片（如果存在metadata字段）
+    const metadata = (hackathon as any).metadata
+    if (metadata?.coverImage) {
+      return metadata.coverImage
+    }
+    
+    // 基于黑客松类别生成主题图片
+    const category = hackathon.categories?.[0]?.toLowerCase() || 'general'
+    const themeImages: Record<string, string> = {
+      defi: '/images/themes/defi-bg.jpg',
+      nft: '/images/themes/nft-bg.jpg',
+      dao: '/images/themes/dao-bg.jpg',
+      gamefi: '/images/themes/gamefi-bg.jpg',
+      ai: '/images/themes/ai-bg.jpg',
+      web3: '/images/themes/web3-bg.jpg',
+      blockchain: '/images/themes/blockchain-bg.jpg',
+      general: '/images/themes/hackathon-default.jpg'
+    }
+    
+    return themeImages[category] || themeImages.general
+  }
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('zh-CN', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
     })
+  }
+
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    // 图片加载失败时的后备方案
+    const img = e.target as HTMLImageElement
+    img.src = '/images/themes/hackathon-default.jpg'
   }
 
   if (loading) {
@@ -138,9 +167,11 @@ export function FeaturedHackathons() {
             <Card key={hackathon.id} className="overflow-hidden hover:shadow-lg transition-shadow group">
               <div className="relative">
                 <img
-                  src="/placeholder.svg?height=200&width=400"
+                  src={getHackathonImage(hackathon)}
                   alt={hackathon.title}
                   className="w-full h-48 object-cover"
+                  onError={handleImageError}
+                  loading="lazy"
                 />
                 <div className="absolute top-4 left-4">
                   <Badge className={`${getStatusColor(hackathon.status)} text-white`}>

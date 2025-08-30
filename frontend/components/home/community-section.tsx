@@ -95,12 +95,12 @@ export function CommunitySection() {
             <CardContent className="pt-6 space-y-4">
               <h3 className="text-xl font-semibold">准备好开始了吗？</h3>
               <p className="text-muted-foreground">
-                立即注册 HackX，发现下一个改变世界的项目，或者创建你自己的黑客松活动！
+                立即加入 HackX，发现下一个改变世界的项目，或者创建你自己的黑客松活动！
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button size="lg" asChild>
-                  <Link href="/auth/signup">
-                    立即注册
+                  <Link href="/auth/signin">
+                    连接钱包加入
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>

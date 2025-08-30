@@ -4,6 +4,7 @@ import './globals.css'
 import { Toaster } from '@/components/ui/toaster'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Header } from '@/components/layout/header'
+import { Footer } from '@/components/layout/footer'
 import { AuthProvider } from '@/hooks/use-auth'
 import { Web3AuthProvider } from '@/hooks/use-web3-auth'
 import { NetworkStatus } from '@/components/web3/network-status'
@@ -39,6 +40,7 @@ export default function RootLayout({
                 <main>
                   {children}
                 </main>
+                <Footer />
                 <Toaster />
               </IPFSConfigProvider>
             </Web3AuthProvider>

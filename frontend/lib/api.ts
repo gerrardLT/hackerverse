@@ -1,10 +1,29 @@
 // API服务层 - 管理所有的HTTP请求
+
+// 标准化错误类型
+export interface ApiError {
+  code: string
+  message: string
+  details?: any
+}
+
+// 认证相关错误码
+export enum AuthErrorCode {
+  INVALID_CREDENTIALS = 'INVALID_CREDENTIALS',
+  TOKEN_EXPIRED = 'TOKEN_EXPIRED',
+  TOKEN_INVALID = 'TOKEN_INVALID',
+  UNAUTHORIZED = 'UNAUTHORIZED',
+  WALLET_NOT_CONNECTED = 'WALLET_NOT_CONNECTED',
+  SIGNATURE_INVALID = 'SIGNATURE_INVALID'
+}
+
 interface ApiResponse<T> {
   success: boolean
   data?: T
   error?: string
   message?: string
   details?: any
+  code?: string
 }
 
 interface User {
@@ -179,7 +198,7 @@ class ApiService {
   private baseURL: string
   private token: string | null = null
 
-  constructor(baseURL: string = 'http://localhost:3000/api') {
+  constructor(baseURL: string = 'http://localhost:3002/api') {
     this.baseURL = baseURL
     // 从localStorage获取token
     if (typeof window !== 'undefined') {
@@ -191,7 +210,14 @@ class ApiService {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
-    const url = `${this.baseURL}${endpoint}`
+    // 构建URL，并在GET请求时追加时间戳防缓存
+    let url = `${this.baseURL}${endpoint}`
+    const method = (options.method || 'GET').toUpperCase()
+    if (method === 'GET') {
+      const hasQuery = url.includes('?')
+      const ts = `_ts=${Date.now()}`
+      url = hasQuery ? `${url}&${ts}` : `${url}?${ts}`
+    }
     
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -207,6 +233,8 @@ class ApiService {
       const response = await fetch(url, {
         ...options,
         headers,
+        // 禁用缓存，确保每次刷新都会重新请求
+        cache: 'no-store',
       })
 
       const data = await response.json()
@@ -257,6 +285,27 @@ class ApiService {
   }
 
   // ============ 认证API ============
+  
+  /**
+   * 验证token有效性
+   */
+  async validateToken(token?: string): Promise<boolean> {
+    const tokenToValidate = token || this.token
+    if (!tokenToValidate) return false
+    
+    try {
+      const response = await this.request('/auth/validate', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${tokenToValidate}`
+        }
+      })
+      return response.success
+    } catch (error) {
+      return false
+    }
+  }
+  
   async signIn(email: string, password: string): Promise<ApiResponse<{ user: User; token: string }>> {
     return this.request('/auth/signin', {
       method: 'POST',
@@ -274,6 +323,25 @@ class ApiService {
   // ============ 用户管理API ============
   async getCurrentUser(): Promise<ApiResponse<{ user: User }>> {
     return this.request('/users/me')
+  }
+
+  async getUserStats(): Promise<ApiResponse<{ 
+    stats: {
+      participatedHackathons: number
+      submittedProjects: number
+      wonPrizes: number
+      reputationScore: number
+    }
+    recentActivities: Array<{
+      id: string
+      type: string
+      title: string
+      description: string
+      date: string
+      hackathonName?: string
+    }>
+  }>> {
+    return this.request('/users/me/stats')
   }
 
   async updateUser(data: {

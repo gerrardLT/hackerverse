@@ -8,8 +8,9 @@ import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Progress } from '@/components/ui/progress'
-import { Trophy, Calendar, Users, Code, Star, Plus } from 'lucide-react'
+import { Trophy, Calendar, Users, Code, Star, Plus, Settings } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
+import { apiService } from '@/lib/api'
 
 interface DashboardStats {
   participatedHackathons: number
@@ -36,45 +37,45 @@ export default function DashboardPage() {
     reputationScore: 0,
   })
   const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // 模拟加载用户数据
-    setTimeout(() => {
-      setStats({
-        participatedHackathons: 12,
-        submittedProjects: 8,
-        wonPrizes: 3,
-        reputationScore: 850,
-      })
+    const fetchUserStats = async () => {
+      if (!user) return
+      
+      try {
+        setLoading(true)
+        const response = await apiService.getUserStats()
+        
+        if (response.success && response.data) {
+          setStats(response.data.stats)
+          setRecentActivities(response.data.recentActivities)
+        } else {
+          console.error('获取用户统计数据失败:', response.error)
+          // 如果API失败，显示默认数据
+          setStats({
+            participatedHackathons: 0,
+            submittedProjects: 0,
+            wonPrizes: 0,
+            reputationScore: user.reputationScore || 0,
+          })
+        }
+      } catch (error) {
+        console.error('获取用户统计数据错误:', error)
+        // 显示默认数据
+        setStats({
+          participatedHackathons: 0,
+          submittedProjects: 0,
+          wonPrizes: 0,
+          reputationScore: user.reputationScore || 0,
+        })
+      } finally {
+        setLoading(false)
+      }
+    }
 
-      setRecentActivities([
-        {
-          id: '1',
-          type: 'project_submitted',
-          title: '提交了项目',
-          description: '在 Web3 DeFi 创新挑战赛中提交了 DeFi 聚合器项目',
-          date: '2024-01-15',
-          hackathonName: 'Web3 DeFi 创新挑战赛',
-        },
-        {
-          id: '2',
-          type: 'hackathon_joined',
-          title: '参加了黑客松',
-          description: '加入了 AI × 区块链融合大赛',
-          date: '2024-01-10',
-          hackathonName: 'AI × 区块链融合大赛',
-        },
-        {
-          id: '3',
-          type: 'prize_won',
-          title: '获得奖项',
-          description: '在 NFT 创作者工具挑战赛中获得第二名',
-          date: '2024-01-05',
-          hackathonName: 'NFT 创作者工具挑战赛',
-        },
-      ])
-    }, 800)
-  }, [])
+    fetchUserStats()
+  }, [user])
 
   if (!user) {
     return (
@@ -92,7 +93,7 @@ export default function DashboardPage() {
   return (
     <div className="container py-8">
       <div className="space-y-8">
-        {/* 用户信息头部 */}
+                {/* 用户信息头部 */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Avatar className="h-16 w-16">
@@ -100,9 +101,22 @@ export default function DashboardPage() {
               <AvatarFallback className="text-lg">{user.username?.[0]?.toUpperCase()}</AvatarFallback>
             </Avatar>
             <div>
-              <h1 className="text-3xl font-bold">欢迎回来，{user.username}</h1>
-              <p className="text-muted-foreground">继续你的黑客松之旅</p>
+              <h2 className="text-2xl font-bold">{user.username}</h2>
+              <p className="text-muted-foreground">{user.email}</p>
             </div>
+          </div>
+          <Button asChild variant="outline">
+            <Link href="/dashboard/settings">
+              <Settings className="h-4 w-4 mr-2" />
+              设置
+            </Link>
+          </Button>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">欢迎回来，{user.username}</h1>
+            <p className="text-muted-foreground">继续你的黑客松之旅</p>
           </div>
           <Button asChild>
             <Link href="/hackathons">

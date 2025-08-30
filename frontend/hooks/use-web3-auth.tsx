@@ -49,7 +49,8 @@ const HACKX_CORE_ABI = [
 ]
 
 // 合约地址 - BSC Testnet 部署地址
-const CONTRACT_ADDRESS = '0x4BcFE52B6f38881d888b595E201E56B2cde93699'
+const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '0x4BcFE52B6f38881d888b595E201E56B2cde93699'
+const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 export function Web3AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<Web3User | null>(null)
@@ -67,7 +68,7 @@ export function Web3AuthProvider({ children }: { children: React.ReactNode }) {
 
   // 当signer变化时，更新合约实例
   useEffect(() => {
-    if (signer && CONTRACT_ADDRESS !== '0x0000000000000000000000000000000000000000') {
+    if (signer && CONTRACT_ADDRESS !== ZERO_ADDRESS) {
       const contractInstance = new ethers.Contract(CONTRACT_ADDRESS, HACKX_CORE_ABI, signer)
       setContract(contractInstance)
     }
@@ -76,23 +77,35 @@ export function Web3AuthProvider({ children }: { children: React.ReactNode }) {
   // ⭐ 同步Web3用户到传统认证系统
   const syncWithTraditionalAuth = async (walletAddress: string, profileCID?: string) => {
     try {
-      console.log('🔄 正在同步Web3用户到传统认证系统...')
+      console.log('🔄 检查Web3用户认证状态...')
       
-      // 1. 尝试通过钱包地址登录/注册
+      // ⭐ 验证现有token的有效性（修复：不仅检查存在性，还要验证有效性）
+      const existingToken = localStorage.getItem('hackx-token')
+      if (existingToken) {
+        console.log('🔍 发现现有token，验证有效性...')
+        const isValid = await apiService.validateToken(existingToken)
+        if (isValid) {
+          console.log('✅ 现有token有效，跳过重复登录')
+          return
+        } else {
+          console.warn('⚠️ 现有token已失效，清理并重新认证')
+          // 清理无效token
+          localStorage.removeItem('hackx-token')
+          localStorage.removeItem('hackx-user')
+        }
+      }
+      
+      console.log('🔑 开始钱包认证流程...')
+      
+      // 1. 尝试通过钱包地址登录
       const response = await apiService.signInWithWallet(walletAddress)
       
       if (response.success && response.data) {
-        // 用户已存在，设置认证状态
-        console.log('✅ 找到现有用户，已设置认证状态')
+        console.log('✅ 找到现有用户，使用统一认证管理器')
         
-        // 触发useAuth的状态更新（通过事件或直接调用）
-        const authEvent = new CustomEvent('web3-auth-success', {
-          detail: {
-            user: response.data.user,
-            token: response.data.token
-          }
-        })
-        window.dispatchEvent(authEvent)
+        // 使用统一的认证状态管理器
+        const { authStateManager } = await import('@/lib/auth-state-manager')
+        await authStateManager.authenticateUser(response.data.user, response.data.token, 'wallet')
         
       } else {
         console.log('📝 用户不存在，需要创建新用户')
@@ -106,16 +119,11 @@ export function Web3AuthProvider({ children }: { children: React.ReactNode }) {
         })
         
         if (createResponse.success && createResponse.data) {
-          console.log('✅ 新用户创建成功')
+          console.log('✅ 新用户创建成功，使用统一认证管理器')
           
-          // 设置认证状态
-          const authEvent = new CustomEvent('web3-auth-success', {
-            detail: {
-              user: createResponse.data.user,
-              token: createResponse.data.token
-            }
-          })
-          window.dispatchEvent(authEvent)
+          // 使用统一的认证状态管理器
+          const { authStateManager } = await import('@/lib/auth-state-manager')
+          await authStateManager.authenticateUser(createResponse.data.user, createResponse.data.token, 'wallet')
         } else {
           console.warn('⚠️ 创建新用户失败:', createResponse.error)
         }
@@ -181,7 +189,7 @@ export function Web3AuthProvider({ children }: { children: React.ReactNode }) {
       let profileCID = undefined
       
       try {
-        if (CONTRACT_ADDRESS !== '0x0000000000000000000000000000000000000000') {
+        if (CONTRACT_ADDRESS !== ZERO_ADDRESS) {
           const contractInstance = new ethers.Contract(CONTRACT_ADDRESS, HACKX_CORE_ABI, signer)
           setContract(contractInstance)
           

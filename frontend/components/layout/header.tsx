@@ -19,6 +19,7 @@ import { Menu, User, Settings, LogOut, Wallet, Trophy, Users, Calendar, FolderOp
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/hooks/use-auth'
+import { NotificationDropdown } from '@/components/notifications/notification-dropdown'
 import { useWeb3Auth } from '@/hooks/use-web3-auth'
 import { WalletConnect } from '@/components/ui/wallet-connect'
 
@@ -90,13 +91,8 @@ export function Header() {
             {user ? (
               // 用户已登录：显示用户头像和下拉菜单
               <div className="flex items-center gap-4">
-                {/* 通知图标 */}
-                <Button variant="ghost" size="sm" className="relative">
-                  <Bell className="h-5 w-5" />
-                  <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs">
-                    3
-                  </Badge>
-                </Button>
+                {/* 通知组件 */}
+                <NotificationDropdown />
 
                 {/* 用户头像和下拉菜单 */}
                 <DropdownMenu>
@@ -128,20 +124,7 @@ export function Header() {
                         个人中心
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/profile" className="flex items-center gap-2">
-                        <Settings className="h-4 w-4" />
-                        设置
-                      </Link>
-                    </DropdownMenuItem>
-                    {user.walletAddress && (
-                      <DropdownMenuItem asChild>
-                        <Link href="/wallet" className="flex items-center gap-2">
-                          <Wallet className="h-4 w-4" />
-                          {formatWalletAddress(user.walletAddress)}
-                        </Link>
-                      </DropdownMenuItem>
-                    )}
+
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
                       <LogOut className="h-4 w-4 mr-2" />
@@ -157,9 +140,12 @@ export function Header() {
               <Button variant="ghost" asChild>
                 <Link href="/auth/signin">登录</Link>
               </Button>
+              {/* 隐藏注册按钮，因为现在只支持钱包登录 */}
+              {/* 
               <Button asChild>
                 <Link href="/auth/signup">注册</Link>
               </Button>
+              */}
             </div>
             )}
 

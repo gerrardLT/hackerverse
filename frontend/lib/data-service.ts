@@ -2,7 +2,6 @@
 
 import { smartContractService } from './smart-contracts'
 import { ipfsDataService, HackathonData, ProjectData, UserProfile } from './ipfs-data-service'
-import { GraphQLService } from './graphql-client'
 import { apiService } from './api'
 
 // 统一的数据获取服务
@@ -11,7 +10,7 @@ export class DataService {
   // ============ 黑客松数据获取 ============
   
   /**
-   * 获取黑客松列表（优先级：The Graph > 智能合约 > API）
+   * 获取黑客松列表（优先级：后端 API > 智能合约）
    */
   async getHackathons(params: {
     search?: string
@@ -26,29 +25,6 @@ export class DataService {
     hasMore: boolean
   }> {
     console.log('DataService: Getting hackathons with params:', params)
-    
-    // 策略1: 尝试从 The Graph 获取（最快）
-    try {
-      console.log('DataService: Trying The Graph...')
-      const graphData = await GraphQLService.getHackathons({
-        first: params.limit || 10,
-        skip: ((params.page || 1) - 1) * (params.limit || 10)
-      })
-      
-      if (graphData?.hackathons && graphData.hackathons.length > 0) {
-        console.log('DataService: The Graph returned data, enriching from IPFS...')
-        const enrichedHackathons = await this.enrichHackathonsFromGraph(graphData.hackathons)
-        const filteredHackathons = this.filterHackathons(enrichedHackathons, params)
-        
-        return {
-          hackathons: filteredHackathons,
-          total: filteredHackathons.length,
-          hasMore: graphData.hackathons.length === (params.limit || 10)
-        }
-      }
-    } catch (error) {
-      console.warn('DataService: The Graph unavailable, falling back to contracts:', error)
-    }
     
     // 策略2: 从智能合约获取（可靠）
     try {
@@ -66,7 +42,7 @@ export class DataService {
       console.warn('DataService: Smart contracts unavailable, falling back to API:', error)
     }
     
-    // 策略3: 从后端 API 获取（备用）
+    // 策略1: 先从后端 API 获取（优先）
     try {
       console.log('DataService: Trying backend API...')
       const response = await apiService.getHackathons(params)
@@ -80,9 +56,9 @@ export class DataService {
         }
       }
     } catch (error) {
-      console.warn('DataService: API also failed:', error)
+      console.warn('DataService: API failed, fallback to smart contracts:', error)
     }
-    
+
     // 都失败了，返回空数据
     console.warn('DataService: All data sources failed, returning empty data')
     return {
@@ -303,58 +279,7 @@ export class DataService {
     }
   }
 
-  /**
-   * 从 The Graph 数据丰富黑客松信息
-   */
-  private async enrichHackathonsFromGraph(graphHackathons: any[]): Promise<HackathonData[]> {
-    const results = await Promise.allSettled(
-      graphHackathons.map(async (h) => {
-        try {
-          // 如果Graph数据中有dataCID，从IPFS获取详细数据
-          if (h.dataCID) {
-            return await ipfsDataService.getHackathonData(Number(h.hackathonId || h.id))
-          }
-          
-          // 否则转换Graph数据
-          return this.convertGraphHackathonToData(h)
-        } catch (error) {
-          console.warn(`Failed to enrich hackathon ${h.id}:`, error)
-          return this.convertGraphHackathonToData(h)
-        }
-      })
-    )
-    
-    return results
-      .filter((result): result is PromiseFulfilledResult<HackathonData> => 
-        result.status === 'fulfilled'
-      )
-      .map(result => result.value)
-  }
-
-  /**
-   * 转换Graph数据为HackathonData
-   */
-  private convertGraphHackathonToData(graphData: any): HackathonData {
-    return {
-      id: Number(graphData.hackathonId || graphData.id),
-      organizer: graphData.organizer?.address || graphData.organizer,
-      createdAt: new Date(graphData.createdAt * 1000),
-      active: true,
-      
-      title: graphData.hackathonData?.title || `黑客松 #${graphData.id}`,
-      description: graphData.hackathonData?.description || '暂无描述',
-      startDate: graphData.hackathonData?.startDate ? new Date(graphData.hackathonData.startDate) : new Date(),
-      endDate: graphData.hackathonData?.endDate ? new Date(graphData.hackathonData.endDate) : new Date(),
-      prizePool: parseFloat(graphData.hackathonData?.prizePool) || 0,
-      categories: graphData.hackathonData?.categories || [],
-      
-      status: 'active' as const,
-      isValid: true,
-      formattedPrize: '待定',
-      duration: '待定',
-      timeRemaining: '待定',
-    }
-  }
+  // （已移除）与 The Graph 相关的辅助方法
 
   /**
    * 转换API数据为HackathonData

@@ -59,21 +59,87 @@ export interface IPFSProjectData {
   data: {
     title: string
     description: string
+    techStack: string[]  // 统一使用techStack字段
     demoUrl?: string
     githubUrl?: string
-    techStack: string[]
-    teamMembers: string[]
-    screenshots?: string[]
+    videoUrl?: string
+    presentationUrl?: string
+    team?: string
+    hackathonId: string
+    teamId?: string
+    tags?: string[]
+    isPublic: boolean
+    createdAt: string
   }
   metadata: {
     creator: string
-    hackathonId: string
+    hackathonTitle?: string
+    platform: string
+    network?: string
     previousVersion?: string
   }
 }
 
 export class IPFSService {
   private static pinata: any = null
+  private static readonly MAX_RETRIES = 3
+  private static readonly RETRY_DELAY = 1000 // 1秒
+  private static readonly UPLOAD_TIMEOUT = 30000 // 30秒
+
+  /**
+   * 重试装饰器 - 为关键方法添加重试逻辑
+   */
+  private static async withRetry<T>(
+    operation: () => Promise<T>,
+    operationName: string,
+    maxRetries: number = this.MAX_RETRIES
+  ): Promise<T> {
+    let lastError: Error | null = null
+    
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`🔄 ${operationName} - 尝试 ${attempt}/${maxRetries}`)
+        const result = await operation()
+        if (attempt > 1) {
+          console.log(`✅ ${operationName} - 第${attempt}次尝试成功`)
+        }
+        return result
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error(String(error))
+        console.warn(`⚠️ ${operationName} - 第${attempt}次尝试失败:`, lastError.message)
+        
+        if (attempt < maxRetries) {
+          const delay = this.RETRY_DELAY * Math.pow(2, attempt - 1) // 指数退避
+          console.log(`🕰️ 等待 ${delay}ms 后重试...`)
+          await this.sleep(delay)
+        }
+      }
+    }
+    
+    throw new Error(`${operationName}在${maxRetries}次尝试后仍然失败: ${lastError?.message}`)
+  }
+
+  /**
+   * 延时工具函数
+   */
+  private static sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms))
+  }
+
+  /**
+   * 超时装饰器 - 为上传操作添加超时控制
+   */
+  private static async withTimeout<T>(
+    operation: () => Promise<T>,
+    timeoutMs: number = this.UPLOAD_TIMEOUT
+  ): Promise<T> {
+    return Promise.race([
+      operation(),
+      new Promise<T>((_, reject) => {
+        setTimeout(() => reject(new Error(`操作超时（${timeoutMs}ms）`)), timeoutMs)
+      })
+    ])
+  }
 
   /**
    * 初始化 Pinata 客户端 (基于最新SDK文档)
@@ -235,188 +301,205 @@ export class IPFSService {
   }
 
   /**
-   * 上传文件到 IPFS (基于Pinata HTTP API)
+   * 上传文件到 IPFS - 带重试和超时保护
    */
   static async uploadFile(file: Buffer, filename: string): Promise<IPFSFile> {
-    try {
-      console.log('📤 准备上传文件到Pinata:', filename)
+    return this.withRetry(async () => {
+      return this.withTimeout(async () => {
+        console.log('📤 准备上传文件到Pinata:', filename)
 
-      // 使用Pinata HTTP API上传文件
-      const FormData = require('form-data')
-      const formData = new FormData()
-      
-      formData.append('file', file, { filename })
-      formData.append('pinataMetadata', JSON.stringify({
-        name: filename
-      }))
+        // 使用Pinata HTTP API上传文件
+        const FormData = require('form-data')
+        const formData = new FormData()
+        
+        formData.append('file', file, { filename })
+        formData.append('pinataMetadata', JSON.stringify({
+          name: filename
+        }))
 
-      const pinataUrl = 'https://api.pinata.cloud/pinning/pinFileToIPFS'
-      const pinataJwt = process.env.PINATA_JWT
-      const pinataApiKey = process.env.PINATA_API_KEY
-      
-      let headers: any = {
-        ...formData.getHeaders()
-      }
-      
-      // 设置认证头
-      if (pinataJwt) {
-        headers['Authorization'] = `Bearer ${pinataJwt}`
-      } else if (pinataApiKey) {
-        headers['pinata_api_key'] = pinataApiKey
-        headers['pinata_secret_api_key'] = process.env.PINATA_API_SECRET
-      }
+        const pinataUrl = 'https://api.pinata.cloud/pinning/pinFileToIPFS'
+        const pinataJwt = process.env.PINATA_JWT
+        const pinataApiKey = process.env.PINATA_API_KEY
+        
+        let headers: any = {
+          ...formData.getHeaders()
+        }
+        
+        // 设置认证头
+        if (pinataJwt) {
+          headers['Authorization'] = `Bearer ${pinataJwt}`
+        } else if (pinataApiKey) {
+          headers['pinata_api_key'] = pinataApiKey
+          headers['pinata_secret_api_key'] = process.env.PINATA_API_SECRET
+        } else {
+          throw new Error('缺少Pinata认证信息，请检查环境变量配置')
+        }
 
-      const response = await fetch(pinataUrl, {
-        method: 'POST',
-        headers,
-        body: formData
+        const response = await fetch(pinataUrl, {
+          method: 'POST',
+          headers,
+          body: formData
+        })
+
+        if (!response.ok) {
+          const errorText = await response.text()
+          throw new Error(`Pinata文件上传API错误: ${response.status} - ${errorText}`)
+        }
+
+        const result = await response.json()
+
+        console.log('✅ Pinata 文件上传成功:', result.IpfsHash)
+
+        // 兼容不同版本的返回字段
+        const cid = result.IpfsHash || result.cid || result.hash
+        if (!cid) {
+          throw new Error('Pinata返回的响应中没有CID')
+        }
+        
+        const gateway = process.env.PINATA_GATEWAY || 'https://gateway.pinata.cloud'
+
+        return {
+          name: filename,
+          type: 'file',
+          size: file.length,
+          hash: cid,
+          url: `${gateway}/ipfs/${cid}`
+        }
       })
-
-      if (!response.ok) {
-        const errorText = await response.text()
-        throw new Error(`Pinata文件上传API错误: ${response.status} - ${errorText}`)
-      }
-
-      const result = await response.json()
-
-      console.log('✅ Pinata 文件上传成功:', result.IpfsHash)
-
-      // 兼容不同版本的返回字段
-      const cid = result.IpfsHash || result.cid || result.hash
-      const gateway = process.env.PINATA_GATEWAY || 'https://gateway.pinata.cloud'
-
-      return {
-        name: filename,
-        type: 'file',
-        size: file.length,
-        hash: cid,
-        url: `${gateway}/ipfs/${cid}`
-      }
-    } catch (error) {
-      console.error('IPFS 文件上传失败:', error)
-      console.error('错误详情:', error instanceof Error && 'response' in error ? (error as any).response?.data || error.message : String(error))
-      throw new Error(`IPFS 文件上传失败: ${error}`)
-    }
+    }, 'IPFS文件上传')
   }
 
   /**
-   * 上传 JSON 数据到 IPFS (基于Pinata HTTP API)
+   * 上传 JSON 数据到 IPFS (基于Pinata HTTP API) - 带重试和超时保护
    */
   static async uploadJSON(data: any, metadata?: Partial<IPFSMetadata>): Promise<string> {
-    try {
-      const jsonData = {
-        ...data,
-        metadata: {
-          name: metadata?.name || 'data.json',
-          description: metadata?.description,
-          tags: metadata?.tags || [],
-          version: metadata?.version || '1.0.0',
-          author: metadata?.author,
-          timestamp: Date.now()
+    return this.withRetry(async () => {
+      return this.withTimeout(async () => {
+        const jsonData = {
+          ...data,
+          metadata: {
+            name: metadata?.name || 'data.json',
+            description: metadata?.description,
+            tags: metadata?.tags || [],
+            version: metadata?.version || '1.0.0',
+            author: metadata?.author,
+            timestamp: Date.now()
+          }
         }
-      }
 
-      console.log('📤 准备上传JSON到Pinata:', jsonData.metadata.name)
-      
-      // 使用Pinata HTTP API直接上传JSON
-      const pinataUrl = 'https://api.pinata.cloud/pinning/pinJSONToIPFS'
-      const pinataJwt = process.env.PINATA_JWT
-      const pinataApiKey = process.env.PINATA_API_KEY
-      
-      let headers: any = {
-        'Content-Type': 'application/json',
-      }
-      
-      // 设置认证头
-      if (pinataJwt) {
-        headers['Authorization'] = `Bearer ${pinataJwt}`
-      } else if (pinataApiKey) {
-        headers['pinata_api_key'] = pinataApiKey
-        headers['pinata_secret_api_key'] = process.env.PINATA_API_SECRET
-      }
-
-      const requestBody = {
-        pinataContent: jsonData,
-        pinataMetadata: {
-          name: jsonData.metadata.name,
-          description: jsonData.metadata.description,
+        console.log('📤 准备上传JSON到Pinata:', jsonData.metadata.name)
+        
+        // 使用Pinata HTTP API直接上传JSON
+        const pinataUrl = 'https://api.pinata.cloud/pinning/pinJSONToIPFS'
+        const pinataJwt = process.env.PINATA_JWT
+        const pinataApiKey = process.env.PINATA_API_KEY
+        
+        let headers: any = {
+          'Content-Type': 'application/json',
         }
-      }
+        
+        // 设置认证头
+        if (pinataJwt) {
+          headers['Authorization'] = `Bearer ${pinataJwt}`
+        } else if (pinataApiKey) {
+          headers['pinata_api_key'] = pinataApiKey
+          headers['pinata_secret_api_key'] = process.env.PINATA_API_SECRET
+        } else {
+          throw new Error('缺少Pinata认证信息，请检查环境变量配置')
+        }
 
-      const response = await fetch(pinataUrl, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(requestBody)
+        const requestBody = {
+          pinataContent: jsonData,
+          pinataMetadata: {
+            name: jsonData.metadata.name,
+            description: jsonData.metadata.description,
+          }
+        }
+
+        const response = await fetch(pinataUrl, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(requestBody)
+        })
+
+        if (!response.ok) {
+          const errorText = await response.text()
+          throw new Error(`Pinata API错误: ${response.status} - ${errorText}`)
+        }
+
+        const result = await response.json()
+
+        console.log('✅ Pinata JSON上传成功:', result.IpfsHash)
+        
+        // 新版SDK返回的字段名可能不同，兼容处理
+        const cid = result.IpfsHash || result.cid || result.hash
+        if (!cid) {
+          throw new Error('Pinata返回的响应中没有CID')
+        }
+        return cid
       })
-
-      if (!response.ok) {
-        const errorText = await response.text()
-        throw new Error(`Pinata API错误: ${response.status} - ${errorText}`)
-      }
-
-      const result = await response.json()
-
-      console.log('✅ Pinata JSON上传成功:', result.IpfsHash)
-      
-      // 新版SDK返回的字段名可能不同，兼容处理
-      const cid = result.IpfsHash || result.cid || result.hash
-      return cid
-    } catch (error) {
-      console.error('Pinata JSON 上传失败:', error)
-      console.error('错误详情:', error instanceof Error && 'response' in error ? (error as any).response?.data || error.message : String(error))
-      throw new Error(`Pinata JSON 上传失败: ${error}`)
-    }
+    }, 'IPFS JSON上传')
   }
 
   /**
-   * 从 IPFS 获取数据 (基于最新Pinata SDK)
+   * 从 IPFS 获取数据 - 带多网关fallback和重试机制
    */
   static async getFromIPFS(hash: string): Promise<any> {
-    try {
-      const pinata = await this.initPinata()
-      const gateway = process.env.PINATA_GATEWAY || 'https://gateway.pinata.cloud'
+    return this.withRetry(async () => {
+      console.log('📥 从 IPFS 获取数据:', hash)
       
-      console.log('📥 从IPFS获取数据:', hash)
-      
-      // 优先使用Pinata专用网关
-      try {
-        const response = await fetch(`${gateway}/ipfs/${hash}`)
-        if (response.ok) {
-          const data = await response.json()
-          console.log('✅ 从Pinata专用网关获取数据成功')
-          return data
-        }
-      } catch (pinataError) {
-        console.log('❌ 从Pinata专用网关获取数据失败，尝试其他网关')
-      }
-      
-      // 备用公共网关
-      const fallbackGateways = [
+      // 网关优先级列表，按速度和稳定性排序
+      const gateways = [
+        process.env.PINATA_GATEWAY || 'https://gateway.pinata.cloud',
         'https://ipfs.io/ipfs',
-        'https://cloudflare-ipfs.com/ipfs',
+        'https://cloudflare-ipfs.com/ipfs', 
         'https://dweb.link/ipfs',
-        'https://gateway.pinata.cloud/ipfs'
+        'https://ipfs.infura.io/ipfs'
       ]
 
-      for (const gateway of fallbackGateways) {
+      let lastError: Error | null = null
+      
+      // 逐个尝试网关
+      for (let i = 0; i < gateways.length; i++) {
+        const gateway = gateways[i]
         try {
-          const response = await fetch(`${gateway}/${hash}`)
-          if (response.ok) {
-            const data = await response.json()
-            console.log(`✅ 从 ${gateway} 获取数据成功`)
-            return data
+          console.log(`🌐 尝试网关 ${i + 1}/${gateways.length}: ${gateway}`)
+          
+          const response = await this.withTimeout(async () => {
+            return fetch(`${gateway}/ipfs/${hash}`, {
+              headers: {
+                'Accept': 'application/json',
+                'Cache-Control': 'no-cache'
+              }
+            })
+          }, 15000) // 单个网关超时时间15秒
+          
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`)
           }
-        } catch (gatewayError) {
-          console.log(`❌ 从 ${gateway} 获取数据失败，尝试下一个网关`)
-          continue
+          
+          const contentType = response.headers.get('content-type') || ''
+          if (!contentType.includes('application/json') && !contentType.includes('text/plain')) {
+            throw new Error(`错误的内容类型: ${contentType}`)
+          }
+          
+          const data = await response.json()
+          console.log(`✅ 从 ${gateway} 获取数据成功`)
+          return data
+          
+        } catch (error) {
+          lastError = error instanceof Error ? error : new Error(String(error))
+          console.warn(`⚠️ ${gateway} 获取数据失败:`, lastError.message)
+          
+          // 如果不是最后一个网关，等待一下再试下一个
+          if (i < gateways.length - 1) {
+            await this.sleep(500)
+          }
         }
       }
-
-      throw new Error('所有IPFS网关都无法访问数据')
-    } catch (error) {
-      console.error('从 IPFS 获取数据失败:', error)
-      throw new Error(`从 IPFS 获取数据失败: ${error}`)
-    }
+      
+      throw new Error(`所有IPFS网关都无法访问数据: ${lastError?.message}`)
+    }, 'IPFS数据获取')
   }
 
   /**
