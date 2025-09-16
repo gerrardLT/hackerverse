@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -11,6 +12,8 @@ import { apiService, type Hackathon } from '@/lib/api'
 import { useToast } from '@/hooks/use-toast'
 
 export function FeaturedHackathons() {
+  const t = useTranslations('home.featured')
+  const tCommon = useTranslations('common')
   const [hackathons, setHackathons] = useState<Hackathon[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -21,30 +24,30 @@ export function FeaturedHackathons() {
       try {
         setLoading(true)
         setError(null)
-        
+
         const response = await apiService.getHackathons({
           featured: true,
           limit: 3,
           sortBy: 'startDate',
           sortOrder: 'asc'
         })
-        
+
         if (response.success && response.data) {
           setHackathons(response.data.hackathons)
         } else {
-          setError(response.error || '获取特色黑客松失败')
+          setError(response.error || tCommon('errors.fetchFeaturedFailed'))
           toast({
-            title: '加载失败',
-            description: response.error || '无法获取特色黑客松',
+            title: tCommon('errors.loadFailed'),
+            description: response.error || tCommon('errors.fetchFeaturedFailedDesc'),
             variant: 'destructive'
           })
         }
       } catch (error) {
         console.error('获取特色黑客松错误:', error)
-        setError('网络错误，请检查网络连接')
+        setError(tCommon('errors.networkError'))
         toast({
-          title: '网络错误',
-          description: '请检查网络连接并重试',
+          title: tCommon('errors.networkError'),
+          description: tCommon('errors.networkErrorDesc'),
           variant: 'destructive'
         })
       } finally {
@@ -53,196 +56,172 @@ export function FeaturedHackathons() {
     }
 
     fetchFeaturedHackathons()
-  }, [toast])
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'upcoming': return 'bg-blue-500'
-      case 'ongoing': return 'bg-green-500'
-      case 'ended': return 'bg-gray-500'
-      default: return 'bg-gray-500'
-    }
-  }
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'upcoming': return '即将开始'
-      case 'ongoing': return '进行中'
-      case 'ended': return '已结束'
-      default: return '未知状态'
-    }
-  }
-
-  const getHackathonImage = (hackathon: Hackathon) => {
-    // 优先使用黑客松的封面图片（如果存在metadata字段）
-    const metadata = (hackathon as any).metadata
-    if (metadata?.coverImage) {
-      return metadata.coverImage
-    }
-    
-    // 基于黑客松类别生成主题图片
-    const category = hackathon.categories?.[0]?.toLowerCase() || 'general'
-    const themeImages: Record<string, string> = {
-      defi: '/images/themes/defi-bg.jpg',
-      nft: '/images/themes/nft-bg.jpg',
-      dao: '/images/themes/dao-bg.jpg',
-      gamefi: '/images/themes/gamefi-bg.jpg',
-      ai: '/images/themes/ai-bg.jpg',
-      web3: '/images/themes/web3-bg.jpg',
-      blockchain: '/images/themes/blockchain-bg.jpg',
-      general: '/images/themes/hackathon-default.jpg'
-    }
-    
-    return themeImages[category] || themeImages.general
-  }
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('zh-CN', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
-  }
-
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    // 图片加载失败时的后备方案
-    const img = e.target as HTMLImageElement
-    img.src = '/images/themes/hackathon-default.jpg'
-  }
+  }, [tCommon, toast])
 
   if (loading) {
     return (
-      <div className="text-center py-12">
-        <Loader2 className="h-12 w-12 text-primary animate-spin mx-auto mb-4" />
-        <p className="text-muted-foreground">加载特色黑客松中...</p>
-      </div>
+      <section className="py-20 relative">
+        <div className="container relative">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl text-foreground">
+              {t('title')}
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              {t('subtitle')}
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <Card key={index} className="flex flex-col overflow-hidden rounded-2xl p-6 group">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <Loader2 className="h-10 w-10 text-primary animate-spin" />
+                    <Badge variant="secondary" className="animate-pulse">Loading</Badge>
+                  </div>
+                  <div className="h-6 w-3/4 bg-muted rounded animate-pulse mb-2" />
+                  <div className="h-4 w-1/2 bg-muted rounded animate-pulse" />
+                </CardHeader>
+                <CardContent className="flex-1 space-y-4">
+                  <div className="h-16 bg-muted rounded animate-pulse" />
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="outline" className="h-6 w-16 animate-pulse" />
+                    <Badge variant="outline" className="h-6 w-20 animate-pulse" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="h-12 bg-muted rounded animate-pulse" />
+                    <div className="h-12 bg-muted rounded animate-pulse" />
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button className="w-full animate-pulse" disabled>
+                    {tCommon('loading')}
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
     )
   }
 
   if (error) {
     return (
-      <div className="text-center py-12">
-        <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-        <h3 className="text-lg font-medium mb-2">加载失败</h3>
-        <p className="text-muted-foreground mb-4">{error}</p>
-        <Button onClick={() => window.location.reload()}>
-          重试
-        </Button>
-      </div>
-    )
-  }
-
-  if (hackathons.length === 0) {
-    return (
-      <div className="text-center py-12">
-        <div className="h-12 w-12 bg-muted rounded-lg mx-auto mb-4 flex items-center justify-center">
-          <span className="text-2xl">🏆</span>
+      <section className="py-20 relative">
+        <div className="container relative">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl text-foreground">
+              {t('title')}
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              {t('subtitle')}
+            </p>
+          </div>
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <AlertCircle className="h-16 w-16 text-destructive mb-4" />
+            <h3 className="text-xl font-semibold text-destructive mb-2">{tCommon('errors.loadFailed')}</h3>
+            <p className="text-muted-foreground max-w-md">{error}</p>
+          </div>
         </div>
-        <h3 className="text-lg font-medium mb-2">暂无特色黑客松</h3>
-        <p className="text-muted-foreground">目前没有特色黑客松，请稍后再来查看</p>
-      </div>
+      </section>
     )
   }
 
   return (
-    <section className="py-12">
-      <div className="container mx-auto">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h2 className="text-3xl font-bold mb-2">特色黑客松</h2>
-            <p className="text-muted-foreground">
-              发现最热门、最有价值的黑客松活动
-            </p>
-          </div>
-          <Button asChild variant="outline">
-            <Link href="/hackathons">
-              查看全部
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
+    <section className="py-20 relative">
+      <div className="container relative">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl text-foreground">
+            {t('title')}
+          </h2>
+          <p className="mt-4 text-lg text-muted-foreground">
+            {t('subtitle')}
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {hackathons.map((hackathon) => (
-            <Card key={hackathon.id} className="overflow-hidden hover:shadow-lg transition-shadow group">
-              <div className="relative">
-                <img
-                  src={getHackathonImage(hackathon)}
-                  alt={hackathon.title}
-                  className="w-full h-48 object-cover"
-                  onError={handleImageError}
-                  loading="lazy"
-                />
-                <div className="absolute top-4 left-4">
-                  <Badge className={`${getStatusColor(hackathon.status)} text-white`}>
-                    {getStatusText(hackathon.status)}
-                  </Badge>
-                </div>
-                <div className="absolute top-4 right-4">
-                  <Badge variant="secondary" className="bg-white/90">
-                    <Trophy className="h-3 w-3 mr-1" />
-                    特色
-                  </Badge>
-                </div>
-              </div>
-              
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors">
-                      <Link href={`/hackathons/${hackathon.id}`}>
-                        {hackathon.title}
-                      </Link>
-                    </h3>
-                    <p className="text-sm text-muted-foreground line-clamp-2">
-                      {hackathon.description}
-                    </p>
+            <Card
+              key={hackathon.id}
+              className="flex flex-col glass dark:glass-dark border-primary/20 hover:border-primary/40 transition-all duration-300 hover:scale-105 group relative overflow-hidden rounded-2xl p-6"
+            >
+              <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-secondary`} />
+
+              <CardHeader className="relative pb-4">
+                <div className="flex items-center justify-between mb-4">
+                  <div className={`p-3 rounded-xl bg-gradient-to-r from-primary to-secondary text-white`}>
+                    <Trophy className="h-6 w-6" /> {/* Using Trophy icon as a placeholder */}
                   </div>
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage src={hackathon.organizer?.avatarUrl} />
-                    <AvatarFallback>
-                      {hackathon.organizer?.username?.charAt(0) || 'O'}
-                    </AvatarFallback>
-                  </Avatar>
+                  <Badge variant="secondary" className="glass border-primary/20">
+                    {hackathon.status}
+                  </Badge>
+                </div>
+
+                <h3 className="text-xl font-bold group-hover:text-primary transition-colors line-clamp-2">
+                  {hackathon.title}
+                </h3>
+
+                <div className="flex items-center text-sm text-muted-foreground">
+                  <Calendar className="mr-2 h-4 w-4" />
+                  <span className="font-medium">{Math.ceil((new Date(hackathon.startDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} {t('daysLeft')}</span>
                 </div>
               </CardHeader>
-              
-              <CardContent className="space-y-3">
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-4 w-4" />
-                    <span>{formatDate(hackathon.startDate)}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Users className="h-4 w-4" />
-                    <span>{hackathon._count?.participations || 0} 参与</span>
-                  </div>
-                </div>
-                
-                <div className="flex flex-wrap gap-1">
-                  {Array.isArray(hackathon.tags) && hackathon.tags.slice(0, 3).map((tag: string) => (
-                    <Badge key={tag} variant="outline" className="text-xs">
+
+              <CardContent className="flex-1 space-y-4">
+                <p className="text-muted-foreground line-clamp-3">
+                  {hackathon.description}
+                </p>
+
+                <div className="flex flex-wrap gap-2">
+                  {hackathon.tags.map((tag) => (
+                    <Badge
+                      key={tag}
+                      variant="outline"
+                      className="text-xs glass border-accent/30 hover:border-accent/60 transition-colors"
+                    >
                       {tag}
                     </Badge>
                   ))}
-                  {Array.isArray(hackathon.tags) && hackathon.tags.length > 3 && (
-                    <Badge variant="outline" className="text-xs">
-                      +{hackathon.tags.length - 3}
-                    </Badge>
-                  )}
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 p-4 glass dark:glass-dark rounded-xl">
+                  <div className="text-center">
+                    <div className="flex items-center justify-center mb-1">
+                      <Trophy className="mr-1 h-4 w-4 text-accent" />
+                    </div>
+                    <div className="font-bold text-lg">{hackathon.prizePool ? `$${(hackathon.prizePool / 1000).toFixed(1)}K` : 'TBD'}</div>
+                    <div className="text-xs text-muted-foreground">{t('prizePool')}</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="flex items-center justify-center mb-1">
+                      <Users className="mr-1 h-4 w-4 text-primary" />
+                    </div>
+                    <div className="font-bold text-lg">{hackathon._count?.participations || 0}</div>
+                    <div className="text-xs text-muted-foreground">{t('participants')}</div>
+                  </div>
                 </div>
               </CardContent>
-              
+
               <CardFooter>
-                <Button asChild className="w-full">
+                <Button asChild className="w-full group-hover:animate-glow">
                   <Link href={`/hackathons/${hackathon.id}`}>
-                    查看详情
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                    {hackathon.status === 'Active' ? t('joinHackathon') : t('viewDetails')}
                   </Link>
                 </Button>
               </CardFooter>
             </Card>
           ))}
+        </div>
+
+        <div className="text-center mt-16">
+          <Button
+            variant="outline"
+            size="lg"
+            asChild
+            className="glass dark:glass-dark border-primary/20 hover:border-primary/40 bg-transparent"
+          >
+            <Link href="/hackathons">{t('viewAllHackathons')}</Link>
+          </Button>
         </div>
       </div>
     </section>

@@ -1,13 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { IPFSService } from '@/lib/ipfs'
+import { getLocaleFromRequest, createTFunction } from '@/lib/i18n'
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
     const hackathonId = params.id
+    console.log('🔍 后端获取黑客松详情:', hackathonId)
     
     // 获取黑客松详情
     const hackathon = await prisma.hackathon.findUnique({
@@ -27,6 +32,7 @@ export async function GET(
         rules: true,
         isPublic: true,
         featured: true,
+        organizerId: true,
         ipfsHash: true,
         metadata: true,
         createdAt: true,
@@ -89,16 +95,20 @@ export async function GET(
     })
     
     if (!hackathon) {
+      console.log('❌ 黑客松不存在:', hackathonId)
       return NextResponse.json(
-        { error: '黑客松不存在' },
+        { success: false, error: t('hackathons.notFound') },
         { status: 404 }
       )
     }
     
+    console.log('✅ 找到黑客松:', hackathon.title)
+    
     // 检查黑客松是否公开
     if (!hackathon.isPublic) {
+      console.log('❌ 黑客松为私有:', hackathonId)
       return NextResponse.json(
-        { error: '该黑客松为私有活动' },
+        { success: false, error: t('hackathons.privateEvent', { fallback: 'This hackathon is a private event' }) },
         { status: 403 }
       )
     }
@@ -126,22 +136,28 @@ export async function GET(
     
     return NextResponse.json({
       success: true,
-      hackathon: {
-        ...hackathon,
-        ipfsUrl,
-        ipfsData,
-        // 合并数据库中的metadata和IPFS数据
-        fullMetadata: {
-          ...(hackathon.metadata as Record<string, any> || {}),
-          ...(ipfsData?.hackathon || {})
+      data: {
+        hackathon: {
+          ...hackathon,
+          ipfsUrl,
+          ipfsData,
+          // 合并数据库中的metadata和IPFS数据
+          fullMetadata: {
+            ...(hackathon.metadata as Record<string, any> || {}),
+            ...(ipfsData?.hackathon || {})
+          }
         }
-      },
+      }
     })
     
   } catch (error) {
     console.error('获取黑客松详情错误:', error)
+    
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
     return NextResponse.json(
-      { error: '获取黑客松详情失败' },
+      { success: false, error: t('hackathons.getDetailsError', { fallback: 'Failed to get hackathon details' }) },
       { status: 500 }
     )
   }

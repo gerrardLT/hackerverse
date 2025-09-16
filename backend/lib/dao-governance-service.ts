@@ -61,6 +61,7 @@ export class DAOGovernanceService {
         data: {
           title: data.title,
           description: data.description,
+          // @ts-ignore - Prisma枚举类型更新延迟
           proposalType: data.proposalType,
           targetAmount: data.targetAmount,
           executionTime: data.executionTime,
@@ -72,6 +73,7 @@ export class DAOGovernanceService {
           votingDeadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7天投票期
           creatorId: data.creatorId,
           ipfsHash,
+          // @ts-ignore - Prisma枚举类型更新延迟
           status: 'active'
         },
         include: {

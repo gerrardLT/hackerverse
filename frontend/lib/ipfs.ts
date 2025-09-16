@@ -2,72 +2,33 @@
 
 // IPFS 服务封装 - 前端只负责数据获取，上传由后端处理
 class IPFSService {
-  // 获取Pinata专用网关（如果配置了的话）
-  private getPinataGateway(): string | null {
-    // 在浏览器环境中，我们可以从环境变量或配置中获取
-    if (typeof window !== 'undefined' && (window as any).__PINATA_GATEWAY__) {
-      return (window as any).__PINATA_GATEWAY__
-    }
-    return null
-  }
-
-  // 动态构建网关列表，优先使用Pinata专用网关
-  private getGateways(): string[] {
-    const pinataGateway = this.getPinataGateway()
-    const gateways = []
+  // 通过后端API获取IPFS数据
+  private async getFromBackend(hash: string, type: 'file' | 'json' = 'json'): Promise<any> {
+    const response = await fetch(`/api/ipfs/get?hash=${hash}&type=${type}`)
     
-    // 如果有Pinata专用网关，优先使用
-    if (pinataGateway) {
-      gateways.push(`https://${pinataGateway}/ipfs`)
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: '未知错误' }))
+      throw new Error(`后端IPFS API错误: ${response.status} - ${errorData.error || errorData.details}`)
     }
     
-    // 添加公共网关作为备用
-    gateways.push(
-      'https://gateway.pinata.cloud/ipfs',
-      'https://ipfs.io/ipfs',
-      'https://cloudflare-ipfs.com/ipfs',
-      'https://dweb.link/ipfs',
-      'https://nftstorage.link/ipfs'
-    )
+    const result = await response.json()
     
-    return gateways
+    if (!result.success) {
+      throw new Error(result.error || result.details || 'IPFS数据获取失败')
+    }
+    
+    return result.data
   }
   
   private currentGatewayIndex = 0
 
-  // 前端只负责从IPFS获取数据，上传由后端API处理
+  // 前端通过后端API获取IPFS文件
   async getFile(hash: string): Promise<any> {
     if (!this.isValidHash(hash)) {
       throw new Error('Invalid IPFS hash format')
     }
 
-    const gateways = this.getGateways()
-    
-    for (let i = 0; i < gateways.length; i++) {
-      const gateway = gateways[(this.currentGatewayIndex + i) % gateways.length]
-      
-      try {
-        const controller = new AbortController()
-        const timeoutId = setTimeout(() => controller.abort(), 10000) // 10秒超时
-        
-        const response = await fetch(`${gateway}/${hash}`, {
-          signal: controller.signal,
-        })
-        
-        clearTimeout(timeoutId)
-        
-        if (response.ok) {
-          // 成功的网关移到前面
-          this.currentGatewayIndex = (this.currentGatewayIndex + i) % gateways.length
-          return await response.blob()
-        }
-      } catch (error) {
-        console.warn(`Gateway ${gateway} failed for hash ${hash}:`, error)
-        continue
-      }
-    }
-    
-    throw new Error(`Failed to fetch ${hash} from all IPFS gateways`)
+    return await this.getFromBackend(hash, 'file')
   }
 
   async getJSON(hash: string): Promise<any> {
@@ -75,51 +36,23 @@ class IPFSService {
       throw new Error('Invalid IPFS hash format')
     }
 
-    const gateways = this.getGateways()
-    
-    for (let i = 0; i < gateways.length; i++) {
-      const gateway = gateways[(this.currentGatewayIndex + i) % gateways.length]
-      
-      try {
-        const controller = new AbortController()
-        const timeoutId = setTimeout(() => controller.abort(), 10000) // 10秒超时
-        
-        const response = await fetch(`${gateway}/${hash}`, {
-          signal: controller.signal,
-        })
-        
-        clearTimeout(timeoutId)
-        
-        if (response.ok) {
-          // 成功的网关移到前面
-          this.currentGatewayIndex = (this.currentGatewayIndex + i) % gateways.length
-          const data = await response.json()
-          return data
-        }
-      } catch (error) {
-        console.warn(`Gateway ${gateway} failed for hash ${hash}:`, error)
-        continue
-      }
-    }
-    
-    throw new Error(`Failed to fetch JSON ${hash} from all IPFS gateways`)
+    return await this.getFromBackend(hash, 'json')
   }
 
   getFileUrl(hash: string): string {
     if (!this.isValidHash(hash)) {
       return ''
     }
-    const gateways = this.getGateways()
-    return `${gateways[this.currentGatewayIndex]}/${hash}`
+    // 通过后端代理获取文件URL
+    return `/api/ipfs/proxy?hash=${hash}`
   }
 
-  // 获取所有网关的URL列表
+  // 获取所有可能的URL（现在都通过后端代理）
   getAllUrls(hash: string): string[] {
     if (!this.isValidHash(hash)) {
       return []
     }
-    const gateways = this.getGateways()
-    return gateways.map(gateway => `${gateway}/${hash}`)
+    return [`/api/ipfs/proxy?hash=${hash}`]
   }
 
   isValidHash(hash: string): boolean {

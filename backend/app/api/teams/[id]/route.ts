@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
+import { getLocaleFromRequest, createTFunction } from '@/lib/i18n'
 
 // 更新团队验证模式
 const updateTeamSchema = z.object({
@@ -18,6 +19,9 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
     const teamId = params.id
 
     const team = await prisma.team.findUnique({
@@ -71,7 +75,7 @@ export async function GET(
 
     if (!team) {
       return NextResponse.json(
-        { success: false, error: '团队不存在' },
+        { success: false, error: t('teams.notFound') },
         { status: 404 }
       )
     }
@@ -82,8 +86,12 @@ export async function GET(
     })
   } catch (error) {
     console.error('获取团队详情错误:', error)
+    
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
     return NextResponse.json(
-      { success: false, error: '获取团队详情失败' },
+      { success: false, error: t('teams.getDetailsError', { fallback: 'Failed to get team details' }) },
       { status: 500 }
     )
   }
@@ -94,6 +102,9 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
     const teamId = params.id
     const body = await request.json()
     
@@ -104,7 +115,7 @@ export async function PUT(
     const user = await auth(request)
     if (!user) {
       return NextResponse.json(
-        { success: false, error: '未认证' },
+        { success: false, error: t('auth.unauthorized') },
         { status: 401 }
       )
     }
@@ -117,14 +128,14 @@ export async function PUT(
 
     if (!existingTeam) {
       return NextResponse.json(
-        { success: false, error: '团队不存在' },
+        { success: false, error: t('teams.notFound') },
         { status: 404 }
       )
     }
 
     if (existingTeam.leaderId !== user.id) {
       return NextResponse.json(
-        { success: false, error: '只有队长可以修改团队信息' },
+        { success: false, error: t('teams.onlyLeaderCanModify', { fallback: 'Only team leader can modify team information' }) },
         { status: 403 }
       )
     }
@@ -171,14 +182,18 @@ export async function PUT(
     })
   } catch (error) {
     console.error('更新团队错误:', error)
+    
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { success: false, error: '请求数据验证失败', details: error.errors },
+        { success: false, error: t('errors.validationError'), details: error.errors },
         { status: 400 }
       )
     }
     return NextResponse.json(
-      { success: false, error: '更新团队失败' },
+      { success: false, error: t('teams.updateError', { fallback: 'Failed to update team' }) },
       { status: 500 }
     )
   }
@@ -189,13 +204,16 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
     const teamId = params.id
     
     // 验证用户身份
     const user = await auth(request)
     if (!user) {
       return NextResponse.json(
-        { success: false, error: '未认证' },
+        { success: false, error: t('auth.unauthorized') },
         { status: 401 }
       )
     }
@@ -208,14 +226,14 @@ export async function DELETE(
 
     if (!existingTeam) {
       return NextResponse.json(
-        { success: false, error: '团队不存在' },
+        { success: false, error: t('teams.notFound') },
         { status: 404 }
       )
     }
 
     if (existingTeam.leaderId !== user.id) {
       return NextResponse.json(
-        { success: false, error: '只有队长可以删除团队' },
+        { success: false, error: t('teams.onlyLeaderCanDelete', { fallback: 'Only team leader can delete team' }) },
         { status: 403 }
       )
     }
@@ -232,12 +250,16 @@ export async function DELETE(
 
     return NextResponse.json({
       success: true,
-      message: '团队删除成功'
+      message: t('teams.deleteSuccess', { fallback: 'Team deleted successfully' })
     })
   } catch (error) {
     console.error('删除团队错误:', error)
+    
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
     return NextResponse.json(
-      { success: false, error: '删除团队失败' },
+      { success: false, error: t('teams.deleteError', { fallback: 'Failed to delete team' }) },
       { status: 500 }
     )
   }

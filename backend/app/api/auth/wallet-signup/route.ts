@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
-import jwt from 'jsonwebtoken'
+import { AuthService } from '@/lib/auth'
+import { smartContractService } from '@/lib/smart-contracts'
 
 const walletSignUpSchema = z.object({
   walletAddress: z.string().regex(/^0x[a-fA-F0-9]{40}$/, '钱包地址格式不正确'),
@@ -51,34 +52,39 @@ export async function POST(request: NextRequest) {
     // ⭐ 创建Web3用户的IPFS资料
     let ipfsCID
     try {
-      const { UserProfileIPFSService } = await import('@/lib/user-profile-ipfs')
+      const { IPFSService } = await import('@/lib/ipfs')
       
       // 如果用户提供了现有的profileCID，尝试获取数据
       let existingProfileData = null
       if (profileCID) {
         try {
-          existingProfileData = await UserProfileIPFSService.getProfile(profileCID)
+          existingProfileData = await IPFSService.getFromIPFS(profileCID)
           console.log('📦 获取到现有IPFS用户资料')
         } catch (error) {
           console.warn('获取现有IPFS资料失败:', error)
         }
       }
       
-      // 创建或更新用户资料
-      ipfsCID = await UserProfileIPFSService.uploadProfile({
-        ...existingProfileData, // 合并现有数据
-        username: finalUsername,
-        walletAddress: walletAddress.toLowerCase(),
-        bio: bio || (existingProfileData?.bio) || '通过Web3钱包连接的用户',
-        // Web3特定数据
-        web3Data: {
-          ensName: undefined, // 可以后续添加ENS解析
-          nfts: [],
-          tokenHoldings: [],
-          daoMemberships: []
+      // 构建标准的用户资料数据结构
+      const userProfileData = {
+        version: '1.0.0',
+        timestamp: new Date().toISOString(),
+        data: {
+          username: finalUsername,
+          email: '',
+          avatar: '',
+          bio: bio || (existingProfileData?.data?.bio) || '通过Web3钱包连接的用户',
+          skills: existingProfileData?.data?.skills || [],
+          socialLinks: existingProfileData?.data?.socialLinks || {}
         },
-        createdAt: existingProfileData?.createdAt || new Date().toISOString()
-      }, 'wallet')
+        metadata: {
+          previousVersion: existingProfileData?.version,
+          updatedBy: walletAddress.toLowerCase()
+        }
+      }
+      
+      // 创建或更新用户资料
+      ipfsCID = await IPFSService.uploadUserProfile(userProfileData)
       
     } catch (ipfsError) {
       console.error('钱包用户IPFS上传失败:', ipfsError)
@@ -99,8 +105,8 @@ export async function POST(request: NextRequest) {
         ipfsProfileHash: ipfsCID,
         profileSyncStatus: 'SYNCED',
         emailVerified: false, // Web3用户不需要邮箱验证
-        role: 'user',
-        status: 'active',
+        role: 'USER',
+        status: 'ACTIVE',
         lastLoginAt: new Date(),
         
         // 默认设置
@@ -135,17 +141,61 @@ export async function POST(request: NextRequest) {
     })
 
     // 生成JWT token
-    const token = jwt.sign(
-      { 
-        userId: user.id,
-        walletAddress: user.walletAddress,
-        role: user.role 
-      },
-      process.env.JWT_SECRET!,
-      { expiresIn: '7d' }
-    )
+    const token = AuthService.generateToken({
+      userId: user.id,
+      email: user.email,
+      walletAddress: user.walletAddress || undefined,
+    })
 
     console.log('✅ Web3用户创建成功:', user.username)
+
+    // ⭐ 自动在智能合约中注册用户
+    try {
+      console.log('🔗 开始在智能合约中注册用户...')
+      
+      // 先初始化智能合约服务
+      await smartContractService.initialize()
+      
+      // 检查用户是否已在智能合约中注册
+      const isAlreadyRegistered = await smartContractService.isUserRegistered(walletAddress.toLowerCase())
+      
+      if (isAlreadyRegistered) {
+        console.log('✅ 用户已在智能合约中注册，跳过注册步骤')
+        // 直接更新同步状态为已同步
+        await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            profileSyncStatus: 'SYNCED'
+          }
+        })
+      } else {
+        // 使用智能合约服务注册用户
+        const contractResult = await smartContractService.registerUser(ipfsCID)
+        
+        if (contractResult) {
+          console.log('✅ 智能合约注册成功:', contractResult)
+          
+          // 更新用户的区块链同步状态
+          await prisma.user.update({
+            where: { id: user.id },
+            data: {
+              profileSyncStatus: 'SYNCED',
+              lastTxHash: contractResult
+            }
+          })
+        }
+      }
+      
+    } catch (contractError) {
+      console.warn('⚠️ 智能合约注册失败，但数据库用户已创建:', contractError)
+      // 不阻断用户注册流程，只是标记为待同步
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          profileSyncStatus: 'FAILED'
+        }
+      })
+    }
 
     return NextResponse.json({
       success: true,

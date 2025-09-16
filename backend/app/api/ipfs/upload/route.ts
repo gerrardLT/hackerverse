@@ -64,20 +64,59 @@ export async function POST(request: NextRequest) {
     // 将文件转换为Buffer
     const buffer = Buffer.from(await file.arrayBuffer())
     
+    // 📷 打印上传文件的详细信息
+    console.log('📤 后端IPFS文件上传开始:', {
+      fileName: file.name,
+      fileSize: file.size,
+      fileSizeFormatted: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
+      fileType: file.type,
+      bufferLength: buffer.length
+    })
+    
     // 动态导入IPFS服务并上传
     try {
       const { IPFSService } = await import('@/lib/ipfs')
       const ipfsFile = await IPFSService.uploadFile(buffer, file.name)
       
+      console.log('✅ 后端IPFS文件上传成功:', {
+        originalFile: {
+          name: file.name,
+          size: file.size,
+          type: file.type
+        },
+        ipfsResult: {
+          hash: ipfsFile.hash,
+          url: ipfsFile.url,
+          name: ipfsFile.name,
+          size: ipfsFile.size,
+          type: ipfsFile.type
+        }
+      })
+      
       return NextResponse.json({
         success: true,
         message: '文件上传成功',
-        file: ipfsFile,
+        data: {
+          hash: ipfsFile.hash,
+          url: ipfsFile.url,
+          name: ipfsFile.name,
+          size: ipfsFile.size
+        }
       })
     } catch (ipfsError) {
-      console.error('IPFS上传失败:', ipfsError)
+      console.error('❌ IPFS上传失败:', {
+        error: ipfsError,
+        message: ipfsError instanceof Error ? ipfsError.message : String(ipfsError),
+        stack: ipfsError instanceof Error ? ipfsError.stack : undefined,
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type
+      })
       return NextResponse.json(
-        { error: 'IPFS服务不可用，文件上传失败' },
+        { 
+          error: 'IPFS服务不可用，文件上传失败',
+          details: ipfsError instanceof Error ? ipfsError.message : String(ipfsError)
+        },
         { status: 503 }
       )
     }

@@ -5,6 +5,54 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+/**
+ * 计算奖项总奖金（考虑获奖人数）
+ */
+export function calculateTotalPrizePool(prizes: Array<{ amount: string; winnerCount: string }>): number {
+  return prizes.reduce((total, prize) => {
+    const amount = parseInt(prize.amount.replace(/[^0-9]/g, '')) || 0
+    const winnerCount = parseInt(prize.winnerCount) || 1
+    return total + (amount * winnerCount)
+  }, 0)
+}
+
+/**
+ * 格式化奖项金额显示（考虑获奖人数）
+ */
+export function formatPrizeAmount(amount: number, winnerCount: number = 1): string {
+  if (winnerCount > 1) {
+    const totalAmount = amount * winnerCount
+    return `$${amount.toLocaleString()} × ${winnerCount} = $${totalAmount.toLocaleString()}`
+  }
+  return `$${amount.toLocaleString()}`
+}
+
+/**
+ * 处理IPFS图片URL，将代理URL或hash转换为直接网关URL
+ */
+export function getIPFSImageUrl(storedImage: string | null | undefined, fallback: string = '/placeholder.svg'): string {
+  if (!storedImage) return fallback
+  
+  // 如果已经是完整URL，直接使用
+  if (storedImage.startsWith('http')) return storedImage
+  
+  // 如果是代理URL，提取hash并构建直接网关URL
+  if (storedImage.startsWith('/api/ipfs/proxy?hash=')) {
+    const hash = storedImage.split('hash=')[1]
+    const pinataGateway = process.env.NEXT_PUBLIC_PINATA_GATEWAY || 'plum-deliberate-peacock-875.mypinata.cloud'
+    return `https://${pinataGateway}/ipfs/${hash}`
+  }
+  
+  // 如果是纯hash，直接构建URL
+  if (storedImage.startsWith('Qm') || storedImage.startsWith('bafy')) {
+    const pinataGateway = process.env.NEXT_PUBLIC_PINATA_GATEWAY || 'plum-deliberate-peacock-875.mypinata.cloud'
+    return `https://${pinataGateway}/ipfs/${storedImage}`
+  }
+  
+  // 其他情况返回原值或fallback
+  return storedImage || fallback
+}
+
 // 格式化验证错误信息
 export function formatValidationError(error: any): string {
   if (!error) return '未知错误'

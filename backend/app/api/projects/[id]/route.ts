@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
+import { getLocaleFromRequest, createTFunction } from '@/lib/i18n'
 
 // 更新项目验证模式
 const updateProjectSchema = z.object({
@@ -22,6 +23,9 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
     const projectId = params.id
 
     const project = await prisma.project.findUnique({
@@ -75,7 +79,7 @@ export async function GET(
 
     if (!project) {
       return NextResponse.json(
-        { success: false, error: '项目不存在' },
+        { success: false, error: t('projects.notFound') },
         { status: 404 }
       )
     }
@@ -86,8 +90,12 @@ export async function GET(
     })
   } catch (error) {
     console.error('获取项目详情错误:', error)
+    
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
     return NextResponse.json(
-      { success: false, error: '获取项目详情失败' },
+      { success: false, error: t('projects.getDetailsError', { fallback: 'Failed to get project details' }) },
       { status: 500 }
     )
   }
@@ -98,6 +106,9 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
     const projectId = params.id
     const body = await request.json()
     
@@ -108,7 +119,7 @@ export async function PUT(
     const user = await auth(request)
     if (!user) {
       return NextResponse.json(
-        { success: false, error: '未认证' },
+        { success: false, error: t('auth.unauthorized') },
         { status: 401 }
       )
     }
@@ -133,7 +144,7 @@ export async function PUT(
 
     if (!existingProject) {
       return NextResponse.json(
-        { success: false, error: '项目不存在' },
+        { success: false, error: t('projects.notFound') },
         { status: 404 }
       )
     }
@@ -144,7 +155,7 @@ export async function PUT(
 
     if (!isTeamMember && !isTeamLeader) {
       return NextResponse.json(
-        { success: false, error: '只有项目团队成员可以修改项目信息' },
+        { success: false, error: t('projects.onlyTeamMemberCanModify', { fallback: 'Only project team members can modify project information' }) },
         { status: 403 }
       )
     }
@@ -195,14 +206,18 @@ export async function PUT(
     })
   } catch (error) {
     console.error('更新项目错误:', error)
+    
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { success: false, error: '请求数据验证失败', details: error.errors },
+        { success: false, error: t('errors.validationError'), details: error.errors },
         { status: 400 }
       )
     }
     return NextResponse.json(
-      { success: false, error: '更新项目失败' },
+      { success: false, error: t('projects.updateError', { fallback: 'Failed to update project' }) },
       { status: 500 }
     )
   }
@@ -213,13 +228,16 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
     const projectId = params.id
     
     // 验证用户身份
     const user = await auth(request)
     if (!user) {
       return NextResponse.json(
-        { success: false, error: '未认证' },
+        { success: false, error: t('auth.unauthorized') },
         { status: 401 }
       )
     }
@@ -239,14 +257,14 @@ export async function DELETE(
 
     if (!existingProject) {
       return NextResponse.json(
-        { success: false, error: '项目不存在' },
+        { success: false, error: t('projects.notFound') },
         { status: 404 }
       )
     }
 
     if (existingProject.team?.leaderId !== user.id) {
       return NextResponse.json(
-        { success: false, error: '只有队长可以删除项目' },
+        { success: false, error: t('projects.onlyLeaderCanDelete', { fallback: 'Only team leader can delete project' }) },
         { status: 403 }
       )
     }
@@ -266,12 +284,16 @@ export async function DELETE(
 
     return NextResponse.json({
       success: true,
-      message: '项目删除成功'
+      message: t('projects.deleteSuccess', { fallback: 'Project deleted successfully' })
     })
   } catch (error) {
     console.error('删除项目错误:', error)
+    
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
     return NextResponse.json(
-      { success: false, error: '删除项目失败' },
+      { success: false, error: t('projects.deleteError', { fallback: 'Failed to delete project' }) },
       { status: 500 }
     )
   }

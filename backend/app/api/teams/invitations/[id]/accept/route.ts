@@ -89,11 +89,12 @@ export async function POST(
     }
 
     // 加入团队
+    const inviteData = invitation.data as any
     const teamMember = await prisma.teamMember.create({
       data: {
         teamId,
         userId: user.id,
-        role: 'member',
+        role: inviteData?.role || 'member',
         joinedAt: new Date()
       },
       select: {

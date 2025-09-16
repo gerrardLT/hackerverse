@@ -35,6 +35,7 @@ export async function POST(
       select: {
         id: true,
         title: true,
+        registrationStartDate: true,
         registrationDeadline: true,
         maxParticipants: true,
         isPublic: true,
@@ -61,10 +62,27 @@ export async function POST(
       )
     }
     
-    // 检查报名截止时间
-    if (hackathon.registrationDeadline && new Date() > hackathon.registrationDeadline) {
+    // 检查报名时间限制
+    const now = new Date()
+    
+    // 检查报名是否已开始
+    if (hackathon.registrationStartDate && now < hackathon.registrationStartDate) {
       return NextResponse.json(
-        { error: '报名已截止' },
+        { 
+          error: '报名尚未开始',
+          details: `报名将于 ${hackathon.registrationStartDate.toLocaleString('zh-CN')} 开始`
+        },
+        { status: 400 }
+      )
+    }
+    
+    // 检查报名是否已截止
+    if (hackathon.registrationDeadline && now > hackathon.registrationDeadline) {
+      return NextResponse.json(
+        { 
+          error: '报名已截止',
+          details: `报名已于 ${hackathon.registrationDeadline.toLocaleString('zh-CN')} 截止`
+        },
         { status: 400 }
       )
     }

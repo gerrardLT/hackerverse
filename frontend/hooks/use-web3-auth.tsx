@@ -21,7 +21,7 @@ interface Web3AuthContextType {
   signer: ethers.JsonRpcSigner | null
   contract: ethers.Contract | null
   connectWallet: () => Promise<boolean>
-  disconnectWallet: () => void
+  disconnectWallet: () => Promise<void>
   registerUser: (profileCID: string) => Promise<boolean>
   updateProfile: (newProfileCID: string) => Promise<boolean>
   createHackathon: (hackathonCID: string) => Promise<boolean>
@@ -32,7 +32,7 @@ interface Web3AuthContextType {
 
 const Web3AuthContext = createContext<Web3AuthContextType | undefined>(undefined)
 
-// 智能合约ABI (简化版本)
+// Smart contract ABI (simplified version)
 const HACKX_CORE_ABI = [
   "function registerUser(string memory profileCID) external",
   "function updateUserProfile(string memory newProfileCID) external",
@@ -48,7 +48,7 @@ const HACKX_CORE_ABI = [
   "event ProjectSubmitted(uint256 indexed hackathonId, address indexed participant, string projectCID)"
 ]
 
-// 合约地址 - BSC Testnet 部署地址
+// Contract address - BSC Testnet deployment address
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '0x4BcFE52B6f38881d888b595E201E56B2cde93699'
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
@@ -61,12 +61,70 @@ export function Web3AuthProvider({ children }: { children: React.ReactNode }) {
   const [contract, setContract] = useState<ethers.Contract | null>(null)
   const { toast } = useToast()
 
-  // 初始化Web3
+  // Initialize Web3
   useEffect(() => {
     initializeWeb3()
+    
+    // Listen for account changes
+    if (typeof window !== 'undefined' && window.ethereum) {
+      const handleAccountsChanged = async (accounts: string[]) => {
+        console.log('🔄 Detected MetaMask account switch:', accounts)
+        
+        if (accounts.length === 0) {
+          // User disconnected
+          console.log('👋 User disconnected wallet')
+          setUser(null)
+          setProvider(null)
+          setSigner(null)
+          setContract(null)
+          
+          // Clear authentication state
+          const { useAuthStore } = await import('@/lib/auth-state-manager')
+          const authStore = useAuthStore.getState()
+          if (authStore.authType === 'web3') {
+            await authStore.logout()
+          }
+        } else {
+          // User switched to new account, force re-authentication
+          console.log('🔄 Account switched, cleaning old auth state and reconnecting wallet')
+          
+          // Clear old authentication state
+          const { useAuthStore } = await import('@/lib/auth-state-manager')
+          const authStore = useAuthStore.getState()
+          await authStore.logout()
+          
+          // Clear local state
+          setUser(null)
+          setProvider(null)
+          setSigner(null)
+          setContract(null)
+          
+          // Reconnect wallet
+          await connectWallet()
+        }
+      }
+      
+      const handleChainChanged = (chainId: string) => {
+        console.log('🌐 Detected network switch:', chainId)
+        // Reconnect when network switches
+        window.location.reload()
+      }
+      
+      // Add event listeners
+      window.ethereum.on('accountsChanged', handleAccountsChanged)
+      window.ethereum.on('chainChanged', handleChainChanged)
+      
+      // Cleanup function
+      return () => {
+        if (window.ethereum) {
+          window.ethereum.removeListener('accountsChanged', handleAccountsChanged)
+          window.ethereum.removeListener('chainChanged', handleChainChanged)
+        }
+      }
+    }
   }, [])
 
-  // 当signer变化时，更新合约实例
+  // Update contract instance when signer changes
   useEffect(() => {
     if (signer && CONTRACT_ADDRESS !== ZERO_ADDRESS) {
       const contractInstance = new ethers.Contract(CONTRACT_ADDRESS, HACKX_CORE_ABI, signer)
@@ -79,20 +137,42 @@ export function Web3AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log('🔄 检查Web3用户认证状态...')
       
-      // ⭐ 验证现有token的有效性（修复：不仅检查存在性，还要验证有效性）
+      // ⭐ 验证现有token是否与当前钱包地址匹配
       const existingToken = localStorage.getItem('hackx-token')
       if (existingToken) {
-        console.log('🔍 发现现有token，验证有效性...')
-        const isValid = await apiService.validateToken(existingToken)
-        if (isValid) {
-          console.log('✅ 现有token有效，跳过重复登录')
-          return
-        } else {
-          console.warn('⚠️ 现有token已失效，清理并重新认证')
-          // 清理无效token
-          localStorage.removeItem('hackx-token')
-          localStorage.removeItem('hackx-user')
+        console.log('🔍 发现现有token，验证有效性和钱包地址匹配性...')
+        
+        try {
+          // 验证token有效性
+          const isValid = await apiService.validateToken(existingToken)
+          if (isValid) {
+            // 获取token关联的用户信息
+            const userResponse = await apiService.getCurrentUser()
+            if (userResponse.success && userResponse.data) {
+              const tokenWalletAddress = userResponse.data.user.walletAddress?.toLowerCase()
+              const currentWalletAddress = user?.address?.toLowerCase()
+              
+              // 检查钱包地址是否匹配
+              if (tokenWalletAddress === currentWalletAddress) {
+                console.log('✅ 现有token有效且钱包地址匹配，跳过重复登录')
+                return
+              } else {
+                console.warn('⚠️ 钱包地址不匹配，需要重新认证', {
+                  tokenAddress: tokenWalletAddress,
+                  currentAddress: currentWalletAddress
+                })
+              }
+            }
+          } else {
+            console.warn('⚠️ 现有token已失效')
+          }
+        } catch (error) {
+          console.warn('⚠️ token验证失败:', error)
         }
+        
+        // 清理无效或不匹配的token
+        localStorage.removeItem('hackx-token')
+        localStorage.removeItem('hackx-user')
       }
       
       console.log('🔑 开始钱包认证流程...')
@@ -104,13 +184,22 @@ export function Web3AuthProvider({ children }: { children: React.ReactNode }) {
         console.log('✅ 找到现有用户，使用统一认证管理器')
         
         // 使用统一的认证状态管理器
-        const { authStateManager } = await import('@/lib/auth-state-manager')
-        await authStateManager.authenticateUser(response.data.user, response.data.token, 'wallet')
+        const { useAuthStore } = await import('@/lib/auth-state-manager')
+        const authStore = useAuthStore.getState()
+        // 转换User类型到UserState类型，添加缺失的字段
+        const userState = {
+          ...response.data.user,
+          role: 'user' as const,  // 前端使用小写，后端会处理转换
+          status: 'active' as const  // 前端使用小写，后端会处理转换
+        }
+        authStore.setAuthenticated(userState, response.data.token, 'web3')
         
       } else {
         console.log('📝 用户不存在，需要创建新用户')
         
         // 2. 用户不存在，创建新的Web3用户
+        console.log('📝 开始创建新Web3用户，可能需要IPFS上传...')
+        
         const createResponse = await apiService.createWeb3User({
           walletAddress,
           profileCID,
@@ -122,10 +211,21 @@ export function Web3AuthProvider({ children }: { children: React.ReactNode }) {
           console.log('✅ 新用户创建成功，使用统一认证管理器')
           
           // 使用统一的认证状态管理器
-          const { authStateManager } = await import('@/lib/auth-state-manager')
-          await authStateManager.authenticateUser(createResponse.data.user, createResponse.data.token, 'wallet')
+          const { useAuthStore } = await import('@/lib/auth-state-manager')
+          const authStore = useAuthStore.getState()
+          // 转换User类型到UserState类型，添加缺失的字段
+          const userState = {
+            ...createResponse.data.user,
+            role: 'user' as const,  // 前端使用小写，后端会处理转换
+            status: 'active' as const  // 前端使用小写，后端会处理转换
+          }
+          authStore.setAuthenticated(userState, createResponse.data.token, 'web3')
         } else {
           console.warn('⚠️ 创建新用户失败:', createResponse.error)
+          // 如果是IPFS相关错误，给用户友好提示
+          if (createResponse.error && createResponse.error.includes('IPFS')) {
+            throw new Error('网络服务暂时不可用，请稍后重试')
+          }
         }
       }
       
@@ -142,11 +242,9 @@ export function Web3AuthProvider({ children }: { children: React.ReactNode }) {
         const provider = new ethers.BrowserProvider(window.ethereum)
         setProvider(provider)
 
-        // 检查是否已经连接
-        const accounts = await provider.listAccounts()
-        if (accounts.length > 0) {
-          await connectWallet()
-        }
+        // 不自动连接，让用户主动选择连接
+        // 这样确保连接的是MetaMask当前活跃的账户
+        console.log('🔗 Web3 provider已准备，等待用户主动连接钱包')
       }
     } catch (error) {
       console.error('Web3初始化失败:', error)
@@ -169,16 +267,76 @@ export function Web3AuthProvider({ children }: { children: React.ReactNode }) {
         return false
       }
 
+      // 强制刷新MetaMask连接状态，确保获取最新的活跃账户
+      try {
+        console.log('🔄 强制刷新MetaMask连接状态...')
+        // 先请求权限，这会确保MetaMask处于活跃状态
+        await window.ethereum.request({
+          method: 'wallet_requestPermissions',
+          params: [{
+            eth_accounts: {}
+          }]
+        })
+        console.log('✅ MetaMask权限已刷新')
+      } catch (permissionError) {
+        console.log('⚠️ 权限刷新失败，继续使用现有连接:', permissionError)
+        // 如果权限刷新失败，继续使用现有连接
+      }
+
       // 创建或更新provider
       const newProvider = new ethers.BrowserProvider(window.ethereum)
       setProvider(newProvider)
       
-      // 请求连接钱包
-      const accounts = await newProvider.send("eth_requestAccounts", [])
+      // 强制请求连接钱包，这会弹出MetaMask并获取当前活跃账户
+      console.log('🔄 请求连接MetaMask当前活跃账户...')
+      
+      // 方法1: 使用 eth_requestAccounts 强制弹出授权
+      const requestedAccounts = await newProvider.send("eth_requestAccounts", [])
+      console.log('📋 eth_requestAccounts 返回的账户:', requestedAccounts)
+      
+      // 方法2: 再次获取当前账户，确保是最新的
+      const currentAccounts = await newProvider.send("eth_accounts", [])
+      console.log('📋 eth_accounts 返回的账户:', currentAccounts)
+      
+      // 方法3: 直接从window.ethereum获取
+      const windowAccounts = await window.ethereum.request({ method: 'eth_accounts' })
+      console.log('📋 window.ethereum 返回的账户:', windowAccounts)
+      
+      // 使用最可靠的账户源
+      const accounts = currentAccounts.length > 0 ? currentAccounts : 
+                     (requestedAccounts.length > 0 ? requestedAccounts : windowAccounts)
+      
+      if (!accounts || accounts.length === 0) {
+        throw new Error('未获取到钱包账户')
+      }
+      
+      const address = accounts[0]
+      console.log('✅ 最终使用的MetaMask账户:', address)
+      console.log('🔍 账户来源分析:', {
+        requestedAccounts: requestedAccounts[0],
+        currentAccounts: currentAccounts[0], 
+        windowAccounts: windowAccounts[0],
+        finalAddress: address
+      })
+      
       const signer = await newProvider.getSigner()
       setSigner(signer)
-
-      const address = accounts[0]
+      
+      // 验证signer地址与获取的地址是否一致
+      const signerAddress = await signer.getAddress()
+      console.log('🔍 Signer地址验证:', {
+        获取的地址: address,
+        Signer地址: signerAddress,
+        是否一致: address.toLowerCase() === signerAddress.toLowerCase()
+      })
+      
+      // 使用signer的地址作为最终地址，这是最可靠的当前活跃地址
+      let finalAddress = address
+      if (address.toLowerCase() !== signerAddress.toLowerCase()) {
+        console.warn('⚠️ 地址不一致，使用Signer地址作为最终地址')
+        finalAddress = signerAddress
+        console.log('🔄 更新最终地址为:', finalAddress)
+      }
       
       // 检查网络
       const network = await newProvider.getNetwork()
@@ -193,16 +351,19 @@ export function Web3AuthProvider({ children }: { children: React.ReactNode }) {
           const contractInstance = new ethers.Contract(CONTRACT_ADDRESS, HACKX_CORE_ABI, signer)
           setContract(contractInstance)
           
-          isRegistered = await contractInstance.isUserRegistered(address)
-          profileCID = isRegistered ? await contractInstance.getUserProfile(address) : undefined
+          isRegistered = await contractInstance.isUserRegistered(finalAddress)
+          profileCID = isRegistered ? await contractInstance.getUserProfile(finalAddress) : undefined
+          
+          console.log('🔍 智能合约注册状态:', { isRegistered, profileCID })
         }
       } catch (contractError) {
         console.warn('合约交互失败:', contractError)
         // 即使合约交互失败，我们仍然允许钱包连接
+        // 后端会在登录/注册时处理智能合约注册
       }
 
       const web3User: Web3User = {
-        address,
+        address: finalAddress,
         profileCID,
         isRegistered
       }
@@ -213,11 +374,11 @@ export function Web3AuthProvider({ children }: { children: React.ReactNode }) {
       await smartContractService.initialize(newProvider, signer)
 
       // ⭐ 新增：同步到传统认证系统
-      await syncWithTraditionalAuth(address, profileCID)
+      await syncWithTraditionalAuth(finalAddress, profileCID)
 
       toast({
         title: "连接成功",
-        description: `钱包地址: ${address.slice(0, 6)}...${address.slice(-4)}`,
+        description: `钱包地址: ${finalAddress.slice(0, 6)}...${finalAddress.slice(-4)}`,
       })
 
       return true
@@ -242,10 +403,30 @@ export function Web3AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const disconnectWallet = () => {
+  const disconnectWallet = async () => {
+    // 1. 清理本地 Web3Auth 状态
     setUser(null)
     setSigner(null)
     setContract(null)
+    
+    // 2. 同步清理全局认证状态
+    try {
+      const { useAuthStore } = await import('@/lib/auth-state-manager')
+      const authStore = useAuthStore.getState()
+      
+      // 由于Web3和钱包用户是同步注册的，断开钱包连接意味着用户要完全退出
+      if (authStore.isAuthenticated) {
+        console.log('🔄 钱包断开连接，执行完全登出（Web3和钱包用户同步）')
+        await authStore.logout()
+      } else {
+        // 只是清理钱包连接状态（用户可能没有完全登录）
+        console.log('🔄 清理钱包连接状态')
+        authStore.disconnectWallet()
+      }
+    } catch (error) {
+      console.error('❌ 清理认证状态失败:', error)
+    }
+    
     toast({
       title: "已断开连接",
       description: "钱包连接已断开",

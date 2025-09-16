@@ -1,409 +1,365 @@
 'use client'
 
+import { ipfsDataService, type HackathonData, type ProjectData, type UserProfile } from './ipfs-data-service'
 import { smartContractService } from './smart-contracts'
-import { ipfsDataService, HackathonData, ProjectData, UserProfile } from './ipfs-data-service'
 import { apiService } from './api'
 
-// 统一的数据获取服务
+/**
+ * 统一数据服务
+ * 实现多层级回退策略，确保数据获取的可靠性
+ */
 export class DataService {
-  
-  // ============ 黑客松数据获取 ============
+  private cache = new Map<string, { data: any; timestamp: number; ttl: number }>()
+  private readonly CACHE_TTL = 5 * 60 * 1000 // 5分钟缓存
   
   /**
-   * 获取黑客松列表（优先级：后端 API > 智能合约）
+   * 获取黑客松列表（优先级：API > The Graph > 智能合约）
+   * 暂时优先使用API，避免合约调用问题
    */
   async getHackathons(params: {
     search?: string
-    category?: string
     status?: string
-    sortBy?: string
+    category?: string
     page?: number
     limit?: number
-  } = {}): Promise<{
-    hackathons: HackathonData[]
-    total: number
-    hasMore: boolean
-  }> {
-    console.log('DataService: Getting hackathons with params:', params)
+    featured?: boolean
+  } = {}): Promise<HackathonData[]> {
+    const cacheKey = `hackathons:${JSON.stringify(params)}`
     
-    // 策略2: 从智能合约获取（可靠）
+    // 检查缓存
+    const cached = this.getFromCache(cacheKey)
+    if (cached) return cached
+
     try {
-      console.log('DataService: Trying smart contracts...')
-      const hackathons = await this.getHackathonsFromContract(params)
-      console.log(`DataService: Smart contracts returned ${hackathons.length} hackathons`)
-      
-      return {
-        hackathons,
-        total: hackathons.length,
-        hasMore: false // 智能合约返回所有数据
-      }
-    } catch (error) {
-      console.log(error)
-      console.warn('DataService: Smart contracts unavailable, falling back to API:', error)
-    }
-    
-    // 策略1: 先从后端 API 获取（优先）
-    try {
-      console.log('DataService: Trying backend API...')
+      // 优先从后端 API 获取（稳定可靠）
+      console.log('🔍 DataService: 从API获取黑客松列表', params)
       const response = await apiService.getHackathons(params)
       
-      if (response.success && response.data) {
-        console.log(`DataService: API returned ${response.data.hackathons?.length || 0} hackathons`)
-        return {
-          hackathons: response.data.hackathons || [],
-          total: response.data.total || 0,
-          hasMore: response.data.hasMore || false
-        }
+      // 保持完整的响应结构，包括分页信息
+      if (Array.isArray(response)) {
+        // 旧格式：直接返回数组
+        this.setCache(cacheKey, response)
+        console.log('✅ DataService: API获取成功，黑客松数量:', response.length)
+        return response
+      } else {
+        // 新格式：返回完整的响应对象
+        const apiData = response.data?.hackathons || response.hackathons || []
+        this.setCache(cacheKey, response) // 缓存完整响应
+        console.log('✅ DataService: API获取成功，黑客松数量:', apiData.length)
+        return response // 返回完整响应，包括分页信息
       }
+      
     } catch (error) {
-      console.warn('DataService: API failed, fallback to smart contracts:', error)
-    }
-
-    // 都失败了，返回空数据
-    console.warn('DataService: All data sources failed, returning empty data')
-    return {
-      hackathons: [],
-      total: 0,
-      hasMore: false
+      console.warn('⚠️ API获取失败:', error)
+      // API失败时直接返回空数组，不再尝试其他不稳定的数据源
+      return []
     }
   }
 
   /**
-   * 获取单个黑客松数据
+   * 获取黑客松详情
    */
-  async getHackathon(hackathonId: number): Promise<HackathonData | null> {
+  async getHackathonDetail(id: string): Promise<HackathonData | null> {
+    const cacheKey = `hackathon:${id}`
+    
+    // 检查缓存
+    const cached = this.getFromCache(cacheKey)
+    if (cached) return cached
+
     try {
-      console.log(`DataService: Getting hackathon ${hackathonId}`)
+      // 1. 从智能合约获取基础信息
+      const contractData = await smartContractService.getHackathon(Number(id))
       
-      // 优先从 IPFS 数据服务获取（最完整）
-      const hackathonData = await ipfsDataService.getHackathonData(hackathonId)
-      console.log(`DataService: Successfully loaded hackathon ${hackathonId}`)
-      
-      return hackathonData
-    } catch (error) {
-      console.error(`DataService: Failed to load hackathon ${hackathonId}:`, error)
-      
-      // 备用：从API获取
-      try {
-        const response = await apiService.getHackathon(hackathonId.toString())
-        if (response.success && response.data) {
-          return this.convertApiHackathonToData(response.data.hackathon)
+      // 2. 从IPFS获取详细数据
+      if (contractData.dataCID) {
+        const ipfsData = await ipfsDataService.getHackathonData(contractData.dataCID)
+        const enrichedData = {
+          ...ipfsData,
+          id: contractData.id.toString(),
+          organizer: contractData.organizer,
+          participantCount: contractData.participantCount || 0,
+          projectCount: contractData.projectCount || 0
         }
-      } catch (apiError) {
-        console.warn('DataService: API fallback also failed')
+        this.setCache(cacheKey, enrichedData)
+        return enrichedData
+      }
+    } catch (error) {
+      console.warn('Contract + IPFS failed, falling back to API:', error)
+    }
+
+    try {
+      // 3. 从API获取
+      const response = await apiService.getHackathon(id)
+      const apiData = response.data?.hackathon
+      if (apiData) {
+        this.setCache(cacheKey, apiData)
+        return apiData
+      }
+    } catch (error) {
+      console.error('All data sources failed for hackathon detail:', error)
       }
       
       return null
-    }
   }
 
-  // ============ 项目数据获取 ============
-  
   /**
-   * 获取项目列表
+   * 获取黑客松中的项目列表
    */
-  async getProjects(params: {
-    hackathonId?: number
+  async getHackathonProjects(hackathonId: string, params: {
     search?: string
     technology?: string
     status?: string
-    sortBy?: string
     page?: number
     limit?: number
-  } = {}): Promise<{
-    projects: ProjectData[]
-    total: number
-    hasMore: boolean
-  }> {
-    console.log('DataService: Getting projects with params:', params)
+  } = {}): Promise<ProjectData[]> {
+    const cacheKey = `hackathon-projects:${hackathonId}:${JSON.stringify(params)}`
     
-    // 策略1: 尝试从智能合约获取
+    // 检查缓存
+    const cached = this.getFromCache(cacheKey)
+    if (cached) return cached
+
     try {
-      const projects = await this.getProjectsFromContract(params)
-      console.log(`DataService: Smart contracts returned ${projects.length} projects`)
+      // 直接从API获取指定黑客松的项目
+      console.log('🔍 DataService: 获取黑客松项目', { hackathonId, params })
+      const response = await apiService.getProjects({
+        hackathonId,
+        ...params
+      })
       
-      return {
-        projects,
-        total: projects.length,
-        hasMore: false
-      }
+      const apiData = response.data?.projects || []
+      this.setCache(cacheKey, apiData)
+      console.log('✅ DataService: 黑客松项目获取成功，数量:', apiData.length)
+      return apiData
     } catch (error) {
-      console.warn('DataService: Smart contracts unavailable for projects:', error)
-    }
-    
-    // 策略2: 从后端API获取
-    try {
-      const response = await apiService.getProjects(params)
-      
-      if (response.success && response.data) {
-        return {
-          projects: response.data.projects || [],
-          total: response.data.total || 0,
-          hasMore: response.data.hasMore || false
-        }
-      }
-    } catch (error) {
-      console.warn('DataService: API also failed for projects:', error)
-    }
-    
-    return {
-      projects: [],
-      total: 0,
-      hasMore: false
+      console.error('❌ 获取黑客松项目失败:', error)
+      return []
     }
   }
 
   /**
-   * 获取单个项目数据
+   * 获取项目详情
    */
-  async getProject(projectId: number): Promise<ProjectData | null> {
+  async getProjectDetail(id: string): Promise<ProjectData | null> {
+    const cacheKey = `project:${id}`
+    
+    // 检查缓存
+    const cached = this.getFromCache(cacheKey)
+    if (cached) return cached
+
     try {
-      return await ipfsDataService.getProjectData(projectId)
+      // 从API获取项目详情
+      console.log('🔍 DataService: 获取项目详情', id)
+      const response = await apiService.getProject(id)
+      const apiData = response.data?.project
+      
+      if (apiData) {
+        this.setCache(cacheKey, apiData)
+        console.log('✅ DataService: 项目详情获取成功')
+        return apiData
+      }
     } catch (error) {
-      console.error(`DataService: Failed to load project ${projectId}:`, error)
-      return null
+      console.error('❌ 获取项目详情失败:', error)
     }
+
+    return null
   }
 
-  // ============ 用户数据获取 ============
-  
   /**
    * 获取用户资料
    */
-  async getUserProfile(address: string): Promise<UserProfile> {
+  async getUserProfile(address: string): Promise<UserProfile | null> {
+    const cacheKey = `user:${address}`
+    
+    // 检查缓存
+    const cached = this.getFromCache(cacheKey)
+    if (cached) return cached
+
     try {
-      return await ipfsDataService.getUserProfile(address)
+      // 1. 从智能合约获取基础信息
+      const contractData = await smartContractService.getUser(address)
+      
+      // 2. 从IPFS获取详细数据
+      if (contractData.profileCID) {
+        const ipfsData = await ipfsDataService.getUserProfile(contractData.profileCID)
+        const enrichedData = {
+          ...ipfsData,
+          address: contractData.address,
+          isRegistered: contractData.isRegistered
+        }
+        this.setCache(cacheKey, enrichedData)
+        return enrichedData
+      }
     } catch (error) {
-      console.error(`DataService: Failed to load user profile ${address}:`, error)
-      
-      // 返回基础用户信息
-      return {
-        address: address.toLowerCase(),
-        isValid: false,
-        displayName: `${address.slice(0, 6)}...${address.slice(-4)}`,
-      }
+      console.warn('Contract + IPFS failed for user profile, falling back to API:', error)
     }
+
+    try {
+      // 3. 从API获取
+      const response = await apiService.getUserProfile(address)
+      const apiData = response.data?.user
+      if (apiData) {
+        this.setCache(cacheKey, apiData)
+        return apiData
+      }
+    } catch (error) {
+      console.error('All data sources failed for user profile:', error)
+    }
+
+    return null
   }
 
-  // ============ 私有辅助方法 ============
-  
   /**
-   * 从智能合约获取黑客松列表
+   * 从The Graph获取黑客松数据
    */
-  private async getHackathonsFromContract(params: any): Promise<HackathonData[]> {
+  private async getHackathonsFromGraph(params: any): Promise<any[]> {
+    // 这里应该实现The Graph查询
+    // 由于The Graph子图还未部署，暂时返回空数组
+    console.log('The Graph查询暂未实现')
+    return []
+  }
+
+  /**
+   * 从智能合约获取黑客松数据
+   */
+  private async getHackathonsFromContracts(params: any): Promise<HackathonData[]> {
     try {
-      // 确保智能合约服务已初始化
-      await smartContractService.initialize()
-      
+      // 获取黑客松总数
       const count = await smartContractService.getHackathonCount()
-      const totalCount = Number(count)
-      
-      if (totalCount === 0) return []
-      
-      // 生成ID数组
-      const ids = Array.from({ length: totalCount }, (_, i) => i + 1)
-      
-      // 批量获取数据
-      const hackathons = await ipfsDataService.getHackathonsData(ids)
-      
-      // 应用筛选和排序
-    const filteredHackathons = this.filterHackathons(hackathons, params)
-    const sortedHackathons = this.sortHackathons(filteredHackathons, params.sortBy)
-    
-    // 应用分页
-    if (params.page && params.limit) {
-      const start = (params.page - 1) * params.limit
-      const end = start + params.limit
-      return sortedHackathons.slice(start, end)
-    }
-    
-    return sortedHackathons
-    } catch (error: any) {
-      console.warn('从智能合约获取黑客松数据失败:', error)
-      
-      // 检查是否是网络相关错误
-      if (error.message?.includes('missing trie node') || 
-          error.message?.includes('Internal JSON-RPC error') ||
-          error.code === 'CALL_EXCEPTION') {
-        console.warn('检测到BSC Testnet网络问题，切换到fallback数据源')
+      const hackathons: HackathonData[] = []
+
+      // 获取所有黑客松数据
+      for (let i = 1; i <= Math.min(count, 20); i++) { // 限制最多20个
+        try {
+          const contractData = await smartContractService.getHackathon(i)
+          if (contractData.dataCID) {
+            const ipfsData = await ipfsDataService.getHackathonData(contractData.dataCID)
+            hackathons.push({
+              ...ipfsData,
+              id: contractData.id.toString(),
+              organizer: contractData.organizer,
+              participantCount: contractData.participantCount || 0,
+              projectCount: contractData.projectCount || 0
+            })
+          }
+        } catch (error) {
+          console.warn(`Failed to load hackathon ${i}:`, error)
+          continue
+        }
       }
-      
-      // 如果合约调用失败，返回空数组，让上层逻辑fallback到其他数据源
-      return []
+
+      return hackathons
+    } catch (error) {
+      console.error('Failed to get hackathons from contracts:', error)
+      throw error
+    }
+  }
+
+
+  /**
+   * 从IPFS丰富黑客松数据
+   */
+  private async enrichHackathonsFromIPFS(hackathons: any[]): Promise<HackathonData[]> {
+    return Promise.all(
+      hackathons.map(async (hackathon) => {
+        try {
+          if (hackathon.dataCID) {
+            const ipfsData = await ipfsDataService.getHackathonData(hackathon.dataCID)
+            return { ...hackathon, ...ipfsData }
+          }
+          return hackathon
+        } catch (error) {
+          console.warn(`Failed to load IPFS data for hackathon ${hackathon.id}:`, error)
+          return hackathon
+        }
+      })
+    )
+  }
+
+
+  /**
+   * 缓存管理
+   */
+  private getFromCache(key: string): any | null {
+    const cached = this.cache.get(key)
+    if (cached && Date.now() - cached.timestamp < cached.ttl) {
+      return cached.data
+    }
+    this.cache.delete(key)
+    return null
+  }
+
+  private setCache(key: string, data: any, ttl: number = this.CACHE_TTL): void {
+    this.cache.set(key, {
+      data,
+      timestamp: Date.now(),
+      ttl
+    })
+  }
+
+  /**
+   * 清除缓存
+   */
+  clearCache(pattern?: string): void {
+    if (pattern) {
+      for (const key of this.cache.keys()) {
+        if (key.includes(pattern)) {
+          this.cache.delete(key)
+        }
+      }
+    } else {
+      this.cache.clear()
     }
   }
 
   /**
-   * 从智能合约获取项目列表
+   * 获取缓存统计
    */
-  private async getProjectsFromContract(params: any): Promise<ProjectData[]> {
-    try {
-      // 确保智能合约服务已初始化
-      await smartContractService.initialize()
-      
-      const count = await smartContractService.getProjectCount()
-      const totalCount = Number(count)
-    
-    if (totalCount === 0) return []
-    
-    // 生成ID数组
-    const ids = Array.from({ length: totalCount }, (_, i) => i + 1)
-    
-    // 批量获取数据
-    const projects = await ipfsDataService.getProjectsData(ids)
-    
-    // 应用筛选
-    const filteredProjects = this.filterProjects(projects, params)
-    const sortedProjects = this.sortProjects(filteredProjects, params.sortBy)
-    
-    // 应用分页
-    if (params.page && params.limit) {
-      const start = (params.page - 1) * params.limit
-      const end = start + params.limit
-      return sortedProjects.slice(start, end)
-    }
-    
-    return sortedProjects
-    } catch (error: any) {
-      console.warn('从智能合约获取项目数据失败:', error)
-      
-      // 检查是否是网络相关错误
-      if (error.message?.includes('missing trie node') || 
-          error.message?.includes('Internal JSON-RPC error') ||
-          error.code === 'CALL_EXCEPTION') {
-        console.warn('检测到BSC Testnet网络问题，切换到fallback数据源')
-      }
-      
-      // 如果合约调用失败，返回空数组，让上层逻辑fallback到其他数据源
-      return []
-    }
-  }
-
-  // （已移除）与 The Graph 相关的辅助方法
-
-  /**
-   * 转换API数据为HackathonData
-   */
-  private convertApiHackathonToData(apiData: any): HackathonData {
+  getCacheStats(): { size: number; keys: string[] } {
     return {
-      id: Number(apiData.id),
-      organizer: apiData.organizerId,
-      createdAt: new Date(apiData.createdAt),
-      active: apiData.status === 'active',
+      size: this.cache.size,
+      keys: Array.from(this.cache.keys())
+    }
+  }
+
+  /**
+   * 预加载数据
+   */
+  async preloadData(type: 'hackathons' | 'users', params: any = {}): Promise<void> {
+    try {
+      switch (type) {
+        case 'hackathons':
+          await this.getHackathons(params)
+          break
+        case 'users':
+          // 预加载用户数据
+          break
+      }
+      console.log(`✅ 预加载 ${type} 数据成功`)
+    } catch (error) {
+      console.warn(`⚠️ 预加载 ${type} 数据失败:`, error)
+    }
+  }
+
+  /**
+   * 数据同步
+   */
+  async syncData(): Promise<void> {
+    try {
+      // 清除旧缓存
+      this.clearCache()
       
-      title: apiData.title,
-      description: apiData.description,
-      startDate: new Date(apiData.startDate),
-      endDate: new Date(apiData.endDate),
-      prizePool: parseFloat(apiData.prizePool) || 0,
-      categories: apiData.categories || [],
+      // 重新加载数据
+      await Promise.all([
+        this.preloadData('hackathons')
+      ])
       
-      status: apiData.status,
-      isValid: true,
-      formattedPrize: `$${apiData.prizePool?.toLocaleString()}` || '待定',
-      duration: '待定',
-      timeRemaining: '待定',
-    }
-  }
-
-  /**
-   * 筛选黑客松
-   */
-  private filterHackathons(hackathons: HackathonData[], params: any): HackathonData[] {
-    let filtered = [...hackathons]
-    
-    // 搜索筛选
-    if (params.search) {
-      const search = params.search.toLowerCase()
-      filtered = filtered.filter(h => 
-        h.title.toLowerCase().includes(search) ||
-        h.description.toLowerCase().includes(search)
-      )
-    }
-    
-    // 分类筛选
-    if (params.category && params.category !== 'all') {
-      filtered = filtered.filter(h => 
-        h.categories.includes(params.category)
-      )
-    }
-    
-    // 状态筛选
-    if (params.status && params.status !== 'all') {
-      filtered = filtered.filter(h => h.status === params.status)
-    }
-    
-    return filtered
-  }
-
-  /**
-   * 排序黑客松
-   */
-  private sortHackathons(hackathons: HackathonData[], sortBy?: string): HackathonData[] {
-    const sorted = [...hackathons]
-    
-    switch (sortBy) {
-      case 'prize':
-        return sorted.sort((a, b) => b.prizePool - a.prizePool)
-      case 'startDate':
-        return sorted.sort((a, b) => a.startDate.getTime() - b.startDate.getTime())
-      case 'endDate':
-        return sorted.sort((a, b) => a.endDate.getTime() - b.endDate.getTime())
-      case 'createdAt':
-      default:
-        return sorted.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-    }
-  }
-
-  /**
-   * 筛选项目
-   */
-  private filterProjects(projects: ProjectData[], params: any): ProjectData[] {
-    let filtered = [...projects]
-    
-    // 黑客松筛选
-    if (params.hackathonId) {
-      filtered = filtered.filter(p => p.hackathonId === Number(params.hackathonId))
-    }
-    
-    // 搜索筛选
-    if (params.search) {
-      const search = params.search.toLowerCase()
-      filtered = filtered.filter(p => 
-        p.title.toLowerCase().includes(search) ||
-        p.description.toLowerCase().includes(search)
-      )
-    }
-    
-    // 技术栈筛选
-    if (params.technology && params.technology !== 'all') {
-      filtered = filtered.filter(p => 
-        p.techStack.some(tech => tech.toLowerCase().includes(params.technology.toLowerCase()))
-      )
-    }
-    
-    return filtered
-  }
-
-  /**
-   * 排序项目
-   */
-  private sortProjects(projects: ProjectData[], sortBy?: string): ProjectData[] {
-    const sorted = [...projects]
-    
-    switch (sortBy) {
-      case 'score':
-        return sorted.sort((a, b) => (b.averageScore || 0) - (a.averageScore || 0))
-      case 'submissionTime':
-        return sorted.sort((a, b) => b.submissionTime.getTime() - a.submissionTime.getTime())
-      case 'title':
-        return sorted.sort((a, b) => a.title.localeCompare(b.title))
-      case 'createdAt':
-      default:
-        return sorted.sort((a, b) => b.submissionTime.getTime() - a.submissionTime.getTime())
+      console.log('✅ 数据同步完成')
+    } catch (error) {
+      console.error('❌ 数据同步失败:', error)
+      throw error
     }
   }
 }
 
-// 导出服务实例
+// 创建单例实例
 export const dataService = new DataService()

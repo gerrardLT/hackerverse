@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Button } from './button'
 import { Input } from './input'
 import { Label } from './label'
@@ -18,14 +19,16 @@ export function UserRegistration({ onSuccess, className }: UserRegistrationProps
   const { user, registerUser, loading } = useWeb3Auth()
   const { toast } = useToast()
   const [username, setUsername] = useState('')
+  const t = useTranslations('ui.userRegistration')
+  const tCommon = useTranslations('common')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     if (!user) {
       toast({
-        title: "错误",
-        description: "请先连接钱包",
+        title: tCommon('error'),
+        description: t('connectWalletFirst'),
         variant: "destructive"
       })
       return
@@ -33,8 +36,8 @@ export function UserRegistration({ onSuccess, className }: UserRegistrationProps
 
     if (!username) {
       toast({
-        title: "错误",
-        description: "请填写用户名",
+        title: tCommon('error'),
+        description: t('enterUsername'),
         variant: "destructive"
       })
       return
@@ -47,16 +50,16 @@ export function UserRegistration({ onSuccess, className }: UserRegistrationProps
       
       if (success) {
         toast({
-          title: "注册成功",
-          description: "用户已注册到区块链",
+        title: t('registrationSuccess'),
+        description: t('userRegisteredToBlockchain'),
         })
         onSuccess?.()
       }
     } catch (error) {
-      console.error('用户注册失败:', error)
+      console.error('User registration failed:', error)
       toast({
-        title: "注册失败",
-        description: "请稍后重试",
+        title: t('registrationFailed'),
+        description: t('tryAgainLater'),
         variant: "destructive"
       })
     }
@@ -68,10 +71,10 @@ export function UserRegistration({ onSuccess, className }: UserRegistrationProps
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <User className="h-5 w-5" />
-            <span>用户注册</span>
+            <span>{t('title')}</span>
           </CardTitle>
           <CardDescription>
-            请先连接钱包以注册用户
+            {t('connectWalletToRegister')}
           </CardDescription>
         </CardHeader>
       </Card>
@@ -83,21 +86,21 @@ export function UserRegistration({ onSuccess, className }: UserRegistrationProps
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
           <User className="h-5 w-5" />
-          <span>用户注册</span>
+            <span>{t('title')}</span>
         </CardTitle>
         <CardDescription>
-          注册用户资料到去中心化平台
+          {t('registerToDecentralizedPlatform')}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="username">用户名 *</Label>
+            <Label htmlFor="username">{t('username')} *</Label>
             <Input
               id="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="输入用户名"
+              placeholder={t('enterUsernamePlaceholder')}
               required
             />
           </div>
@@ -110,16 +113,16 @@ export function UserRegistration({ onSuccess, className }: UserRegistrationProps
             {loading && (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             )}
-            {loading ? '注册中...' : '注册用户'}
+            {loading ? t('registering') : t('registerUser')}
           </Button>
         </form>
 
         <div className="mt-4 p-3 bg-muted rounded-lg">
           <p className="text-sm text-muted-foreground">
-            <strong>钱包地址:</strong> {user.address}
+            <strong>{t('walletAddress')}:</strong> {user.address}
           </p>
           <p className="text-sm text-muted-foreground">
-            <strong>注册状态:</strong> {user.isRegistered ? '已注册' : '未注册'}
+            <strong>{t('registrationStatus')}:</strong> {user.isRegistered ? t('registered') : t('notRegistered')}
           </p>
         </div>
       </CardContent>

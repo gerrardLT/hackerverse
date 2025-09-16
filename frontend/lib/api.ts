@@ -34,6 +34,8 @@ interface User {
   avatarUrl?: string
   bio?: string
   reputationScore: number
+  role: 'user' | 'admin' | 'moderator' | 'judge'
+  status: 'active' | 'suspended' | 'banned' | 'pending'
   emailVerified: boolean
   notificationSettings: {
     email: boolean
@@ -76,6 +78,52 @@ interface Hackathon {
   featured: boolean
   status: string
   createdAt: string
+  // 区块链相关字段
+  contractId?: number | null
+  ipfsHash?: string | null
+  txHash?: string | null
+  blockNumber?: number | null
+  gasUsed?: number | null
+  syncStatus?: string | null
+  // ⭐ 添加metadata字段
+  metadata?: {
+    prizes?: Array<{
+      rank: number
+      name?: string
+      amount: number
+      description: string
+    }>
+    tracks?: Array<{
+      name: string
+      description: string
+      requirements?: string
+    }>
+    judgingCriteria?: Array<{
+      category: string
+      weight: number
+      description: string
+    }>
+    judges?: Array<{
+      name: string
+      title: string
+      bio: string
+      avatarUrl: string
+    }>
+    sponsors?: Array<{
+      name: string
+      logoUrl: string
+      websiteUrl: string
+      tier: string
+    }>
+    timeline?: Array<{
+      date: string
+      title: string
+      description: string
+      completed: boolean
+    }>
+    schedule?: any[]
+    coverImage?: string | null
+  }
   organizer: {
     id: string
     username: string
@@ -125,6 +173,7 @@ interface Team {
   skills: string[]
   tags: string[]
   isPublic: boolean
+  status: 'RECRUITING' | 'FULL' | 'COMPETING' | 'COMPLETED' | 'DISBANDED'
   createdAt: string
   hackathon: {
     id: string
@@ -182,6 +231,9 @@ interface CommunityPost {
   isLocked: boolean
   lastReplyAt?: string
   lastReplyBy?: CommunityUser
+  // 用户态（可选）
+  isLiked?: boolean
+  isBookmarked?: boolean
 }
 
 interface CommunityReply {
@@ -224,9 +276,31 @@ class ApiService {
       ...(options.headers as Record<string, string>),
     }
 
+    // 动态获取最新的token（每次请求都重新检查）
+    let currentToken = this.token
+    if (typeof window !== 'undefined') {
+      const storageToken = localStorage.getItem('hackx-token')
+      if (storageToken && storageToken !== this.token) {
+        console.log('🔄 检测到localStorage中有新token，更新实例token')
+        this.token = storageToken
+        currentToken = storageToken
+      } else if (!currentToken) {
+        currentToken = storageToken
+        console.log('🔄 从localStorage获取token:', currentToken ? currentToken.substring(0, 20) + '...' : 'null')
+      }
+    }
+
     // 添加认证header
-    if (this.token) {
-      headers.Authorization = `Bearer ${this.token}`
+    if (currentToken) {
+      headers.Authorization = `Bearer ${currentToken}`
+      console.log('🔑 API请求包含token:', currentToken.substring(0, 20) + '...')
+    } else {
+      console.log('⚠️ API请求缺少token - 请检查用户登录状态')
+      console.log('🔍 调试信息:', {
+        instanceToken: this.token ? 'exists' : 'null',
+        storageToken: typeof window !== 'undefined' ? (localStorage.getItem('hackx-token') ? 'exists' : 'null') : 'server-side',
+        endpoint: endpoint
+      })
     }
 
     try {
@@ -320,8 +394,25 @@ class ApiService {
     })
   }
 
+  async logout(): Promise<ApiResponse<{ success: boolean }>> {
+    return this.request('/auth/logout', {
+      method: 'POST',
+    })
+  }
+
   // ============ 用户管理API ============
-  async getCurrentUser(): Promise<ApiResponse<{ user: User }>> {
+  async getCurrentUser(): Promise<ApiResponse<{ 
+    user: User;
+    communityOverview?: {
+      counts: { bookmarks: number; likes: number; myPosts: number; following: number }
+      previews: { 
+        bookmarks: { id: string; title: string }[]
+        likes: { id: string; title: string }[]
+        myPosts: { id: string; title: string }[]
+        following: { id: string; name: string; avatar?: string }[]
+      }
+    }
+  }>> {
     return this.request('/users/me')
   }
 
@@ -344,11 +435,100 @@ class ApiService {
     return this.request('/users/me/stats')
   }
 
+  // 用户黑客松参与历史
+  async getUserHackathons(): Promise<ApiResponse<{
+    hackathons: Array<{
+      id: string
+      name: string
+      description?: string
+      status: string
+      role: string
+      relationshipType: 'participant' | 'organizer'
+      joinedAt: string
+      date: string
+      prizePool?: number
+      categories: string[]
+      participationStatus: string
+    }>
+    total: number
+  }>> {
+    return this.request('/users/me/hackathons')
+  }
+
+  // 用户项目列表
+  async getUserProjects(params?: { hackathonId?: string }): Promise<ApiResponse<{
+    projects: Array<{
+      id: string
+      name: string
+      title?: string
+      description?: string
+      hackathon: string
+      hackathonId: string
+      status: string
+      score?: string
+      rank?: string
+      role: string
+      teamName?: string
+      teamMembers: number
+      createdAt: string
+      updatedAt: string
+      ipfsHash?: string
+      repositoryUrl?: string
+      demoUrl?: string
+      githubUrl?: string
+      technologies?: string[]
+      tags?: string[]
+    }>
+    total: number
+    created: number
+    participated: number
+  }>> {
+    const url = params?.hackathonId 
+      ? `/projects?hackathonId=${params.hackathonId}` 
+      : '/users/me/projects'
+    return this.request(url)
+  }
+
+  // 用户团队列表
+  async getUserTeams(): Promise<ApiResponse<{
+    teams: Array<{
+      id: string
+      name: string
+      description?: string
+      hackathon: string
+      hackathonId: string
+      status: string
+      role: string
+      members: number
+      membersList: Array<{
+        id: string
+        username: string
+        avatarUrl?: string
+        role: string
+      }>
+      projects: Array<{
+        id: string
+        title: string
+        status: string
+      }>
+      createdAt: string
+      maxMembers?: number
+      skills: string[]
+      isPublic: boolean
+    }>
+    total: number
+    leading: number
+    participating: number
+  }>> {
+    return this.request('/users/me/teams')
+  }
+
   async updateUser(data: {
     username?: string
     bio?: string
     avatarUrl?: string
     walletAddress?: string
+    skills?: string[]
     notificationSettings?: any
     privacySettings?: any
   }): Promise<ApiResponse<{ user: User }>> {
@@ -421,6 +601,72 @@ class ApiService {
 
   async getHackathon(id: string): Promise<ApiResponse<{ hackathon: Hackathon }>> {
     return this.request(`/hackathons/${id}`)
+  }
+
+  async getHackathonProjects(hackathonId: string): Promise<ApiResponse<{ projects: any[] }>> {
+    return this.request(`/hackathons/${hackathonId}/projects`)
+  }
+
+  async joinHackathon(hackathonId: string): Promise<ApiResponse<any>> {
+    return this.request(`/hackathons/${hackathonId}/join`, {
+      method: 'POST',
+    })
+  }
+
+  async getUserHackathonParticipation(hackathonId: string): Promise<ApiResponse<{ isParticipating: boolean }>> {
+    return this.request(`/hackathons/${hackathonId}/participation`)
+  }
+
+  // 获取推荐黑客松
+  async getRecommendedHackathons(limit?: number): Promise<ApiResponse<{
+    hackathons: Array<{
+      id: string
+      title: string
+      description: string
+      startDate: string
+      endDate: string
+      registrationDeadline?: string
+      prizePool?: number
+      categories: string[]
+      tags: string[]
+      participantCount: number
+      maxParticipants?: number
+      organizer: {
+        username: string
+        avatarUrl?: string
+      }
+      daysUntilStart: number
+    }>
+    total: number
+  }>> {
+    const queryString = limit ? `?limit=${limit}` : ''
+    return this.request(`/hackathons/recommended${queryString}`)
+  }
+
+  // 获取特色黑客松（用于首页展示）
+  async getFeaturedHackathons(limit: number = 3): Promise<ApiResponse<{
+    hackathons: Array<{
+      id: string
+      title: string
+      description: string
+      startDate: string
+      endDate: string
+      prizePool?: number
+      categories: string[]
+      tags: string[]
+      participantCount: number
+      status: string
+      organizer: {
+        username: string
+        avatarUrl?: string
+      }
+      daysLeft: number
+      prize: string
+      participants: string
+    }>
+    total: number
+  }>> {
+    return this.request(`/hackathons?featured=true&limit=${limit}&sortBy=startDate&sortOrder=asc`)
   }
 
   async registerForHackathon(id: string): Promise<ApiResponse<any>> {
@@ -497,9 +743,13 @@ class ApiService {
     })
   }
 
-  async joinTeam(teamId: string): Promise<ApiResponse<any>> {
+  async joinTeam(teamId: string, applicationData?: {
+    message?: string
+    skills?: string[]
+  }): Promise<ApiResponse<any>> {
     return this.request(`/teams/${teamId}/join`, {
       method: 'POST',
+      body: JSON.stringify(applicationData || {})
     })
   }
 
@@ -531,11 +781,61 @@ class ApiService {
     })
   }
 
+  // ============ 团队申请管理API ============
+  async getTeamApplications(teamId: string, params?: {
+    status?: 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELLED'
+    page?: number
+    limit?: number
+  }): Promise<ApiResponse<{
+    applications: Array<{
+      id: string
+      message: string
+      skills: string[]
+      status: string
+      createdAt: string
+      reviewedAt?: string
+      user: {
+        id: string
+        username: string
+        avatarUrl?: string
+        bio?: string
+        skills: string[]
+        reputationScore: number
+      }
+      reviewer?: {
+        id: string
+        username: string
+      }
+    }>
+    pagination: any
+  }>> {
+    const queryString = params ? new URLSearchParams(
+      Object.entries(params).reduce((acc, [key, value]) => {
+        if (value !== undefined && value !== null) {
+          acc[key] = String(value)
+        }
+        return acc
+      }, {} as Record<string, string>)
+    ).toString() : ''
+    
+    return this.request(`/teams/${teamId}/applications${queryString ? `?${queryString}` : ''}`)
+  }
+
+  async reviewTeamApplication(teamId: string, applicationId: string, data: {
+    action: 'approve' | 'reject'
+    reason?: string
+  }): Promise<ApiResponse<any>> {
+    return this.request(`/teams/${teamId}/applications/${applicationId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data)
+    })
+  }
+
   async getTeamInvitations(): Promise<ApiResponse<{ invitations: any[] }>> {
     return this.request('/teams/invitations')
   }
 
-  // ============ 项目API ============
+  // ============ 项目API（在黑客松中使用）============
   async getProjects(params?: {
     page?: number
     limit?: number
@@ -629,12 +929,10 @@ class ApiService {
     activeUsers: number
     totalPosts: number
     totalHackathons: number
-    totalProjects: number
     pendingReviews: number
     userGrowth: number
     postGrowth: number
     hackathonGrowth: number
-    projectGrowth: number
   }>> {
     return this.request('/admin/stats')
   }
@@ -948,10 +1246,11 @@ class ApiService {
     return this.request(`/community/posts${queryString ? `?${queryString}` : ''}`)
   }
 
-  async getCommunityPost(id: string): Promise<ApiResponse<{ 
-    post: CommunityPost & { replies: CommunityReply[] }
-  }>> {
-    return this.request(`/community/posts/${id}`)
+  async getCommunityPost(id: string, incrementView: boolean = true): Promise<ApiResponse<CommunityPost & { replies: CommunityReply[] }>> {
+    const queryString = incrementView ? '?incrementView=true' : ''
+    console.log(`🔍 [API] getCommunityPost 调用: ${id}, incrementView: ${incrementView}`)
+    console.trace('getCommunityPost 调用堆栈:')
+    return this.request(`/community/posts/${id}${queryString}`)
   }
 
   async createCommunityPost(data: {
@@ -986,24 +1285,318 @@ class ApiService {
     })
   }
 
+  // ============ 社区回复API ============
+  async createCommunityReply(postId: string, data: {
+    content: string
+    parentId?: string
+  }): Promise<ApiResponse<{ reply: CommunityReply }>> {
+    return this.request(`/community/posts/${postId}/replies`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async updateCommunityReply(id: string, data: {
+    content: string
+  }): Promise<ApiResponse<{ reply: CommunityReply }>> {
+    return this.request(`/community/replies/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async deleteCommunityReply(id: string): Promise<ApiResponse<any>> {
+    return this.request(`/community/replies/${id}`, {
+      method: 'DELETE',
+    })
+  }
+
+  // ============ 社区点赞API ============
+  async likeCommunityPost(postId: string): Promise<ApiResponse<{ isLiked: boolean; likeCount: number }>> {
+    return this.request(`/community/posts/${postId}/like`, {
+      method: 'POST',
+    })
+  }
+
+  async getPostLikeStatus(postId: string): Promise<ApiResponse<{ isLiked: boolean; likeCount: number }>> {
+    return this.request(`/community/posts/${postId}/like`)
+  }
+
+  async likeCommunityReply(replyId: string): Promise<ApiResponse<{ isLiked: boolean; likeCount: number }>> {
+    return this.request(`/community/replies/${replyId}/like`, {
+      method: 'POST',
+    })
+  }
+
+  async getReplyLikeStatus(replyId: string): Promise<ApiResponse<{ isLiked: boolean; likeCount: number }>> {
+    return this.request(`/community/replies/${replyId}/like`)
+  }
+
+  // ============ 社区收藏API ============
+  async bookmarkCommunityPost(postId: string): Promise<ApiResponse<{ isBookmarked: boolean }>> {
+    return this.request(`/community/posts/${postId}/bookmark`, {
+      method: 'POST',
+    })
+  }
+
+  async getPostBookmarkStatus(postId: string): Promise<ApiResponse<{ isBookmarked: boolean }>> {
+    return this.request(`/community/posts/${postId}/bookmark`)
+  }
+
+  async getUserBookmarks(params?: {
+    page?: number
+    limit?: number
+  }): Promise<ApiResponse<{ 
+    bookmarks: Array<{
+      id: string
+      bookmarkedAt: string
+      post: CommunityPost
+    }>
+    pagination: any
+  }>> {
+    const queryString = params ? new URLSearchParams(
+      Object.entries(params).reduce((acc, [key, value]) => {
+        if (value !== undefined) {
+          acc[key] = String(value)
+        }
+        return acc
+      }, {} as Record<string, string>)
+    ).toString() : ''
+    
+    return this.request(`/users/me/bookmarks${queryString ? `?${queryString}` : ''}`)
+  }
+
+  // ============ 社区关注API ============
+  async followUser(userId: string): Promise<ApiResponse<{ isFollowing: boolean; followersCount: number }>> {
+    return this.request(`/users/${userId}/follow`, {
+      method: 'POST',
+    })
+  }
+
+  async getUserFollowStatus(userId: string): Promise<ApiResponse<{ 
+    isFollowing: boolean
+    followersCount: number
+    followingCount: number
+  }>> {
+    return this.request(`/users/${userId}/follow`)
+  }
+
+  async getUserFollowing(params?: {
+    page?: number
+    limit?: number
+  }): Promise<ApiResponse<{ 
+    following: Array<{
+      id: string
+      followedAt: string
+      user: any
+    }>
+    pagination: any
+  }>> {
+    const queryString = params ? new URLSearchParams(
+      Object.entries(params).reduce((acc, [key, value]) => {
+        if (value !== undefined) {
+          acc[key] = String(value)
+        }
+        return acc
+      }, {} as Record<string, string>)
+    ).toString() : ''
+    
+    return this.request(`/users/me/following${queryString ? `?${queryString}` : ''}`)
+  }
+
+  async getUserFollowers(params?: {
+    page?: number
+    limit?: number
+  }): Promise<ApiResponse<{ 
+    followers: Array<{
+      id: string
+      followedAt: string
+      user: any
+    }>
+    pagination: any
+  }>> {
+    const queryString = params ? new URLSearchParams(
+      Object.entries(params).reduce((acc, [key, value]) => {
+        if (value !== undefined) {
+          acc[key] = String(value)
+        }
+        return acc
+      }, {} as Record<string, string>)
+    ).toString() : ''
+    
+    return this.request(`/users/me/followers${queryString ? `?${queryString}` : ''}`)
+  }
+
+  async getUserPublicStats(userId: string): Promise<ApiResponse<{
+    postsCount: number
+    repliesCount: number
+    joinedAt: string
+  }>> {
+    return this.request(`/users/${userId}/stats`)
+  }
+
+  // ============ 社区搜索API ============
+  async searchCommunity(params: {
+    q: string
+    type?: 'all' | 'posts' | 'users' | 'tags'
+    page?: number
+    limit?: number
+  }): Promise<ApiResponse<{
+    query: string
+    type: string
+    results: {
+      posts?: {
+        items: CommunityPost[]
+        total: number
+        pagination?: any
+      }
+      users?: {
+        items: any[]
+        total: number
+        pagination?: any
+      }
+      tags?: {
+        items: Array<{
+          name: string
+          count: number
+          postsCount: number
+        }>
+        total: number
+      }
+    }
+  }>> {
+    const queryString = new URLSearchParams(
+      Object.entries(params).reduce((acc, [key, value]) => {
+        if (value !== undefined) {
+          acc[key] = String(value)
+        }
+        return acc
+      }, {} as Record<string, string>)
+    ).toString()
+    
+    return this.request(`/community/search?${queryString}`)
+  }
+
+  // ============ 社区通知API ============
+  async getCommunityNotifications(params?: {
+    page?: number
+    limit?: number
+    unreadOnly?: boolean
+  }): Promise<ApiResponse<{
+    notifications: Array<{
+      id: string
+      type: string
+      title: string
+      content: string
+      entityType?: string
+      entityId?: string
+      isRead: boolean
+      createdAt: string
+      readAt?: string
+      triggerUser?: {
+        id: string
+        name: string
+        username: string
+        avatar?: string
+      }
+    }>
+    pagination: any
+  }>> {
+    const queryString = params ? new URLSearchParams(
+      Object.entries(params).reduce((acc, [key, value]) => {
+        if (value !== undefined) {
+          acc[key] = String(value)
+        }
+        return acc
+      }, {} as Record<string, string>)
+    ).toString() : ''
+    
+    return this.request(`/community/notifications${queryString ? `?${queryString}` : ''}`)
+  }
+
+  async notificationActions(data: {
+    action: 'markRead' | 'markAllRead' | 'delete'
+    notificationIds?: string[]
+  }): Promise<ApiResponse<any>> {
+    return this.request('/community/notifications/actions', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
+  async getUnreadNotificationCount(): Promise<ApiResponse<{ unreadCount: number }>> {
+    return this.request('/community/notifications/unread-count')
+  }
+
+  // ============ 社区推荐API ============
+  async getCommunityRecommendations(params: {
+    type: 'hot' | 'personalized' | 'tags'
+    limit?: number
+  }): Promise<ApiResponse<{
+    type: string
+    items: any[]
+    count: number
+  }>> {
+    const queryString = new URLSearchParams(
+      Object.entries(params).reduce((acc, [key, value]) => {
+        if (value !== undefined) {
+          acc[key] = String(value)
+        }
+        return acc
+      }, {} as Record<string, string>)
+    ).toString()
+    
+    return this.request(`/community/recommendations?${queryString}`)
+  }
+
+  async getRelatedPosts(postId: string, limit?: number): Promise<ApiResponse<{
+    relatedPosts: any[]
+    count: number
+  }>> {
+    const queryString = limit ? `?limit=${limit}` : ''
+    return this.request(`/community/posts/${postId}/related${queryString}`)
+  }
+
   // ============ IPFS API ============
   // 注意：这些方法现在通过后端API调用，不再直接调用Pinata
-  async uploadFile(file: File): Promise<ApiResponse<{ file: any }>> {
+  async uploadFile(file: File): Promise<ApiResponse<{ hash: string; url: string; name: string; size: number }>> {
     const formData = new FormData()
     formData.append('file', file)
 
+    // 构建完整URL
+    const url = `${this.baseURL}/ipfs/upload`
+    
     const headers: Record<string, string> = {}
     
     // 添加认证header
     if (this.token) {
       headers.Authorization = `Bearer ${this.token}`
     }
+    
+    // 注意：不要设置Content-Type，让浏览器自动设置multipart/form-data
+    console.log('📤 上传文件到:', url, '认证token:', !!this.token)
+    
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers,
+        body: formData,
+      })
 
-    return this.request('/ipfs/upload', {
-      method: 'POST',
-      headers,
-      body: formData,
-    })
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('❌ 文件上传HTTP错误:', response.status, errorText)
+        throw new Error(`HTTP ${response.status}: ${errorText}`)
+      }
+
+      const data = await response.json()
+      console.log('✅ 文件上传响应:', data)
+      
+      return data
+    } catch (error) {
+      console.error('❌ 文件上传fetch错误:', error)
+      throw error
+    }
   }
 
   async uploadJSON(data: any, metadata?: any): Promise<ApiResponse<{ hash: string; url: string }>> {
@@ -1011,6 +1604,27 @@ class ApiService {
       method: 'PUT', // JSON数据使用PUT方法
       body: JSON.stringify({ data, metadata }),
     })
+  }
+
+  // ============ 统计数据API ============
+  async getStats(): Promise<ApiResponse<{
+    users: { total: number; label: string; description: string }
+    hackathons: { total: number; label: string; description: string }
+    projects: { total: number; label: string; description: string }
+    countries: { total: number; label: string; description: string }
+    participations?: number
+    teams?: number
+  }>> {
+    return this.request('/stats/public')
+  }
+
+  // ============ 搜索建议API ============
+  async getSearchSuggestions(): Promise<ApiResponse<{
+    popularSearches: string[]
+    relatedSuggestions?: string[]
+    query?: string
+  }>> {
+    return this.request('/search/suggestions')
   }
 
   // ⭐ ============ Web3 认证 API ============

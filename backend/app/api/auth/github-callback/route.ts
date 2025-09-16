@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import jwt from 'jsonwebtoken'
+import { AuthService } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
   try {
@@ -83,36 +83,30 @@ export async function GET(request: NextRequest) {
       // ⭐ 使用统一的IPFS服务创建用户资料
       let ipfsCID
       try {
-        const { UserProfileIPFSService } = await import('@/lib/user-profile-ipfs')
+        const { IPFSService } = await import('@/lib/ipfs')
         
-        ipfsCID = await UserProfileIPFSService.uploadProfile({
-          username: githubUser.login,
-          displayName: githubUser.name || githubUser.login,
-          bio: githubUser.bio || 'GitHub开发者',
-          avatarUrl: githubUser.avatar_url,
-          email: githubUser.email,
-          socialLinks: {
-            github: githubUser.login,
-            githubUrl: githubUser.html_url
+        // 构建标准的用户资料数据结构
+        const userProfileData = {
+          version: '1.0.0',
+          timestamp: new Date().toISOString(),
+          data: {
+            username: githubUser.login,
+            email: githubUser.email || '',
+            avatar: githubUser.avatar_url || '',
+            bio: githubUser.bio || 'GitHub开发者',
+            skills: [],
+            socialLinks: {
+              github: githubUser.html_url,
+              website: githubUser.blog || ''
+            }
           },
-          githubData: {
-            id: githubUser.id,
-            login: githubUser.login,
-            publicRepos: githubUser.public_repos,
-            followers: githubUser.followers,
-            following: githubUser.following,
-            createdAt: githubUser.created_at
-          },
-          // 基于GitHub数据计算初始声誉
-          reputation: {
-            hackathonsParticipated: 0,
-            hackathonsWon: 0,
-            projectsCompleted: githubUser.public_repos || 0,
-            skillEndorsements: [],
-            badges: []
-          },
-          createdAt: new Date().toISOString()
-        }, 'github')
+          metadata: {
+            previousVersion: undefined,
+            updatedBy: githubUser.login
+          }
+        }
+        
+        ipfsCID = await IPFSService.uploadUserProfile(userProfileData)
         
       } catch (ipfsError) {
         console.error('GitHub用户IPFS上传失败:', ipfsError)
@@ -167,16 +161,10 @@ export async function GET(request: NextRequest) {
     }
 
     // 6. 生成JWT token
-    const token = jwt.sign(
-      { 
-        userId: user.id,
-        email: user.email,
-        github: githubUser.login,
-        role: user.role 
-      },
-      process.env.JWT_SECRET!,
-      { expiresIn: '7d' }
-    )
+    const token = AuthService.generateToken({
+      userId: user.id,
+      email: user.email,
+    })
 
     console.log('✅ GitHub登录成功:', user.username)
 

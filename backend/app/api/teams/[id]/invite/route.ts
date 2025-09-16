@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
+import { SimpleNotificationService } from '@/lib/simple-notification-service'
+import { getLocaleFromRequest, createTFunction } from '@/lib/i18n'
 
 // 邀请用户验证模式
 const inviteUserSchema = z.object({
@@ -15,6 +17,9 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
     const teamId = params.id
     const body = await request.json()
     
@@ -25,7 +30,7 @@ export async function POST(
     const user = await auth(request)
     if (!user) {
       return NextResponse.json(
-        { success: false, error: '未认证' },
+        { success: false, error: t('auth.unauthorized') },
         { status: 401 }
       )
     }
@@ -48,14 +53,14 @@ export async function POST(
 
     if (!team) {
       return NextResponse.json(
-        { success: false, error: '团队不存在' },
+        { success: false, error: t('teams.notFound') },
         { status: 404 }
       )
     }
 
     if (team.leaderId !== user.id) {
       return NextResponse.json(
-        { success: false, error: '只有队长可以邀请成员' },
+        { success: false, error: t('teams.onlyLeaderCanInvite', { fallback: 'Only team leader can invite members' }) },
         { status: 403 }
       )
     }
@@ -63,7 +68,7 @@ export async function POST(
     // 检查团队是否已满员
     if (team._count.members >= team.maxMembers) {
       return NextResponse.json(
-        { success: false, error: '团队已满员' },
+        { success: false, error: t('teams.teamFull') },
         { status: 400 }
       )
     }
@@ -75,7 +80,7 @@ export async function POST(
 
     if (!invitedUser) {
       return NextResponse.json(
-        { success: false, error: '被邀请用户不存在' },
+        { success: false, error: t('teams.invitedUserNotFound', { fallback: 'Invited user not found' }) },
         { status: 404 }
       )
     }
@@ -90,7 +95,7 @@ export async function POST(
 
     if (existingMember) {
       return NextResponse.json(
-        { success: false, error: '该用户已经是团队成员' },
+        { success: false, error: t('teams.alreadyTeamMember', { fallback: 'User is already a team member' }) },
         { status: 400 }
       )
     }
@@ -105,7 +110,7 @@ export async function POST(
 
     if (!participation) {
       return NextResponse.json(
-        { success: false, error: '被邀请用户未参加该黑客松' },
+        { success: false, error: t('teams.userNotRegistered', { fallback: 'Invited user has not registered for this hackathon' }) },
         { status: 400 }
       )
     }
@@ -122,63 +127,73 @@ export async function POST(
 
     if (otherTeamMember) {
       return NextResponse.json(
-        { success: false, error: '被邀请用户已加入其他团队' },
+        { success: false, error: t('teams.alreadyInOtherTeam', { fallback: 'Invited user has already joined another team' }) },
         { status: 400 }
       )
     }
 
-    // 创建邀请（这里可以扩展为邀请系统，暂时直接加入团队）
-    const teamMember = await prisma.teamMember.create({
-      data: {
-        teamId,
-        userId: validatedData.userId,
-        role: validatedData.role,
-        joinedAt: new Date()
-      },
+    // 获取团队详细信息以便创建邀请通知
+    const teamWithDetails = await prisma.team.findUnique({
+      where: { id: teamId },
       select: {
         id: true,
-        role: true,
-        joinedAt: true,
-        user: {
+        name: true,
+        leader: {
           select: {
             id: true,
             username: true,
-            avatarUrl: true,
+            avatarUrl: true
           }
         }
       }
     })
 
-    // 创建通知
-    await prisma.notification.create({
-      data: {
+    // 检查是否已有未处理的邀请
+    const existingInvitation = await prisma.notification.findFirst({
+      where: {
         userId: validatedData.userId,
         type: 'team_invite',
-        title: '团队邀请',
-        message: `您被邀请加入团队，邀请消息：${validatedData.message || '欢迎加入我们的团队！'}`,
+        read: false,
         data: {
-          teamId,
-          teamName: team.id, // 这里应该获取团队名称
-          inviterId: user.id
+          path: ['teamId'],
+          equals: teamId
         }
       }
     })
 
+    if (existingInvitation) {
+      return NextResponse.json(
+        { success: false, error: t('teams.pendingInvitationExists', { fallback: 'User already has a pending team invitation' }) },
+        { status: 400 }
+      )
+    }
+
+    // 创建邀请通知
+    await SimpleNotificationService.createTeamInviteNotification(
+      validatedData.userId,
+      teamWithDetails?.name || '未知团队',
+      user.username || '未知用户',
+      teamId
+    )
+
     return NextResponse.json({
       success: true,
-      data: { teamMember },
-      message: '邀请发送成功'
+      message: t('teams.inviteSent')
     })
   } catch (error) {
     console.error('发送邀请错误:', error)
+    
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { success: false, error: '请求数据验证失败', details: error.errors },
+        { success: false, error: t('errors.validationError'), details: error.errors },
         { status: 400 }
       )
     }
     return NextResponse.json(
-      { success: false, error: '发送邀请失败' },
+      { success: false, error: t('teams.inviteError', { fallback: 'Failed to send invitation' }) },
       { status: 500 }
     )
   }

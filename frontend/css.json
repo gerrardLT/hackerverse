@@ -1,0 +1,166 @@
+{
+    "page": "Hackerverse",
+    "theme": {
+      "primaryColor": "#6A45FF",
+      "backgroundColor": "#FFFFFF",
+      "secondaryBackgroundColor": "#F9F8FF",
+      "textColor": "#000000",
+      "lightTextColor": "#555555",
+      "cardBackgroundColor": "#FFFFFF",
+      "borderColor": "#EAEAEA"
+    },
+    "header": {
+      "component": "Header",
+      "logo": {
+        "text": "Hackerverse",
+        "iconUrl": "assets/logo_icon.svg"
+      },
+      "navigationLinks": [
+        { "id": "nav-hackathons", "text": "Hackathons", "url": "/hackathons", "isActive": true },
+        { "id": "nav-projects", "text": "Projects", "url": "/projects" },
+        { "id": "nav-teams", "text": "Teams", "url": "/teams" },
+        { "id": "nav-community", "text": "Community", "url": "/community" }
+      ],
+      "actionButtons": [
+        { "id": "btn-connect-wallet", "text": "Connect Wallet", "type": "secondary" },
+        { "id": "btn-create", "text": "Create", "type": "primary" }
+      ]
+    },
+    "heroSection": {
+      "component": "Hero",
+      "title": "Welcome to the Hackerverse",
+      "subtitle": "Where Hackers Meet the Metaverse",
+      "description": "Join the premier Web3-powered hackathon platform where developers, innovators, and creators collaborate to build the next generation of decentralized applications in virtual worlds.",
+      "search": {
+        "placeholder": "Search hackathons by name, category, or technology...",
+        "filters": [
+          { "id": "filter-upcoming", "label": "Upcoming", "type": "toggle" },
+          { "id": "filter-virtual", "label": "Virtual", "type": "toggle" },
+          { "id": "filter-all", "label": "All Filters", "type": "button" }
+        ],
+        "searchButton": {
+          "text": "Search"
+        }
+      },
+      "ctaButtons": [
+        { "id": "cta-explore", "text": "Explore Hackathons", "type": "primary" },
+        { "id": "cta-create", "text": "Create Hackathon", "type": "secondary" }
+      ]
+    },
+    "valuePropositions": {
+      "component": "ValueProps",
+      "items": [
+        {
+          "id": "prop-metaverse",
+          "icon": "GlobalMetaverseIcon",
+          "title": "Global Metaverse",
+          "description": "Connect with developers across the globe, from digital nomads to enterprise teams."
+        },
+        {
+          "id": "prop-culture",
+          "icon": "HackerCultureIcon",
+          "title": "Hacker Culture",
+          "description": "Built by hackers, for hackers. We foster a community of builders and innovators."
+        },
+        {
+          "id": "prop-trust",
+          "icon": "DecentralizedTrustIcon",
+          "title": "Decentralized Trust",
+          "description": "Transparent, blockchain-verified contributions ensure that your work is recognized."
+        }
+      ]
+    },
+    "statisticsSection": {
+      "component": "Statistics",
+      "title": "Platform Statistics",
+      "subtitle": "REAL-TIME METRICS from the Hackerverse",
+      "metrics": [
+        { "id": "stat-hackathons", "icon": "ActiveHackathonsIcon", "value": "24", "label": "Active Hackathons" },
+        { "id": "stat-projects", "icon": "TotalProjectsIcon", "value": "1,247", "label": "Total Projects" },
+        { "id": "stat-devs", "icon": "DevelopersIcon", "value": "8,932", "label": "Developers" },
+        { "id": "stat-prize", "icon": "PrizePaidIcon", "value": "$2.4M", "label": "Prize Paid" }
+      ]
+    },
+    "featuredHackathonsSection": {
+      "component": "FeaturedHackathons",
+      "title": "Featured Hackathons",
+      "subtitle": "Join these exciting challenges and showcase your skills in the metaverse.",
+      "hackathonCards": [
+        {
+          "id": "hackathon-defi",
+          "icon": "DeFiIcon",
+          "title": "DeFi Innovation Challenge",
+          "organizer": "by ACME",
+          "description": "Build the next generation of decentralized finance applications.",
+          "tags": ["DeFi", "Ethereum", "Smart Contracts"],
+          "prize": { "amount": "$50,000", "label": "Prize Pool" },
+          "participants": { "count": "234", "label": "Participants" },
+          "actionButton": { "text": "Join Hackathon" }
+        },
+        {
+          "id": "hackathon-nft",
+          "icon": "NFTIcon",
+          "title": "NFT Marketplace Hackathon",
+          "organizer": "by OpenLabs",
+          "description": "Create innovative NFT marketplace solutions.",
+          "tags": ["NFT", "Polygon", "IPFS"],
+          "prize": { "amount": "$100,000", "label": "Prize Pool" },
+          "participants": { "count": "589", "label": "Participants" },
+          "actionButton": { "text": "Join Hackathon" }
+        },
+        {
+          "id": "hackathon-gaming",
+          "icon": "GamingIcon",
+          "title": "Web3 Gaming Revolution",
+          "organizer": "by G-Corp",
+          "description": "Develop blockchain-based gaming experiences.",
+          "tags": ["Gaming", "Solana", "Unity"],
+          "prize": { "amount": "$75,000", "label": "Prize Pool" },
+          "participants": { "count": "412", "label": "Participants" },
+          "actionButton": { "text": "Join Hackathon" }
+        }
+      ],
+      "viewAllLink": {
+        "text": "View All Hackathons",
+        "url": "/hackathons"
+      }
+    },
+    "footer": {
+      "component": "Footer",
+      "brandInfo": {
+        "name": "Hackerverse",
+        "description": "The premier decentralized hackathon platform for developers in the Web3 and Metaverse."
+      },
+      "linkColumns": [
+        {
+          "title": "Platform",
+          "links": [
+            { "text": "Hackathons", "url": "/hackathons" },
+            { "text": "Projects", "url": "/projects" },
+            { "text": "Community", "url": "/community" },
+            { "text": "Leaderboard", "url": "/leaderboard" }
+          ]
+        },
+        {
+          "title": "Resources",
+          "links": [
+            { "text": "Documentation", "url": "/docs" },
+            { "text": "API", "url": "/api" },
+            { "text": "Support", "url": "/support" },
+            { "text": "Blog", "url": "/blog" }
+          ]
+        },
+        {
+          "title": "Company",
+          "links": [
+            { "text": "About", "url": "/about" },
+            { "text": "Careers", "url": "/careers" },
+            { "text": "Press", "url": "/press" },
+            { "text": "Terms", "url": "/terms" }
+          ]
+        }
+      ],
+      "copyright": "© 2024 Hackerverse. All rights reserved. Built for the future of collaborative innovation."
+    }
+  }
+  

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -32,6 +33,8 @@ interface Proposal {
 export function DAOGovernance() {
   const { user } = useAuth()
   const { toast } = useToast()
+  const t = useTranslations('web3.dao')
+  const tCommon = useTranslations('common')
   
   const [proposals, setProposals] = useState<Proposal[]>([])
   const [votingPower, setVotingPower] = useState(0)
@@ -68,19 +71,19 @@ export function DAOGovernance() {
         setProposals(response.data.proposals)
         setTotalVotingPower(response.data.totalVotingPower)
       } else {
-        setError(response.error || '获取提案列表失败')
+        setError(response.error || t('loadProposalsFailed'))
         toast({
-          title: '加载失败',
-          description: response.error || '无法获取提案列表',
+          title: t('loadFailed'),
+          description: response.error || t('cannotLoadProposals'),
           variant: 'destructive'
         })
       }
     } catch (error) {
-      console.error('获取提案列表错误:', error)
-      setError('网络错误，请检查网络连接')
+      console.error('Load proposals error:', error)
+      setError(t('networkError'))
       toast({
-        title: '网络错误',
-        description: '请检查网络连接并重试',
+        title: t('networkError'),
+        description: t('checkNetworkConnection'),
         variant: 'destructive'
       })
     } finally {

@@ -7,6 +7,7 @@ declare global {
 }
 
 import { useState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -27,6 +28,8 @@ interface WalletInfo {
 
 export function WalletConnect() {
   const { toast } = useToast()
+  const t = useTranslations('web3.wallet')
+  const tCommon = useTranslations('common')
   const [isConnected, setIsConnected] = useState(false)
   const [isConnecting, setIsConnecting] = useState(false)
   const [walletInfo, setWalletInfo] = useState<WalletInfo | null>(null)
@@ -66,8 +69,8 @@ export function WalletConnect() {
   const connectWallet = async () => {
     if (typeof window === 'undefined' || !window.ethereum) {
       toast({
-        title: '未检测到钱包',
-        description: '请安装 MetaMask 或其他以太坊钱包',
+        title: t('walletNotDetected'),
+        description: t('installWalletPrompt'),
         variant: 'destructive',
       })
       return
@@ -81,14 +84,14 @@ export function WalletConnect() {
       await loadWalletInfo()
       
       toast({
-        title: '钱包连接成功',
-        description: '已成功连接到您的钱包',
+        title: t('connectSuccess'),
+        description: t('connectSuccessDesc'),
       })
     } catch (error: any) {
       console.error('Error connecting wallet:', error)
       toast({
-        title: '连接失败',
-        description: error.message || '无法连接到钱包',
+        title: t('connectFailed'),
+        description: error.message || t('connectFailedDesc'),
         variant: 'destructive',
       })
     } finally {
@@ -125,8 +128,8 @@ export function WalletConnect() {
     } catch (error) {
       console.error('Error loading wallet info:', error)
       toast({
-        title: '加载钱包信息失败',
-        description: '请刷新页面重试',
+        title: t('loadWalletInfoFailed'),
+        description: t('refreshAndRetry'),
         variant: 'destructive',
       })
     } finally {
@@ -139,8 +142,8 @@ export function WalletConnect() {
       setIsConnected(false)
       setWalletInfo(null)
       toast({
-        title: '钱包已断开',
-        description: '请重新连接钱包',
+        title: t('walletDisconnected'),
+        description: t('reconnectWallet'),
         variant: 'destructive',
       })
     } else {
@@ -156,8 +159,8 @@ export function WalletConnect() {
     if (walletInfo?.address) {
       navigator.clipboard.writeText(walletInfo.address)
       toast({
-        title: '地址已复制',
-        description: '钱包地址已复制到剪贴板',
+        title: t('addressCopied'),
+        description: t('addressCopiedDesc'),
       })
     }
   }
@@ -176,21 +179,21 @@ export function WalletConnect() {
       return (
         <Badge className="bg-green-500 text-white">
           <CheckCircle className="h-3 w-3 mr-1" />
-          主网
+          {t('mainnet')}
         </Badge>
       )
     } else if (isTestnet) {
       return (
         <Badge className="bg-yellow-500 text-white">
           <AlertCircle className="h-3 w-3 mr-1" />
-          测试网
+          {t('testnet')}
         </Badge>
       )
     } else {
       return (
         <Badge variant="destructive">
           <AlertCircle className="h-3 w-3 mr-1" />
-          未知网络
+          {t('unknownNetwork')}
         </Badge>
       )
     }
@@ -205,9 +208,9 @@ export function WalletConnect() {
               <Wallet className="h-8 w-8 text-primary" />
             </div>
           </div>
-          <CardTitle>连接钱包</CardTitle>
+          <CardTitle>{t('connectWallet')}</CardTitle>
           <CardDescription>
-            连接您的以太坊钱包以使用 Web3 功能
+            {t('connectWalletDesc')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -219,18 +222,18 @@ export function WalletConnect() {
             {isConnecting ? (
               <>
                 <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                连接中...
+                {tCommon('connecting')}
               </>
             ) : (
               <>
                 <Wallet className="h-4 w-4 mr-2" />
-                连接 MetaMask
+                {t('connectMetaMask')}
               </>
             )}
           </Button>
           
           <div className="text-center text-sm text-muted-foreground">
-            <p>支持的钱包：</p>
+            <p>{t('supportedWallets')}:</p>
             <div className="flex justify-center gap-4 mt-2">
               <div className="flex items-center gap-1">
                 <img src="/metamask-icon.png" alt="MetaMask" className="w-4 h-4" />
@@ -259,9 +262,9 @@ export function WalletConnect() {
               </AvatarFallback>
             </Avatar>
             <div>
-              <CardTitle className="text-lg">钱包已连接</CardTitle>
+              <CardTitle className="text-lg">{t('walletConnected')}</CardTitle>
               <CardDescription>
-                {walletInfo ? formatAddress(walletInfo.address) : '加载中...'}
+                {walletInfo ? formatAddress(walletInfo.address) : tCommon('loading')}
               </CardDescription>
             </div>
           </div>
@@ -284,7 +287,7 @@ export function WalletConnect() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">ETH 余额</span>
+                <span className="text-sm text-muted-foreground">{t('ethBalance')}</span>
                 <div className="flex items-center gap-1">
                   <Zap className="h-4 w-4 text-blue-500" />
                   <span className="font-mono">
@@ -294,7 +297,7 @@ export function WalletConnect() {
               </div>
               
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">HXT 余额</span>
+                <span className="text-sm text-muted-foreground">{t('hxtBalance')}</span>
                 <div className="flex items-center gap-1">
                   <div className="w-4 h-4 rounded-full bg-primary" />
                   <span className="font-mono">
@@ -306,12 +309,12 @@ export function WalletConnect() {
             
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">网络</span>
+                <span className="text-sm text-muted-foreground">{t('network')}</span>
                 <span className="font-medium">{walletInfo.network}</span>
               </div>
               
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">链 ID</span>
+                <span className="text-sm text-muted-foreground">{t('chainId')}</span>
                 <span className="font-mono">{walletInfo.chainId}</span>
               </div>
             </div>
@@ -322,7 +325,7 @@ export function WalletConnect() {
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={copyAddress} className="flex-1">
               <Copy className="h-4 w-4 mr-2" />
-              复制地址
+              {t('copyAddress')}
             </Button>
             <Button variant="outline" size="sm" asChild className="flex-1">
               <a 
@@ -331,13 +334,13 @@ export function WalletConnect() {
                 rel="noopener noreferrer"
               >
                 <ExternalLink className="h-4 w-4 mr-2" />
-                查看详情
+                {t('viewDetails')}
               </a>
             </Button>
           </div>
           
           <div className="text-xs text-muted-foreground text-center">
-            <p>钱包地址: {walletInfo.address}</p>
+            <p>{t('walletAddress')}: {walletInfo.address}</p>
           </div>
         </CardContent>
       )}

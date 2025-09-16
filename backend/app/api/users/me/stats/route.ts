@@ -36,30 +36,28 @@ export async function GET(request: NextRequest) {
 						{ creatorId: user.id },
 						{ team: { members: { some: { userId: user.id } } } },
 					],
-					status: 'completed',
-					finalScore: { gte: 80 },
+					status: 'WINNER', // 修正为正确的项目状态字段
 				},
 			}),
-			prisma.$queryRawUnsafe<any[]>(
-				`SELECT 'hackathon_joined' AS type, h.title AS hackathon_name, p."joinedAt" AS date, '参加了黑客松' AS title, CONCAT('加入了 ', h.title) AS description
-				FROM hackathon_schema.participations p
-				JOIN hackathon_schema.hackathons h ON p."hackathonId" = h.id
-				WHERE p."userId" = $1
-				UNION ALL
-				SELECT 'project_submitted' AS type, h.title AS hackathon_name, pr."createdAt" AS date, '提交了项目' AS title, CONCAT('在 ', h.title, ' 中提交了 ', pr.title, ' 项目') AS description
-				FROM hackathon_schema.projects pr
-				JOIN hackathon_schema.hackathons h ON pr."hackathonId" = h.id
-				WHERE pr."creatorId" = $1
-				UNION ALL
-				SELECT 'prize_won' AS type, h.title AS hackathon_name, pr."updatedAt" AS date, '获得奖项' AS title,
-				CONCAT('在 ', h.title, ' 中获得第 ', CASE WHEN pr."finalScore" >= 95 THEN '1' WHEN pr."finalScore" >= 90 THEN '2' WHEN pr."finalScore" >= 85 THEN '3' ELSE '优秀' END, ' 名') AS description
-				FROM hackathon_schema.projects pr
-				JOIN hackathon_schema.hackathons h ON pr."hackathonId" = h.id
-				WHERE pr."creatorId" = $1 AND pr.status = 'completed' AND pr."finalScore" >= 80
-				ORDER BY date DESC
-				LIMIT 10`,
-				user.id,
-			),
+			// 获取最近活动 - 改用 Prisma 查询而不是原始 SQL
+			prisma.participation.findMany({
+				where: { userId: user.id },
+				include: {
+					hackathon: {
+						select: { title: true }
+					}
+				},
+				orderBy: { joinedAt: 'desc' },
+				take: 5
+			}).then(participations => 
+				participations.map(p => ({
+					type: 'hackathon_joined',
+					title: '参加了黑客松',
+					description: `加入了 ${p.hackathon.title}`,
+					date: p.joinedAt,
+					hackathon_name: p.hackathon.title
+				}))
+			)
 		])
 
 		const reputationScore = Math.min(1000, participatedHackathons * 50 + submittedProjects * 100 + wonPrizes * 200)

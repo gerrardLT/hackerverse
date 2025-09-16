@@ -70,11 +70,18 @@ export async function GET(
       )
     }
 
-    // 增加浏览量
-    await prisma.communityPost.update({
-      where: { id: postId },
-      data: { views: { increment: 1 } }
-    })
+    // 检查是否需要增加浏览量 (通过query参数控制)
+    const { searchParams } = new URL(request.url)
+    const incrementView = searchParams.get('incrementView') === 'true'
+    
+    let currentViews = post.views
+    if (incrementView) {
+      const updatedPost = await prisma.communityPost.update({
+        where: { id: postId },
+        data: { views: { increment: 1 } }
+      })
+      currentViews = updatedPost.views
+    }
 
     return NextResponse.json({
       success: true,
@@ -94,7 +101,7 @@ export async function GET(
         tags: post.tags,
         createdAt: post.createdAt.toISOString(),
         updatedAt: post.updatedAt.toISOString(),
-        views: post.views + 1, // 包含当前访问
+        views: currentViews,
         likes: post.likes,
         replies: post.communityReplies.map((reply: any) => ({
           id: reply.id,

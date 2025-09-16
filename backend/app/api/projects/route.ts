@@ -3,6 +3,10 @@ import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { AuthService } from '@/lib/auth'
 import { IPFSService } from '@/lib/ipfs'
+import { getLocaleFromRequest, createTFunction } from '@/lib/i18n'
+
+// 强制使用Node.js运行时，避免Edge Runtime的crypto模块限制
+export const runtime = 'nodejs'
 
 // 创建项目验证模式
 const createProjectSchema = z.object({
@@ -10,7 +14,7 @@ const createProjectSchema = z.object({
   description: z.string().min(10, '项目描述至少10个字符'),
   hackathonId: z.string().min(1, '黑客松ID不能为空'),
   teamId: z.string().optional(),
-  technologies: z.array(z.string()).min(1, '至少选择一种技术'), // 保持与techStack一致
+  technologies: z.array(z.string()).min(1, '至少选择一种技术'), // 统一使用technologies字段
   tags: z.array(z.string()).optional(),
   githubUrl: z.string().url('GitHub链接格式不正确').optional(),
   demoUrl: z.string().url('演示链接格式不正确').optional(),
@@ -35,15 +39,51 @@ const querySchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
+    // 🔐 添加认证检查
+    const authHeader = request.headers.get('authorization')
+    const token = AuthService.extractTokenFromHeader(authHeader || undefined)
+    
+    if (!token) {
+      return NextResponse.json(
+        { 
+          success: false,
+          error: t('auth.unauthorized'),
+          code: 'UNAUTHORIZED'
+        },
+        { status: 401 }
+      )
+    }
+
+    const decoded = AuthService.verifyToken(token)
+    if (!decoded) {
+      return NextResponse.json(
+        { 
+          success: false,
+          error: t('auth.tokenInvalid'),
+          code: 'TOKEN_INVALID'
+        },
+        { status: 401 }
+      )
+    }
+
+    const userId = decoded.userId
+    console.log('🔍 项目API - 用户认证成功:', userId)
+
     const { searchParams } = new URL(request.url)
     const query = Object.fromEntries(searchParams.entries())
     
     // 验证查询参数
     const validatedQuery = querySchema.parse(query)
     
-    // 构建查询条件
+    // 构建查询条件 - 认证用户可以看到更多项目
     const where: any = {
-      isPublic: true,
+      OR: [
+        { isPublic: true },
+        { creatorId: userId }, // 用户自己的项目，无论是否公开
+      ]
     }
     
     // 搜索条件
@@ -155,15 +195,18 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('获取项目列表错误:', error)
     
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: '查询参数验证失败', details: error.errors },
+        { error: t('errors.validationError'), details: error.errors },
         { status: 400 }
       )
     }
     
     return NextResponse.json(
-      { error: '获取项目列表失败' },
+      { error: t('projects.getListError', { fallback: 'Failed to get project list' }) },
       { status: 500 }
     )
   }
@@ -171,13 +214,16 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
     // 从请求头获取认证token
     const authHeader = request.headers.get('authorization')
     const token = AuthService.extractTokenFromHeader(authHeader || undefined)
     
     if (!token) {
       return NextResponse.json(
-        { error: '未提供认证token' },
+        { error: t('auth.unauthorized') },
         { status: 401 }
       )
     }
@@ -186,7 +232,7 @@ export async function POST(request: NextRequest) {
     const payload = AuthService.verifyToken(token)
     if (!payload) {
       return NextResponse.json(
-        { error: '无效的认证token' },
+        { error: t('auth.tokenInvalid') },
         { status: 401 }
       )
     }
@@ -202,6 +248,7 @@ export async function POST(request: NextRequest) {
       select: {
         id: true,
         title: true,
+        startDate: true,
         endDate: true,
         isPublic: true,
       }
@@ -209,7 +256,7 @@ export async function POST(request: NextRequest) {
     
     if (!hackathon) {
       return NextResponse.json(
-        { error: '黑客松不存在' },
+        { error: t('hackathons.notFound') },
         { status: 404 }
       )
     }
@@ -217,8 +264,37 @@ export async function POST(request: NextRequest) {
     // 检查黑客松是否公开
     if (!hackathon.isPublic) {
       return NextResponse.json(
-        { error: '该黑客松为私有活动' },
+        { error: t('hackathons.privateEvent', { fallback: 'This hackathon is a private event' }) },
         { status: 403 }
+      )
+    }
+    
+    // 检查黑客松是否已开始（项目提交必须在黑客松开始后）
+    const now = new Date()
+    if (now < hackathon.startDate) {
+      return NextResponse.json(
+        { 
+          error: t('projects.hackathonNotStarted', { fallback: 'Hackathon has not started yet, cannot submit project' }),
+          details: t('projects.hackathonStartsAt', { 
+            fallback: `Hackathon will start at ${hackathon.startDate.toLocaleString('en-US')}`,
+            startTime: hackathon.startDate.toLocaleString(locale === 'zh' ? 'zh-CN' : 'en-US')
+          })
+        },
+        { status: 400 }
+      )
+    }
+    
+    // 检查黑客松是否已结束
+    if (now > hackathon.endDate) {
+      return NextResponse.json(
+        { 
+          error: t('projects.hackathonEnded', { fallback: 'Hackathon has ended, cannot submit project' }),
+          details: t('projects.hackathonEndedAt', {
+            fallback: `Hackathon ended at ${hackathon.endDate.toLocaleString('en-US')}`,
+            endTime: hackathon.endDate.toLocaleString(locale === 'zh' ? 'zh-CN' : 'en-US')
+          })
+        },
+        { status: 400 }
       )
     }
     
@@ -232,7 +308,7 @@ export async function POST(request: NextRequest) {
     
     if (!participation) {
       return NextResponse.json(
-        { error: '您需要先报名参加该黑客松' },
+        { error: t('teams.needRegistration') },
         { status: 400 }
       )
     }
@@ -248,23 +324,27 @@ export async function POST(request: NextRequest) {
       
       if (!teamMember) {
         return NextResponse.json(
-          { error: '您不是该团队成员' },
+          { error: t('teams.notTeamMember', { fallback: 'You are not a member of this team' }) },
           { status: 403 }
         )
       }
     }
     
-    // 检查是否已提交项目
+    // 检查是否已提交项目（一个用户在一个黑客松中只能提交一个项目）
     const existingProject = await prisma.project.findFirst({
       where: {
         hackathonId: validatedData.hackathonId,
-        teamId: validatedData.teamId || null,
+        creatorId: payload.userId, // 检查当前用户是否已经为该黑客松创建过项目
       }
     })
     
     if (existingProject) {
       return NextResponse.json(
-        { error: '您已经为该黑客松提交了项目' },
+        { 
+          success: false,
+          error: t('projects.alreadySubmitted'),
+          code: 'PROJECT_ALREADY_EXISTS'
+        },
         { status: 400 }
       )
     }
@@ -272,17 +352,17 @@ export async function POST(request: NextRequest) {
     // ⭐ 使用统一的IPFSService上传项目数据到IPFS（必须成功）
     let ipfsCID
     try {
-      // 导入IPFS服务和类型定义
-      const { IPFSService, IPFSProjectData } = await import('@/lib/ipfs')
+      // 导入IPFS服务
+      const { IPFSService } = await import('@/lib/ipfs')
       
       // 构建标准化的项目数据结构
-      const projectData: IPFSProjectData = {
+      const projectData = {
         version: '1.0.0',
         timestamp: new Date().toISOString(),
         data: {
           title: validatedData.title,
           description: validatedData.description,
-          techStack: validatedData.technologies, // 统一字段名
+          technologies: validatedData.technologies, // 统一字段名
           demoUrl: validatedData.demoUrl,
           githubUrl: validatedData.githubUrl,
           videoUrl: validatedData.videoUrl,
@@ -314,61 +394,34 @@ export async function POST(request: NextRequest) {
       }, { status: 500 })
     }
 
-    // ⭐ 调用智能合约提交项目
-    let contractResult
-    try {
-      const { smartContractService } = await import('@/lib/smart-contracts')
-      await smartContractService.initialize()
-      
-      // 创建创建者信息CID（简化版）
-      const creatorsCID = await IPFSService.uploadJSON({
-        creators: [payload.userId],
-        timestamp: new Date().toISOString()
-      })
-      
-      const tx = await smartContractService.submitProject(
-        Number(validatedData.hackathonId), // 注意：需要确保这是智能合约中的黑客松ID
-        ipfsCID,
-        creatorsCID
-      )
-      const receipt = await tx.wait()
-      
-      // 解析项目ID
-      const projectSubmittedEvent = receipt.logs?.find((log: any) => {
-        try {
-          const parsedLog = smartContractService.contracts.hackxCore.interface.parseLog(log)
-          return parsedLog?.name === 'ProjectSubmitted'
-        } catch {
-          return false
-        }
-      })
-      
-      let contractProjectId = 1 // 默认值
-      if (projectSubmittedEvent) {
-        try {
-          const parsedLog = smartContractService.contracts.hackxCore.interface.parseLog(projectSubmittedEvent)
-          contractProjectId = Number(parsedLog.args.projectId)
-        } catch (parseError) {
-          console.warn('解析项目事件失败，使用默认ID:', parseError)
-        }
-      }
-      
-      contractResult = {
-        projectId: contractProjectId,
-        txHash: tx.hash,
-        blockNumber: Number(receipt.blockNumber),
-        gasUsed: Number(receipt.gasUsed)
-      }
-      
-      console.log('⛓️ 智能合约项目提交成功:', contractResult)
-      
-    } catch (contractError) {
-      console.error('智能合约调用失败:', contractError)
-      return NextResponse.json({
-        error: '智能合约调用失败，项目创建失败',
-        details: contractError instanceof Error ? contractError.message : '未知错误'
-      }, { status: 500 })
-    }
+    // ⭐ 暂时禁用智能合约调用，避免UUID转数字ID的问题
+    let contractResult: {
+      projectId: number
+      txHash: string
+      blockNumber: number
+      gasUsed: number
+    } | null = null
+    
+    // TODO: 实现UUID到数字ID的映射机制后再启用智能合约调用
+    console.log('⚠️ 智能合约调用已暂时禁用，项目将仅存储在数据库中')
+    
+    // 如果需要启用智能合约，需要先解决hackathonId映射问题
+    // try {
+    //   const { smartContractService } = await import('@/lib/smart-contracts')
+    //   await smartContractService.initialize()
+    //   
+    //   // 需要将UUID hackathonId 映射为合约中的数字ID
+    //   const contractHackathonId = await getContractHackathonId(validatedData.hackathonId)
+    //   
+    //   const tx = await smartContractService.submitProject(
+    //     contractHackathonId,
+    //     ipfsCID
+    //   )
+    //   // ... 其余逻辑
+    // } catch (contractError) {
+    //   console.error('智能合约调用失败:', contractError)
+    //   // 不阻止项目创建，仅记录错误
+    // }
 
     // ⭐ 创建项目（写入数据库作为缓存）
     const project = await prisma.project.create({
@@ -386,13 +439,13 @@ export async function POST(request: NextRequest) {
         ipfsHash: ipfsCID,
         isPublic: validatedData.isPublic,
         creatorId: payload.userId,
-        status: 'draft',
-        // ⭐ 新增区块链相关字段
-        contractId: contractResult.projectId,  // 智能合约中的ID
-        txHash: contractResult.txHash,         // 交易哈希
-        blockNumber: contractResult.blockNumber, // 区块号
-        gasUsed: contractResult.gasUsed,         // Gas消耗
-        syncStatus: 'SYNCED',                    // 同步状态
+        status: 'DRAFT',
+        // ⭐ 区块链相关字段（智能合约禁用时为null）
+        contractId: (contractResult as any)?.projectId || null,  // 智能合约中的ID
+        txHash: (contractResult as any)?.txHash || null,         // 交易哈希
+        blockNumber: (contractResult as any)?.blockNumber || null, // 区块号
+        gasUsed: (contractResult as any)?.gasUsed || null,         // Gas消耗
+        syncStatus: contractResult ? 'SYNCED' : 'PENDING',  // 同步状态
       },
       select: {
         id: true,
@@ -425,16 +478,16 @@ export async function POST(request: NextRequest) {
     
     return NextResponse.json({
       success: true,
-      message: '项目创建成功',
+      message: t('projects.createSuccess'),
       data: {
         project: {
           ...project,
-          // ⭐ 确保返回智能合约相关信息
-          contractId: contractResult.projectId,
+          // ⭐ 智能合约相关信息（可能为null）
+          contractId: (contractResult as any)?.projectId || null,
           ipfsCID,
-          txHash: contractResult.txHash,
-          blockNumber: contractResult.blockNumber,
-          gasUsed: contractResult.gasUsed,
+          txHash: (contractResult as any)?.txHash || null,
+          blockNumber: (contractResult as any)?.blockNumber || null,
+          gasUsed: (contractResult as any)?.gasUsed || null,
           ipfsUrl: ipfsCID ? `${process.env.IPFS_GATEWAY}/ipfs/${ipfsCID}` : null
         }
       }
@@ -443,15 +496,18 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('创建项目错误:', error)
     
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: '请求数据验证失败', details: error.errors },
+        { error: t('errors.validationError'), details: error.errors },
         { status: 400 }
       )
     }
     
     return NextResponse.json(
-      { error: '创建项目失败' },
+      { error: t('projects.createError') },
       { status: 500 }
     )
   }

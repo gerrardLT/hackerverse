@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { AuthService } from '@/lib/auth'
+import { SimpleNotificationService } from '@/lib/simple-notification-service'
 
 // 注册请求验证模式
 const signupSchema = z.object({
@@ -64,21 +65,54 @@ export async function POST(request: NextRequest) {
     // ⭐ 使用统一的IPFS服务创建用户资料
     let ipfsCID
     try {
-      const { UserProfileIPFSService } = await import('@/lib/user-profile-ipfs')
+      console.log('🚀 开始IPFS上传用户资料...')
+      const { IPFSService } = await import('@/lib/ipfs')
       
-      ipfsCID = await UserProfileIPFSService.uploadProfile({
-        email: validatedData.email,
-        username: validatedData.username,
-        walletAddress: validatedData.walletAddress,
-        bio: '新注册用户',
-        createdAt: new Date().toISOString()
-      }, 'email')
+      // 构建标准的用户资料数据结构
+      const userProfileData = {
+        version: '1.0.0',
+        timestamp: new Date().toISOString(),
+        data: {
+          username: validatedData.username,
+          email: validatedData.email,
+          avatar: '',
+          bio: '新注册用户',
+          skills: [],
+          socialLinks: {}
+        },
+        metadata: {
+          previousVersion: undefined,
+          updatedBy: validatedData.email
+        }
+      }
+      
+      // 设置IPFS上传超时（30秒）
+      const uploadPromise = IPFSService.uploadUserProfile(userProfileData)
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('IPFS上传超时')), 30000)
+      })
+      
+      ipfsCID = await Promise.race([uploadPromise, timeoutPromise]) as string
+      console.log('✅ IPFS上传成功，CID:', ipfsCID)
       
     } catch (ipfsError) {
-      console.error('IPFS上传失败:', ipfsError)
+      console.error('❌ IPFS上传失败:', ipfsError)
+      
+      // 根据错误类型提供不同的错误信息
+      let errorMessage = 'IPFS上传失败，无法创建用户'
+      if (ipfsError instanceof Error) {
+        if (ipfsError.message.includes('timeout') || ipfsError.message.includes('超时')) {
+          errorMessage = 'IPFS网络响应超时，请检查网络连接后重试'
+        } else if (ipfsError.message.includes('gateway') || ipfsError.message.includes('网关')) {
+          errorMessage = 'IPFS网关服务暂时不可用，请稍后重试'
+        } else if (ipfsError.message.includes('network') || ipfsError.message.includes('网络')) {
+          errorMessage = 'IPFS网络连接失败，请检查网络设置'
+        }
+      }
+      
       return NextResponse.json({
         success: false,
-        error: 'IPFS上传失败，无法创建用户',
+        error: errorMessage,
         details: ipfsError instanceof Error ? ipfsError.message : '未知错误'
       }, { status: 500 })
     }
@@ -125,6 +159,17 @@ export async function POST(request: NextRequest) {
       email: user.email,
       walletAddress: user.walletAddress || undefined,
     })
+
+    // 发送欢迎通知
+    try {
+      await SimpleNotificationService.createWelcomeNotification(
+        user.id,
+        user.username || user.email
+      )
+    } catch (notificationError) {
+      console.error('发送欢迎通知失败:', notificationError)
+      // 通知失败不影响注册流程
+    }
     
     return NextResponse.json({
       success: true,

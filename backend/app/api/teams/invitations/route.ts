@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     }
 
     // 获取用户的团队邀请
-    const invitations = await prisma.notification.findMany({
+    const notifications = await prisma.notification.findMany({
       where: {
         userId: user.id,
         type: 'team_invite',
@@ -30,6 +30,20 @@ export async function GET(request: NextRequest) {
       },
       orderBy: {
         createdAt: 'desc'
+      }
+    })
+
+    // 转换数据结构以匹配前端期望
+    const invitations = notifications.map(notification => {
+      const data = notification.data as any
+      return {
+        id: notification.id,
+        teamId: data?.teamId || '',
+        teamName: data?.teamName || '未知团队',
+        inviterName: data?.inviterName || '未知用户',
+        inviterAvatar: data?.inviterAvatar || '',
+        message: notification.message || '',
+        createdAt: notification.createdAt
       }
     })
 

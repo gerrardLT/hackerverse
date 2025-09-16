@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -33,87 +34,119 @@ export function ConnectWalletDialog({ open, onOpenChange, onConnect, onWalletCon
   const [connecting, setConnecting] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const { toast } = useToast()
+  const t = useTranslations('auth')
+  const tCommon = useTranslations('common')
 
-  // 定义支持的钱包
-  const walletOptions: WalletOption[] = [
-    {
-      id: 'metamask',
-      name: 'MetaMask',
-      description: '最受欢迎的以太坊钱包',
-      type: 'browser',
-      recommended: true,
-      isInstalled: () => typeof window !== 'undefined' && !!window.ethereum?.isMetaMask,
-      downloadUrl: 'https://metamask.io/download/',
-      connect: async () => {
-        if (!window.ethereum?.isMetaMask) {
-          throw new Error('MetaMask未安装')
+  // 检测所有可用钱包
+  const detectWallets = (): WalletOption[] => {
+    const allWallets: WalletOption[] = [
+      {
+        id: 'metamask',
+        name: 'MetaMask',
+        description: t('wallet.metamaskDesc'),
+        type: 'browser',
+        recommended: true,
+        isInstalled: () => typeof window !== 'undefined' && !!window.ethereum?.isMetaMask,
+        downloadUrl: 'https://metamask.io/download/',
+        connect: async () => {
+          if (!window.ethereum?.isMetaMask) {
+            throw new Error(t('wallet.metamaskNotInstalled'))
+          }
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
+          const chainId = await window.ethereum.request({ method: 'eth_chainId' })
+          return { address: accounts[0], chainId: parseInt(chainId, 16) }
         }
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
-        const chainId = await window.ethereum.request({ method: 'eth_chainId' })
-        return { address: accounts[0], chainId: parseInt(chainId, 16) }
-      }
-    },
-    {
-      id: 'trustwallet',
-      name: 'Trust Wallet',
-      description: '移动端首选钱包',
-      type: 'mobile',
-      isInstalled: () => typeof window !== 'undefined' && !!window.ethereum?.isTrust,
-      downloadUrl: 'https://trustwallet.com/',
-      connect: async () => {
-        if (!window.ethereum?.isTrust) {
-          throw new Error('Trust Wallet未安装')
+      },
+      {
+        id: 'trustwallet',
+        name: 'Trust Wallet',
+        description: t('wallet.trustWalletDesc'),
+        type: 'mobile',
+        isInstalled: () => typeof window !== 'undefined' && !!window.ethereum?.isTrust,
+        downloadUrl: 'https://trustwallet.com/',
+        connect: async () => {
+          if (!window.ethereum?.isTrust) {
+            throw new Error(t('wallet.trustWalletNotInstalled'))
+          }
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
+          const chainId = await window.ethereum.request({ method: 'eth_chainId' })
+          return { address: accounts[0], chainId: parseInt(chainId, 16) }
         }
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
-        const chainId = await window.ethereum.request({ method: 'eth_chainId' })
-        return { address: accounts[0], chainId: parseInt(chainId, 16) }
-      }
-    },
-    {
-      id: 'binance',
-      name: 'Binance Wallet',
-      description: 'BSC生态官方钱包',
-      type: 'browser',
-      isInstalled: () => typeof window !== 'undefined' && !!window.BinanceChain,
-      downloadUrl: 'https://www.binance.org/en/binance-wallet',
-      connect: async () => {
-        if (!window.BinanceChain) {
-          throw new Error('Binance Wallet未安装')
+      },
+      {
+        id: 'binance',
+        name: 'Binance Wallet',
+        description: t('wallet.binanceWalletDesc'),
+        type: 'browser',
+        isInstalled: () => typeof window !== 'undefined' && !!window.BinanceChain,
+        downloadUrl: 'https://www.binance.org/en/binance-wallet',
+        connect: async () => {
+          if (!window.BinanceChain) {
+            throw new Error(t('wallet.binanceWalletNotInstalled'))
+          }
+          const accounts = await window.BinanceChain.request({ method: 'eth_requestAccounts' })
+          const chainId = await window.BinanceChain.request({ method: 'eth_chainId' })
+          return { address: accounts[0], chainId: parseInt(chainId, 16) }
         }
-        const accounts = await window.BinanceChain.request({ method: 'eth_requestAccounts' })
-        const chainId = await window.BinanceChain.request({ method: 'eth_chainId' })
-        return { address: accounts[0], chainId: parseInt(chainId, 16) }
-      }
-    },
-    {
-      id: 'coinbase',
-      name: 'Coinbase Wallet',
-      description: '安全易用的数字钱包',
-      type: 'browser',
-      isInstalled: () => typeof window !== 'undefined' && !!window.ethereum?.isCoinbaseWallet,
-      downloadUrl: 'https://wallet.coinbase.com/',
-      connect: async () => {
-        if (!window.ethereum?.isCoinbaseWallet) {
-          throw new Error('Coinbase Wallet未安装')
+      },
+      {
+        id: 'coinbase',
+        name: 'Coinbase Wallet',
+        description: t('wallet.coinbaseWalletDesc'),
+        type: 'browser',
+        isInstalled: () => typeof window !== 'undefined' && !!window.ethereum?.isCoinbaseWallet,
+        downloadUrl: 'https://wallet.coinbase.com/',
+        connect: async () => {
+          if (!window.ethereum?.isCoinbaseWallet) {
+            throw new Error(t('wallet.coinbaseWalletNotInstalled'))
+          }
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
+          const chainId = await window.ethereum.request({ method: 'eth_chainId' })
+          return { address: accounts[0], chainId: parseInt(chainId, 16) }
         }
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
-        const chainId = await window.ethereum.request({ method: 'eth_chainId' })
-        return { address: accounts[0], chainId: parseInt(chainId, 16) }
+      },
+      {
+        id: 'okx',
+        name: 'OKX Wallet',
+        description: t('wallet.okxWalletDesc'),
+        type: 'browser',
+        isInstalled: () => typeof window !== 'undefined' && !!window.okxwallet,
+        downloadUrl: 'https://www.okx.com/web3',
+        connect: async () => {
+          if (!window.okxwallet) {
+            throw new Error(t('wallet.okxWalletNotInstalled'))
+          }
+          const accounts = await window.okxwallet.request({ method: 'eth_requestAccounts' })
+          const chainId = await window.okxwallet.request({ method: 'eth_chainId' })
+          return { address: accounts[0], chainId: parseInt(chainId, 16) }
+        }
+      },
+      {
+        id: 'phantom',
+        name: 'Phantom',
+        description: t('wallet.phantomDesc'),
+        type: 'browser',
+        isInstalled: () => typeof window !== 'undefined' && !!window.phantom?.ethereum,
+        downloadUrl: 'https://phantom.app/',
+        connect: async () => {
+          if (!window.phantom?.ethereum) {
+            throw new Error(t('wallet.phantomNotInstalled'))
+          }
+          const accounts = await window.phantom.ethereum.request({ method: 'eth_requestAccounts' })
+          const chainId = await window.phantom.ethereum.request({ method: 'eth_chainId' })
+          return { address: accounts[0], chainId: parseInt(chainId, 16) }
+        }
       }
-    },
-    {
-      id: 'walletconnect',
-      name: 'WalletConnect',
-      description: '扫码连接移动钱包',
-      type: 'mobile',
-      isInstalled: () => true, // WalletConnect is always available
-      downloadUrl: 'https://walletconnect.com/',
-      connect: async () => {
-        // 这里需要集成 WalletConnect 库
-        throw new Error('WalletConnect 即将支持')
-      }
-    }
-  ]
+    ]
+
+    // Put installed wallets first, then uninstalled ones
+    const installedWallets = allWallets.filter(wallet => wallet.isInstalled())
+    const notInstalledWallets = allWallets.filter(wallet => !wallet.isInstalled())
+    
+    return [...installedWallets, ...notInstalledWallets]
+  }
+
+  const walletOptions = detectWallets()
 
   const handleConnect = async (wallet: WalletOption) => {
     setConnecting(wallet.id)
@@ -121,7 +154,7 @@ export function ConnectWalletDialog({ open, onOpenChange, onConnect, onWalletCon
 
     try {
       if (!wallet.isInstalled()) {
-        setError(`${wallet.name} 未安装，请先下载安装`)
+        setError(t('wallet.notInstalledError', { walletName: wallet.name }))
         return
       }
 
@@ -133,13 +166,13 @@ export function ConnectWalletDialog({ open, onOpenChange, onConnect, onWalletCon
         try {
           await switchToBSCTestnet()
           toast({
-            title: "网络已切换",
-            description: "已自动切换到 BSC Testnet",
+            title: t('wallet.networkSwitched'),
+            description: t('wallet.switchedToBSCTestnet'),
           })
         } catch (switchError) {
           toast({
-            title: "网络错误",
-            description: `请手动切换到 BSC Testnet (ChainID: ${expectedChainId})`,
+            title: t('wallet.networkError'),
+            description: t('wallet.switchToBSCManually', { chainId: expectedChainId }),
             variant: "destructive"
           })
           return
@@ -148,7 +181,7 @@ export function ConnectWalletDialog({ open, onOpenChange, onConnect, onWalletCon
 
       onConnect(result.address, result.chainId)
       
-      // 调用Web3Auth连接回调
+      // Call Web3Auth connection callback
       if (onWalletConnected) {
         onWalletConnected()
       }
@@ -156,17 +189,17 @@ export function ConnectWalletDialog({ open, onOpenChange, onConnect, onWalletCon
       onOpenChange(false)
       
       toast({
-        title: "连接成功",
-        description: `已通过 ${wallet.name} 连接钱包`,
+        title: t('wallet.connectSuccess'),
+        description: t('wallet.connectedVia', { walletName: wallet.name }),
       })
 
     } catch (error: any) {
-      console.error('钱包连接失败:', error)
-      setError(error.message || '连接失败，请重试')
+      console.error('Wallet connection failed:', error)
+      setError(error.message || t('wallet.connectFailed'))
       
       toast({
-        title: "连接失败",
-        description: error.message || '请检查钱包是否已解锁',
+        title: t('wallet.connectFailed'),
+        description: error.message || t('wallet.checkWalletUnlocked'),
         variant: "destructive"
       })
     } finally {
@@ -193,10 +226,10 @@ export function ConnectWalletDialog({ open, onOpenChange, onConnect, onWalletCon
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Wallet className="h-5 w-5" />
-            连接钱包
+            {t('wallet.connect')}
           </DialogTitle>
           <DialogDescription>
-            选择你喜欢的钱包来连接到 HackX 平台
+            {t('wallet.selectWalletDesc')}
           </DialogDescription>
         </DialogHeader>
 
@@ -205,7 +238,9 @@ export function ConnectWalletDialog({ open, onOpenChange, onConnect, onWalletCon
           <Alert>
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
-              请确保您的钱包已连接到 <strong>BSC Testnet (ChainID: 97)</strong>
+              {t.rich('wallet.ensureBSCTestnet', {
+                strong: (chunks) => <strong className="font-semibold">{chunks}</strong>
+              })}
             </AlertDescription>
           </Alert>
 
@@ -226,7 +261,7 @@ export function ConnectWalletDialog({ open, onOpenChange, onConnect, onWalletCon
                       <div className="flex items-center gap-2">
                         <h3 className="font-medium">{wallet.name}</h3>
                         {wallet.recommended && (
-                          <Badge variant="secondary" className="text-xs">推荐</Badge>
+                          <Badge variant="secondary" className="text-xs">{tCommon('recommended')}</Badge>
                         )}
                         {getWalletTypeIcon(wallet.type)}
                       </div>
@@ -244,10 +279,10 @@ export function ConnectWalletDialog({ open, onOpenChange, onConnect, onWalletCon
                         {isConnecting ? (
                           <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            连接中...
+                            {tCommon('connecting')}
                           </>
                         ) : (
-                          '连接'
+                          t('wallet.connect')
                         )}
                       </Button>
                     ) : (
@@ -257,7 +292,7 @@ export function ConnectWalletDialog({ open, onOpenChange, onConnect, onWalletCon
                         size="sm"
                       >
                         <ExternalLink className="mr-2 h-4 w-4" />
-                        安装
+                        {tCommon('install')}
                       </Button>
                     )}
                   </div>
@@ -278,10 +313,10 @@ export function ConnectWalletDialog({ open, onOpenChange, onConnect, onWalletCon
           <div className="text-center space-y-2">
             <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
               <CheckCircle className="h-4 w-4 text-green-500" />
-              我们不会存储您的私钥或助记词
+              {t('wallet.securityPromise')}
             </div>
             <div className="text-xs text-muted-foreground">
-              连接钱包即表示您同意我们的服务条款
+              {t('wallet.termsAgreement')}
             </div>
           </div>
         </div>
@@ -295,5 +330,7 @@ declare global {
   interface Window {
     ethereum?: any
     BinanceChain?: any
+    okxwallet?: any
+    phantom?: any
   }
 }

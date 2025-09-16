@@ -1,0 +1,1702 @@
+{
+  "common": {
+    "loading": "加载中...",
+    "error": "错误",
+    "success": "成功",
+    "cancel": "取消",
+    "confirm": "确认",
+    "submit": "提交",
+    "edit": "编辑",
+    "delete": "删除",
+    "save": "保存",
+    "back": "返回",
+    "next": "下一步",
+    "previous": "上一步",
+    "search": "搜索",
+    "filter": "筛选",
+    "sort": "排序",
+    "clear": "清除",
+    "all": "全部",
+    "none": "无",
+    "select": "选择",
+    "upload": "上传",
+    "download": "下载",
+    "view": "查看",
+    "close": "关闭",
+    "open": "打开",
+    "connecting": "连接中...",
+    "recommended": "推荐",
+    "install": "安装",
+    "backToHome": "返回首页",
+    "loadingFeatured": "加载特色黑客松中...",
+    "retry": "重试",
+    "participants": "参与",
+    "viewDetails": "查看详情",
+    "noFeatured": "暂无特色黑客松",
+    "noFeaturedDesc": "目前没有特色黑客松，请稍后再来查看",
+    "errors": {
+      "fetchDataFailed": "获取统计数据失败",
+      "dataLoadFailed": "数据加载失败",
+      "dataLoadFailedDesc": "无法获取最新的统计数据，请稍后重试",
+      "fetchFeaturedFailed": "获取特色黑客松失败",
+      "loadFailed": "加载失败",
+      "fetchFeaturedFailedDesc": "无法获取特色黑客松",
+      "networkError": "网络错误，请检查网络连接",
+      "networkErrorDesc": "请检查网络连接并重试",
+      "fetchTeamsFailed": "获取团队列表失败",
+      "fetchTeamsFailedDesc": "无法获取团队列表"
+    },
+    "notFound": "页面未找到",
+    "notFoundDesc": "您要查找的页面不存在。",
+    "backHome": "返回首页",
+    "terms": "服务条款",
+    "privacy": "隐私政策",
+    "and": "和",
+    "createHackathon": "创建黑客松",
+    "errors": {
+      "loadFailed": "加载失败",
+      "networkError": "网络错误",
+      "networkErrorDesc": "请检查网络连接后重试",
+      "fetchStatsFailed": "获取统计数据失败",
+      "fetchStatsFailedDesc": "无法加载平台统计数据",
+      "fetchFeaturedFailed": "获取特色黑客松失败",
+      "fetchFeaturedFailedDesc": "无法加载特色黑客松数据"
+    }
+  },
+  "navigation": {
+    "home": "首页",
+    "hackathons": "黑客松",
+    "projects": "项目",
+    "teams": "团队",
+    "community": "社区",
+    "dashboard": "仪表板",
+    "profile": "个人资料",
+    "settings": "设置",
+    "admin": "管理",
+    "notifications": "通知",
+    "user": "用户",
+    "disconnectWallet": "断开钱包",
+    "toggleMenu": "切换菜单"
+  },
+  "auth": {
+    "signin": "登录",
+    "signup": "注册",
+    "signout": "登出",
+    "wallet": {
+      "connect": "连接钱包",
+      "disconnect": "断开钱包",
+      "connecting": "连接中...",
+      "connected": "已连接",
+      "connectMetaMask": "使用MetaMask连接",
+      "connectWalletConnect": "使用WalletConnect连接",
+      "switchNetwork": "切换网络",
+      "wrongNetwork": "网络错误",
+      "connectRequired": "需要连接钱包",
+      "pageAccessRequired": "此页面需要连接钱包后才能访问",
+      "firstTime": "第一次使用？",
+      "autoCreateAccount": "连接钱包即可自动创建账户",
+      "metamaskDesc": "最受欢迎的以太坊钱包",
+      "trustWalletDesc": "移动端首选钱包",
+      "binanceWalletDesc": "BSC生态官方钱包",
+      "coinbaseWalletDesc": "安全易用的数字钱包",
+      "okxWalletDesc": "多链支持钱包",
+      "phantomDesc": "Solana生态钱包",
+      "metamaskNotInstalled": "MetaMask未安装",
+      "trustWalletNotInstalled": "Trust Wallet未安装",
+      "binanceWalletNotInstalled": "Binance Wallet未安装",
+      "coinbaseWalletNotInstalled": "Coinbase Wallet未安装",
+      "okxWalletNotInstalled": "OKX Wallet未安装",
+      "phantomNotInstalled": "Phantom未安装",
+      "notInstalledError": "{walletName} 未安装，请先下载安装",
+      "networkSwitched": "网络已切换",
+      "switchedToBSCTestnet": "已自动切换到 BSC Testnet",
+      "networkError": "网络错误",
+      "switchToBSCManually": "请手动切换到 BSC Testnet (ChainID: {chainId})",
+      "connectSuccess": "连接成功",
+      "connectedVia": "已通过 {walletName} 连接钱包",
+      "connectFailed": "连接失败",
+      "checkWalletUnlocked": "请检查钱包是否已解锁",
+      "selectWalletDesc": "选择你喜欢的钱包来连接到 HackX 平台",
+      "ensureBSCTestnet": "请确保您的钱包已连接到 {strong}BSC Testnet (ChainID: 97){/strong}",
+      "securityPromise": "我们不会存储您的私钥或助记词",
+      "termsAgreement": "连接钱包即表示您同意我们的服务条款",
+      "loginWithWeb3": "使用您的Web3钱包登录HackX平台",
+      "noWallet": "没有钱包？",
+      "installMetaMask": "安装MetaMask",
+      "byConnecting": "通过连接钱包，您同意我们的",
+      "connectToSignup": "连接钱包创建账户"
+    },
+    "signup": {
+      "createAccount": "创建账户",
+      "connectToCreate": "连接您的Web3钱包来创建HackX账户",
+      "alreadyHaveAccount": "已有账户？",
+      "directConnect": "直接连接钱包",
+      "whyWallet": "为什么使用钱包？",
+      "benefit1": "去中心化身份验证",
+      "benefit2": "安全的数字资产管理",
+      "benefit3": "参与区块链生态系统",
+      "benefit4": "无需记住密码"
+    },
+    "email": "邮箱",
+    "password": "密码",
+    "confirmPassword": "确认密码",
+    "forgotPassword": "忘记密码？",
+    "rememberMe": "记住我",
+    "loginSuccess": "登录成功",
+    "loginError": "登录失败",
+    "signupSuccess": "注册成功",
+    "signupError": "注册失败"
+  },
+  "web3": {
+    "network": {
+      "switchToNetwork": "请切换到 {networkName} (ChainID: {chainId})",
+      "walletNotDetected": "未检测到钱包",
+      "bscNodeSyncIssue": "BSC Testnet节点同步问题，请稍后重试",
+      "networkUnstable": "网络连接不稳定，正在使用备用数据源",
+      "networkError": "网络连接异常",
+      "retry": "重试",
+      "addBSCTestnetFailed": "添加BSC Testnet失败"
+    },
+    "wallet": {
+      "walletNotDetected": "未检测到钱包",
+      "installWalletPrompt": "请安装 MetaMask 或其他以太坊钱包",
+      "connectSuccess": "钱包连接成功",
+      "connectSuccessDesc": "已成功连接到您的钱包",
+      "connectFailed": "连接失败",
+      "connectFailedDesc": "无法连接到钱包",
+      "loadWalletInfoFailed": "加载钱包信息失败",
+      "refreshAndRetry": "请刷新页面重试",
+      "walletDisconnected": "钱包已断开",
+      "reconnectWallet": "请重新连接钱包",
+      "addressCopied": "地址已复制",
+      "addressCopiedDesc": "钱包地址已复制到剪贴板",
+      "mainnet": "主网",
+      "testnet": "测试网",
+      "unknownNetwork": "未知网络",
+      "connectWallet": "连接钱包",
+      "connectWalletDesc": "连接您的以太坊钱包以使用 Web3 功能",
+      "connectMetaMask": "连接 MetaMask",
+      "supportedWallets": "支持的钱包",
+      "walletConnected": "钱包已连接",
+      "ethBalance": "ETH 余额",
+      "hxtBalance": "HXT 余额",
+      "network": "网络",
+      "chainId": "链 ID",
+      "copyAddress": "复制地址",
+      "viewDetails": "查看详情",
+      "walletAddress": "钱包地址"
+    },
+    "dao": {
+      "loadProposalsFailed": "获取提案列表失败",
+      "loadFailed": "加载失败",
+      "cannotLoadProposals": "无法获取提案列表",
+      "networkError": "网络错误",
+      "checkNetworkConnection": "请检查网络连接并重试"
+    }
+  },
+  "footer": {
+    "description": "基于 IPFS 的去中心化黑客松平台，连接全球开发者，构建 Web3 未来。",
+    "cta": {
+      "badge": "加入未来",
+      "title": "准备开始构建了吗？",
+      "description": "与全球开发者连接，参与前沿黑客松，共同构建去中心化的未来。",
+      "exploreHackathons": "探索黑客松",
+      "createTeam": "创建团队"
+    },
+    "stats": {
+      "projects": "项目",
+      "developers": "开发者"
+    },
+    "social": {
+      "title": "关注我们"
+    },
+    "platform": "平台",
+    "hackathons": "黑客松",
+    "projects": "项目展示",
+    "community": "开发者社区",
+    "teams": "团队",
+    "resources": "资源",
+    "docs": "开发文档",
+    "apiDocs": "API 文档",
+    "blog": "博客",
+    "helpCenter": "帮助中心",
+    "about": "关于",
+    "aboutUs": "关于我们",
+    "careers": "加入我们",
+    "privacy": "隐私政策",
+    "terms": "服务条款",
+    "location": "全球",
+    "madeWith": "用",
+    "forCommunity": "为社区而制作",
+    "copyright": "© 2024 HackX. 版权所有。用 ❤️ 为全球开发者社区打造。"
+  },
+  "ui": {
+    "theme": {
+      "toggleTheme": "切换主题",
+      "light": "亮色",
+      "dark": "暗色",
+      "system": "系统"
+    },
+    "fileUpload": {
+      "uploadFailed": "上传失败",
+      "title": "选择文件上传到IPFS",
+      "supportedFormats": "支持图片、PDF、文本文件等格式",
+      "uploading": "上传中...",
+      "selectFiles": "选择文件"
+    },
+    "userRegistration": {
+      "connectWalletFirst": "请先连接钱包",
+      "enterUsername": "请填写用户名",
+      "registrationSuccess": "注册成功",
+      "userRegisteredToBlockchain": "用户已注册到区块链",
+      "registrationFailed": "注册失败",
+      "tryAgainLater": "请稍后重试",
+      "title": "用户注册",
+      "connectWalletToRegister": "请先连接钱包以注册用户",
+      "registerToDecentralizedPlatform": "注册用户资料到去中心化平台",
+      "username": "用户名",
+      "enterUsernamePlaceholder": "输入用户名",
+      "registering": "注册中...",
+      "registerUser": "注册用户",
+      "walletAddress": "钱包地址",
+      "registrationStatus": "注册状态",
+      "registered": "已注册",
+      "notRegistered": "未注册"
+    },
+    "walletConnect": {
+      "registering": "注册中...",
+      "registered": "已注册",
+      "connectWallet": "连接钱包"
+    }
+  },
+  "dashboard": {
+    "pleaseLogin": "请先登录",
+    "login": "登录",
+    "errors": {
+      "getUserStats": "获取用户统计信息失败",
+      "getRecommendations": "获取推荐信息失败",
+      "getUserHackathons": "获取用户黑客松失败",
+      "getUserProjects": "获取用户项目失败",
+      "getUserTeams": "获取用户团队失败",
+      "debugInfo": "调试信息"
+    },
+    "toasts": {
+      "authRequired": "需要身份验证",
+      "reloginRequired": "请重新登录",
+      "avatarUploadSuccess": "头像上传成功",
+      "avatarUploadSuccessDesc": "您的头像已成功更新",
+      "avatarUploadFailed": "头像上传失败",
+      "avatarUploadRetry": "请重试",
+      "avatarUploadServerError": "服务器错误，请稍后重试",
+      "avatarUploadNetworkError": "网络错误，请检查网络连接",
+      "saveSuccess": "保存成功",
+      "saveSuccessDesc": "您的个人资料已成功更新",
+      "saveFailed": "保存失败",
+      "saveFailedRetry": "请重试",
+      "saveNetworkError": "网络错误，请检查网络连接",
+      "fileFormatError": "文件格式错误",
+      "fileFormatDesc": "请选择JPG、PNG或GIF格式的图片",
+      "fileTooLarge": "文件过大",
+      "fileTooLargeDesc": "请选择小于5MB的图片"
+    },
+    "profile": {
+      "userAvatar": "用户头像",
+      "enterUsername": "输入用户名",
+      "techStack": "技术栈",
+      "noTechStack": "尚未设置技术栈，请在下方添加",
+      "addTechStack": "添加技术栈（如：React、Node.js）",
+      "addButton": "添加",
+      "skillExists": "技能已存在",
+      "skillExistsDesc": "该技能已在列表中",
+      "skillLimit": "技能数量已达上限",
+      "skillLimitDesc": "最多可添加20个技能",
+      "skillTooLong": "技能名称过长",
+      "skillTooLongDesc": "技能名称不能超过20个字符",
+      "skillInstructions": "按回车键或点击添加按钮来添加技能",
+      "notSetYet": "尚未设置",
+      "cancel": "取消",
+      "save": "保存",
+      "edit": "编辑"
+    },
+    "statistics": {
+      "participatedHackathons": "参与的黑客松",
+      "participatedDesc": "您参与的黑客松数量",
+      "submittedProjects": "提交的项目",
+      "submittedDesc": "您提交的项目数量",
+      "wonPrizes": "获得的奖项",
+      "wonPrizesDesc": "您获得的奖项数量",
+      "reputationScore": "声誉分数",
+      "reputationScoreDesc": "您的整体声誉分数",
+      "prizesTooltip": {
+        "title": "奖项计算规则",
+        "rule1": "🥇 第一名 = 3分",
+        "rule2": "🥈 第二名 = 2分",
+        "rule3": "🥉 第三名 = 1分"
+      },
+      "reputationTooltip": {
+        "title": "声誉分数计算规则",
+        "rule1": "💎 参与黑客松：+10分",
+        "rule2": "🚀 提交项目：+20分",
+        "rule3": "🏆 获得奖项：+50分",
+        "rule4": "⭐ 社区贡献：+5分"
+      }
+    },
+    "tabs": {
+      "overview": "概览",
+      "hackathons": "我的黑客松",
+      "projects": "我的项目",
+      "teams": "我的团队",
+      "community": "我的社区"
+    },
+    "recentActivity": {
+      "title": "最近活动",
+      "description": "您的最新动态",
+      "noActivities": "暂无最近活动"
+    },
+    "recommendations": {
+      "title": "推荐的黑客松",
+      "description": "符合您兴趣的黑客松",
+      "loading": "正在加载推荐...",
+      "view": "查看",
+      "daysUntilStart": "距离开始还有{days}天",
+      "inProgress": "进行中",
+      "noRecommendations": "暂无推荐内容",
+      "exploreHackathons": "探索所有黑客松"
+    },
+    "actions": {
+      "joinNewHackathon": "参加新的黑客松"
+    }
+  },
+  "hackathons": {
+    "title": "黑客松",
+    "subtitle": "发现并参与全球精彩的黑客松活动",
+    "filters": "筛选条件", 
+    "myHackathons": "我的黑客松",
+    "create": "创建",
+    "searchResults": "搜索: \"{query}\"",
+    "createHackathon": "创建黑客松",
+    "join": "加入",
+    "leave": "退出",
+    "search": {
+      "placeholder": "搜索黑客松...",
+      "searchHistory": "搜索历史",
+      "clearHistory": "清除",
+      "popularSearches": "热门搜索",
+      "searchTips": "小贴士：试试通过技术栈、主题或奖金数额来搜索，找到最适合你的黑客松活动！"
+    },
+    "card": {
+      "startTime": "开始时间",
+      "endTime": "结束时间",
+      "participants": "参与者",
+      "prizePool": "奖金池",
+      "status": "状态",
+      "technologies": "技术栈",
+      "difficulty": "难度",
+      "organizer": "主办方",
+      "location": "地点",
+      "online": "线上",
+      "hybrid": "混合",
+      "inPerson": "线下",
+      "beginner": "初级",
+      "intermediate": "中级",
+      "advanced": "高级",
+      "expert": "专家",
+      "teamSize": "团队规模",
+      "maxTeamSize": "最多{size}人",
+      "individual": "个人",
+      "team": "团队",
+      "viewDetails": "查看详情",
+      "register": "报名",
+      "registered": "已报名",
+      "full": "已满员",
+      "closed": "报名已截止",
+      "upcoming": "即将开始",
+      "ongoing": "进行中",
+      "completed": "已完成",
+      "cancelled": "已取消",
+      "daysLeft": "还有{days}天",
+      "hoursLeft": "还有{hours}小时",
+      "minutesLeft": "还有{minutes}分钟",
+      "ended": "已结束"
+    },
+    "createForm": {
+      "title": "创建黑客松",
+      "description": "创建你的黑客松活动，吸引全球开发者参与",
+      "auth": {
+        "loginRequired": "请先登录",
+        "login": "登录"
+      },
+      "steps": {
+        "basicInfo": "基本信息",
+        "basicInfoDesc": "设置黑客松的基本信息和时间安排",
+        "prizeSettings": "奖项设置", 
+        "prizeSettingsDesc": "配置奖项和赛道",
+        "techRequirements": "技术要求",
+        "techRequirementsDesc": "选择技术栈和要求",
+        "rulesExplanation": "规则说明",
+        "rulesExplanationDesc": "设置规则和评审标准",
+        "judgeTeam": "评委团队",
+        "judgeTeamDesc": "添加评委和赞助商",
+        "previewPublish": "预览发布",
+        "previewPublishDesc": "预览并发布黑客松"
+      },
+      "navigation": {
+        "previous": "上一页",
+        "next": "下一页",
+        "creating": "创建中...",
+        "createHackathon": "创建黑客松"
+      },
+      "basicInfo": {
+        "title": "基本信息",
+        "coverImage": "封面图片",
+        "coverImageDesc": "上传黑客松的封面图片（可选，最大5MB）",
+        "selectImage": "选择图片",
+        "uploading": "上传中...",
+        "supportedFormats": "支持 JPG、PNG、GIF 格式",
+        "hackathonName": "黑客松名称",
+        "hackathonNamePlaceholder": "输入黑客松名称",
+        "eventDescription": "活动描述",
+        "eventDescriptionPlaceholder": "详细描述你的黑客松活动...",
+        "startTime": "开始时间",
+        "selectStartTime": "选择开始时间",
+        "endTime": "结束时间", 
+        "selectEndTime": "选择结束时间",
+        "registrationStartTime": "报名开始时间",
+        "selectRegistrationStartTime": "选择报名开始时间",
+        "registrationDeadline": "报名截止时间",
+        "selectRegistrationDeadline": "选择报名截止时间",
+        "eventLocation": "活动地点",
+        "eventLocationPlaceholder": "线上/线下地点",
+        "maxParticipants": "最大参与人数",
+        "maxParticipantsPlaceholder": "不限制请留空",
+        "timeSchedule": "时间安排",
+        "timeScheduleDesc": "设置黑客松的关键时间节点",
+        "timelineEvent": "时间节点 {index}",
+        "eventTitle": "事件标题",
+        "eventTitlePlaceholder": "例如：比赛开始",
+        "time": "时间",
+        "selectTime": "选择时间", 
+        "eventDesc": "描述",
+        "eventDescPlaceholder": "描述这个时间节点...",
+        "addTimelineEvent": "添加时间节点",
+        "socialLinks": "项目方社交账号（可选）",
+        "socialLinksDesc": "添加项目方或组织的社交媒体链接，便于参赛者了解更多信息",
+        "officialWebsite": "官方网站",
+        "twitter": "Twitter / X",
+        "discord": "Discord",
+        "telegram": "Telegram",
+        "github": "GitHub",
+        "linkedin": "LinkedIn",
+        "socialLinksAdded": "已添加的社交链接：",
+        "website": "官网",
+        "validationMinLength": "至少需要10个字符（当前：{current}）",
+        "validationEntered": "已输入{current}个字符",
+        "validationValid": "✓"
+      },
+      "prizes": {
+        "title": "奖项设置",
+        "prize": "奖项 {index}",
+        "addPrize": "添加奖项",
+        "prizeName": "奖项名称",
+        "prizeNamePlaceholder": "例如：一等奖",
+        "prizeAmount": "奖金金额（美金 $）",
+        "prizeAmountPlaceholder": "例如：10,000",
+        "winnerCount": "获奖人数",
+        "prizeDescription": "奖项描述",
+        "prizeDescPlaceholder": "描述这个奖项...",
+        "tracks": "赛道设置",
+        "track": "赛道 {index}",
+        "addTrack": "添加赛道",
+        "trackName": "赛道名称",
+        "trackNamePlaceholder": "例如：DeFi 赛道",
+        "trackDescription": "赛道描述",
+        "trackDescPlaceholder": "描述这个赛道的重点和要求..."
+      },
+      "tech": {
+        "title": "技术栈选择",
+        "techDesc": "选择推荐的技术栈，帮助参与者了解活动重点",
+        "selectedTech": "已选择的技术栈"
+      },
+      "rules": {
+        "title": "活动规则",
+        "detailedRules": "详细规则",
+        "detailedRulesPlaceholder": "详细描述黑客松的规则和注意事项...",
+        "participationRequirements": "参与要求",
+        "addRequirement": "添加要求",
+        "requirementPlaceholder": "输入参与要求...",
+        "judgingCriteria": "评审标准", 
+        "addCriteria": "添加标准",
+        "criteriaPlaceholder": "输入评审标准..."
+      },
+      "judges": {
+        "title": "评委团队",
+        "judge": "评委 {index}",
+        "addJudge": "添加评委",
+        "judgeName": "姓名",
+        "judgeNamePlaceholder": "评委姓名",
+        "judgePosition": "职位",
+        "judgePositionPlaceholder": "职位/头衔",
+        "judgeBio": "个人简介",
+        "judgeBioPlaceholder": "评委的个人简介...",
+        "judgeAvatar": "头像URL",
+        "judgeAvatarPlaceholder": "头像图片URL",
+        "sponsors": "赞助商",
+        "sponsor": "赞助商 {index}",
+        "addSponsor": "添加赞助商",
+        "companyName": "公司名称",
+        "companyNamePlaceholder": "赞助商名称",
+        "sponsorTier": "赞助等级",
+        "selectSponsorTier": "选择赞助等级",
+        "platinum": "白金赞助商",
+        "gold": "金牌赞助商", 
+        "silver": "银牌赞助商",
+        "bronze": "铜牌赞助商",
+        "companyLogo": "公司Logo",
+        "clickUploadLogo": "点击上传公司Logo",
+        "logoFormats": "支持 PNG, JPG, GIF 格式，建议尺寸 200x100px",
+        "changeLogo": "更换Logo",
+        "deleteLogo": "删除",
+        "websiteLink": "官网链接"
+      },
+      "preview": {
+        "title": "预览黑客松",
+        "timeTBD": "时间待定",
+        "totalPrizePool": "总奖金池: ${amount}",
+        "maxPeople": "最多 {count} 人",
+        "unlimited": "不限人数",
+        "techStack": "技术栈",
+        "prizeSettings": "奖项设置",
+        "people": "人",
+        "judgeTeam": "评委团队",
+        "schedule": "时间安排",
+        "tbd": "待定"
+      },
+      "defaults": {
+        "firstPrize": "一等奖",
+        "mainTrack": "主赛道",
+        "registrationDeadline": "报名截止",
+        "registrationDeadlineDesc": "参赛报名截止",
+        "competitionBegins": "比赛开始", 
+        "competitionBeginsDesc": "正式开始开发",
+        "submissionDeadline": "提交截止",
+        "submissionDeadlineDesc": "项目提交截止"
+      },
+      "validation": {
+        "incompleteInfo": "信息不完整",
+        "fillAllRequired": "请填写所有必填字段",
+        "descriptionTooShort": "描述过短",
+        "descriptionMinLength": "黑客松描述至少需要10个字符",
+        "dateError": "日期错误", 
+        "endAfterStart": "结束日期必须晚于开始日期",
+        "registrationBeforeStart": "注册截止日期必须早于开始日期",
+        "registrationStartBeforeEnd": "报名开始时间必须早于报名截止时间"
+      },
+      "toasts": {
+        "fileTypeError": "文件类型错误",
+        "selectImageFile": "请选择图片文件",
+        "fileTooLarge": "文件过大",
+        "imageSizeLimit": "图片大小不能超过5MB",
+        "retryLater": "请稍后重试",
+        "logoUploadSuccess": "Logo上传成功",
+        "logoUploadedToIPFS": "{fileName} 已成功上传到IPFS",
+        "logoUploadFailed": "Logo上传失败",
+        "hackathonCreated": "黑客松创建成功！",
+        "createdOnBlockchain": "黑客松已在区块链上创建",
+        "contractId": "合约ID: {contractId}",
+        "txHash": "交易哈希: {txHash}",
+        "creationFailed": "创建失败",
+        "networkError": "网络错误，请检查网络连接并重试",
+        "imageUploadFailed": "图片上传失败",
+        "imageUploadFailedContinue": "封面图片上传失败，但仍将继续创建黑客松"
+      }
+    },
+    "submit": {
+      "title": "提交项目",
+      "description": "向 {hackathonTitle} 提交你的创新项目，所有文件将存储在 IPFS 网络中",
+      "auth": {
+        "loginRequired": "请先登录",
+        "login": "登录"
+      }
+    },
+    "detail": {
+      "notFound": "黑客松不存在",
+      "backToList": "返回黑客松列表",
+      "startTime": "开始时间",
+      "duration": "持续时间",
+      "totalPrize": "总奖金",
+      "location": "地点",
+      "days": "{count} 天",
+      "status": {
+        "upcoming": "即将开始",
+        "ongoing": "进行中",
+        "ended": "已结束",
+        "unknown": "未知"
+      },
+      "tabs": {
+        "overview": "概览",
+        "prizes": "奖项",
+        "rules": "规则",
+        "timeline": "时间线",
+        "projects": "项目"
+      }
+    },
+    "submit": "提交项目",
+    "register": "报名",
+    "registered": "已报名",
+    "status": {
+      "upcoming": "即将开始",
+      "ongoing": "进行中",
+      "completed": "已结束",
+      "cancelled": "已取消",
+      "draft": "草稿"
+    },
+    "details": {
+      "description": "活动描述",
+      "rules": "比赛规则",
+      "prizes": "奖项设置",
+      "schedule": "日程安排",
+      "participants": "参与者",
+      "projects": "项目",
+      "organizer": "组织者",
+      "startDate": "开始时间",
+      "endDate": "结束时间",
+      "registrationDeadline": "报名截止",
+      "maxParticipants": "最大参与人数",
+      "prizePool": "奖金池",
+      "categories": "分类",
+      "techStack": "技术栈"
+    },
+    "filters": {
+      "title": "筛选条件",
+      "all": "全部",
+      "status": "状态",
+      "technology": "技术",
+      "prizeRange": "奖金范围",
+      "dateRange": "时间范围",
+      "featured": "精选",
+      "activeFilters": "已选筛选条件",
+      "clearAll": "清除全部",
+      "statusOptions": {
+        "all": "全部",
+        "upcoming": "即将开始",
+        "ongoing": "进行中",
+        "completed": "已结束"
+      },
+      "prizeRangeOptions": {
+        "all": "全部",
+        "0-1000": "$0 - $1,000",
+        "1000-10000": "$1,000 - $10,000",
+        "10000+": "$10,000+"
+      },
+      "dateRangeOptions": {
+        "all": "全部",
+        "this-week": "本周",
+        "this-month": "本月", 
+        "next-month": "下个月"
+      }
+    },
+    "create": {
+      "title": "创建",
+      "basicInfo": "基本信息",
+      "timeSettings": "时间设置",
+      "prizeSettings": "奖项设置",
+      "rules": "规则要求",
+      "preview": "预览",
+      "publish": "发布",
+      "titlePlaceholder": "输入黑客松标题",
+      "descriptionPlaceholder": "描述您的黑客松...",
+      "requirementsPlaceholder": "列出参与要求...",
+      "rulesPlaceholder": "定义比赛规则...",
+      "success": "黑客松创建成功！",
+      "error": "创建黑客松失败"
+    }
+  },
+  "teams": {
+    "title": "团队",
+    "createTeam": "创建团队",
+    "join": "加入团队",
+    "leave": "离开团队",
+    "apply": "申请加入",
+    "invite": "邀请成员",
+    "manage": "管理团队",
+    "members": "成员",
+    "leader": "队长",
+    "pageTitle": "团队管理",
+    "pageDescription": "发现团队、管理你的团队、处理邀请",
+    "loading": {
+      "teams": "加载团队中...",
+      "hackathons": "加载黑客松列表失败",
+      "invitations": "加载邀请失败",
+      "failed": "加载失败",
+      "retry": "重试",
+      "networkError": "网络错误，请检查网络连接",
+      "getTeamsFailed": "获取团队列表失败",
+      "submitting": "提交中...",
+      "submitApplication": "提交申请"
+    },
+    "search": {
+      "placeholder": "搜索团队...",
+      "statusFilter": "状态筛选",
+      "allStatuses": "全部状态",
+      "hackathonFilter": "黑客松筛选",
+      "allHackathons": "全部黑客松"
+    },
+    "tabs": {
+      "allTeams": "全部团队",
+      "myTeams": "我的团队",
+      "invitations": "团队邀请"
+    },
+    "status": {
+      "recruiting": "招募中",
+      "full": "已满员",
+      "competing": "比赛中",
+      "completed": "已完成",
+      "disbanded": "已解散"
+    },
+    "actions": {
+      "viewDetails": "查看详情",
+      "applyToJoin": "申请加入",
+      "manageTeam": "管理团队",
+      "acceptInvitation": "接受邀请",
+      "decline": "拒绝",
+      "cancel": "取消",
+      "retry": "重试"
+    },
+    "memberCount": "{current}/{max} 成员",
+    "roleLeader": "队长",
+    "roleMember": "成员",
+    "roleRecruiting": "招募中",
+    "unknownHackathon": "未知黑客松",
+    "empty": {
+      "noTeamsFound": "没有找到团队",
+      "adjustSearchCriteria": "尝试调整搜索条件或创建新团队",
+      "noInvitations": "暂无邀请",
+      "noInvitationsDesc": "你目前没有收到任何团队邀请"
+    },
+    "invitations": {
+      "teamInvitation": "团队邀请",
+      "fromInviter": "来自 {inviterName} 的邀请",
+      "acceptInvitation": "接受邀请",
+      "decline": "拒绝"
+    },
+    "joinDialog": {
+      "title": "申请加入团队",
+      "description": "申请加入 \"{teamName}\" 团队",
+      "skillsLabel": "技能标签 (可选)",
+      "skillsPlaceholder": "请输入你的技能，用逗号分隔，如：React, Node.js, Python",
+      "skillsHelp": "展示你的技能，帮助团队了解你的能力",
+      "messageLabel": "申请理由 (可选)",
+      "messagePlaceholder": "请简述你想加入这个团队的理由，或者介绍一下自己...",
+      "characterCount": "{current}/500 字符"
+    },
+    "toasts": {
+      "loginRequired": "请先登录",
+      "loginRequiredDesc": "需要登录才能接受邀请",
+      "loginRequiredToDecline": "需要登录才能拒绝邀请",
+      "loginRequiredToApply": "请先登录",
+      "applicationSubmitted": "申请已提交",
+      "applicationSubmittedDesc": "申请已提交，请等待团队领导审核",
+      "applicationFailed": "申请失败",
+      "applicationFailedDesc": "申请提交失败，请重试",
+      "invitationAccepted": "成功",
+      "invitationAcceptedDesc": "已接受团队邀请",
+      "invitationDeclined": "成功",
+      "invitationDeclinedDesc": "已拒绝团队邀请",
+      "operationFailed": "操作失败",
+      "acceptInvitationFailed": "接受邀请失败",
+      "declineInvitationFailed": "拒绝邀请失败"
+    },
+    "applications": {
+      "title": "申请管理",
+      "pending": "待审核",
+      "approved": "已通过",
+      "rejected": "已拒绝",
+      "approve": "批准",
+      "reject": "拒绝",
+      "message": "申请消息",
+      "skills": "技能",
+      "experience": "经验"
+    },
+    "create": {
+      "title": "创建团队",
+      "subtitle": "创建您的黑客松团队",
+      "backToTeams": "返回团队",
+      "form": {
+        "teamName": "团队名称",
+        "teamNamePlaceholder": "输入团队名称",
+        "teamNameRequired": "团队名称不能为空",
+        "teamNameMinLength": "团队名称至少2个字符",
+        "description": "团队描述",
+        "descriptionPlaceholder": "描述您的团队、目标和正在寻找的成员...",
+        "descriptionRequired": "团队描述不能为空",
+        "descriptionMinLength": "团队描述至少10个字符",
+        "hackathon": "选择黑客松",
+        "hackathonPlaceholder": "选择要参加的黑客松",
+        "hackathonRequired": "请选择参赛的黑客松",
+        "maxMembers": "最大成员数",
+        "maxMembersDesc": "设置团队最大成员数量（包括您自己）",
+        "techStack": "技术栈",
+        "techStackDesc": "选择您的团队将使用的技术",
+        "selectTechStack": "选择技术栈",
+        "addTech": "添加",
+        "skillsRequired": "至少需要选择一项技能",
+        "skillsMaxLimit": "技能最多选择10项",
+        "roles": "团队角色",
+        "rolesDesc": "添加您的团队需要的角色",
+        "selectRole": "选择标签",
+        "addRole": "添加",
+        "teamVisibility": "团队可见性",
+        "publicTeam": "公开团队",
+        "publicTeamDesc": "其他用户可以发现并申请加入您的团队",
+        "privateTeam": "私人团队",
+        "privateTeamDesc": "只有受邀请的用户才能加入您的团队"
+      },
+      "validation": {
+        "formValidationFailed": "表单校验失败",
+        "checkFields": "请检查并修正标红的字段",
+        "createFailed": "创建失败",
+        "createError": "团队创建过程中出现错误，请重试",
+        "createTeamError": "创建团队失败"
+      },
+      "success": {
+        "teamCreated": "团队创建成功",
+        "teamCreatedDesc": "您的团队已创建，现在可以邀请成员加入"
+      },
+      "preview": {
+        "title": "预览",
+        "teamOverview": "团队概览",
+        "noTechStack": "未选择技术栈",
+        "noRoles": "未添加角色",
+        "maxMembersLabel": "最大成员数: {count}",
+        "visibilityPublic": "公开团队",
+        "visibilityPrivate": "私人团队"
+      },
+      "actions": {
+        "createTeam": "创建团队",
+        "creating": "创建中...",
+        "cancel": "取消"
+      }
+    },
+    "detail": {
+      "status": {
+        "recruiting": "招募中",
+        "full": "已满员",
+        "competing": "比赛中",
+        "completed": "已完成"
+      },
+      "tabs": {
+        "overview": "概览",
+        "members": "成员",
+        "project": "项目",
+        "activity": "动态",
+        "applications": "申请管理"
+      }
+    }
+  },
+  "projects": {
+    "title": "项目",
+    "create": "创建项目",
+    "submit": "提交项目",
+    "edit": "编辑项目",
+    "view": "查看项目",
+    "like": "点赞",
+    "bookmark": "收藏",
+    "share": "分享",
+    "status": {
+      "draft": "草稿",
+      "submitted": "已提交",
+      "reviewed": "已评审",
+      "winner": "获奖",
+      "rejected": "被拒绝"
+    },
+    "details": {
+      "name": "项目名称",
+      "description": "项目描述",
+      "techStack": "技术栈",
+      "category": "项目分类",
+      "repository": "代码仓库",
+      "demo": "演示链接",
+      "documentation": "项目文档",
+      "screenshots": "项目截图",
+      "video": "演示视频",
+      "team": "团队成员"
+    },
+    "submit": {
+      "basicInfo": "基本信息",
+      "techDetails": "技术详情",
+      "demoMaterials": "演示材料",
+      "teamInfo": "团队信息",
+      "preview": "预览",
+      "submit": "提交",
+      "success": "项目提交成功！",
+      "error": "项目提交失败"
+    }
+  },
+  "community": {
+    "title": "社区",
+    "description": "分享想法、提问交流、展示作品",
+    "posts": "帖子",
+    "createPost": "发布帖子",
+    "reply": "回复",
+    "like": "点赞",
+    "bookmark": "收藏",
+    "follow": "关注",
+    "unfollow": "取消关注",
+    "loading": {
+      "community": "加载社区数据中...",
+      "communityDetails": "正在为您加载最新社区动态...",
+      "failed": "加载失败",
+      "retry": "重试",
+      "networkError": "网络错误，请稍后重试",
+      "loadingFailed": "加载社区数据失败",
+      "toggleLikeFailed": "切换点赞状态失败",
+      "toggleBookmarkFailed": "切换收藏状态失败"
+    },
+    "search": {
+      "placeholder": "搜索帖子、标签或用户...",
+      "advancedSearch": "高级搜索",
+      "category": "选择分类",
+      "allCategories": "全部分类",
+      "sort": "排序",
+      "latest": "最新",
+      "popular": "最热",
+      "mostReplies": "回复多",
+      "mostViews": "浏览多",
+      "title": "社区搜索",
+      "subtitle": "搜索帖子、用户和标签",
+      "searchButton": "搜索",
+      "searching": "搜索中...",
+      "searchFailed": "搜索失败",
+      "networkError": "网络错误，请稍后重试",
+      "retry": "重试",
+      "inputRequired": "请输入搜索关键词",
+      "inputRequiredDesc": "搜索关键词至少2个字符",
+      "noResults": "没有找到相关内容",
+      "noResultsDesc": "尝试使用其他关键词搜索",
+      "resultsCount": "共找到 {count} 个帖子",
+      "tabs": {
+        "all": "全部",
+        "posts": "帖子 ({count})",
+        "users": "用户 ({count})",
+        "tags": "标签 ({count})"
+      },
+      "sections": {
+        "posts": "帖子",
+        "users": "用户",
+        "tags": "标签"
+      },
+      "actions": {
+        "viewMore": "查看更多"
+      },
+      "stats": {
+        "searchResults": "{count} 条搜索结果"
+      }
+    },
+    "post": {
+      "backToCommunity": "返回社区",
+      "createPost": "发布帖子",
+      "publishPost": "发布帖子",
+      "publishFirst": "发布第一个帖子",
+      "pinned": "置顶",
+      "locked": "已锁定"
+    },
+    "empty": {
+      "noPosts": "暂无帖子",
+      "adjustFilter": "请尝试调整搜索条件或筛选器",
+      "publishFirst": "发布第一个帖子"
+    },
+    "stats": {
+      "title": "社区统计",
+      "totalPosts": "总帖子数",
+      "activeUsers": "活跃用户",
+      "weeklyPosts": "本周帖子",
+      "totalLikes": "总点赞数",
+      "todayPosts": "今日帖子",
+      "todayReplies": "今日回复"
+    },
+    "contributors": {
+      "title": "优秀贡献者"
+    },
+    "rules": {
+      "title": "社区规则"
+    },
+    "categories": {
+      "general": "综合讨论",
+      "technical": "技术交流", 
+      "showcase": "项目展示",
+      "help": "求助问答",
+      "announcement": "官方公告"
+    },
+    "postDetail": {
+      "loading": "加载帖子中...",
+      "loadFailed": "加载失败",
+      "retry": "重试",
+      "postNotFound": "帖子不存在",
+      "postNotFoundDesc": "您要查看的帖子可能已被删除或不存在。",
+      "backToCommunity": "返回社区",
+      "getLikeStatusFailed": "获取点赞状态失败",
+      "getPostFailed": "获取帖子失败",
+      "cannotGetPostInfo": "无法获取帖子信息",
+      "networkError": "网络错误",
+      "checkNetworkAndRetry": "请检查网络连接并重试",
+      "authorInfo": "作者信息",
+      "reputation": "声望: {score}",
+      "postsCount": "发帖数",
+      "repliesCount": "回复数",
+      "joinedTime": "加入时间",
+      "relatedPosts": "相关帖子",
+      "relatedPostsFeature": "相关帖子功能待实现",
+      "postStats": "帖子统计",
+      "publishTime": "发布时间",
+      "viewsCount": "浏览次数",
+      "likesCount": "点赞数",
+      "repliesCount2": "回复数",
+      "posted": "发帖",
+      "reputation2": "声望: {score}",
+      "loadPostStart": "开始加载帖子",
+      "loadPostSkipDuplicate": "loadPost 已在执行中，跳过重复调用",
+      "loadPostComplete": "loadPost 执行完成",
+      "directDataUse": "直接使用 data，而不是 data.post",
+      "getAuthorStatsFailed": "获取作者统计数据失败",
+      "likeSuccess": "点赞成功",
+      "likeSuccessDesc": "感谢您的点赞！",
+      "unlikeSuccess": "取消点赞",
+      "unlikeSuccessDesc": "已取消对此帖子的点赞",
+      "likeOperationFailed": "点赞操作失败",
+      "likeError": "点赞错误",
+      "likeRetry": "点赞操作失败，请重试",
+      "replyLikeSuccess": "点赞成功",
+      "replyUnlikeSuccess": "取消点赞",
+      "replyLikeSuccessDesc": "感谢您的点赞！",
+      "replyUnlikeSuccessDesc": "已取消对回复的点赞",
+      "replyLikeError": "回复点赞错误",
+      "bookmarkSuccess": "收藏成功",
+      "unbookmarkSuccess": "取消收藏",
+      "bookmarkSuccessDesc": "已添加到收藏夹",
+      "unbookmarkSuccessDesc": "已从收藏夹移除",
+      "bookmarkOperationFailed": "收藏操作失败",
+      "bookmarkError": "收藏错误",
+      "bookmarkRetry": "收藏操作失败，请重试",
+      "replySuccess": "回复成功",
+      "replySuccessDesc": "您的回复已发布",
+      "replyFailed": "回复失败",
+      "replyFailedDesc": "发布回复时出现错误，请重试",
+      "replyError": "回复错误",
+      "editPost": "编辑帖子",
+      "deletePost": "删除帖子",
+      "title": "标题",
+      "titlePlaceholder": "输入帖子标题...",
+      "content": "内容",
+      "contentPlaceholder": "输入帖子内容...",
+      "saving": "保存中...",
+      "save": "保存",
+      "cancel": "取消",
+      "saveFailed": "保存失败",
+      "titleContentRequired": "标题和内容不能为空",
+      "saveSuccess": "保存成功",
+      "postUpdated": "帖子已更新",
+      "saveFailedRetry": "保存失败，请重试",
+      "updatePostError": "更新帖子错误",
+      "networkErrorRetry": "网络错误，请重试",
+      "deleteConfirm": "确定要删除这个帖子吗？删除后无法恢复。",
+      "deleteSuccess": "删除成功",
+      "postDeleted": "帖子已删除",
+      "deleteFailed": "删除失败",
+      "deletePostError": "删除帖子错误",
+      "share": "分享",
+      "viewsLabel": "{count} 浏览",
+      "repliesLabel": "{count} 回复",
+      "repliesTitle": "回复 ({count})",
+      "writeReply": "写下您的回复...",
+      "postReply": "发布回复",
+      "posting": "发布中...",
+      "postLocked": "此帖子已被锁定，无法添加新回复。",
+      "replyTo": "回复 @{name}...",
+      "noRepliesYet": "还没有回复，来发表第一个回复吧！",
+      "bookmarked": "已收藏",
+      "youLabel": "您"
+    },
+    "categories": {
+      "general": "综合讨论",
+      "technical": "技术分享",
+      "showcase": "项目展示",
+      "help": "求助问答",
+      "announcement": "官方公告"
+    },
+    "empty": {
+      "noPosts": "没有找到相关帖子",
+      "adjustFilter": "尝试调整搜索条件或浏览其他分类",
+      "publishFirst": "发布第一个帖子"
+    },
+    "stats": {
+      "title": "社区统计",
+      "totalPosts": "总帖子数",
+      "activeUsers": "活跃用户",
+      "weeklyPosts": "本周新帖",
+      "totalLikes": "总点赞数",
+      "todayPosts": "今日新帖",
+      "todayReplies": "今日回复"
+    },
+    "contributors": {
+      "title": "热门贡献者",
+      "reputation": "声望"
+    },
+    "rules": {
+      "title": "社区规则",
+      "rule1": "保持友善和尊重，营造良好的讨论氛围",
+      "rule2": "发布有价值的内容，避免灌水和重复",
+      "rule3": "使用合适的分类和标签，便于他人查找",
+      "rule4": "禁止发布违法、有害或不当内容",
+      "rule5": "尊重知识产权，注明引用来源"
+    },
+    "sort": {
+      "latest": "最新",
+      "popular": "热门",
+      "trending": "趋势"
+    },
+    "bookmarks": {
+      "title": "我的收藏",
+      "subtitle": "管理收藏的帖子",
+      "backToConsole": "返回控制台",
+      "loading": "加载中...",
+      "loadFailed": "加载失败",
+      "loadError": "加载收藏失败",
+      "networkError": "网络错误，请稍后重试",
+      "retry": "重试",
+      "empty": {
+        "title": "还没有收藏任何帖子",
+        "description": "发现有趣的帖子时，点击收藏按钮保存它们",
+        "browse": "浏览社区"
+      },
+      "unbookmark": "取消收藏",
+      "unbookmarkSuccess": "取消收藏成功",
+      "unbookmarkSuccessDesc": "已从收藏夹移除",
+      "operationFailed": "操作失败",
+      "unbookmarkFailed": "取消收藏失败",
+      "reputation": "声誉 {score}",
+      "views": "浏览 {count}",
+      "loadMore": "加载更多"
+    },
+    "newPost": {
+      "title": "发布新帖子",
+      "backToCommunity": "返回社区",
+      "createPost": "创建帖子",
+      "form": {
+        "title": "标题 *",
+        "titlePlaceholder": "输入一个吸引人的标题...",
+        "titleMinError": "标题至少需要 10 个字符",
+        "titleMaxError": "标题不能超过 200 个字符",
+        "titleRequired": "请输入帖子标题",
+        "category": "分类 *",
+        "categoryPlaceholder": "选择帖子分类",
+        "categoryRequired": "请选择帖子分类",
+        "tags": "标签 (最多 5 个)",
+        "tagsPlaceholder": "输入标签后按回车键添加...",
+        "tagsCount": "{current}/5 个标签",
+        "content": "内容 *",
+        "contentPlaceholder": "详细描述您的想法、经验或问题...",
+        "contentRequired": "请输入帖子内容",
+        "contentMinError": "内容至少需要 50 个字符",
+        "contentCharCount": "{count} 字符 (至少 50 字符)",
+        "preview": "预览",
+        "write": "写作",
+        "cancel": "取消",
+        "publish": "发布帖子",
+        "publishing": "发布中..."
+      },
+      "preview": {
+        "titlePreview": "帖子标题预览",
+        "contentPreview": "帖子内容预览..."
+      },
+      "sidebar": {
+        "writingTips": "写作建议",
+        "tip1": "使用清晰、描述性的标题",
+        "tip2": "选择合适的分类和标签",
+        "tip3": "提供详细的背景信息",
+        "tip4": "包含代码示例或截图",
+        "tip5": "保持友善和建设性的语调",
+        "formatHelp": "格式帮助",
+        "boldText": "**粗体文本**",
+        "italicText": "*斜体文本*",
+        "code": "`代码`",
+        "link": "[链接](URL)",
+        "heading": "# 标题",
+        "guidelines": "发帖须知",
+        "guidelinesDesc": "发布前请确保内容符合社区规则，避免重复发帖。"
+      },
+      "validation": {
+        "publishSuccess": "发布成功",
+        "publishSuccessDesc": "您的帖子已成功发布到社区",
+        "publishFailed": "发布失败",
+        "publishFailedDesc": "发布帖子时出现错误，请稍后重试",
+        "createError": "创建帖子错误"
+      }
+    }
+  },
+  "notifications": {
+    "title": "通知",
+    "markAsRead": "标记已读",
+    "markAllAsRead": "全部标记已读",
+    "clear": "清除",
+    "settings": "通知设置",
+    "types": {
+      "teamInvite": "团队邀请",
+      "applicationApproved": "申请通过",
+      "applicationRejected": "申请拒绝",
+      "hackathonStarting": "黑客松即将开始",
+      "hackathonEnding": "黑客松即将结束",
+      "projectLiked": "项目被点赞",
+      "systemAnnouncement": "系统公告"
+    }
+  },
+  "admin": {
+    "title": "管理后台",
+    "users": "用户管理",
+    "hackathons": "黑客松管理",
+    "projects": "项目管理",
+    "posts": "帖子管理",
+    "statistics": "数据统计",
+    "settings": "系统设置",
+    "moderation": "内容审核",
+    "reports": "举报管理"
+  },
+  "dashboard": {
+    "title": "仪表板",
+    "overview": "概览",
+    "myHackathons": "我的黑客松",
+    "myTeams": "我的团队",
+    "myProjects": "我的项目",
+    "myCommunity": "我的社区",
+    "pleaseLogin": "请先登录",
+    "pleaseLoginDesc": "登录后查看您的个人仪表板，管理黑客松项目和团队",
+    "login": "登录",
+    "level": "级",
+    "toNextLevel": "至下一级",
+    "profile": {
+      "edit": "编辑",
+      "save": "保存",
+      "cancel": "取消",
+      "uploading": "上传中...",
+      "userAvatar": "用户头像",
+      "enterUsername": "输入用户名",
+      "techStack": "技术栈",
+      "noTechStack": "暂无技术栈，请在下方添加",
+      "addTechStack": "添加技术栈（如：React, Node.js）",
+      "addButton": "添加",
+      "skillExists": "技能已存在",
+      "skillExistsDesc": "该技能已经在列表中了",
+      "skillLimit": "技能数量限制",
+      "skillLimitDesc": "最多只能添加20个技能",
+      "skillTooLong": "技能名称过长",
+      "skillTooLongDesc": "技能名称最多50个字符",
+      "skillInstructions": "按回车键或点击添加按钮来添加技能。最多添加20个技能，每个技能名称最多50个字符。",
+      "notSetYet": "暂未设置技术栈"
+    },
+    "actions": {
+      "joinNewHackathon": "参加新的黑客松"
+    },
+    "statistics": {
+      "participatedHackathons": "参与黑客松",
+      "participatedDesc": "所有参与的黑客松数量",
+      "submittedProjects": "提交项目",
+      "submittedDesc": "创建和参与的项目总数",
+      "wonPrizes": "获得奖项",
+      "wonPrizesDesc": "获奖项目总数",
+      "reputationScore": "声誉分数",
+      "participated": "参与",
+      "won": "获奖",
+      "created": "创建",
+      "reputation": "声誉",
+      "prizesTooltip": {
+        "title": "获奖计算规则:",
+        "rule1": "• 统计项目状态为WINNER的数量",
+        "rule2": "• 包括您创建的获奖项目",
+        "rule3": "• 包括您参与团队的获奖项目"
+      },
+      "reputationTooltip": {
+        "title": "声誉计算公式:",
+        "rule1": "• 参与黑客松: 每次 +50分",
+        "rule2": "• 提交项目: 每个 +100分",
+        "rule3": "• 获得奖项: 每个 +200分",
+        "rule4": "• 最高分数: 1000分",
+        "current": "当前: {participated}×50 + {projects}×100 + {prizes}×200 = {total}"
+      }
+    },
+    "tabs": {
+      "overview": "概览",
+      "hackathons": "我的黑客松",
+      "projects": "我的项目",
+      "teams": "我的团队",
+      "community": "我的社区"
+    },
+    "recentActivity": {
+      "title": "最近活动",
+      "description": "你的最新动态",
+      "noActivities": "暂无最近活动"
+    },
+    "recommendations": {
+      "title": "推荐黑客松",
+      "description": "基于你的技能和兴趣",
+      "loading": "加载推荐中...",
+      "noRecommendations": "暂无推荐的黑客松",
+      "browseAll": "浏览所有黑客松",
+      "view": "查看",
+      "daysUntilStart": "{days} 天后开始",
+      "inProgress": "正在进行中"
+    },
+    "hackathons": {
+      "participated": "参与的黑客松",
+      "participatedDesc": "你作为参与者加入的黑客松活动",
+      "created": "创建的黑客松",
+      "createdDesc": "你作为组织者创建的黑客松活动",
+      "loading": "加载中...",
+      "noParticipated": "你还没有参与任何黑客松",
+      "noCreated": "你还没有创建任何黑客松",
+      "joinHackathons": "参加黑客松",
+      "createHackathon": "创建黑客松",
+      "viewDetails": "查看详情",
+      "manage": "管理",
+      "organizer": "组织者",
+      "prizePool": "奖金池: ${amount}",
+      "inProgress": "进行中"
+    },
+    "projects": {
+      "title": "我的项目",
+      "description": "你提交的所有项目",
+      "loading": "加载中...",
+      "noProjects": "你还没有提交任何项目",
+      "joinAndSubmit": "参加黑客松并提交项目",
+      "viewProject": "查看项目",
+      "code": "代码",
+      "demo": "演示",
+      "score": "评分: {score}",
+      "team": "团队: {name} ({count}人)",
+      "status": {
+        "submitted": "已提交"
+      }
+    },
+    "teams": {
+      "title": "我的团队",
+      "description": "你参与的团队",
+      "loading": "加载中...",
+      "noTeams": "你还没有加入任何团队",
+      "findTeams": "寻找团队",
+      "viewTeam": "查看团队",
+      "manageTeam": "管理团队",
+      "teamLeader": "团队领导",
+      "members": "{count} 成员",
+      "projects": "{count} 个项目",
+      "status": {
+        "active": "活跃"
+      }
+    },
+    "community": {
+      "myBookmarks": "我的收藏",
+      "myLikes": "我的点赞",
+      "myPosts": "我的帖子",
+      "myFollowing": "我的关注",
+      "viewBookmarks": "查看收藏",
+      "viewBookmarksDesc": "查看我收藏的帖子",
+      "viewLikes": "查看点赞",
+      "viewLikesDesc": "查看我点赞的帖子",
+      "managePosts": "管理我发布的帖子",
+      "viewMyPosts": "查看我的帖子",
+      "manageFollowing": "管理我关注的用户",
+      "viewFollowing": "查看关注"
+    },
+    "toasts": {
+      "authRequired": "认证失败",
+      "reloginRequired": "请重新登录后再试",
+      "avatarUploadSuccess": "头像上传成功",
+      "avatarUploadSuccessDesc": "新头像已设置，请点击保存确认更改",
+      "avatarUploadFailed": "头像上传失败",
+      "avatarUploadRetry": "请稍后重试",
+      "avatarUploadServerError": "服务器响应错误",
+      "avatarUploadNetworkError": "网络错误，请稍后重试",
+      "fileFormatError": "文件格式错误",
+      "fileFormatDesc": "请选择图片文件（JPG、PNG、GIF、WebP）",
+      "fileTooLarge": "文件过大",
+      "fileTooLargeDesc": "图片大小不能超过5MB",
+      "saveSuccess": "保存成功",
+      "saveSuccessDesc": "用户信息已更新",
+      "saveFailed": "保存失败",
+      "saveFailedRetry": "请稍后重试",
+      "saveNetworkError": "网络错误，请稍后重试"
+    },
+    "errors": {
+      "getUserStats": "获取用户统计数据失败",
+      "getRecommendations": "获取推荐黑客松失败",
+      "getUserHackathons": "获取用户黑客松失败",
+      "getUserProjects": "获取用户项目失败",
+      "getUserTeams": "获取用户团队失败",
+      "debugInfo": "调试信息:"
+    }
+  },
+  "errors": {
+    "notFound": "页面未找到",
+    "serverError": "服务器错误",
+    "networkError": "网络错误",
+    "unauthorized": "未授权",
+    "forbidden": "禁止访问",
+    "validation": "验证错误",
+    "required": "此字段为必填项",
+    "invalidEmail": "邮箱格式不正确",
+    "passwordTooShort": "密码太短",
+    "passwordMismatch": "密码不匹配"
+  },
+  "success": {
+    "created": "创建成功",
+    "updated": "更新成功",
+    "deleted": "删除成功",
+    "saved": "保存成功",
+    "submitted": "提交成功",
+    "sent": "发送成功"
+  },
+  "enums": {
+    "hackathonStatus": {
+      "upcoming": "即将开始",
+      "ongoing": "进行中",
+      "completed": "已结束",
+      "ended": "已结束"
+    },
+    "teamStatus": {
+      "recruiting": "招募中",
+      "full": "已满员",
+      "competing": "比赛中",
+      "completed": "已完成",
+      "disbanded": "已解散"
+    },
+    "projectStatus": {
+      "draft": "草稿",
+      "submitted": "已提交",
+      "reviewed": "已评审",
+      "winner": "获奖项目"
+    },
+    "applicationStatus": {
+      "pending": "待处理",
+      "approved": "已批准",
+      "rejected": "已拒绝",
+      "cancelled": "已取消"
+    },
+    "userRole": {
+      "member": "成员",
+      "admin": "管理员",
+      "leader": "队长"
+    },
+    "notificationType": {
+      "team_invite": "团队邀请",
+      "team_application_approved": "团队申请已批准",
+      "team_application_rejected": "团队申请已拒绝",
+      "team_member_joined": "团队成员加入",
+      "team_status_changed": "团队状态变更",
+      "hackathon_starting": "黑客松即将开始",
+      "hackathon_ending": "黑客松即将结束",
+      "hackathon_started": "黑客松已开始",
+      "hackathon_ended": "黑客松已结束",
+      "hackathon_registration_reminder": "报名提醒",
+      "hackathon_submission_reminder": "提交提醒",
+      "hackathon_results_announced": "结果公布",
+      "prize_awarded": "获奖通知",
+      "project_liked": "项目获赞",
+      "project_commented": "项目获评论",
+      "project_reviewed": "项目已评审",
+      "project_status_changed": "项目状态变更",
+      "community_post_replied": "帖子获回复",
+      "community_post_liked": "帖子获点赞",
+      "community_reply_liked": "回复获点赞",
+      "community_new_follower": "新粉丝"
+    }
+  },
+  "technologies": {
+    "React": "React",
+    "VueJS": "Vue.js",
+    "Angular": "Angular",
+    "NodeJS": "Node.js",
+    "Python": "Python",
+    "Java": "Java",
+    "Go": "Go",
+    "Rust": "Rust",
+    "TypeScript": "TypeScript",
+    "JavaScript": "JavaScript",
+    "HTMLCSS": "HTML/CSS",
+    "TailwindCSS": "Tailwind CSS",
+    "NextJS": "Next.js",
+    "Solidity": "Solidity",
+    "TensorFlow": "TensorFlow",
+    "Machine Learning": "机器学习",
+    "MachineLearning": "机器学习",
+    "Blockchain": "区块链",
+    "Web3": "Web3",
+    "Web3JS": "Web3.js",
+    "DeFi": "DeFi",
+    "NFT": "NFT",
+    "IPFS": "IPFS",
+    "FastAPI": "FastAPI"
+  },
+  "categories": {
+    "DeFi": "DeFi",
+    "NFT": "NFT",
+    "DAO": "DAO",
+    "GameFi": "GameFi",
+    "AI": "人工智能",
+    "blockchain": "区块链",
+    "machineLearning": "机器学习",
+    "dataScience": "数据科学",
+    "sustainableDevelopment": "可持续发展",
+    "cleanEnergy": "清洁能源",
+    "environmentalProtection": "环境保护",
+    "socialImpact": "社会影响"
+  },
+  "tags": {
+    "Web3": "Web3",
+    "blockchain": "区块链",
+    "smartContracts": "智能合约",
+    "decentralization": "去中心化",
+    "artificialIntelligence": "人工智能",
+    "machineLearning": "机器学习",
+    "dataPrivacy": "数据隐私",
+    "greenTechnology": "绿色技术",
+    "environmental": "环保",
+    "socialInnovation": "社会创新",
+    "sustainableDevelopment": "可持续发展",
+    "frontendDevelopment": "前端开发",
+    "yieldOptimization": "收益优化",
+    "riskManagement": "风险管理",
+    "recommendationSystem": "推荐系统"
+  },
+  "home": {
+    "stats": {
+      "title": "平台统计数据",
+      "subtitle": "来自黑客宇宙的实时指标",
+      "users": {
+        "label": "注册开发者",
+        "description": "来自全球的开发者社区"
+      },
+      "hackathons": {
+        "label": "举办黑客松",
+        "description": "成功举办的黑客松活动"
+      },
+      "projects": {
+        "label": "提交项目",
+        "description": "创新项目和解决方案"
+      },
+      "countries": {
+        "label": "覆盖国家",
+        "description": "全球范围的影响力"
+      },
+      "realTimeData": "实时数据",
+      "globalMetrics": "全球指标",
+      "growingCommunity": "不断增长的社区"
+    },
+    "featured": {
+      "title": "特色黑客松",
+      "subtitle": "加入这些令人兴奋的挑战，在元宇宙中展示你的技能。",
+      "daysLeft": "天剩余",
+      "prizePool": "奖金池",
+      "participants": "参与者",
+      "joinHackathon": "加入黑客松",
+      "viewDetails": "查看详情",
+      "viewAllHackathons": "查看所有黑客松"
+    },
+    "hero": {
+      "title": {
+        "part1": "构建未来",
+        "part2": " 去中心化",
+        "part3": "黑客松平台"
+      },
+      "description": "基于 IPFS 的开源黑客松平台，连接全球数百万开发者，发现创新项目，获得投资机会，构建 Web3 未来！",
+      "searchPlaceholder": "搜索黑客松...",
+      "searching": "搜索中...",
+      "startExploring": "开始探索",
+      "joinHackathon": "参与黑客松",
+      "organizeEvent": "组织活动",
+      "searchSuggestions": {
+        "history": {
+          "title": "搜索历史",
+          "clear": "清空",
+          "loadError": "解析搜索历史失败"
+        },
+        "popular": {
+          "title": "热门搜索",
+          "loadingStart": "开始加载热门搜索词...",
+          "loadSuccess": "热门搜索词加载成功",
+          "loadError": "加载热门搜索词失败",
+          "fallbackNote": "API响应无效，使用后备数据",
+          "fallbackTerms": ["Web3", "DeFi", "NFT", "区块链", "AI", "智能合约", "元宇宙", "GameFi", "DAO", "Layer2"]
+        },
+        "navigation": {
+          "searchRedirectError": "搜索跳转失败"
+        }
+      }
+    },
+    "stats": {
+      "title": "平台数据",
+      "subtitle": "HackX 正在成为全球最大的去中心化黑客松平台！",
+      "users": {
+        "label": "注册开发者",
+        "description": "来自全球的开发者社区"
+      },
+      "hackathons": {
+        "label": "举办黑客松",
+        "description": "成功举办的黑客松活动"
+      },
+      "projects": {
+        "label": "提交项目",
+        "description": "创新项目和解决方案"
+      },
+      "countries": {
+        "label": "覆盖国家",
+        "description": "全球范围的影响力"
+      }
+    },
+    "howItWorks": {
+      "title": "如何参与",
+      "subtitle": "四个简单步骤，开启你的黑客松之旅",
+      "steps": {
+        "discover": {
+          "title": "发现黑客松",
+          "description": "浏览和搜索适合你的黑客松活动，筛选技术栈和奖金"
+        },
+        "team": {
+          "title": "组建团队",
+          "description": "找到志同道合的队友，或者加入现有团队开始协作"
+        },
+        "develop": {
+          "title": "开发项目",
+          "description": "在规定时间内开发创新项目，所有文件存储在 IPFS 上"
+        },
+        "reward": {
+          "title": "获得奖励",
+          "description": "接受专业评委评审，获得奖金、投资机会和职业发展"
+        }
+      }
+    },
+    "community": {
+      "title": "加入社区",
+      "subtitle": "与全球开发者连接，分享经验，获得支持，共同构建 Web3 未来",
+      "github": {
+        "description": "开源代码和贡献",
+        "action": "查看代码"
+      },
+      "discord": {
+        "description": "实时交流和讨论",
+        "action": "加入服务器"
+      },
+      "twitter": {
+        "description": "最新动态和公告",
+        "action": "关注我们"
+      },
+      "forum": {
+        "title": "论坛",
+        "description": "深度讨论和问答",
+        "action": "访问论坛"
+      },
+      "cta": {
+        "title": "准备好开始了吗？",
+        "description": "立即加入 HackX，发现下一个改变世界的项目，或者创建你自己的黑客松活动！",
+        "joinButton": "连接钱包加入",
+        "createButton": "创建黑客松"
+      }
+    }
+  }
+}

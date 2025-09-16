@@ -1,131 +1,91 @@
 'use client'
 
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { apiService, type User } from '@/lib/api'
 import { useToast } from '@/hooks/use-toast'
-import { authStateManager, type AuthState } from '@/lib/auth-state-manager'
+import { useAuthStore, initializeAuth } from '@/lib/auth-state-manager'
 
-interface AuthContextType {
-  user: User | null
-  loading: boolean
-  signIn: (email: string, password: string) => Promise<{ success: boolean; error?: string }>
-  signUp: (email: string, password: string, username?: string, walletAddress?: string) => Promise<{ success: boolean; error?: string }>
-  signOut: () => void
-  connectWallet: (address: string) => Promise<boolean>
-  updateProfile: (data: Partial<User>) => Promise<{ success: boolean; error?: string }>
-  refreshUser: () => Promise<void>
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
-
+/**
+ * 初始化认证的Provider组件
+ * 只负责应用启动时的认证初始化，不再提供Context
+ */
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [authState, setAuthState] = useState<AuthState>({
-    user: null,
-    token: null,
-    isAuthenticated: false,
-    loading: true
-  })
-  const { toast } = useToast()
-
-  // 订阅认证状态管理器
   useEffect(() => {
-    const unsubscribe = authStateManager.subscribe((newState) => {
-      setAuthState(newState)
-    })
-    
-    // 初始化认证状态
-    authStateManager.initialize()
-    
-    return unsubscribe
+    initializeAuth()
   }, [])
 
-  // 登录
+  return <>{children}</>
+}
+
+/**
+ * 统一的认证Hook
+ * 直接使用Zustand store，并添加业务逻辑封装
+ */
+export function useAuth() {
+  const auth = useAuthStore()
+  const { toast } = useToast()
+
+  // 登录方法封装
   const signIn = async (email: string, password: string) => {
     try {
-      const response = await apiService.signIn(email, password)
-      
-      if (response.success && response.data) {
-        const { user: userData, token } = response.data
-        await authStateManager.authenticateUser(userData, token, 'email')
-        
-        toast({
-          title: "登录成功",
-          description: `欢迎回来，${userData.username || userData.email}！`,
-        })
-        
-        return { success: true }
-      } else {
-        return { success: false, error: response.error || '登录失败' }
-      }
-    } catch (error) {
-      console.error('登录失败:', error)
-      return { success: false, error: '登录失败，请稍后重试' }
+      await auth.login(email, password)
+      toast({
+        title: 'Login Successful',
+        description: `Welcome back, ${auth.user?.username || auth.user?.email}!`
+      })
+      return { success: true }
+    } catch (error: any) {
+      return { success: false, error: error?.message || 'Login failed' }
     }
   }
 
-  // 注册
+  // 注册方法封装
   const signUp = async (email: string, password: string, username?: string, walletAddress?: string) => {
     try {
-      const response = await apiService.signUp(email, password, username, walletAddress)
-      
-      if (response.success && response.data) {
-        const { user: userData, token } = response.data
-        await authStateManager.authenticateUser(userData, token, 'email')
-        
-        toast({
-          title: "注册成功",
-          description: `欢迎加入HackX，${userData.username || userData.email}！`,
-        })
-        
-        return { success: true }
-      } else {
-        return { success: false, error: response.error || '注册失败' }
-      }
-    } catch (error) {
-      console.error('注册失败:', error)
-      return { success: false, error: '注册失败，请稍后重试' }
+      await auth.register(email, password, username || '')
+      toast({
+        title: 'Registration Successful',
+        description: `Welcome to HackX, ${auth.user?.username || auth.user?.email}!`
+      })
+      return { success: true }
+    } catch (error: any) {
+      return { success: false, error: error?.message || 'Registration failed' }
     }
   }
 
-  // 登出
-  const signOut = () => {
-    authStateManager.logout()
+  // 登出方法封装
+  const signOut = async () => {
+    await auth.logout()
     toast({
-      title: "已退出登录",
-      description: "感谢使用HackX，期待您的再次访问！",
+      title: 'Logged Out',
+      description: 'See you next time!'
     })
   }
 
   // 更新用户信息
   const updateProfile = async (data: Partial<User>) => {
     try {
-      const response = await apiService.updateUser(data)
-      
-      if (response.success && response.data) {
-        authStateManager.updateUser(response.data.user)
+      const res = await apiService.updateUser(data)
+      if (res.success && res.data) {
+        auth.setUser(res.data.user)
         return { success: true }
-      } else {
-        return { success: false, error: response.error || '更新失败' }
       }
-    } catch (error) {
-      console.error('更新用户信息失败:', error)
-      return { success: false, error: '更新失败，请稍后重试' }
+      return { success: false, error: res.error || 'Update failed' }
+    } catch (e) {
+      return { success: false, error: 'Update failed, please try again later' }
     }
   }
 
-  // 连接钱包
+  // 连接钱包（仅更新用户钱包地址到后端）
   const connectWallet = async (address: string) => {
     try {
       const response = await apiService.updateUser({ walletAddress: address })
-
       if (response.success && response.data) {
-        authStateManager.updateUser(response.data.user)
+        auth.setUser(response.data.user)
         return true
-      } else {
-        return false
       }
+      return false
     } catch (error) {
-      console.error('连接钱包失败:', error)
       return false
     }
   }
@@ -134,37 +94,54 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const refreshUser = async () => {
     try {
       const response = await apiService.getCurrentUser()
-      
       if (response.success && response.data) {
-        authStateManager.updateUser(response.data.user)
+        auth.setUser(response.data.user)
       }
-    } catch (error) {
-      console.error('刷新用户信息失败:', error)
-    }
+    } catch {}
   }
 
-  const value: AuthContextType = {
-    user: authState.user, 
-    loading: authState.loading, 
-    signIn, 
-    signUp, 
-    signOut, 
+  return {
+    // 基础状态
+    user: auth.user as any,
+    loading: auth.isLoading || auth.isInitializing,
+    isAuthenticated: auth.isAuthenticated,
+    authType: auth.authType,
+    walletAddress: auth.walletAddress,
+    chainId: auth.chainId,
+    networkName: auth.networkName,
+    isWalletConnected: auth.isWalletConnected,
+    error: auth.error,
+    
+    // 方法
+    signIn,
+    signUp,
+    signOut,
     connectWallet,
     updateProfile,
     refreshUser,
+    
+    // 直接暴露store方法供高级使用
+    loginWithWallet: auth.loginWithWallet,
+    connectWalletDirect: auth.connectWallet,
+    disconnectWallet: auth.disconnectWallet,
+    switchNetwork: auth.switchNetwork,
+    refreshAuth: auth.refreshAuth,
+    updatePreferences: auth.updatePreferences,
+    
+    // 便捷方法
+    isAdmin: auth.user?.role === 'admin',
+    isModerator: auth.user?.role === 'moderator' || auth.user?.role === 'admin',
+    isJudge: auth.user?.role === 'judge' || auth.user?.role === 'admin',
+    canManageContent: auth.user?.role === 'moderator' || auth.user?.role === 'admin',
+    canJudge: auth.user?.role === 'judge' || auth.user?.role === 'admin',
+    
+    // 网络相关
+    isSupportedNetwork: auth.chainId ? [1, 137, 80001, 11155111].includes(auth.chainId) : false,
+    isTestnet: auth.chainId ? [80001, 11155111, 97].includes(auth.chainId) : false,
+    
+    // 认证状态
+    isFullyAuthenticated: auth.isAuthenticated && auth.user && auth.token,
+    needsWalletConnection: auth.authType === 'web3' && !auth.isWalletConnected,
+    needsTraditionalAuth: auth.authType === 'traditional' && !auth.isAuthenticated
   }
-
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  )
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext)
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider')
-  }
-  return context
 }

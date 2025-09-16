@@ -4,7 +4,7 @@
   "description": "HackX 黑客松平台后端 API",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3002",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -25,6 +25,7 @@
     "form-data": "^4.0.4",
     "helmet": "^7.1.0",
     "ipfs-http-client": "^60.0.1",
+    "jose": "^6.1.0",
     "jsonwebtoken": "^9.0.2",
     "multer": "^1.4.5-lts.1",
     "next": "^14.0.4",

@@ -1,6 +1,7 @@
 'use client'
 
 import { ReactNode } from 'react'
+import { useTranslations } from 'next-intl'
 import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -19,6 +20,8 @@ export function AuthGuard({
   redirectTo = '/auth/signin'
 }: AuthGuardProps) {
   const { user, loading } = useAuth()
+  const t = useTranslations('auth')
+  const tCommon = useTranslations('common')
 
   // 如果正在加载，显示加载状态
   if (loading) {
@@ -26,7 +29,7 @@ export function AuthGuard({
       <div className="container py-8">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">加载中...</p>
+          <p className="text-muted-foreground">{tCommon('loading')}</p>
         </div>
       </div>
     )
@@ -48,23 +51,23 @@ export function AuthGuard({
                   <Lock className="h-6 w-6 text-primary" />
                 </div>
               </div>
-              <CardTitle>需要登录</CardTitle>
+              <CardTitle>{t('wallet.connectRequired')}</CardTitle>
               <CardDescription>
-                此页面需要登录后才能访问
+                {t('wallet.pageAccessRequired')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <Button asChild className="w-full">
                 <Link href={redirectTo}>
                   <LogIn className="h-4 w-4 mr-2" />
-                  立即登录
+                  {t('wallet.connect')}
                 </Link>
               </Button>
               <div className="text-center">
                 <p className="text-sm text-muted-foreground">
-                  第一次使用？{' '}
+                  {t('wallet.firstTime')}{' '}
                   <span className="text-primary">
-                    连接钱包即可自动创建账户
+                    {t('wallet.autoCreateAccount')}
                   </span>
                 </p>
               </div>

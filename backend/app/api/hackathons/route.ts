@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
+import { getLocaleFromRequest, createTFunction } from '@/lib/i18n'
 
 // 创建黑客松验证模式
 const createHackathonSchema = z.object({
@@ -9,6 +10,7 @@ const createHackathonSchema = z.object({
   description: z.string().min(10, '描述至少10个字符'),
   startDate: z.string().datetime('开始日期格式不正确'),
   endDate: z.string().datetime('结束日期格式不正确'),
+  registrationStartDate: z.string().datetime('报名开始日期格式不正确').optional(),
   registrationDeadline: z.string().datetime('注册截止日期格式不正确'),
   maxParticipants: z.number().min(1, '最大参与人数至少1人').optional(),
   prizePool: z.number().min(0, '奖金池不能为负数').optional(),
@@ -21,8 +23,10 @@ const createHackathonSchema = z.object({
   // 新增字段用于IPFS元数据
   prizes: z.array(z.object({
     rank: z.number(),
+    name: z.string().optional(), // ⭐ 添加奖项名称
     amount: z.number(),
-    description: z.string()
+    description: z.string(),
+    winnerCount: z.number().optional().default(1) // ⭐ 添加获奖人数
   })).optional(),
   tracks: z.array(z.object({
     name: z.string(),
@@ -37,16 +41,54 @@ const createHackathonSchema = z.object({
   })).optional(),
   sponsors: z.array(z.object({
     name: z.string(),
-    logo: z.string().optional(),
-    website: z.string().optional(),
-    contribution: z.string().optional()
+    logoUrl: z.string().optional(), // ⭐ 更新字段名为logoUrl
+    websiteUrl: z.string().optional(), // ⭐ 更新字段名为websiteUrl
+    tier: z.string().optional() // ⭐ 添加赞助等级
   })).optional(),
   judgingCriteria: z.array(z.object({
     category: z.string(),
     weight: z.number(),
     description: z.string()
   })).optional(),
+  // ⭐ 新增字段
+  judges: z.array(z.object({
+    name: z.string(),
+    title: z.string(),
+    bio: z.string(),
+    avatarUrl: z.string().optional()
+  })).optional(),
+  timeline: z.array(z.object({
+    date: z.string(),
+    title: z.string(),
+    description: z.string(),
+    completed: z.boolean().optional()
+  })).optional(),
+  socialLinks: z.object({
+    website: z.string().url().optional(),
+    twitter: z.string().url().optional(),
+    discord: z.string().url().optional(),
+    telegram: z.string().url().optional(),
+    github: z.string().url().optional(),
+    linkedin: z.string().url().optional()
+  }).optional(),
+  coverImage: z.string().optional()
 })
+
+/**
+ * 转换数据库状态为前端期望的状态格式
+ */
+function convertStatusToFrontend(dbStatus: string, startDate: Date, endDate: Date): string {
+  const now = new Date()
+  
+  // 优先根据时间判断实际状态
+  if (now < startDate) {
+    return 'upcoming'  // 即将开始
+  } else if (now >= startDate && now <= endDate) {
+    return 'ongoing'   // 进行中
+  } else {
+    return 'ended'     // 已结束
+  }
+}
 
 // 查询参数验证模式
 const querySchema = z.object({
@@ -54,7 +96,24 @@ const querySchema = z.object({
   limit: z.string().transform(Number).pipe(z.number().min(1).max(100)).default('12'),
   search: z.string().optional(),
   category: z.string().optional(),
-  status: z.enum(['upcoming', 'ongoing', 'completed']).optional(),
+  // 支持单个状态或逗号分隔的多个状态
+  status: z.string().optional().transform((val) => {
+    if (!val) return undefined
+    // 分割逗号分隔的状态值并验证每个值
+    const statuses = val.split(',').map(s => s.trim())
+    const validStatuses = ['upcoming', 'ongoing', 'completed']
+    const invalidStatuses = statuses.filter(s => !validStatuses.includes(s))
+    if (invalidStatuses.length > 0) {
+      throw new z.ZodError([{
+        code: z.ZodIssueCode.invalid_enum_value,
+        received: invalidStatuses.join(','),
+        options: validStatuses,
+        path: ['status'],
+        message: `Invalid status values: ${invalidStatuses.join(', ')}. Expected: ${validStatuses.join(' | ')}`
+      }])
+    }
+    return statuses as ('upcoming' | 'ongoing' | 'completed')[]
+  }),
   featured: z.string().transform(val => val === 'true').optional(),
   sortBy: z.enum(['createdAt', 'startDate', 'prizePool', 'participants']).default('createdAt'),
   sortOrder: z.enum(['asc', 'desc']).default('desc'),
@@ -62,16 +121,28 @@ const querySchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
     const { searchParams } = new URL(request.url)
     const query = Object.fromEntries(searchParams.entries())
     
     // 验证查询参数
     const validatedQuery = querySchema.parse(query)
     
+    // 检查是否有认证用户（可选）
+    let currentUserId: string | null = null
+    try {
+      const user = await auth(request)
+      currentUserId = user?.id || null
+    } catch (error) {
+      // 忽略认证错误，允许未登录用户查看公开黑客松
+    }
+    
     // 构建查询条件
     const where: any = {
       isPublic: true,
-      status: 'active', // 只显示已审核通过的黑客松
+      status: 'ACTIVE', // 只显示已审核通过的黑客松
     }
     
     // 搜索条件
@@ -89,26 +160,52 @@ export async function GET(request: NextRequest) {
       where.categories = { has: validatedQuery.category }
     }
     
-    // 状态筛选
-    if (validatedQuery.status) {
+    // 状态筛选 - 支持多个状态
+    if (validatedQuery.status && validatedQuery.status.length > 0) {
       const now = new Date()
-      switch (validatedQuery.status) {
-        case 'upcoming':
-          where.startDate = { gt: now }
-          break
-        case 'ongoing':
-          where.startDate = { lte: now }
-          where.endDate = { gt: now }
-          break
-        case 'completed':
-          where.endDate = { lte: now }
-          break
+      const statusConditions: any[] = []
+      
+      for (const status of validatedQuery.status) {
+        switch (status) {
+          case 'upcoming':
+            statusConditions.push({ startDate: { gt: now } })
+            break
+          case 'ongoing':
+            statusConditions.push({
+              AND: [
+                { startDate: { lte: now } },
+                { endDate: { gt: now } }
+              ]
+            })
+            break
+          case 'completed':
+            statusConditions.push({ endDate: { lte: now } })
+            break
+        }
+      }
+      
+      // 如果有多个状态条件，使用OR连接
+      if (statusConditions.length > 0) {
+        if (where.OR) {
+          // 如果已经有OR条件（如搜索），需要合并
+          where.AND = [
+            { OR: where.OR },
+            { OR: statusConditions }
+          ]
+          delete where.OR
+        } else {
+          where.OR = statusConditions
+        }
       }
     }
     
     // 精选筛选
     if (validatedQuery.featured !== undefined) {
-      where.featured = validatedQuery.featured
+      if (validatedQuery.featured) {
+        where.featured = true
+      } else {
+        where.featured = false
+      }
     }
     
     // 排序
@@ -131,6 +228,7 @@ export async function GET(request: NextRequest) {
           description: true,
           startDate: true,
           endDate: true,
+          registrationStartDate: true,
           registrationDeadline: true,
           maxParticipants: true,
           prizePool: true,
@@ -140,6 +238,7 @@ export async function GET(request: NextRequest) {
           rules: true,
           isPublic: true,
           featured: true,
+          status: true,
           ipfsHash: true,
           metadata: true,
           createdAt: true,
@@ -161,10 +260,83 @@ export async function GET(request: NextRequest) {
       prisma.hackathon.count({ where })
     ])
     
+    // 转换状态格式并添加用户参与状态
+    let hackathonsWithStatus
+    
+    if (currentUserId) {
+      // 如果有登录用户，批量查询参与状态以提高性能
+      const hackathonIds = hackathons.map(h => h.id)
+      
+      // 批量查询用户参与状态
+      const [participations, userProjects] = await Promise.all([
+        prisma.participation.findMany({
+          where: {
+            hackathonId: { in: hackathonIds },
+            userId: currentUserId,
+          },
+          select: {
+            hackathonId: true,
+            status: true,
+            joinedAt: true,
+          }
+        }),
+        prisma.project.groupBy({
+          by: ['hackathonId'],
+          where: {
+            hackathonId: { in: hackathonIds },
+            creatorId: currentUserId,
+          },
+          _count: {
+            id: true,
+          }
+        })
+      ])
+      
+      // 创建映射以便快速查找
+      const participationMap = new Map(
+        participations.map(p => [p.hackathonId, p])
+      )
+      const projectCountMap = new Map(
+        userProjects.map(p => [p.hackathonId, p._count.id])
+      )
+      
+      hackathonsWithStatus = hackathons.map((hackathon) => {
+        let userParticipationStatus = null
+        
+        const participation = participationMap.get(hackathon.id)
+        if (participation) {
+          const userProjectCount = projectCountMap.get(hackathon.id) || 0
+          const hasSubmittedProject = userProjectCount > 0
+          const isCompleted = new Date() > hackathon.endDate && hasSubmittedProject
+          
+          userParticipationStatus = {
+            isParticipating: true,
+            status: isCompleted ? 'COMPLETED' : (hasSubmittedProject ? 'SUBMITTED' : 'REGISTERED'),
+            joinedAt: participation.joinedAt,
+            hasSubmittedProject,
+            projectCount: userProjectCount,
+          }
+        }
+        
+        return {
+          ...hackathon,
+          status: convertStatusToFrontend(hackathon.status, hackathon.startDate, hackathon.endDate),
+          userParticipation: userParticipationStatus,
+        }
+      })
+    } else {
+      // 未登录用户，不查询参与状态
+      hackathonsWithStatus = hackathons.map((hackathon) => ({
+        ...hackathon,
+        status: convertStatusToFrontend(hackathon.status, hackathon.startDate, hackathon.endDate),
+        userParticipation: null,
+      }))
+    }
+    
     return NextResponse.json({
       success: true,
       data: {
-        hackathons,
+        hackathons: hackathonsWithStatus,
         pagination: {
           page: validatedQuery.page,
           limit: validatedQuery.limit,
@@ -177,18 +349,42 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('获取黑客松列表错误:', error)
     
-        if (error instanceof z.ZodError) {      return NextResponse.json(        { success: false, error: '请求参数验证失败', details: error.errors },        { status: 400 }      )    }        return NextResponse.json(      { success: false, error: '获取黑客松列表失败' },      { status: 500 }    )
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { success: false, error: t('errors.validationError'), details: error.errors },
+        { status: 400 }
+      )
+    }
+    
+    return NextResponse.json(
+      { success: false, error: t('hackathons.getListError', { fallback: 'Failed to get hackathon list' }) },
+      { status: 500 }
+    )
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    // 验证用户身份
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
+    // 从中间件已验证的请求中获取用户信息
+    // 如果请求能到达这里，说明token已经通过中间件验证
     const user = await auth(request)
+    
+    // 这里不应该出现user为null的情况，因为中间件已经验证过了
     if (!user) {
+      console.error('⚠️ 中间件验证通过但无法获取用户信息 - 可能的数据库问题')
       return NextResponse.json(
-        { success: false, error: '未认证' },
-        { status: 401 }
+        { 
+          success: false, 
+          error: t('auth.userNotFound'),
+          code: 'USER_NOT_FOUND'
+        },
+        { status: 500 } // 改为500，因为这是服务器内部错误
       )
     }
     
@@ -200,18 +396,38 @@ export async function POST(request: NextRequest) {
     // 验证日期逻辑
     const startDate = new Date(validatedData.startDate)
     const endDate = new Date(validatedData.endDate)
+    const registrationStartDate = validatedData.registrationStartDate ? new Date(validatedData.registrationStartDate) : null
     const registrationDeadline = new Date(validatedData.registrationDeadline)
     
     if (startDate >= endDate) {
       return NextResponse.json(
-        { error: '结束日期必须晚于开始日期' },
+        { 
+          success: false,
+          error: t('hackathons.invalidDateRange'),
+          code: 'INVALID_DATE_RANGE'
+        },
         { status: 400 }
       )
     }
     
     if (registrationDeadline >= startDate) {
       return NextResponse.json(
-        { error: '注册截止日期必须早于开始日期' },
+        { 
+          success: false,
+          error: t('hackathons.invalidRegistrationDeadline'),
+          code: 'INVALID_REGISTRATION_DEADLINE'
+        },
+        { status: 400 }
+      )
+    }
+    
+    if (registrationStartDate && registrationStartDate >= registrationDeadline) {
+      return NextResponse.json(
+        { 
+          success: false,
+          error: t('hackathons.invalidRegistrationStart', { fallback: 'Registration start time must be before registration deadline' }),
+          code: 'INVALID_REGISTRATION_START_DATE'
+        },
         { status: 400 }
       )
     }
@@ -224,19 +440,20 @@ export async function POST(request: NextRequest) {
 
     if (!organizer) {
       return NextResponse.json(
-        { error: '组织者信息不存在' },
+        { 
+          success: false,
+          error: t('hackathons.organizerNotFound', { fallback: 'Organizer information not found' }),
+          code: 'ORGANIZER_NOT_FOUND'
+        },
         { status: 404 }
       )
     }
 
-    // ⭐ 使用统一的IPFSService上传黑客松数据到IPFS（必须成功）
-    let ipfsCID
+    // ⭐ 第1步: 先准备数据但不上传
+    let hackathonData
     try {
-      // 导入IPFS服务和类型定义
-      const { IPFSService, IPFSHackathonData } = await import('@/lib/ipfs')
-      
       // 构建标准化的黑客松数据结构
-      const hackathonData: IPFSHackathonData = {
+      hackathonData = {
         version: '1.0.0',
         timestamp: new Date().toISOString(),
         data: {
@@ -251,10 +468,46 @@ export async function POST(request: NextRequest) {
         },
         metadata: {
           organizer: organizer.id,
-          status: 'active',
+          status: 'active' as const,
           previousVersion: undefined
         }
       }
+      console.log('📋 黑客松数据准备完成，准备验证智能合约')
+    } catch (dataError) {
+      console.error('数据准备失败:', dataError)
+      return NextResponse.json({
+        success: false,
+        error: '数据准备失败',
+        details: dataError instanceof Error ? dataError.message : '未知错误'
+      }, { status: 500 })
+    }
+
+    // ⭐ 第2步: 先验证智能合约服务可用性
+    let smartContractService
+    try {
+      // 动态导入智能合约服务
+      const { smartContractService: scs } = await import('@/lib/smart-contracts')
+      smartContractService = scs
+      
+      // 初始化智能合约服务
+      await smartContractService.initialize()
+      
+      console.log('✅ 智能合约服务初始化成功')
+    } catch (contractError) {
+      console.error('智能合约服务初始化失败:', contractError)
+      return NextResponse.json({
+        success: false,
+        error: '智能合约服务不可用，黑客松创建失败',
+        code: 'CONTRACT_ERROR',
+        details: contractError instanceof Error ? contractError.message : '未知错误'
+      }, { status: 500 })
+    }
+
+    // ⭐ 第3步: 智能合约验证通过后，上传数据到IPFS
+    let ipfsCID
+    try {
+      // 导入IPFS服务
+      const { IPFSService } = await import('@/lib/ipfs')
       
       // 使用专用的黑客松数据上传方法
       ipfsCID = await IPFSService.uploadHackathonData(hackathonData)
@@ -268,54 +521,20 @@ export async function POST(request: NextRequest) {
       }, { status: 500 })
     }
     
-    // ⭐ 调用智能合约创建黑客松
+    // ⭐ 第4步: 调用智能合约创建黑客松
     let contractResult
     try {
-      // 动态导入智能合约服务
-      const { smartContractService } = await import('@/lib/smart-contracts')
-      
-      // 初始化智能合约服务
-      await smartContractService.initialize()
-      
       // 调用智能合约创建黑客松
-      const tx = await smartContractService.createHackathon(ipfsCID)
-      const receipt = await tx.wait()
+      contractResult = await smartContractService.createHackathon(ipfsCID)
       
-      // 获取黑客松ID（从事件中解析）
-      const hackathonCreatedEvent = receipt.logs?.find((log: any) => {
-        try {
-          const parsedLog = smartContractService.contracts.hackxCore.interface.parseLog(log)
-          return parsedLog?.name === 'HackathonCreated'
-        } catch {
-          return false
-        }
-      })
-      
-      let contractHackathonId = 1 // 默认值
-      if (hackathonCreatedEvent) {
-        try {
-          const parsedLog = smartContractService.contracts.hackxCore.interface.parseLog(hackathonCreatedEvent)
-          if (parsedLog && parsedLog.args) {
-            contractHackathonId = Number(parsedLog.args.hackathonId)
-          }
-        } catch (parseError) {
-          console.warn('解析事件失败，使用默认ID:', parseError)
-        }
-      }
-      
-      contractResult = {
-        hackathonId: contractHackathonId,
-        txHash: tx.hash,
-        blockNumber: Number(receipt.blockNumber),
-        gasUsed: Number(receipt.gasUsed)
-      }
-      
-      console.log('⛓️ 智能合约创建成功:', contractResult)
+      console.log('✅ 智能合约创建黑客松成功:', contractResult)
       
     } catch (contractError) {
       console.error('智能合约调用失败:', contractError)
       return NextResponse.json({
+        success: false,
         error: '智能合约调用失败，黑客松创建失败',
+        code: 'CONTRACT_ERROR',
         details: contractError instanceof Error ? contractError.message : '未知错误'
       }, { status: 500 })
     }
@@ -327,6 +546,7 @@ export async function POST(request: NextRequest) {
         description: validatedData.description,
         startDate,
         endDate,
+        registrationStartDate,
         registrationDeadline,
         maxParticipants: validatedData.maxParticipants,
         prizePool: validatedData.prizePool,
@@ -336,6 +556,7 @@ export async function POST(request: NextRequest) {
         rules: validatedData.rules,
         isPublic: validatedData.isPublic,
         featured: validatedData.featured,
+        status: 'ACTIVE', // 新创建的黑客松设为活跃状态
         organizerId: user.id,
         
         // ⭐ 新增区块链相关字段
@@ -343,7 +564,7 @@ export async function POST(request: NextRequest) {
         ipfsHash: ipfsCID,                       // IPFS哈希
         txHash: contractResult.txHash,           // 交易哈希
         blockNumber: contractResult.blockNumber, // 区块号
-        gasUsed: contractResult.gasUsed,         // Gas消耗
+        gasUsed: contractResult.gasUsed ? Number(contractResult.gasUsed) : null, // Gas消耗 (转换BigInt为number)
         syncStatus: 'SYNCED',                    // 同步状态
         
         metadata: {
@@ -351,7 +572,11 @@ export async function POST(request: NextRequest) {
           tracks: validatedData.tracks || [],
           schedule: validatedData.schedule || [],
           sponsors: validatedData.sponsors || [],
-          judgingCriteria: validatedData.judgingCriteria || []
+          judges: validatedData.judges || [], // ⭐ 添加评委团队
+          judgingCriteria: validatedData.judgingCriteria || [],
+          timeline: validatedData.timeline || [], // ⭐ 添加时间线
+          socialLinks: validatedData.socialLinks || {}, // ⭐ 添加社交链接支持
+          coverImage: validatedData.coverImage || null // ⭐ 添加封面图片支持
         }
       },
       select: {
@@ -360,6 +585,7 @@ export async function POST(request: NextRequest) {
         description: true,
         startDate: true,
         endDate: true,
+        registrationStartDate: true,
         registrationDeadline: true,
         maxParticipants: true,
         prizePool: true,
@@ -381,10 +607,32 @@ export async function POST(request: NextRequest) {
         }
       }
     })
+
+    // 🚀 打印创建黑客松的完整信息
+    console.log('🚀 黑客松创建成功 - 详细信息:', {
+      hackathonId: hackathon.id,
+      title: hackathon.title,
+      coverImageInfo: {
+        hasCoverImage: !!validatedData.coverImage,
+        coverImageUrl: validatedData.coverImage,
+        storedInMetadata: !!(hackathon.metadata as any)?.coverImage
+      },
+      smartContractInfo: {
+        contractId: contractResult.hackathonId,
+        txHash: contractResult.txHash,
+        blockNumber: contractResult.blockNumber,
+        gasUsed: contractResult.gasUsed
+      },
+      ipfsInfo: {
+        ipfsHash: ipfsCID,
+        ipfsUrl: ipfsCID ? `${process.env.IPFS_GATEWAY}/ipfs/${ipfsCID}` : null
+      },
+      metadata: hackathon.metadata
+    })
     
     return NextResponse.json({
       success: true,
-      message: '黑客松创建成功',
+      message: t('hackathons.createSuccess'),
       data: {
         hackathon: {
           ...hackathon,
@@ -402,17 +650,20 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('创建黑客松错误:', error)
     
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
     if (error instanceof z.ZodError) {
       return NextResponse.json({
         success: false,
-        error: '请求数据验证失败',
+        error: t('errors.validationError'),
         details: error.errors
       }, { status: 400 })
     }
     
     return NextResponse.json({
       success: false,
-      error: '创建黑客松失败'
+      error: t('hackathons.createError')
     }, { status: 500 })
   }
 } 

@@ -3,6 +3,9 @@ import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { AuthService } from '@/lib/auth'
 
+// 强制使用Node.js运行时，避免Edge Runtime的crypto模块限制
+export const runtime = 'nodejs'
+
 // 获取帖子列表
 export async function GET(request: NextRequest) {
   try {
@@ -67,28 +70,154 @@ export async function GET(request: NextRequest) {
       take: limit
     })
 
+    // 若带有用户令牌，查询该用户对本页帖子点赞/收藏状态
+    let likedPostIds = new Set<string>()
+    let bookmarkedPostIds = new Set<string>()
+
+    const authHeader = request.headers.get('authorization')
+    console.log('🔍 [社区列表] 检查认证header:', authHeader ? `Bearer ${authHeader.substring(7, 27)}...` : 'null')
+    
+    if (authHeader?.startsWith('Bearer ')) {
+      const token = authHeader.substring(7)
+      const decoded = AuthService.verifyToken(token)
+      console.log('🔍 [社区列表] Token解码结果:', decoded ? `用户ID: ${decoded.userId}` : '解码失败')
+      
+      if (decoded) {
+        const postIds = posts.map(p => p.id)
+        console.log('🔍 [社区列表] 查询用户状态, 帖子数:', postIds.length)
+        
+        if (postIds.length > 0) {
+          const [likes, bookmarks] = await Promise.all([
+            prisma.postLike.findMany({
+              where: { userId: decoded.userId, postId: { in: postIds } },
+              select: { postId: true }
+            }),
+            prisma.postBookmark.findMany({
+              where: { userId: decoded.userId, postId: { in: postIds } },
+              select: { postId: true }
+            })
+          ])
+          likedPostIds = new Set(likes.map(l => l.postId))
+          bookmarkedPostIds = new Set(bookmarks.map(b => b.postId))
+          console.log('🔍 [社区列表] 用户状态统计:', {
+            点赞帖子数: likedPostIds.size,
+            收藏帖子数: bookmarkedPostIds.size,
+            点赞帖子IDs: Array.from(likedPostIds),
+            收藏帖子IDs: Array.from(bookmarkedPostIds)
+          })
+        }
+      }
+    }
+
     // 获取总数
     const total = await prisma.communityPost.count({ where })
 
     // 获取社区统计
-    const stats = await prisma.communityPost.aggregate({
-      where: { isDeleted: false },
-      _count: {
-        id: true
-      }
-    })
-
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     
-    const todayPosts = await prisma.communityPost.count({
-      where: {
-        isDeleted: false,
-        createdAt: {
-          gte: today
+    // 计算本周开始时间（周一）
+    const weekStart = new Date(today)
+    const dayOfWeek = weekStart.getDay()
+    const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1
+    weekStart.setDate(weekStart.getDate() - daysToMonday)
+    weekStart.setHours(0, 0, 0, 0)
+    
+    const [
+      totalPosts,
+      activeUsers,
+      weeklyPosts,
+      totalLikes,
+      todayPosts,
+      todayReplies,
+      topContributors
+    ] = await Promise.all([
+      // 总帖子数
+      prisma.communityPost.count({
+        where: { isDeleted: false }
+      }),
+      // 活跃用户数（最近30天有发帖或回复的用户）
+      prisma.user.count({
+        where: {
+          status: 'ACTIVE',
+          OR: [
+            {
+              communityPosts: {
+                some: {
+                  createdAt: {
+                    gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+                  },
+                  isDeleted: false
+                }
+              }
+            },
+            {
+              communityReplies: {
+                some: {
+                  createdAt: {
+                    gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+                  },
+                  isDeleted: false
+                }
+              }
+            }
+          ]
         }
-      }
-    })
+      }),
+      // 本周新帖数
+      prisma.communityPost.count({
+        where: {
+          isDeleted: false,
+          createdAt: {
+            gte: weekStart
+          }
+        }
+      }),
+      // 总点赞数
+      prisma.postLike.count(),
+      // 今日新帖数
+      prisma.communityPost.count({
+        where: {
+          isDeleted: false,
+          createdAt: {
+            gte: today
+          }
+        }
+      }),
+      // 今日新回复数
+      prisma.communityReply.count({
+        where: {
+          isDeleted: false,
+          createdAt: {
+            gte: today
+          }
+        }
+      }),
+      // 热门贡献者（按发帖数 + 回复数排序）
+      prisma.user.findMany({
+        where: { status: 'ACTIVE' },
+        select: {
+          id: true,
+          username: true,
+          avatarUrl: true,
+          reputationScore: true,
+          _count: {
+            select: {
+              communityPosts: {
+                where: { isDeleted: false }
+              },
+              communityReplies: {
+                where: { isDeleted: false }
+              }
+            }
+          }
+        },
+        orderBy: [
+          { reputationScore: 'desc' }
+        ],
+        take: 10
+      })
+    ])
 
     return NextResponse.json({
       success: true,
@@ -114,6 +243,8 @@ export async function GET(request: NextRequest) {
           replies: post.replies,
           isPinned: post.isPinned,
           isLocked: post.isLocked,
+          isLiked: likedPostIds.has(post.id),
+          isBookmarked: bookmarkedPostIds.has(post.id),
           lastReplyAt: post.lastReplyAt?.toISOString()
         })),
         pagination: {
@@ -123,8 +254,21 @@ export async function GET(request: NextRequest) {
           totalPages: Math.ceil(total / limit)
         },
         stats: {
-          totalPosts: stats._count.id,
-          todayPosts
+          totalPosts,
+          activeUsers,
+          weeklyPosts,
+          totalLikes,
+          todayPosts,
+          todayReplies,
+          topContributors: topContributors.map(user => ({
+            id: user.id,
+            name: user.username,
+            username: user.username,
+            avatar: user.avatarUrl,
+            reputation: user.reputationScore,
+            postsCount: user._count.communityPosts,
+            repliesCount: user._count.communityReplies
+          }))
         }
       }
     })

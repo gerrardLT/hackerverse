@@ -1,145 +1,118 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { IPFSService } from '@/lib/ipfs'
 
 /**
- * 测试Pinata IPFS配置和连接
- * GET /api/ipfs/test
+ * IPFS服务测试接口
  */
 export async function GET(request: NextRequest) {
   try {
-    console.log('🧪 开始测试Pinata IPFS配置...')
+    console.log('🧪 开始测试IPFS服务...')
     
-    // 1. 测试IPFS服务状态
-    const statusCheck = await IPFSService.checkStatus()
-    if (!statusCheck) {
+    // 检查环境变量
+    const envCheck = {
+      PINATA_JWT: !!process.env.PINATA_JWT,
+      PINATA_API_KEY: !!process.env.PINATA_API_KEY,
+      PINATA_API_SECRET: !!process.env.PINATA_API_SECRET,
+      PINATA_GATEWAY: !!process.env.PINATA_GATEWAY
+    }
+    
+    console.log('🔍 环境变量检查:', envCheck)
+    
+    // 动态导入IPFS服务
+    const { IPFSService } = await import('@/lib/ipfs')
+    
+    // 验证环境变量
+    const validation = IPFSService.validateEnvironment()
+    console.log('✅ 环境变量验证结果:', validation)
+    
+    if (!validation.isValid) {
       return NextResponse.json({
         success: false,
-        error: 'IPFS服务不可用',
-        details: '无法初始化Pinata客户端'
+        error: 'IPFS环境配置不完整',
+        details: {
+          missingVars: validation.missingVars,
+          warnings: validation.warnings
+        }
       }, { status: 500 })
     }
-
-    // 2. 测试JSON上传
-    const testData = {
-      message: 'Hello from HackX!',
-      timestamp: new Date().toISOString(),
-      version: '1.0.0'
-    }
-
-    console.log('🧪 测试JSON上传...')
-    const jsonCID = await IPFSService.uploadJSON(testData, {
-      name: 'test-data.json',
-      description: 'Test data for Pinata configuration',
-      tags: ['test', 'configuration'],
-      version: '1.0.0',
-      author: 'system'
-    })
-
-    // 3. 测试数据获取
-    console.log('🧪 测试数据获取...')
-    const retrievedData = await IPFSService.getFromIPFS(jsonCID)
-
-    // 4. 验证数据完整性
-    const isValid = retrievedData && 
-                   retrievedData.message === testData.message &&
-                   retrievedData.timestamp === testData.timestamp
-
-    const result = {
-      success: true,
-      message: 'Pinata IPFS配置测试完成',
-      results: {
-        statusCheck: {
-          passed: statusCheck,
-          message: statusCheck ? '✅ 服务可用' : '❌ 服务不可用'
-        },
-        upload: {
-          passed: !!jsonCID,
-          cid: jsonCID,
-          message: jsonCID ? '✅ 上传成功' : '❌ 上传失败'
-        },
-        retrieval: {
-          passed: !!retrievedData,
-          message: retrievedData ? '✅ 获取成功' : '❌ 获取失败'
-        },
-        dataIntegrity: {
-          passed: isValid,
-          message: isValid ? '✅ 数据完整' : '❌ 数据不匹配'
-        }
-      },
-      testData: {
-        uploaded: testData,
-        retrieved: retrievedData,
-        cid: jsonCID
-      },
-      environment: {
-        hasJWT: !!process.env.PINATA_JWT,
-        hasAPIKey: !!process.env.PINATA_API_KEY,
-        hasGateway: !!process.env.PINATA_GATEWAY,
-        gateway: process.env.PINATA_GATEWAY
-      }
-    }
-
-    console.log('✅ Pinata配置测试完成:', result.results)
     
-    return NextResponse.json(result, { status: 200 })
-
-  } catch (error) {
-    console.error('❌ Pinata配置测试失败:', error)
+    // 检查服务状态
+    const isServiceReady = await IPFSService.checkStatus()
+    console.log('🔧 IPFS服务状态:', isServiceReady)
+    
+    if (!isServiceReady) {
+      return NextResponse.json({
+        success: false,
+        error: 'IPFS服务初始化失败',
+        details: 'Pinata服务不可用'
+      }, { status: 503 })
+    }
+    
+    // 获取网关健康报告
+    const healthReport = await IPFSService.getGatewayHealthReport()
+    console.log('📊 网关健康报告:', healthReport)
     
     return NextResponse.json({
-      success: false,
-      error: '配置测试失败',
-      details: error instanceof Error ? error.message : String(error),
-      environment: {
-        hasJWT: !!process.env.PINATA_JWT,
-        hasAPIKey: !!process.env.PINATA_API_KEY,
-        hasGateway: !!process.env.PINATA_GATEWAY,
-        gateway: process.env.PINATA_GATEWAY
+      success: true,
+      message: 'IPFS服务运行正常',
+      data: {
+        environment: envCheck,
+        validation,
+        serviceReady: isServiceReady,
+        gatewayHealth: healthReport
       }
+    })
+    
+  } catch (error) {
+    console.error('❌ IPFS服务测试失败:', error)
+    return NextResponse.json({
+      success: false,
+      error: 'IPFS服务测试失败',
+      details: error instanceof Error ? error.message : String(error)
     }, { status: 500 })
   }
 }
 
-/**
- * 测试文件上传
- * POST /api/ipfs/test
- */
 export async function POST(request: NextRequest) {
   try {
-    console.log('🧪 开始测试文件上传...')
+    console.log('🧪 开始测试IPFS上传...')
     
-    // 创建测试文件
-    const testContent = JSON.stringify({
-      message: 'Test file upload',
+    // 动态导入IPFS服务
+    const { IPFSService } = await import('@/lib/ipfs')
+    
+    // 创建测试数据
+    const testData = {
+      message: 'IPFS服务测试',
       timestamp: new Date().toISOString(),
-      type: 'test-file'
-    }, null, 2)
+      version: '1.0.0'
+    }
     
-    const testBuffer = Buffer.from(testContent, 'utf8')
-    const filename = `test-file-${Date.now()}.json`
+    // 测试JSON上传
+    const ipfsHash = await IPFSService.uploadJSON(testData, {
+      name: 'ipfs-test.json',
+      description: 'IPFS服务测试文件'
+    })
     
-    // 测试文件上传
-    const fileResult = await IPFSService.uploadFile(testBuffer, filename)
+    console.log('✅ 测试上传成功，IPFS Hash:', ipfsHash)
     
-    // 验证上传结果
-    const isValid = fileResult.hash && fileResult.url && fileResult.name === filename
+    // 测试数据获取
+    const retrievedData = await IPFSService.getFromIPFS(ipfsHash)
+    console.log('✅ 测试获取成功:', retrievedData)
     
     return NextResponse.json({
       success: true,
-      message: '文件上传测试完成',
-      result: {
-        passed: isValid,
-        file: fileResult,
-        message: isValid ? '✅ 文件上传成功' : '❌ 文件上传失败'
+      message: 'IPFS上传测试成功',
+      data: {
+        uploadedHash: ipfsHash,
+        retrievedData,
+        gatewayUrl: IPFSService.getGatewayURL(ipfsHash)
       }
-    }, { status: 200 })
-
-  } catch (error) {
-    console.error('❌ 文件上传测试失败:', error)
+    })
     
+  } catch (error) {
+    console.error('❌ IPFS上传测试失败:', error)
     return NextResponse.json({
       success: false,
-      error: '文件上传测试失败',
+      error: 'IPFS上传测试失败',
       details: error instanceof Error ? error.message : String(error)
     }, { status: 500 })
   }

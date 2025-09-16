@@ -3,23 +3,20 @@ import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { AuthService } from '@/lib/auth'
 
+// 强制使用Node.js运行时，避免Edge Runtime的crypto模块限制
+export const runtime = 'nodejs'
+
 // 获取通知列表
 export async function GET(request: NextRequest) {
   try {
-    // 验证用户身份
+    // 从中间件验证过的请求中提取用户信息
     const authHeader = request.headers.get('authorization')
-    if (!authHeader?.startsWith('Bearer ')) {
-      return NextResponse.json(
-        { error: '未授权访问' },
-        { status: 401 }
-      )
-    }
-
-    const token = authHeader.substring(7)
-    const decoded = AuthService.verifyToken(token)
+    const token = authHeader?.substring(7)
+    const decoded = AuthService.verifyToken(token!)
+    
     if (!decoded) {
       return NextResponse.json(
-        { error: '无效的令牌' },
+        { error: '用户认证失败' },
         { status: 401 }
       )
     }
@@ -47,24 +44,50 @@ export async function GET(request: NextRequest) {
       where.read = false
     }
 
-    // 获取通知列表
+    // 获取通知列表 (排除过期通知)
     const notifications = await prisma.notification.findMany({
-      where,
-      orderBy: {
-        createdAt: 'desc'
+      where: {
+        ...where,
+        OR: [
+          { expiresAt: null },
+          { expiresAt: { gt: new Date() } }
+        ]
       },
+      orderBy: [
+        { priority: 'desc' }, // 优先级高的在前
+        { createdAt: 'desc' }  // 时间新的在前
+      ],
       skip,
-      take: limit
+      take: limit,
+      select: {
+        id: true,
+        type: true,
+        title: true,
+        message: true,
+        data: true,
+        read: true,
+        priority: true,
+        category: true,
+        actionUrl: true,
+        actionLabel: true,
+        createdAt: true,
+        readAt: true,
+        userId: true
+      }
     })
 
     // 获取总数
     const total = await prisma.notification.count({ where })
 
-    // 获取未读数量
+    // 获取未读数量 (排除过期通知)
     const unreadCount = await prisma.notification.count({
       where: {
         userId: userId,
-        read: false
+        read: false,
+        OR: [
+          { expiresAt: null },
+          { expiresAt: { gt: new Date() } }
+        ]
       }
     })
 
@@ -107,20 +130,14 @@ export async function GET(request: NextRequest) {
 // 创建新通知
 export async function POST(request: NextRequest) {
   try {
-    // 验证用户身份
+    // 从中间件验证过的请求中提取用户信息
     const authHeader = request.headers.get('authorization')
-    if (!authHeader?.startsWith('Bearer ')) {
-      return NextResponse.json(
-        { error: '未授权访问' },
-        { status: 401 }
-      )
-    }
-
-    const token = authHeader.substring(7)
-    const decoded = AuthService.verifyToken(token)
+    const token = authHeader?.substring(7)
+    const decoded = AuthService.verifyToken(token!)
+    
     if (!decoded) {
       return NextResponse.json(
-        { error: '无效的令牌' },
+        { error: '用户认证失败' },
         { status: 401 }
       )
     }
@@ -189,20 +206,14 @@ export async function POST(request: NextRequest) {
 // 标记通知为已读
 export async function PATCH(request: NextRequest) {
   try {
-    // 验证用户身份
+    // 从中间件验证过的请求中提取用户信息
     const authHeader = request.headers.get('authorization')
-    if (!authHeader?.startsWith('Bearer ')) {
-      return NextResponse.json(
-        { error: '未授权访问' },
-        { status: 401 }
-      )
-    }
-
-    const token = authHeader.substring(7)
-    const decoded = AuthService.verifyToken(token)
+    const token = authHeader?.substring(7)
+    const decoded = AuthService.verifyToken(token!)
+    
     if (!decoded) {
       return NextResponse.json(
-        { error: '无效的令牌' },
+        { error: '用户认证失败' },
         { status: 401 }
       )
     }
@@ -226,7 +237,8 @@ export async function PATCH(request: NextRequest) {
           userId: userId
         },
         data: {
-          read: true
+          read: true,
+          readAt: new Date()
         }
       })
 
@@ -243,7 +255,8 @@ export async function PATCH(request: NextRequest) {
           read: false
         },
         data: {
-          read: true
+          read: true,
+          readAt: new Date()
         }
       })
 
@@ -278,20 +291,14 @@ export async function PATCH(request: NextRequest) {
 // 删除通知
 export async function DELETE(request: NextRequest) {
   try {
-    // 验证用户身份
+    // 从中间件验证过的请求中提取用户信息
     const authHeader = request.headers.get('authorization')
-    if (!authHeader?.startsWith('Bearer ')) {
-      return NextResponse.json(
-        { error: '未授权访问' },
-        { status: 401 }
-      )
-    }
-
-    const token = authHeader.substring(7)
-    const decoded = AuthService.verifyToken(token)
+    const token = authHeader?.substring(7)
+    const decoded = AuthService.verifyToken(token!)
+    
     if (!decoded) {
       return NextResponse.json(
-        { error: '无效的令牌' },
+        { error: '用户认证失败' },
         { status: 401 }
       )
     }

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { AlertTriangle, Wifi, WifiOff, RefreshCw } from 'lucide-react'
@@ -11,6 +12,7 @@ interface NetworkStatusProps {
 }
 
 export function NetworkStatus({ className }: NetworkStatusProps) {
+  const t = useTranslations('web3.network')
   const [networkStatus, setNetworkStatus] = useState<'checking' | 'connected' | 'error' | 'warning'>('checking')
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [lastChecked, setLastChecked] = useState<Date>(new Date())
@@ -26,7 +28,7 @@ export function NetworkStatus({ className }: NetworkStatusProps) {
         
         if (currentChainId !== NETWORK_CONFIG.chainId) {
           setNetworkStatus('warning')
-          setErrorMessage(`请切换到 ${NETWORK_CONFIG.name} (ChainID: ${NETWORK_CONFIG.chainId})`)
+          setErrorMessage(t('switchToNetwork', { networkName: NETWORK_CONFIG.name, chainId: NETWORK_CONFIG.chainId }))
           return
         }
         
@@ -41,18 +43,18 @@ export function NetworkStatus({ className }: NetworkStatusProps) {
         }
       } else {
         setNetworkStatus('warning')
-        setErrorMessage('未检测到钱包')
+        setErrorMessage(t('walletNotDetected'))
       }
     } catch (error: any) {
-      console.error('网络状态检查失败:', error)
+      console.error('Network status check failed:', error)
       setNetworkStatus('error')
       
       if (error.message?.includes('missing trie node')) {
-        setErrorMessage('BSC Testnet节点同步问题，请稍后重试')
+        setErrorMessage(t('bscNodeSyncIssue'))
       } else if (error.message?.includes('Internal JSON-RPC error')) {
-        setErrorMessage('网络连接不稳定，正在使用备用数据源')
+        setErrorMessage(t('networkUnstable'))
       } else {
-        setErrorMessage('网络连接异常')
+        setErrorMessage(t('networkError'))
       }
     } finally {
       setLastChecked(new Date())
@@ -125,7 +127,7 @@ export function NetworkStatus({ className }: NetworkStatusProps) {
           disabled={networkStatus === 'checking'}
         >
           <RefreshCw className={`h-3 w-3 mr-1 ${networkStatus === 'checking' ? 'animate-spin' : ''}`} />
-          重试
+          {t('retry')}
         </Button>
       </AlertDescription>
     </Alert>
@@ -135,7 +137,7 @@ export function NetworkStatus({ className }: NetworkStatusProps) {
 // 辅助函数：切换到BSC Testnet
 export const switchToBSCTestnet = async () => {
   if (typeof window === 'undefined' || !window.ethereum) {
-    throw new Error('未检测到钱包')
+    throw new Error(t('walletNotDetected'))
   }
 
   try {
@@ -159,7 +161,7 @@ export const switchToBSCTestnet = async () => {
           }],
         })
       } catch (addError) {
-        throw new Error('添加BSC Testnet失败')
+        throw new Error(t('addBSCTestnetFailed'))
       }
     } else {
       throw switchError

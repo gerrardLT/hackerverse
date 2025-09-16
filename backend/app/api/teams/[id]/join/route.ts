@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
+
+const joinTeamSchema = z.object({
+  message: z.string().max(500, '申请理由不能超过500字符').optional(),
+  skills: z.array(z.string().min(1, '技能不能为空').max(50, '技能名称最多50个字符')).max(10, '最多添加10个技能').optional()
+})
 
 export async function POST(
   request: NextRequest,
@@ -17,6 +23,10 @@ export async function POST(
         { status: 401 }
       )
     }
+
+    // 解析请求体
+    const body = await request.json()
+    const validatedData = joinTeamSchema.parse(body)
 
     // 检查团队是否存在
     const team = await prisma.team.findUnique({
@@ -71,6 +81,44 @@ export async function POST(
       )
     }
 
+    // 检查是否已有待处理的申请
+    const existingApplication = await prisma.teamApplication.findUnique({
+      where: {
+        teamId_userId: {
+          teamId,
+          userId: user.id
+        }
+      }
+    })
+
+    if (existingApplication) {
+      if (existingApplication.status === 'PENDING') {
+        return NextResponse.json(
+          { success: false, error: '您已提交申请，请等待审核' },
+          { status: 400 }
+        )
+      } else if (existingApplication.status === 'REJECTED') {
+        // 如果之前被拒绝，可以重新申请，更新现有记录
+        const updatedApplication = await prisma.teamApplication.update({
+          where: { id: existingApplication.id },
+          data: {
+            message: validatedData.message,
+            skills: validatedData.skills || [],
+            status: 'PENDING',
+            updatedAt: new Date(),
+            reviewedAt: null,
+            reviewedBy: null
+          }
+        })
+
+        return NextResponse.json({
+          success: true,
+          data: { application: updatedApplication },
+          message: '申请已重新提交，请等待审核'
+        })
+      }
+    }
+
     // 检查用户是否已参加该黑客松
     const participation = await prisma.participation.findFirst({
       where: {
@@ -103,23 +151,38 @@ export async function POST(
       )
     }
 
-    // 加入团队
-    const teamMember = await prisma.teamMember.create({
+    // 创建团队申请
+    const application = await prisma.teamApplication.create({
       data: {
         teamId,
         userId: user.id,
-        role: 'member',
-        joinedAt: new Date()
+        message: validatedData.message,
+        skills: validatedData.skills || [],
+        status: 'PENDING'
       },
       select: {
         id: true,
-        role: true,
-        joinedAt: true,
+        message: true,
+        skills: true,
+        status: true,
+        createdAt: true,
         user: {
           select: {
             id: true,
             username: true,
             avatarUrl: true,
+          }
+        },
+        team: {
+          select: {
+            id: true,
+            name: true,
+            leader: {
+              select: {
+                id: true,
+                username: true
+              }
+            }
           }
         }
       }
@@ -127,13 +190,13 @@ export async function POST(
 
     return NextResponse.json({
       success: true,
-      data: { teamMember },
-      message: '成功加入团队'
+      data: { application },
+      message: '申请已提交，请等待团队领导审核'
     })
   } catch (error) {
-    console.error('加入团队错误:', error)
+    console.error('申请加入团队错误:', error)
     return NextResponse.json(
-      { success: false, error: '加入团队失败' },
+      { success: false, error: '申请提交失败' },
       { status: 500 }
     )
   }

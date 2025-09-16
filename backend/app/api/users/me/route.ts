@@ -9,6 +9,7 @@ const updateUserSchema = z.object({
   bio: z.string().max(500, '个人简介最多500个字符').optional(),
   avatarUrl: z.string().url('头像链接格式不正确').optional(),
   walletAddress: z.string().regex(/^0x[a-fA-F0-9]{40}$/, '钱包地址格式不正确').optional(),
+  skills: z.array(z.string().min(1, '技能名称不能为空').max(50, '技能名称最多50个字符')).max(20, '最多添加20个技能').optional(),
   notificationSettings: z.object({
     email: z.boolean().optional(),
     push: z.boolean().optional(),
@@ -42,7 +43,10 @@ export async function GET(request: NextRequest) {
         walletAddress: true,
         avatarUrl: true,
         bio: true,
+        skills: true as any,
         reputationScore: true,
+        role: true,
+        status: true,
         emailVerified: true,
         socialLinks: true,
         notificationSettings: true,
@@ -60,12 +64,73 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    // 追加社区概览
+    console.log('🔍 [用户信息] 开始查询社区概览数据, 用户ID:', user.id)
+    const [bookmarksCount, likesCount, myPostsCount, followingCount] = await Promise.all([
+      prisma.postBookmark.count({ where: { userId: user.id } }),
+      prisma.postLike.count({ where: { userId: user.id } }),
+      prisma.communityPost.count({ where: { authorId: user.id, isDeleted: false } }),
+      prisma.userFollow.count({ where: { followerId: user.id } })
+    ])
+
+    const [recentBookmarks, recentLikes, recentMyPosts, recentFollowing] = await Promise.all([
+      prisma.postBookmark.findMany({
+        where: { userId: user.id },
+        orderBy: { createdAt: 'desc' },
+        take: 3,
+        include: { post: { select: { id: true, title: true } } }
+      }),
+      prisma.postLike.findMany({
+        where: { userId: user.id },
+        orderBy: { createdAt: 'desc' },
+        take: 3,
+        include: { post: { select: { id: true, title: true } } }
+      }),
+      prisma.communityPost.findMany({
+        where: { authorId: user.id, isDeleted: false },
+        orderBy: { createdAt: 'desc' },
+        take: 3,
+        select: { id: true, title: true }
+      }),
+      prisma.userFollow.findMany({
+        where: { followerId: user.id },
+        orderBy: { createdAt: 'desc' },
+        take: 3,
+        include: { following: { select: { id: true, username: true, avatarUrl: true } } }
+      })
+    ])
+
+    console.log('🔍 [用户信息] 社区概览统计:', {
+      收藏数: bookmarksCount,
+      点赞数: likesCount,
+      我的帖子数: myPostsCount,
+      关注数: followingCount,
+      收藏预览数: recentBookmarks.length,
+      点赞预览数: recentLikes.length,
+      我的帖子预览数: recentMyPosts.length,
+      关注预览数: recentFollowing.length
+    })
+
     return NextResponse.json({
       success: true,
       data: {
         user: {
           ...userInfo,
           ipfsUrl: userInfo.ipfsProfileHash ? `${process.env.PINATA_GATEWAY}/ipfs/${userInfo.ipfsProfileHash}` : null
+        },
+        communityOverview: {
+          counts: {
+            bookmarks: bookmarksCount,
+            likes: likesCount,
+            myPosts: myPostsCount,
+            following: followingCount
+          },
+          previews: {
+            bookmarks: recentBookmarks.map((b: any) => ({ id: b.post.id, title: b.post.title })),
+            likes: recentLikes.map((l: any) => ({ id: l.post.id, title: l.post.title })),
+            myPosts: recentMyPosts,
+            following: recentFollowing.map((f: any) => ({ id: f.following.id, name: f.following.username, avatar: f.following.avatarUrl }))
+          }
         }
       }
     })
@@ -179,48 +244,9 @@ export async function PUT(request: NextRequest) {
       }, { status: 500 })
     }
     
-    // ⭐ 调用智能合约更新用户资料
-    let contractResult
-    try {
-      const { smartContractService } = await import('@/lib/smart-contracts')
-      await smartContractService.initialize()
-      
-      // 检查用户是否已注册
-      const userOnChain = await smartContractService.getUser(currentUser.walletAddress || '0x0')
-      
-      if (!userOnChain.isRegistered) {
-        // 首次注册用户
-        const tx = await smartContractService.registerUser(ipfsCID)
-        const receipt = await tx.wait()
-        
-        contractResult = {
-          action: 'register',
-          txHash: tx.hash,
-          blockNumber: Number(receipt.blockNumber),
-          gasUsed: Number(receipt.gasUsed)
-        }
-        console.log('⛓️ 智能合约用户注册成功:', contractResult)
-      } else {
-        // 更新用户资料
-        const tx = await smartContractService.updateProfile(ipfsCID)
-        const receipt = await tx.wait()
-        
-        contractResult = {
-          action: 'update',
-          txHash: tx.hash,
-          blockNumber: Number(receipt.blockNumber),
-          gasUsed: Number(receipt.gasUsed)
-        }
-        console.log('⛓️ 智能合约用户资料更新成功:', contractResult)
-      }
-      
-    } catch (contractError) {
-      console.error('智能合约调用失败:', contractError)
-      return NextResponse.json({
-        error: '智能合约调用失败，用户资料更新失败',
-        details: contractError instanceof Error ? contractError.message : '未知错误'
-      }, { status: 500 })
-    }
+    // 💡 优化设计：用户基础信息不需要上链
+    // 仅存储到IPFS和数据库，提升用户体验
+    console.log('💡 用户基础信息更新 - 仅同步IPFS和数据库')
     
     // 更新用户信息
     const updatedUser = await prisma.user.update({
@@ -230,15 +256,13 @@ export async function PUT(request: NextRequest) {
         bio: validatedData.bio,
         avatarUrl: validatedData.avatarUrl,
         walletAddress: validatedData.walletAddress,
+        skills: validatedData.skills as any,
         notificationSettings: validatedData.notificationSettings,
         privacySettings: validatedData.privacySettings,
         
-        // ⭐ 更新区块链相关字段
+        // ⭐ 仅更新IPFS相关字段
         ipfsProfileHash: ipfsCID, // 存储IPFS哈希
-        lastTxHash: contractResult.txHash,
-        lastBlockNumber: contractResult.blockNumber,
-        lastGasUsed: contractResult.gasUsed,
-        profileSyncStatus: 'SYNCED',
+        profileSyncStatus: 'IPFS_ONLY', // 标记为仅IPFS同步
       },
       select: {
         id: true,
@@ -247,6 +271,7 @@ export async function PUT(request: NextRequest) {
         walletAddress: true,
         avatarUrl: true,
         bio: true,
+        skills: true as any,
         reputationScore: true,
         emailVerified: true,
         notificationSettings: true,

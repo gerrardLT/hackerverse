@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
@@ -15,32 +16,53 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Badge } from '@/components/ui/badge'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
-import { Menu, User, Settings, LogOut, Wallet, Trophy, Users, Calendar, FolderOpen, Database, Bell, ChevronDown, MessageSquare } from 'lucide-react'
+import { Menu, User, Settings, LogOut, Wallet, Trophy, Users, Calendar, Bell, ChevronDown, MessageSquare, X, Sparkles, Plus } from 'lucide-react'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/hooks/use-auth'
 import { NotificationDropdown } from '@/components/notifications/notification-dropdown'
 import { useWeb3Auth } from '@/hooks/use-web3-auth'
 import { WalletConnect } from '@/components/ui/wallet-connect'
-
-const navigation = [
-  { name: '首页', href: '/', icon: null },
-  { name: '黑客松', href: '/hackathons', icon: Calendar },
-  { name: '项目', href: '/projects', icon: FolderOpen },
-  { name: '社区', href: '/community', icon: MessageSquare },
-  { name: '团队', href: '/teams', icon: Users },
-  { name: 'IPFS', href: '/ipfs', icon: Database },
-]
+import HackerverseLogo from '@/components/ui/hackerverse-logo'
 
 export function Header() {
+  const t = useTranslations('navigation')
+  const tCommon = useTranslations('common')
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const { user, signOut } = useAuth()
-  const { user: web3User } = useWeb3Auth()
+  const [isScrolled, setIsScrolled] = useState(false)
+  const [isVisible, setIsVisible] = useState(false)
+  const { user, signOut, isAuthenticated } = useAuth()
+  const { user: web3User, disconnectWallet } = useWeb3Auth()
 
-  const handleSignOut = () => {
-    signOut()
+  // Scroll detection for floating nav effects
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // Entrance animation
+  useEffect(() => {
+    setIsVisible(true)
+  }, [])
+
+  const navigation = [
+    { name: t('home'), href: '/', icon: null },
+    { name: t('hackathons'), href: '/hackathons', icon: Calendar },
+    { name: t('community'), href: '/community', icon: MessageSquare },
+    { name: t('teams'), href: '/teams', icon: Users },
+  ]
+
+  const handleSignOut = async () => {
+    // 使用 Web3Auth 的 disconnectWallet 来确保完全清理状态
+    await disconnectWallet()
   }
+
+  // 只有当真正认证且有用户信息时才显示用户菜单
+  const shouldShowUserMenu = isAuthenticated && user
 
   const formatWalletAddress = (address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`
@@ -48,195 +70,343 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center gap-6">
-            <Link href="/" className="flex items-center space-x-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                <span className="text-sm font-bold">HX</span>
-              </div>
-              <span className="hidden font-bold sm:inline-block">HackX</span>
-            </Link>
+      {/* Floating Navigation */}
+      <header 
+        className={cn(
+          "fixed top-4 left-1/2 z-50 transition-all duration-500 w-[calc(100%-2rem)] max-w-7xl",
+          isScrolled 
+            ? "glass border border-primary/20 shadow-glow" 
+            : "bg-background border border-primary/20",
+          "rounded-2xl backdrop-blur-xl"
+        )}
+        style={{
+          transform: `translateX(-50%) translateY(${isVisible ? '0px' : '-16px'})`,
+          opacity: isVisible ? 1 : 0
+        }}
+      >
+        <div className="flex h-16 items-center justify-between px-6">
+          {/* Enhanced Logo */}
+          <Link 
+            href="/" 
+            className="flex items-center space-x-3"
+          >
+            <div className="text-primary">
+              <HackerverseLogo className="h-10 w-10" />
+            </div>
+            <span className="hidden sm:inline-block font-bold text-lg bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              Hackerverse
+            </span>
+          </Link>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
-              {navigation.map((item) => {
-                const Icon = item.icon
-                return (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className={cn(
-                      "flex items-center gap-2 transition-colors hover:text-foreground/80",
-                      pathname === item.href
-                        ? "text-foreground"
-                        : "text-foreground/60"
-                    )}
-                  >
-                    {Icon && <Icon className="h-4 w-4" />}
-                    {item.name}
-                  </Link>
-                )
-              })}
-            </nav>
-          </div>
+          {/* Enhanced Desktop Navigation */}
+          <nav className="hidden lg:flex items-center space-x-1">
+            {navigation.map((item) => {
+              const Icon = item.icon
+              const isActive = pathname === item.href
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={cn(
+                    "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 relative group hover-lift",
+                    isActive
+                      ? "text-primary bg-primary/10 shadow-inner"
+                      : "text-foreground/70 hover:text-primary hover:shadow-lg"
+                  )}
+                  style={{
+                    '--hover-bg': 'color-mix(in oklab, var(--primary) 10%, transparent)'
+                  } as React.CSSProperties}
+                  onMouseEnter={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.backgroundColor = 'color-mix(in oklab, var(--primary) 10%, transparent)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.backgroundColor = 'transparent'
+                    }
+                  }}
+                >
+                  {Icon && <Icon className="h-4 w-4 transition-all duration-300 group-hover:scale-110 group-hover:text-primary" />}
+                  <span className="transition-all duration-300 group-hover:font-semibold">{item.name}</span>
+                  {isActive && (
+                    <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary/20 to-accent/20 -z-10 animate-pulse-slow" />
+                  )}
+                </Link>
+              )
+            })}
+          </nav>
 
-          {/* Right Side */}
-          <div className="flex items-center gap-4">
-            {/* Theme Toggle */}
-            <ThemeToggle />
+          {/* Enhanced Right Side */}
+          <div className="flex items-center gap-3">
+            {/* Theme Toggle with Enhancement */}
+            <div className="hidden md:block">
+              <ThemeToggle />
+            </div>
             
             {/* 根据登录状态显示不同内容 */}
-            {user ? (
-              // 用户已登录：显示用户头像和下拉菜单
-              <div className="flex items-center gap-4">
-                {/* 通知组件 */}
-                <NotificationDropdown />
+            {shouldShowUserMenu ? (
+              <div className="flex items-center gap-3">
+                {/* Enhanced Notification */}
+                <div className="relative">
+                  <NotificationDropdown />
+                </div>
 
-                {/* 用户头像和下拉菜单 */}
+                {/* Create Hackathon Button - Always visible when logged in */}
+                <Button 
+                  asChild
+                  className="hidden lg:flex items-center gap-1.5 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground px-2 py-2 rounded-lg hover-lift transition-all duration-300"
+                >
+                  <Link href="/hackathons/create">
+                    <Plus className="h-4 w-4" />
+                    <span className="text-sm font-medium">{tCommon('createHackathon')}</span>
+                  </Link>
+                </Button>
+
+                {/* Wallet Address Display */}
+                {web3User?.address && (
+                  <div className="hidden lg:flex items-center gap-2 px-3 py-2 glass border border-primary/20 rounded-xl">
+                    <Wallet className="h-4 w-4 text-primary" />
+                    <span className="text-sm font-mono text-muted-foreground">
+                      {formatWalletAddress(web3User.address)}
+                    </span>
+                  </div>
+                )}
+
+                {/* Enhanced User Menu */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="flex items-center gap-2 p-2">
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage src={user.avatarUrl || '/placeholder.svg'} alt={user.username} />
-                        <AvatarFallback className="text-sm font-medium">
-                          {user.username?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase()}
+                    <Button 
+                      variant="ghost" 
+                      className="flex items-center gap-2 p-2 rounded-xl hover-lift hover:bg-muted/50 transition-all duration-300 group"
+                    >
+                      <Avatar className="h-8 w-8 ring-2 ring-primary/20 transition-all group-hover:ring-primary/40">
+                        <AvatarImage 
+                          src={user.avatarUrl} 
+                          alt={user.username || 'User Avatar'}
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none'
+                          }}
+                        />
+                        <AvatarFallback className="text-sm font-medium bg-gradient-to-r from-primary to-accent text-primary-foreground">
+                          {user.username?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || 'U'}
                         </AvatarFallback>
                       </Avatar>
-                      <span className="hidden md:inline-block font-medium">
-                        {user.username || user.email}
-                      </span>
-                      <ChevronDown className="h-4 w-4" />
+                      <ChevronDown className="h-3 w-3 transition-transform group-hover:rotate-180" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuContent 
+                    align="end" 
+                    className="w-64"
+                  >
                     <DropdownMenuLabel>
-                      <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none">{user.username || '用户'}</p>
-                        <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                      <div className="flex items-center gap-3 p-2">
+                        <Avatar className="h-12 w-12">
+                          <AvatarImage 
+                            src={user.avatarUrl} 
+                            alt={user.username || 'User Avatar'}
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none'
+                            }}
+                          />
+                          <AvatarFallback className="bg-gradient-to-r from-primary to-accent text-primary-foreground">
+                            {user.username?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || 'U'}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold leading-none truncate">{user.username || 'User'}</p>
+                          {user.email && (
+                            <p className="text-xs text-muted-foreground mt-1 truncate">{user.email}</p>
+                          )}
+                          {web3User?.address && (
+                            <div className="flex items-center gap-1 mt-1">
+                              <Wallet className="h-3 w-3 text-primary" />
+                              <p className="text-xs text-muted-foreground font-mono">
+                                {formatWalletAddress(web3User.address)}
+                              </p>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                      <Link href="/dashboard" className="flex items-center gap-2">
+                      <Link href="/dashboard" className="flex items-center gap-3 p-3 hover:bg-muted/50 transition-colors">
                         <User className="h-4 w-4" />
-                        个人中心
+                        {t('dashboard')}
                       </Link>
                     </DropdownMenuItem>
-
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
-                      <LogOut className="h-4 w-4 mr-2" />
-                      退出登录
+                    <DropdownMenuItem 
+                      onClick={handleSignOut} 
+                      className="text-destructive p-3 hover:bg-destructive/10 transition-colors"
+                    >
+                      <LogOut className="h-4 w-4 mr-3" />
+                      {t('disconnectWallet')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
             ) : (
-              // 用户未登录：显示登录/注册按钮和钱包连接
-            <div className="flex items-center gap-2">
-              <WalletConnect />
-              <Button variant="ghost" asChild>
-                <Link href="/auth/signin">登录</Link>
-              </Button>
-              {/* 隐藏注册按钮，因为现在只支持钱包登录 */}
-              {/* 
-              <Button asChild>
-                <Link href="/auth/signup">注册</Link>
-              </Button>
-              */}
-            </div>
+              // Enhanced Wallet Connect
+              <WalletConnect className="hover-lift" />
             )}
 
-            {/* Mobile Menu */}
-            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-              <SheetTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="md:hidden"
-                  size="sm"
-                >
-                  <Menu className="h-5 w-5" />
-                  <span className="sr-only">Toggle menu</span>
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-                <nav className="flex flex-col gap-4">
-                  {navigation.map((item) => {
-                    const Icon = item.icon
-                    return (
-                      <Link
-                        key={item.name}
-                        href={item.href}
-                        className={cn(
-                          "flex items-center gap-2 text-lg font-medium transition-colors hover:text-foreground/80",
-                          pathname === item.href
-                            ? "text-foreground"
-                            : "text-foreground/60"
-                        )}
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        {Icon && <Icon className="h-5 w-5" />}
-                        {item.name}
-                      </Link>
-                    )
-                  })}
-                  
-                  {/* 移动端用户菜单 */}
-                  {user && (
-                    <>
-                      <div className="border-t pt-4 mt-4">
-                        <div className="flex items-center gap-3 mb-4">
-                          <Avatar className="h-10 w-10">
-                            <AvatarImage src={user.avatarUrl || '/placeholder.svg'} alt={user.username} />
-                            <AvatarFallback className="text-sm font-medium">
-                              {user.username?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase()}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-medium">{user.username || '用户'}</p>
-                            <p className="text-sm text-muted-foreground">{user.email}</p>
-                          </div>
-                        </div>
-                        <div className="space-y-2">
-                          <Link
-                            href="/dashboard"
-                            className="flex items-center gap-2 text-lg font-medium transition-colors hover:text-foreground/80"
-                            onClick={() => setMobileMenuOpen(false)}
-                          >
-                            <User className="h-5 w-5" />
-                            个人中心
-                          </Link>
-                          <Link
-                            href="/profile"
-                            className="flex items-center gap-2 text-lg font-medium transition-colors hover:text-foreground/80"
-                            onClick={() => setMobileMenuOpen(false)}
-                          >
-                            <Settings className="h-5 w-5" />
-                            设置
-                          </Link>
-                          <Button
-                            variant="ghost"
-                            className="w-full justify-start text-lg font-medium text-destructive"
-                            onClick={() => {
-                              handleSignOut()
-                              setMobileMenuOpen(false)
-                            }}
-                          >
-                            <LogOut className="h-5 w-5 mr-2" />
-                            退出登录
-                          </Button>
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </nav>
-              </SheetContent>
-            </Sheet>
+            {/* Enhanced Mobile Menu */}
+            <div className="lg:hidden">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="relative h-10 w-10 rounded-xl hover:bg-muted/50 transition-all duration-300 group"
+              >
+                <div className="relative w-5 h-5">
+                  <Menu 
+                    className={cn(
+                      "absolute inset-0 transition-all duration-300",
+                      mobileMenuOpen ? "rotate-90 opacity-0" : "rotate-0 opacity-100"
+                    )} 
+                  />
+                  <X 
+                    className={cn(
+                      "absolute inset-0 transition-all duration-300",
+                      mobileMenuOpen ? "rotate-0 opacity-100" : "-rotate-90 opacity-0"
+                    )} 
+                  />
+                </div>
+                <span className="sr-only">{t('toggleMenu')}</span>
+                {/* Hover indicator */}
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary/20 to-accent/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10" />
+              </Button>
+            </div>
           </div>
         </div>
+
+        {/* Enhanced Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="lg:hidden border-t border-border/50 glass rounded-b-2xl animate-slide-down">
+            <nav className="p-6 space-y-2">
+              {navigation.map((item) => {
+                const Icon = item.icon
+                const isActive = pathname === item.href
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={cn(
+                      "flex items-center gap-3 p-3 rounded-xl text-base font-medium transition-all duration-300 group relative hover-lift",
+                      isActive
+                        ? "text-primary bg-primary/10 shadow-inner"
+                        : "text-foreground/80 hover:text-primary hover:shadow-lg"
+                    )}
+                    style={{
+                      '--hover-bg': 'color-mix(in oklab, var(--primary) 10%, transparent)'
+                    } as React.CSSProperties}
+                    onMouseEnter={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.backgroundColor = 'color-mix(in oklab, var(--primary) 10%, transparent)'
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.backgroundColor = 'transparent'
+                      }
+                    }}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {Icon && <Icon className="h-5 w-5 transition-all duration-300 group-hover:scale-110 group-hover:text-primary" />}
+                    <span className="transition-all duration-300 group-hover:font-semibold">{item.name}</span>
+                    {isActive && <Sparkles className="h-4 w-4 ml-auto text-primary animate-pulse-slow" />}
+                  </Link>
+                )
+              })}
+              
+              {/* Mobile Theme Toggle */}
+              <div className="flex items-center gap-3 p-3">
+                <Bell className="h-5 w-5 text-muted-foreground" />
+                <span className="text-base font-medium text-muted-foreground">Theme</span>
+                <div className="ml-auto">
+                  <ThemeToggle />
+                </div>
+              </div>
+              
+              {/* 移动端用户菜单 */}
+              {shouldShowUserMenu && (
+                <div className="border-t border-border/50 pt-4 mt-4 space-y-2">
+                  <div className="flex items-center gap-4 p-3 rounded-xl bg-muted/30">
+                    <Avatar className="h-12 w-12 ring-2 ring-primary/20">
+                      <AvatarImage 
+                        src={user.avatarUrl} 
+                        alt={user.username || 'User Avatar'}
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none'
+                        }}
+                      />
+                      <AvatarFallback className="bg-gradient-to-r from-primary to-accent text-primary-foreground">
+                        {user.username?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || 'U'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold leading-none truncate">{user.username || 'User'}</p>
+                      {user.email && (
+                        <p className="text-xs text-muted-foreground mt-1 truncate">{user.email}</p>
+                      )}
+                      {web3User?.address && (
+                        <div className="flex items-center gap-1 mt-1">
+                          <Wallet className="h-3 w-3 text-primary" />
+                          <p className="text-xs text-muted-foreground font-mono">
+                            {formatWalletAddress(web3User.address)}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <Link
+                    href="/hackathons/create"
+                    className="flex items-center gap-3 p-3 rounded-xl text-base font-medium transition-all bg-gradient-to-r from-primary to-accent text-primary-foreground hover:from-primary/90 hover:to-accent/90 group"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Plus className="h-5 w-5 transition-transform group-hover:scale-110" />
+                    {tCommon('createHackathon')}
+                  </Link>
+                  
+                  <Link
+                    href="/dashboard"
+                    className="flex items-center gap-3 p-3 rounded-xl text-base font-medium transition-all hover:bg-muted/50 group"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <User className="h-5 w-5 transition-transform group-hover:scale-110" />
+                    {t('dashboard')}
+                  </Link>
+                  
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start p-3 text-base font-medium text-destructive hover:bg-destructive/10 rounded-xl"
+                    onClick={() => {
+                      handleSignOut()
+                      setMobileMenuOpen(false)
+                    }}
+                  >
+                    <LogOut className="h-5 w-5 mr-3" />
+                    {t('disconnectWallet')}
+                  </Button>
+                </div>
+              )}
+              
+              {/* 移动端连接钱包按钮 */}
+              {!shouldShowUserMenu && (
+                <div className="border-t border-border/50 pt-4 mt-4">
+                  <WalletConnect className="w-full h-12 text-base" />
+                </div>
+              )}
+            </nav>
+          </div>
+        )}
       </header>
+
+      {/* Spacer for floating nav */}
+      <div className="h-24" />
     </>
   )
 }

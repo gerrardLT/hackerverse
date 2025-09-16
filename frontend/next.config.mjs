@@ -1,14 +1,19 @@
+import createNextIntlPlugin from 'next-intl/plugin';
+
+const withNextIntl = createNextIntlPlugin();
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
+  // 现有配置保持不变
+  experimental: {
+    serverComponentsExternalPackages: ['@prisma/client'],
   },
   typescript: {
     ignoreBuildErrors: true,
   },
-  images: {
-    unoptimized: true,
+  eslint: {
+    ignoreDuringBuilds: true,
   },
-}
+};
 
-export default nextConfig
+export default withNextIntl(nextConfig);

@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { AuthService } from '@/lib/auth'
+import { getLocaleFromRequest, createTFunction } from '@/lib/i18n'
+
+// 强制使用Node.js运行时，避免Edge Runtime的crypto模块限制
+export const runtime = 'nodejs'
 
 // 创建团队验证模式
 const createTeamSchema = z.object({
@@ -21,6 +25,7 @@ const querySchema = z.object({
   search: z.string().optional(),
   hackathonId: z.string().optional(),
   skill: z.string().optional(),
+  status: z.enum(['recruiting', 'full', 'competing', 'completed', 'disbanded']).optional(),
   hasOpenings: z.string().transform(val => val === 'true').optional(),
   sortBy: z.enum(['createdAt', 'name', 'memberCount']).default('createdAt'),
   sortOrder: z.enum(['asc', 'desc']).default('desc'),
@@ -28,6 +33,35 @@ const querySchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
+    // 验证用户身份
+    const authHeader = request.headers.get('authorization')
+    if (!authHeader?.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { 
+          success: false,
+          error: t('auth.unauthorized'),
+          code: 'UNAUTHORIZED'
+        },
+        { status: 401 }
+      )
+    }
+
+    const token = authHeader.substring(7)
+    const decoded = AuthService.verifyToken(token)
+    if (!decoded) {
+      return NextResponse.json(
+        { 
+          success: false,
+          error: t('auth.tokenInvalid'),
+          code: 'TOKEN_INVALID'
+        },
+        { status: 401 }
+      )
+    }
+
     const { searchParams } = new URL(request.url)
     const query = Object.fromEntries(searchParams.entries())
     
@@ -56,6 +90,11 @@ export async function GET(request: NextRequest) {
     // 技能筛选
     if (validatedQuery.skill) {
       where.skills = { has: validatedQuery.skill }
+    }
+    
+    // 状态筛选
+    if (validatedQuery.status) {
+      where.status = validatedQuery.status.toUpperCase()
     }
     
     // 有空位筛选
@@ -91,6 +130,7 @@ export async function GET(request: NextRequest) {
           skills: true,
           tags: true,
           isPublic: true,
+          status: true,
           createdAt: true,
           updatedAt: true,
           hackathon: {
@@ -136,19 +176,35 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('获取团队列表错误:', error)
     
-        if (error instanceof z.ZodError) {      return NextResponse.json(        { success: false, error: '查询参数验证失败', details: error.errors },        { status: 400 }      )    }        return NextResponse.json(      { success: false, error: '获取团队列表失败' },      { status: 500 }    )
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { success: false, error: t('errors.validationError'), details: error.errors },
+        { status: 400 }
+      )
+    }
+    
+    return NextResponse.json(
+      { success: false, error: t('teams.getListError', { fallback: 'Failed to get team list' }) },
+      { status: 500 }
+    )
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
     // 从请求头获取认证token
     const authHeader = request.headers.get('authorization')
     const token = AuthService.extractTokenFromHeader(authHeader || undefined)
     
     if (!token) {
       return NextResponse.json(
-        { error: '未提供认证token' },
+        { error: t('auth.unauthorized') },
         { status: 401 }
       )
     }
@@ -157,7 +213,7 @@ export async function POST(request: NextRequest) {
     const payload = AuthService.verifyToken(token)
     if (!payload) {
       return NextResponse.json(
-        { error: '无效的认证token' },
+        { error: t('auth.tokenInvalid') },
         { status: 401 }
       )
     }
@@ -180,7 +236,7 @@ export async function POST(request: NextRequest) {
     
     if (!hackathon) {
       return NextResponse.json(
-        { error: '黑客松不存在' },
+        { error: t('hackathons.notFound') },
         { status: 404 }
       )
     }
@@ -188,7 +244,7 @@ export async function POST(request: NextRequest) {
     // 检查黑客松是否公开
     if (!hackathon.isPublic) {
       return NextResponse.json(
-        { error: '该黑客松为私有活动' },
+        { error: t('hackathons.privateEvent', { fallback: 'This hackathon is a private event' }) },
         { status: 403 }
       )
     }
@@ -203,7 +259,7 @@ export async function POST(request: NextRequest) {
     
     if (!participation) {
       return NextResponse.json(
-        { error: '您需要先报名参加该黑客松' },
+        { error: t('teams.needRegistration') },
         { status: 400 }
       )
     }
@@ -220,7 +276,7 @@ export async function POST(request: NextRequest) {
     
     if (existingTeamMember) {
       return NextResponse.json(
-        { error: '您已经加入了该黑客松的其他团队' },
+        { error: t('teams.alreadyInTeam') },
         { status: 400 }
       )
     }
@@ -235,7 +291,7 @@ export async function POST(request: NextRequest) {
     
     if (existingTeam) {
       return NextResponse.json(
-        { error: '该黑客松中已存在同名团队' },
+        { error: t('teams.nameExists') },
         { status: 400 }
       )
     }
@@ -286,11 +342,24 @@ export async function POST(request: NextRequest) {
       }
     })
     
-        return NextResponse.json({      success: true,      message: '团队创建成功',      data: {        team,      }    }, { status: 201 })
+        return NextResponse.json({      success: true,      message: t('teams.createSuccess'),      data: {        team,      }    }, { status: 201 })
     
   } catch (error) {
     console.error('创建团队错误:', error)
     
-        if (error instanceof z.ZodError) {      return NextResponse.json(        { success: false, error: '请求数据验证失败', details: error.errors },        { status: 400 }      )    }        return NextResponse.json(      { success: false, error: '创建团队失败' },      { status: 500 }    )
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { success: false, error: t('errors.validationError'), details: error.errors },
+        { status: 400 }
+      )
+    }
+    
+    return NextResponse.json(
+      { success: false, error: t('teams.createError') },
+      { status: 500 }
+    )
   }
 } 

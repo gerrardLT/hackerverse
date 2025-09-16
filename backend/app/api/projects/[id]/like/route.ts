@@ -1,19 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
+import { ApiResponseHandler, ErrorCode } from '@/lib/api-response'
+import { getLocaleFromRequest, createTFunction } from '@/lib/i18n'
 
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
     const projectId = params.id
     
     // 验证用户身份
     const user = await auth(request)
     if (!user) {
       return NextResponse.json(
-        { success: false, error: '未认证' },
+        { success: false, error: t('auth.unauthorized') },
         { status: 401 }
       )
     }
@@ -25,7 +30,7 @@ export async function POST(
 
     if (!project) {
       return NextResponse.json(
-        { success: false, error: '项目不存在' },
+        { success: false, error: t('projects.notFound') },
         { status: 404 }
       )
     }
@@ -40,13 +45,13 @@ export async function POST(
 
     if (existingLike) {
       return NextResponse.json(
-        { success: false, error: '您已经点赞过该项目' },
-        { status: 400 }
+        { success: false, error: t('projects.alreadyLiked', { fallback: 'You have already liked this project' }) },
+        { status: 409 }
       )
     }
 
     // 创建点赞记录
-    await prisma.projectLike.create({
+    const like = await prisma.projectLike.create({
       data: {
         projectId,
         userId: user.id,
@@ -56,12 +61,17 @@ export async function POST(
 
     return NextResponse.json({
       success: true,
-      message: '点赞成功'
-    })
+      message: t('projects.likeSuccess', { fallback: 'Liked successfully' }),
+      data: like
+    }, { status: 201 })
   } catch (error) {
     console.error('点赞项目错误:', error)
+    
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
     return NextResponse.json(
-      { success: false, error: '点赞失败' },
+      { success: false, error: t('projects.likeError', { fallback: 'Failed to like project' }) },
       { status: 500 }
     )
   }
@@ -72,13 +82,16 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
     const projectId = params.id
     
     // 验证用户身份
     const user = await auth(request)
     if (!user) {
       return NextResponse.json(
-        { success: false, error: '未认证' },
+        { success: false, error: t('auth.unauthorized') },
         { status: 401 }
       )
     }
@@ -90,7 +103,7 @@ export async function DELETE(
 
     if (!project) {
       return NextResponse.json(
-        { success: false, error: '项目不存在' },
+        { success: false, error: t('projects.notFound') },
         { status: 404 }
       )
     }
@@ -105,19 +118,23 @@ export async function DELETE(
 
     if (deletedLike.count === 0) {
       return NextResponse.json(
-        { success: false, error: '您还没有点赞该项目' },
+        { success: false, error: t('projects.notLikedYet', { fallback: 'You have not liked this project yet' }) },
         { status: 400 }
       )
     }
 
     return NextResponse.json({
       success: true,
-      message: '取消点赞成功'
+      message: t('projects.unlikeSuccess', { fallback: 'Unliked successfully' })
     })
   } catch (error) {
     console.error('取消点赞错误:', error)
+    
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
     return NextResponse.json(
-      { success: false, error: '取消点赞失败' },
+      { success: false, error: t('projects.unlikeError', { fallback: 'Failed to unlike project' }) },
       { status: 500 }
     )
   }

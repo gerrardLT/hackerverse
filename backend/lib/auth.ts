@@ -6,8 +6,12 @@ import { prisma } from './prisma'
 
 export interface JWTPayload {
   userId: string
-  email: string
+  email?: string
   walletAddress?: string
+  role?: string
+  github?: string
+  iat?: number
+  exp?: number
 }
 
 export class AuthService {
@@ -45,6 +49,7 @@ export class AuthService {
     try {
       return jwt.verify(token, this.JWT_SECRET) as JWTPayload
     } catch (error) {
+      console.log('JWT验证失败:', error instanceof Error ? error.message : 'Unknown error')
       return null
     }
   }

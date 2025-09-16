@@ -6,6 +6,8 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { X } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { useDataTranslations } from '@/lib/enum-utils'
 
 interface Filters {
   status: string
@@ -20,12 +22,14 @@ interface HackathonFiltersProps {
 }
 
 const technologies = [
-  'React', 'Vue.js', 'Angular', 'Node.js', 'Python', 'Java',
+  'React', 'VueJS', 'Angular', 'NodeJS', 'Python', 'Java',
   'Solidity', 'Rust', 'Go', 'TypeScript', 'JavaScript',
-  'AI/ML', 'Blockchain', 'DeFi', 'NFT', 'Web3', 'IPFS'
+  'Machine Learning', 'Blockchain', 'DeFi', 'NFT', 'Web3', 'IPFS'
 ]
 
 export function HackathonFilters({ filters, onFiltersChange }: HackathonFiltersProps) {
+  const t = useTranslations('hackathons.filters')
+  const { getTechnologyText } = useDataTranslations()
   const updateFilters = (key: keyof Filters, value: any) => {
     onFiltersChange({ ...filters, [key]: value })
   }
@@ -55,12 +59,12 @@ export function HackathonFilters({ filters, onFiltersChange }: HackathonFiltersP
     <div className="space-y-4">
       {hasActiveFilters && (
         <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">已选筛选条件</span>
+          <span className="text-sm text-muted-foreground">{t('activeFilters')}</span>
           <button
             onClick={clearAllFilters}
             className="text-sm text-primary hover:underline"
           >
-            清除全部
+            {t('clearAll')}
           </button>
         </div>
       )}
@@ -70,8 +74,7 @@ export function HackathonFilters({ filters, onFiltersChange }: HackathonFiltersP
         <div className="flex flex-wrap gap-2">
           {filters.status !== 'all' && (
             <Badge variant="secondary" className="text-xs">
-              {filters.status === 'upcoming' ? '即将开始' : 
-               filters.status === 'ongoing' ? '进行中' : '已结束'}
+              {t(`statusOptions.${filters.status}`)}
               <X 
                 className="ml-1 h-3 w-3 cursor-pointer" 
                 onClick={() => updateFilters('status', 'all')}
@@ -80,7 +83,7 @@ export function HackathonFilters({ filters, onFiltersChange }: HackathonFiltersP
           )}
           {filters.technologies.map(tech => (
             <Badge key={tech} variant="secondary" className="text-xs">
-              {tech}
+              {getTechnologyText(tech)}
               <X 
                 className="ml-1 h-3 w-3 cursor-pointer" 
                 onClick={() => toggleTechnology(tech)}
@@ -93,7 +96,7 @@ export function HackathonFilters({ filters, onFiltersChange }: HackathonFiltersP
       {/* Status Filter */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm">活动状态</CardTitle>
+          <CardTitle className="text-sm">{t('status')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <RadioGroup 
@@ -102,19 +105,19 @@ export function HackathonFilters({ filters, onFiltersChange }: HackathonFiltersP
           >
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="all" id="status-all" />
-              <Label htmlFor="status-all" className="text-sm">全部</Label>
+              <Label htmlFor="status-all" className="text-sm">{t('statusOptions.all')}</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="upcoming" id="status-upcoming" />
-              <Label htmlFor="status-upcoming" className="text-sm">即将开始</Label>
+              <Label htmlFor="status-upcoming" className="text-sm">{t('statusOptions.upcoming')}</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="ongoing" id="status-ongoing" />
-              <Label htmlFor="status-ongoing" className="text-sm">进行中</Label>
+              <Label htmlFor="status-ongoing" className="text-sm">{t('statusOptions.ongoing')}</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="ended" id="status-ended" />
-              <Label htmlFor="status-ended" className="text-sm">已结束</Label>
+              <RadioGroupItem value="completed" id="status-completed" />
+              <Label htmlFor="status-completed" className="text-sm">{t('statusOptions.completed')}</Label>
             </div>
           </RadioGroup>
         </CardContent>
@@ -123,7 +126,7 @@ export function HackathonFilters({ filters, onFiltersChange }: HackathonFiltersP
       {/* Technology Filter */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm">技术栈</CardTitle>
+          <CardTitle className="text-sm">{t('technology')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
           <div className="max-h-48 overflow-y-auto space-y-2">
@@ -135,7 +138,7 @@ export function HackathonFilters({ filters, onFiltersChange }: HackathonFiltersP
                   onCheckedChange={() => toggleTechnology(tech)}
                 />
                 <Label htmlFor={`tech-${tech}`} className="text-sm">
-                  {tech}
+                  {getTechnologyText(tech)}
                 </Label>
               </div>
             ))}
@@ -146,7 +149,7 @@ export function HackathonFilters({ filters, onFiltersChange }: HackathonFiltersP
       {/* Prize Range Filter */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm">奖金范围</CardTitle>
+          <CardTitle className="text-sm">{t('prizeRange')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <RadioGroup 
@@ -155,19 +158,19 @@ export function HackathonFilters({ filters, onFiltersChange }: HackathonFiltersP
           >
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="all" id="prize-all" />
-              <Label htmlFor="prize-all" className="text-sm">全部</Label>
+              <Label htmlFor="prize-all" className="text-sm">{t('prizeRangeOptions.all')}</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="0-1000" id="prize-low" />
-              <Label htmlFor="prize-low" className="text-sm">$0 - $1,000</Label>
+              <Label htmlFor="prize-low" className="text-sm">{t('prizeRangeOptions.0-1000')}</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="1000-10000" id="prize-mid" />
-              <Label htmlFor="prize-mid" className="text-sm">$1,000 - $10,000</Label>
+              <Label htmlFor="prize-mid" className="text-sm">{t('prizeRangeOptions.1000-10000')}</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="10000+" id="prize-high" />
-              <Label htmlFor="prize-high" className="text-sm">$10,000+</Label>
+              <Label htmlFor="prize-high" className="text-sm">{t('prizeRangeOptions.10000+')}</Label>
             </div>
           </RadioGroup>
         </CardContent>
@@ -176,7 +179,7 @@ export function HackathonFilters({ filters, onFiltersChange }: HackathonFiltersP
       {/* Date Range Filter */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm">时间范围</CardTitle>
+          <CardTitle className="text-sm">{t('dateRange')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <RadioGroup 
@@ -185,19 +188,19 @@ export function HackathonFilters({ filters, onFiltersChange }: HackathonFiltersP
           >
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="all" id="date-all" />
-              <Label htmlFor="date-all" className="text-sm">全部</Label>
+              <Label htmlFor="date-all" className="text-sm">{t('dateRangeOptions.all')}</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="this-week" id="date-week" />
-              <Label htmlFor="date-week" className="text-sm">本周</Label>
+              <Label htmlFor="date-week" className="text-sm">{t('dateRangeOptions.this-week')}</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="this-month" id="date-month" />
-              <Label htmlFor="date-month" className="text-sm">本月</Label>
+              <Label htmlFor="date-month" className="text-sm">{t('dateRangeOptions.this-month')}</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="next-month" id="date-next" />
-              <Label htmlFor="date-next" className="text-sm">下个月</Label>
+              <Label htmlFor="date-next" className="text-sm">{t('dateRangeOptions.next-month')}</Label>
             </div>
           </RadioGroup>
         </CardContent>

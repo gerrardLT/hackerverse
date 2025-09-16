@@ -1,0 +1,1702 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "submit": "Submit",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "clear": "Clear",
+    "all": "All",
+    "none": "None",
+    "select": "Select",
+    "upload": "Upload",
+    "download": "Download",
+    "view": "View",
+    "close": "Close",
+    "open": "Open",
+    "connecting": "Connecting...",
+    "recommended": "Recommended",
+    "install": "Install",
+    "backToHome": "Back to Home",
+    "loadingFeatured": "Loading featured hackathons...",
+    "retry": "Retry",
+    "participants": "participants",
+    "viewDetails": "View Details",
+    "noFeatured": "No Featured Hackathons",
+    "noFeaturedDesc": "No featured hackathons available, please check back later",
+    "errors": {
+      "fetchDataFailed": "Failed to fetch data",
+      "dataLoadFailed": "Data Load Failed",
+      "dataLoadFailedDesc": "Unable to get latest data, please try again later",
+      "fetchFeaturedFailed": "Failed to fetch featured hackathons",
+      "loadFailed": "Load Failed",
+      "fetchFeaturedFailedDesc": "Unable to fetch featured hackathons",
+      "networkError": "Network error, please check connection",
+      "networkErrorDesc": "Please check network connection and retry",
+      "fetchTeamsFailed": "Failed to fetch teams",
+      "fetchTeamsFailedDesc": "Unable to fetch teams list"
+    },
+    "notFound": "Page Not Found",
+    "notFoundDesc": "The page you are looking for does not exist.",
+    "backHome": "Back to Home",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "and": "and",
+    "createHackathon": "Create Hackathon",
+    "errors": {
+      "loadFailed": "Failed to Load",
+      "networkError": "Network Error",
+      "networkErrorDesc": "Please check your network connection and try again",
+      "fetchStatsFailed": "Failed to fetch statistics",
+      "fetchStatsFailedDesc": "Unable to load platform statistics data",
+      "fetchFeaturedFailed": "Failed to fetch featured hackathons",
+      "fetchFeaturedFailedDesc": "Unable to load featured hackathons data"
+    }
+  },
+  "navigation": {
+    "home": "Home",
+    "hackathons": "Hackathons",
+    "projects": "Projects",
+    "teams": "Teams",
+    "community": "Community",
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "settings": "Settings",
+    "admin": "Admin",
+    "notifications": "Notifications",
+    "user": "User",
+    "disconnectWallet": "Disconnect Wallet",
+    "toggleMenu": "Toggle menu"
+  },
+  "auth": {
+    "signin": "Sign In",
+    "signup": "Sign Up",
+    "signout": "Sign Out",
+    "wallet": {
+      "connect": "Connect Wallet",
+      "disconnect": "Disconnect Wallet",
+      "connecting": "Connecting...",
+      "connected": "Connected",
+      "connectMetaMask": "Connect with MetaMask",
+      "connectWalletConnect": "Connect with WalletConnect",
+      "switchNetwork": "Switch Network",
+      "wrongNetwork": "Wrong Network",
+      "connectRequired": "Wallet Connection Required",
+      "pageAccessRequired": "This page requires wallet connection to access",
+      "firstTime": "First time using?",
+      "autoCreateAccount": "Connect wallet to automatically create account",
+      "metamaskDesc": "Most popular Ethereum wallet",
+      "trustWalletDesc": "Mobile-first crypto wallet",
+      "binanceWalletDesc": "Official BSC ecosystem wallet",
+      "coinbaseWalletDesc": "Secure and user-friendly digital wallet",
+      "okxWalletDesc": "Multi-chain wallet support",
+      "phantomDesc": "Solana ecosystem wallet",
+      "metamaskNotInstalled": "MetaMask not installed",
+      "trustWalletNotInstalled": "Trust Wallet not installed",
+      "binanceWalletNotInstalled": "Binance Wallet not installed",
+      "coinbaseWalletNotInstalled": "Coinbase Wallet not installed",
+      "okxWalletNotInstalled": "OKX Wallet not installed",
+      "phantomNotInstalled": "Phantom not installed",
+      "notInstalledError": "{walletName} is not installed, please download and install first",
+      "networkSwitched": "Network Switched",
+      "switchedToBSCTestnet": "Automatically switched to BSC Testnet",
+      "networkError": "Network Error",
+      "switchToBSCManually": "Please manually switch to BSC Testnet (ChainID: {chainId})",
+      "connectSuccess": "Connection Successful",
+      "connectedVia": "Connected wallet via {walletName}",
+      "connectFailed": "Connection Failed",
+      "checkWalletUnlocked": "Please check if wallet is unlocked",
+      "selectWalletDesc": "Choose your preferred wallet to connect to HackX platform",
+      "ensureBSCTestnet": "Please ensure your wallet is connected to {strong}BSC Testnet (ChainID: 97){/strong}",
+      "securityPromise": "We never store your private keys or seed phrases",
+      "termsAgreement": "By connecting wallet, you agree to our terms of service",
+      "loginWithWeb3": "Login to HackX platform with your Web3 wallet",
+      "noWallet": "Don't have a wallet?",
+      "installMetaMask": "Install MetaMask",
+      "byConnecting": "By connecting wallet, you agree to our",
+      "connectToSignup": "Connect Wallet to Create Account"
+    },
+    "signup": {
+      "createAccount": "Create Account",
+      "connectToCreate": "Connect your Web3 wallet to create HackX account",
+      "alreadyHaveAccount": "Already have an account?",
+      "directConnect": "Connect wallet directly",
+      "whyWallet": "Why use wallet?",
+      "benefit1": "Decentralized identity verification",
+      "benefit2": "Secure digital asset management", 
+      "benefit3": "Participate in blockchain ecosystem",
+      "benefit4": "No need to remember passwords"
+    },
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot Password?",
+    "rememberMe": "Remember Me",
+    "loginSuccess": "Login successful",
+    "loginError": "Login failed",
+    "signupSuccess": "Registration successful",
+    "signupError": "Registration failed"
+  },
+  "web3": {
+    "network": {
+      "switchToNetwork": "Please switch to {networkName} (ChainID: {chainId})",
+      "walletNotDetected": "Wallet not detected",
+      "bscNodeSyncIssue": "BSC Testnet node sync issue, please try again later",
+      "networkUnstable": "Network connection unstable, using backup data source",
+      "networkError": "Network connection error",
+      "retry": "Retry",
+      "addBSCTestnetFailed": "Failed to add BSC Testnet"
+    },
+    "wallet": {
+      "walletNotDetected": "Wallet not detected",
+      "installWalletPrompt": "Please install MetaMask or other Ethereum wallet",
+      "connectSuccess": "Wallet connected successfully",
+      "connectSuccessDesc": "Successfully connected to your wallet",
+      "connectFailed": "Connection failed",
+      "connectFailedDesc": "Unable to connect to wallet",
+      "loadWalletInfoFailed": "Failed to load wallet information",
+      "refreshAndRetry": "Please refresh the page and try again",
+      "walletDisconnected": "Wallet disconnected",
+      "reconnectWallet": "Please reconnect wallet",
+      "addressCopied": "Address copied",
+      "addressCopiedDesc": "Wallet address copied to clipboard",
+      "mainnet": "Mainnet",
+      "testnet": "Testnet",
+      "unknownNetwork": "Unknown Network",
+      "connectWallet": "Connect Wallet",
+      "connectWalletDesc": "Connect your Ethereum wallet to use Web3 features",
+      "connectMetaMask": "Connect MetaMask",
+      "supportedWallets": "Supported wallets",
+      "walletConnected": "Wallet Connected",
+      "ethBalance": "ETH Balance",
+      "hxtBalance": "HXT Balance",
+      "network": "Network",
+      "chainId": "Chain ID",
+      "copyAddress": "Copy Address",
+      "viewDetails": "View Details",
+      "walletAddress": "Wallet Address"
+    },
+    "dao": {
+      "loadProposalsFailed": "Failed to load proposal list",
+      "loadFailed": "Load failed",
+      "cannotLoadProposals": "Cannot load proposal list",
+      "networkError": "Network error",
+      "checkNetworkConnection": "Please check network connection and retry"
+    }
+  },
+  "footer": {
+    "description": "IPFS-based decentralized hackathon platform, connecting global developers to build the Web3 future.",
+    "cta": {
+      "badge": "Join the Future",
+      "title": "Ready to Start Building?",
+      "description": "Connect with global developers, participate in cutting-edge hackathons, and build the decentralized future together.",
+      "exploreHackathons": "Explore Hackathons",
+      "createTeam": "Create Team"
+    },
+    "stats": {
+      "projects": "Projects",
+      "developers": "Developers"
+    },
+    "social": {
+      "title": "Follow Us"
+    },
+    "platform": "Platform",
+    "hackathons": "Hackathons",
+    "projects": "Projects",
+    "community": "Developer Community",
+    "teams": "Teams",
+    "resources": "Resources",
+    "docs": "Documentation",
+    "apiDocs": "API Docs",
+    "blog": "Blog",
+    "helpCenter": "Help Center",
+    "about": "About",
+    "aboutUs": "About Us",
+    "careers": "Join Us",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "location": "Global",
+    "madeWith": "Made with",
+    "forCommunity": "for the community",
+    "copyright": "© 2024 HackX. All rights reserved. Built with ❤️ for the global developer community."
+  },
+  "ui": {
+    "theme": {
+      "toggleTheme": "Toggle theme",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
+    "fileUpload": {
+      "uploadFailed": "Upload failed",
+      "title": "Select files to upload to IPFS",
+      "supportedFormats": "Supports image, PDF, text files and other formats",
+      "uploading": "Uploading...",
+      "selectFiles": "Select Files"
+    },
+    "userRegistration": {
+      "connectWalletFirst": "Please connect wallet first",
+      "enterUsername": "Please enter username",
+      "registrationSuccess": "Registration successful",
+      "userRegisteredToBlockchain": "User registered to blockchain",
+      "registrationFailed": "Registration failed",
+      "tryAgainLater": "Please try again later",
+      "title": "User Registration",
+      "connectWalletToRegister": "Please connect wallet to register user",
+      "registerToDecentralizedPlatform": "Register user profile to decentralized platform",
+      "username": "Username",
+      "enterUsernamePlaceholder": "Enter username",
+      "registering": "Registering...",
+      "registerUser": "Register User",
+      "walletAddress": "Wallet Address",
+      "registrationStatus": "Registration Status",
+      "registered": "Registered",
+      "notRegistered": "Not Registered"
+    },
+    "walletConnect": {
+      "registering": "Registering...",
+      "registered": "Registered",
+      "connectWallet": "Connect Wallet"
+    }
+  },
+  "dashboard": {
+    "pleaseLogin": "Please login first",
+    "login": "Login",
+    "errors": {
+      "getUserStats": "Failed to get user statistics",
+      "getRecommendations": "Failed to get recommendations",
+      "getUserHackathons": "Failed to get user hackathons",
+      "getUserProjects": "Failed to get user projects",
+      "getUserTeams": "Failed to get user teams",
+      "debugInfo": "Debug Info"
+    },
+    "toasts": {
+      "authRequired": "Authentication Required",
+      "reloginRequired": "Please login again",
+      "avatarUploadSuccess": "Avatar Upload Successful",
+      "avatarUploadSuccessDesc": "Your avatar has been updated successfully",
+      "avatarUploadFailed": "Avatar Upload Failed", 
+      "avatarUploadRetry": "Please try again",
+      "avatarUploadServerError": "Server error, please try again later",
+      "avatarUploadNetworkError": "Network error, please check your connection",
+      "saveSuccess": "Save Successful",
+      "saveSuccessDesc": "Your profile has been updated successfully",
+      "saveFailed": "Save Failed",
+      "saveFailedRetry": "Please try again",
+      "saveNetworkError": "Network error, please check your connection",
+      "fileFormatError": "File Format Error",
+      "fileFormatDesc": "Please select JPG, PNG or GIF format image",
+      "fileTooLarge": "File Too Large",
+      "fileTooLargeDesc": "Please select image smaller than 5MB"
+    },
+    "profile": {
+      "userAvatar": "User Avatar",
+      "enterUsername": "Enter username",
+      "techStack": "Tech Stack",
+      "noTechStack": "No tech stack set yet, please add below",
+      "addTechStack": "Add tech stack (e.g.: React, Node.js)",
+      "addButton": "Add",
+      "skillExists": "Skill Already Exists",
+      "skillExistsDesc": "This skill is already in the list",
+      "skillLimit": "Skill Limit Reached",
+      "skillLimitDesc": "You can add up to 20 skills maximum",
+      "skillTooLong": "Skill Name Too Long",
+      "skillTooLongDesc": "Skill name cannot exceed 20 characters",
+      "skillInstructions": "Press Enter or click Add button to add skill",
+      "notSetYet": "Not set yet",
+      "cancel": "Cancel",
+      "save": "Save",
+      "edit": "Edit"
+    },
+    "statistics": {
+      "participatedHackathons": "Participated Hackathons",
+      "participatedDesc": "Number of hackathons you've joined",
+      "submittedProjects": "Submitted Projects",
+      "submittedDesc": "Number of projects you've submitted",
+      "wonPrizes": "Won Prizes",
+      "wonPrizesDesc": "Number of prizes you've won",
+      "reputationScore": "Reputation Score",
+      "reputationScoreDesc": "Your overall reputation score",
+      "prizesTooltip": {
+        "title": "Prize Calculation Rules",
+        "rule1": "🥇 1st place = 3 points",
+        "rule2": "🥈 2nd place = 2 points", 
+        "rule3": "🥉 3rd place = 1 point"
+      },
+      "reputationTooltip": {
+        "title": "Reputation Score Calculation",
+        "rule1": "💎 Participate in hackathon: +10 points",
+        "rule2": "🚀 Submit project: +20 points",
+        "rule3": "🏆 Win prize: +50 points",
+        "rule4": "⭐ Community contribution: +5 points"
+      }
+    },
+    "tabs": {
+      "overview": "Overview",
+      "hackathons": "My Hackathons",
+      "projects": "My Projects", 
+      "teams": "My Teams",
+      "community": "My Community"
+    },
+    "recentActivity": {
+      "title": "Recent Activity",
+      "description": "Your latest activities",
+      "noActivities": "No recent activities"
+    },
+    "recommendations": {
+      "title": "Recommended Hackathons",
+      "description": "Hackathons matching your interests",
+      "loading": "Loading recommendations...",
+      "view": "View",
+      "daysUntilStart": "{days} days until start",
+      "inProgress": "In Progress",
+      "noRecommendations": "No recommendations available",
+      "exploreHackathons": "Explore All Hackathons"
+    },
+    "actions": {
+      "joinNewHackathon": "Join New Hackathon"
+    }
+  },
+  "hackathons": {
+    "title": "Hackathons",
+    "subtitle": "Discover and join amazing hackathon events worldwide",
+    "filters": "Filters",
+    "myHackathons": "My Hackathons",
+    "create": "Create",
+    "searchResults": "Search: \"{query}\"",
+    "createHackathon": "Create Hackathon",
+    "join": "Join",
+    "leave": "Leave",
+    "search": {
+      "placeholder": "Search hackathons...",
+      "searchHistory": "Search History",
+      "clearHistory": "Clear",
+      "popularSearches": "Popular Searches",
+      "searchTips": "Tip: Try searching by technology stack, theme, or prize amount to find the perfect hackathon for you!"
+    },
+    "card": {
+      "startTime": "Start Time",
+      "endTime": "End Time", 
+      "participants": "Participants",
+      "prizePool": "Prize Pool",
+      "status": "Status",
+      "technologies": "Technologies",
+      "difficulty": "Difficulty",
+      "organizer": "Organizer",
+      "location": "Location",
+      "online": "Online",
+      "hybrid": "Hybrid",
+      "inPerson": "In Person",
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced",
+      "expert": "Expert",
+      "teamSize": "Team Size",
+      "maxTeamSize": "Max {size} members",
+      "individual": "Individual",
+      "team": "Team",
+      "viewDetails": "View Details",
+      "register": "Register",
+      "registered": "Registered",
+      "full": "Full",
+      "closed": "Registration Closed",
+      "upcoming": "Upcoming",
+      "ongoing": "Ongoing", 
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "daysLeft": "{days} days left",
+      "hoursLeft": "{hours} hours left",
+      "minutesLeft": "{minutes} minutes left",
+      "ended": "Ended"
+    },
+    "createForm": {
+      "title": "Create Hackathon",
+      "description": "Create your hackathon event and attract developers worldwide",
+      "auth": {
+        "loginRequired": "Please login first",
+        "login": "Login"
+      },
+      "steps": {
+        "basicInfo": "Basic Information",
+        "basicInfoDesc": "Set basic information and schedule",
+        "prizeSettings": "Prize Settings", 
+        "prizeSettingsDesc": "Configure prizes and tracks",
+        "techRequirements": "Technical Requirements",
+        "techRequirementsDesc": "Select tech stack and requirements",
+        "rulesExplanation": "Rules Explanation",
+        "rulesExplanationDesc": "Set rules and judging criteria",
+        "judgeTeam": "Judge Team",
+        "judgeTeamDesc": "Add judges and sponsors",
+        "previewPublish": "Preview & Publish",
+        "previewPublishDesc": "Preview and publish hackathon"
+      },
+      "navigation": {
+        "previous": "Previous",
+        "next": "Next",
+        "creating": "Creating...",
+        "createHackathon": "Create Hackathon"
+      },
+      "basicInfo": {
+        "title": "Basic Information",
+        "coverImage": "Cover Image",
+        "coverImageDesc": "Upload hackathon cover image (optional, max 5MB)",
+        "selectImage": "Select Image",
+        "uploading": "Uploading...",
+        "supportedFormats": "Supports JPG, PNG, GIF formats",
+        "hackathonName": "Hackathon Name",
+        "hackathonNamePlaceholder": "Enter hackathon name",
+        "eventDescription": "Event Description",
+        "eventDescriptionPlaceholder": "Describe your hackathon event in detail...",
+        "startTime": "Start Time",
+        "selectStartTime": "Select start time",
+        "endTime": "End Time", 
+        "selectEndTime": "Select end time",
+        "registrationStartTime": "Registration Start Time",
+        "selectRegistrationStartTime": "Select registration start time",
+        "registrationDeadline": "Registration Deadline",
+        "selectRegistrationDeadline": "Select registration deadline",
+        "eventLocation": "Event Location",
+        "eventLocationPlaceholder": "Online/Offline location",
+        "maxParticipants": "Max Participants",
+        "maxParticipantsPlaceholder": "Leave empty for no limit",
+        "timeSchedule": "Time Schedule",
+        "timeScheduleDesc": "Set key milestones for the hackathon",
+        "timelineEvent": "Timeline Event {index}",
+        "eventTitle": "Event Title",
+        "eventTitlePlaceholder": "e.g.: Competition Begins",
+        "time": "Time",
+        "selectTime": "Select time", 
+        "eventDesc": "Description",
+        "eventDescPlaceholder": "Describe this milestone...",
+        "addTimelineEvent": "Add Timeline Event",
+        "socialLinks": "Project Social Links (Optional)",
+        "socialLinksDesc": "Add project or organization social media links for participants to learn more",
+        "officialWebsite": "Official Website",
+        "twitter": "Twitter / X",
+        "discord": "Discord",
+        "telegram": "Telegram",
+        "github": "GitHub",
+        "linkedin": "LinkedIn",
+        "socialLinksAdded": "Added social links:",
+        "website": "Website",
+        "validationMinLength": "At least 10 characters required (current: {current})",
+        "validationEntered": "Entered {current} characters",
+        "validationValid": "✓"
+      },
+      "prizes": {
+        "title": "Prize Settings",
+        "prize": "Prize {index}",
+        "addPrize": "Add Prize",
+        "prizeName": "Prize Name",
+        "prizeNamePlaceholder": "e.g.: First Place",
+        "prizeAmount": "Prize Amount (USD $)",
+        "prizeAmountPlaceholder": "e.g.: 10,000",
+        "winnerCount": "Number of Winners",
+        "prizeDescription": "Prize Description",
+        "prizeDescPlaceholder": "Describe this prize...",
+        "tracks": "Track Settings",
+        "track": "Track {index}",
+        "addTrack": "Add Track",
+        "trackName": "Track Name",
+        "trackNamePlaceholder": "e.g.: DeFi Track",
+        "trackDescription": "Track Description",
+        "trackDescPlaceholder": "Describe the focus and requirements of this track..."
+      },
+      "tech": {
+        "title": "Technology Stack Selection",
+        "techDesc": "Select recommended technology stacks to help participants understand the event focus",
+        "selectedTech": "Selected Technology Stack"
+      },
+      "rules": {
+        "title": "Event Rules",
+        "detailedRules": "Detailed Rules",
+        "detailedRulesPlaceholder": "Describe hackathon rules and guidelines in detail...",
+        "participationRequirements": "Participation Requirements",
+        "addRequirement": "Add Requirement",
+        "requirementPlaceholder": "Enter participation requirement...",
+        "judgingCriteria": "Judging Criteria", 
+        "addCriteria": "Add Criteria",
+        "criteriaPlaceholder": "Enter judging criteria..."
+      },
+      "judges": {
+        "title": "Judge Team",
+        "judge": "Judge {index}",
+        "addJudge": "Add Judge",
+        "judgeName": "Name",
+        "judgeNamePlaceholder": "Judge name",
+        "judgePosition": "Position",
+        "judgePositionPlaceholder": "Position/Title",
+        "judgeBio": "Personal Bio",
+        "judgeBioPlaceholder": "Judge's personal bio...",
+        "judgeAvatar": "Avatar URL",
+        "judgeAvatarPlaceholder": "Avatar image URL",
+        "sponsors": "Sponsors",
+        "sponsor": "Sponsor {index}",
+        "addSponsor": "Add Sponsor",
+        "companyName": "Company Name",
+        "companyNamePlaceholder": "Sponsor name",
+        "sponsorTier": "Sponsor Tier",
+        "selectSponsorTier": "Select sponsor tier",
+        "platinum": "Platinum Sponsor",
+        "gold": "Gold Sponsor", 
+        "silver": "Silver Sponsor",
+        "bronze": "Bronze Sponsor",
+        "companyLogo": "Company Logo",
+        "clickUploadLogo": "Click to upload company logo",
+        "logoFormats": "Supports PNG, JPG, GIF formats, recommended size 200x100px",
+        "changeLogo": "Change Logo",
+        "deleteLogo": "Delete",
+        "websiteLink": "Website Link"
+      },
+      "preview": {
+        "title": "Preview Hackathon",
+        "timeTBD": "Time TBD",
+        "totalPrizePool": "Total Prize Pool: ${amount}",
+        "maxPeople": "Max {count} people",
+        "unlimited": "Unlimited",
+        "techStack": "Tech Stack",
+        "prizeSettings": "Prize Settings",
+        "people": "people",
+        "judgeTeam": "Judge Team",
+        "schedule": "Schedule",
+        "tbd": "TBD"
+      },
+      "defaults": {
+        "firstPrize": "First Prize",
+        "mainTrack": "Main Track",
+        "registrationDeadline": "Registration Deadline",
+        "registrationDeadlineDesc": "Registration deadline",
+        "competitionBegins": "Competition Begins", 
+        "competitionBeginsDesc": "Official development starts",
+        "submissionDeadline": "Submission Deadline",
+        "submissionDeadlineDesc": "Project submission deadline"
+      },
+      "validation": {
+        "incompleteInfo": "Incomplete Information",
+        "fillAllRequired": "Please fill in all required fields",
+        "descriptionTooShort": "Description Too Short",
+        "descriptionMinLength": "Hackathon description requires at least 10 characters",
+        "dateError": "Date Error", 
+        "endAfterStart": "End date must be after start date",
+        "registrationBeforeStart": "Registration deadline must be before start date",
+        "registrationStartBeforeEnd": "Registration start time must be before registration deadline"
+      },
+      "toasts": {
+        "fileTypeError": "File Type Error",
+        "selectImageFile": "Please select an image file",
+        "fileTooLarge": "File Too Large",
+        "imageSizeLimit": "Image size cannot exceed 5MB",
+        "retryLater": "Please try again later",
+        "logoUploadSuccess": "Logo Upload Success",
+        "logoUploadedToIPFS": "{fileName} has been successfully uploaded to IPFS",
+        "logoUploadFailed": "Logo Upload Failed",
+        "hackathonCreated": "Hackathon Created Successfully!",
+        "createdOnBlockchain": "Hackathon has been created on blockchain",
+        "contractId": "Contract ID: {contractId}",
+        "txHash": "Transaction Hash: {txHash}",
+        "creationFailed": "Creation Failed",
+        "networkError": "Network error, please check connection and retry",
+        "imageUploadFailed": "Image Upload Failed",
+        "imageUploadFailedContinue": "Cover image upload failed, but will continue creating hackathon"
+      }
+    },
+    "submit": {
+      "title": "Submit Project",
+      "description": "Submit your innovative project to {hackathonTitle}, all files will be stored on IPFS network",
+      "auth": {
+        "loginRequired": "Please login first",
+        "login": "Login"
+      }
+    },
+    "detail": {
+      "notFound": "Hackathon not found",
+      "backToList": "Back to Hackathons",
+      "startTime": "Start Time",
+      "duration": "Duration", 
+      "totalPrize": "Total Prize",
+      "location": "Location",
+      "days": "{count, plural, =1 {# day} other {# days}}",
+      "status": {
+        "upcoming": "Upcoming",
+        "ongoing": "Ongoing", 
+        "ended": "Ended",
+        "unknown": "Unknown"
+      },
+      "tabs": {
+        "overview": "Overview",
+        "prizes": "Prizes", 
+        "rules": "Rules",
+        "timeline": "Timeline",
+        "projects": "Projects"
+      }
+    },
+    "submit": "Submit Project",
+    "register": "Register",
+    "registered": "Registered",
+    "status": {
+      "upcoming": "Upcoming",
+      "ongoing": "Ongoing", 
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "draft": "Draft"
+    },
+    "details": {
+      "description": "Description",
+      "rules": "Rules",
+      "prizes": "Prizes",
+      "schedule": "Schedule",
+      "participants": "Participants",
+      "projects": "Projects",
+      "organizer": "Organizer",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "registrationDeadline": "Registration Deadline",
+      "maxParticipants": "Max Participants",
+      "prizePool": "Prize Pool",
+      "categories": "Categories",
+      "techStack": "Tech Stack"
+    },
+    "filters": {
+      "title": "Filters",
+      "all": "All",
+      "status": "Status",
+      "technology": "Technology",
+      "prizeRange": "Prize Range",
+      "dateRange": "Date Range",
+      "featured": "Featured",
+      "activeFilters": "Active Filters",
+      "clearAll": "Clear All",
+      "statusOptions": {
+        "all": "All",
+        "upcoming": "Upcoming",
+        "ongoing": "Ongoing", 
+        "completed": "Completed"
+      },
+      "prizeRangeOptions": {
+        "all": "All",
+        "0-1000": "$0 - $1,000",
+        "1000-10000": "$1,000 - $10,000", 
+        "10000+": "$10,000+"
+      },
+      "dateRangeOptions": {
+        "all": "All",
+        "this-week": "This Week",
+        "this-month": "This Month",
+        "next-month": "Next Month"
+      }
+    },
+    "create": {
+      "title": "Create",
+      "basicInfo": "Basic Information",
+      "timeSettings": "Time Settings", 
+      "prizeSettings": "Prize Settings",
+      "rules": "Rules & Requirements",
+      "preview": "Preview",
+      "publish": "Publish",
+      "titlePlaceholder": "Enter hackathon title",
+      "descriptionPlaceholder": "Describe your hackathon...",
+      "requirementsPlaceholder": "List participation requirements...",
+      "rulesPlaceholder": "Define hackathon rules...",
+      "success": "Hackathon created successfully!",
+      "error": "Failed to create hackathon"
+    }
+  },
+  "teams": {
+    "title": "Teams",
+    "createTeam": "Create Team",
+    "join": "Join Team",
+    "leave": "Leave Team",
+    "apply": "Apply to Join",
+    "invite": "Invite Members",
+    "manage": "Manage Team",
+    "members": "Members",
+    "leader": "Leader",
+    "pageTitle": "Team Management",
+    "pageDescription": "Discover teams, manage your teams, handle invitations",
+    "loading": {
+      "teams": "Loading teams...",
+      "hackathons": "Loading hackathons failed",
+      "invitations": "Loading invitations failed",
+      "failed": "Loading Failed",
+      "retry": "Retry",
+      "networkError": "Network error, please check your connection",
+      "getTeamsFailed": "Failed to get team list",
+      "submitting": "Submitting...",
+      "submitApplication": "Submit Application"
+    },
+    "search": {
+      "placeholder": "Search teams...",
+      "statusFilter": "Status Filter",
+      "allStatuses": "All Statuses",
+      "hackathonFilter": "Hackathon Filter",
+      "allHackathons": "All Hackathons"
+    },
+    "tabs": {
+      "allTeams": "All Teams",
+      "myTeams": "My Teams",
+      "invitations": "Team Invitations"
+    },
+    "status": {
+      "recruiting": "Recruiting",
+      "full": "Full",
+      "competing": "Competing",
+      "completed": "Completed",
+      "disbanded": "Disbanded"
+    },
+    "actions": {
+      "viewDetails": "View Details",
+      "applyToJoin": "Apply to Join",
+      "manageTeam": "Manage Team",
+      "acceptInvitation": "Accept Invitation",
+      "decline": "Decline",
+      "cancel": "Cancel",
+      "retry": "Retry"
+    },
+    "memberCount": "{current}/{max} members",
+    "roleLeader": "Leader",
+    "roleMember": "Member",
+    "roleRecruiting": "Recruiting",
+    "unknownHackathon": "Unknown Hackathon",
+    "empty": {
+      "noTeamsFound": "No teams found",
+      "adjustSearchCriteria": "Try adjusting search criteria or create a new team",
+      "noInvitations": "No Invitations",
+      "noInvitationsDesc": "You currently have no team invitations"
+    },
+    "invitations": {
+      "teamInvitation": "Team Invitation",
+      "fromInviter": "From {inviterName}'s invitation",
+      "acceptInvitation": "Accept Invitation",
+      "decline": "Decline"
+    },
+    "joinDialog": {
+      "title": "Apply to Join Team",
+      "description": "Apply to join \"{teamName}\" team",
+      "skillsLabel": "Skills (Optional)",
+      "skillsPlaceholder": "Enter your skills, separated by commas, e.g.: React, Node.js, Python",
+      "skillsHelp": "Show your skills to help the team understand your abilities",
+      "messageLabel": "Application Reason (Optional)",
+      "messagePlaceholder": "Please briefly explain why you want to join this team, or introduce yourself...",
+      "characterCount": "{current}/500 characters"
+    },
+    "toasts": {
+      "loginRequired": "Please login first",
+      "loginRequiredDesc": "You need to login to accept invitations",
+      "loginRequiredToDecline": "You need to login to decline invitations",
+      "loginRequiredToApply": "You need to login to apply",
+      "applicationSubmitted": "Application Submitted",
+      "applicationSubmittedDesc": "Application submitted, please wait for team leader review",
+      "applicationFailed": "Application Failed",
+      "applicationFailedDesc": "Application submission failed, please try again",
+      "invitationAccepted": "Success",
+      "invitationAcceptedDesc": "Team invitation accepted",
+      "invitationDeclined": "Success", 
+      "invitationDeclinedDesc": "Team invitation declined",
+      "operationFailed": "Operation Failed",
+      "acceptInvitationFailed": "Failed to accept invitation",
+      "declineInvitationFailed": "Failed to decline invitation"
+    },
+    "applications": {
+      "title": "Applications",
+      "pending": "Pending",
+      "approved": "Approved", 
+      "rejected": "Rejected",
+      "approve": "Approve",
+      "reject": "Reject",
+      "message": "Application Message",
+      "skills": "Skills",
+      "experience": "Experience"
+    },
+    "create": {
+      "title": "Create Team",
+      "subtitle": "Create your hackathon team",
+      "backToTeams": "Back to Teams",
+      "form": {
+        "teamName": "Team Name",
+        "teamNamePlaceholder": "Enter team name",
+        "teamNameRequired": "Team name cannot be empty",
+        "teamNameMinLength": "Team name must be at least 2 characters",
+        "description": "Team Description",
+        "descriptionPlaceholder": "Describe your team, goals, and what you're looking for...",
+        "descriptionRequired": "Team description cannot be empty",
+        "descriptionMinLength": "Team description must be at least 10 characters",
+        "hackathon": "Select Hackathon",
+        "hackathonPlaceholder": "Choose the hackathon to participate in",
+        "hackathonRequired": "Please select a hackathon to participate in",
+        "maxMembers": "Maximum Members",
+        "maxMembersDesc": "Set the maximum number of team members (including yourself)",
+        "techStack": "Technology Stack",
+        "techStackDesc": "Select the technologies your team will use",
+        "selectTechStack": "Select technology stack",
+        "addTech": "Add",
+        "skillsRequired": "At least one skill must be selected",
+        "skillsMaxLimit": "Maximum 10 skills can be selected",
+        "roles": "Team Roles",
+        "rolesDesc": "Add the roles you need for your team",
+        "selectRole": "Select role",
+        "addRole": "Add",
+        "teamVisibility": "Team Visibility",
+        "publicTeam": "Public Team",
+        "publicTeamDesc": "Other users can discover and apply to join your team",
+        "privateTeam": "Private Team",
+        "privateTeamDesc": "Only invited users can join your team"
+      },
+      "validation": {
+        "formValidationFailed": "Form validation failed",
+        "checkFields": "Please check and correct the highlighted fields",
+        "createFailed": "Creation failed",
+        "createError": "An error occurred during team creation, please try again",
+        "createTeamError": "Create team failed"
+      },
+      "success": {
+        "teamCreated": "Team created successfully",
+        "teamCreatedDesc": "Your team has been created and you can now invite members"
+      },
+      "preview": {
+        "title": "Preview",
+        "teamOverview": "Team Overview",
+        "noTechStack": "No technology stack selected",
+        "noRoles": "No roles added",
+        "maxMembersLabel": "Max Members: {count}",
+        "visibilityPublic": "Public Team",
+        "visibilityPrivate": "Private Team"
+      },
+      "actions": {
+        "createTeam": "Create Team",
+        "creating": "Creating...",
+        "cancel": "Cancel"
+      }
+    },
+    "detail": {
+      "status": {
+        "recruiting": "Recruiting",
+        "full": "Full",
+        "competing": "Competing", 
+        "completed": "Completed"
+      },
+      "tabs": {
+        "overview": "Overview",
+        "members": "Members",
+        "project": "Project",
+        "activity": "Activity",
+        "applications": "Applications"
+      }
+    }
+  },
+  "projects": {
+    "title": "Projects",
+    "create": "Create Project",
+    "submit": "Submit Project",
+    "edit": "Edit Project", 
+    "view": "View Project",
+    "like": "Like",
+    "bookmark": "Bookmark",
+    "share": "Share",
+    "status": {
+      "draft": "Draft",
+      "submitted": "Submitted",
+      "reviewed": "Reviewed",
+      "winner": "Winner",
+      "rejected": "Rejected"
+    },
+    "details": {
+      "name": "Project Name",
+      "description": "Description",
+      "techStack": "Tech Stack",
+      "category": "Category",
+      "repository": "Repository",
+      "demo": "Demo Link",
+      "documentation": "Documentation",
+      "screenshots": "Screenshots",
+      "video": "Demo Video",
+      "team": "Team Members"
+    },
+    "submit": {
+      "basicInfo": "Basic Information",
+      "techDetails": "Technical Details",
+      "demoMaterials": "Demo Materials",
+      "teamInfo": "Team Information",
+      "preview": "Preview",
+      "submit": "Submit",
+      "success": "Project submitted successfully!",
+      "error": "Failed to submit project"
+    }
+  },
+  "community": {
+    "title": "Community",
+    "description": "Share ideas, ask questions, showcase your work",
+    "posts": "Posts",
+    "createPost": "Create Post",
+    "reply": "Reply",
+    "like": "Like",
+    "bookmark": "Bookmark",
+    "follow": "Follow",
+    "unfollow": "Unfollow",
+    "loading": {
+      "community": "Loading community data...",
+      "communityDetails": "Loading the latest community updates for you...",
+      "failed": "Loading Failed",
+      "retry": "Retry",
+      "networkError": "Network error, please try again later",
+      "loadingFailed": "Failed to load community data",
+      "toggleLikeFailed": "Failed to toggle like status",
+      "toggleBookmarkFailed": "Failed to toggle bookmark status"
+    },
+    "search": {
+      "placeholder": "Search posts, tags or users...",
+      "advancedSearch": "Advanced Search",
+      "category": "Select Category",
+      "allCategories": "All Categories",
+      "sort": "Sort",
+      "latest": "Latest",
+      "popular": "Popular",
+      "mostReplies": "Most Replies",
+      "mostViews": "Most Views",
+      "title": "Community Search",
+      "subtitle": "Search posts, users and tags",
+      "searchButton": "Search",
+      "searching": "Searching...",
+      "searchFailed": "Search Failed",
+      "networkError": "Network error, please try again later",
+      "retry": "Retry",
+      "inputRequired": "Please enter search keywords",
+      "inputRequiredDesc": "Search keywords must be at least 2 characters",
+      "noResults": "No relevant content found",
+      "noResultsDesc": "Try using other keywords to search",
+      "resultsCount": "Found {count} posts",
+      "tabs": {
+        "all": "All",
+        "posts": "Posts ({count})",
+        "users": "Users ({count})",
+        "tags": "Tags ({count})"
+      },
+      "sections": {
+        "posts": "Posts",
+        "users": "Users", 
+        "tags": "Tags"
+      },
+      "actions": {
+        "viewMore": "View More"
+      },
+      "stats": {
+        "searchResults": "{count} search results"
+      }
+    },
+    "post": {
+      "backToCommunity": "Back to Community",
+      "createPost": "Create Post",
+      "publishPost": "Publish Post",
+      "publishFirst": "Publish First Post",
+      "pinned": "Pinned",
+      "locked": "Locked"
+    },
+    "empty": {
+      "noPosts": "No Posts Yet",
+      "adjustFilter": "Try adjusting your search criteria or filters",
+      "publishFirst": "Publish First Post"
+    },
+    "stats": {
+      "title": "Community Stats",
+      "totalPosts": "Total Posts",
+      "activeUsers": "Active Users",
+      "weeklyPosts": "Weekly Posts",
+      "totalLikes": "Total Likes",
+      "todayPosts": "Posts Today",
+      "todayReplies": "Replies Today"
+    },
+    "contributors": {
+      "title": "Top Contributors"
+    },
+    "rules": {
+      "title": "Community Rules"
+    },
+    "categories": {
+      "general": "General Discussion",
+      "technical": "Technical Exchange", 
+      "showcase": "Project Showcase",
+      "help": "Q&A Help",
+      "announcement": "Official Announcement"
+    },
+    "postDetail": {
+      "loading": "Loading post...",
+      "loadFailed": "Load Failed",
+      "retry": "Retry",
+      "postNotFound": "Post not found",
+      "postNotFoundDesc": "The post you are looking for may have been deleted or does not exist.",
+      "backToCommunity": "Back to Community",
+      "getLikeStatusFailed": "Failed to get like status",
+      "getPostFailed": "Failed to get post",
+      "cannotGetPostInfo": "Cannot get post information",
+      "networkError": "Network error",
+      "checkNetworkAndRetry": "Please check your network connection and try again",
+      "authorInfo": "Author Information",
+      "reputation": "Reputation: {score}",
+      "postsCount": "Posts",
+      "repliesCount": "Replies",
+      "joinedTime": "Joined",
+      "relatedPosts": "Related Posts",
+      "relatedPostsFeature": "Related posts feature to be implemented",
+      "postStats": "Post Statistics",
+      "publishTime": "Publish Time",
+      "viewsCount": "Views",
+      "likesCount": "Likes",
+      "repliesCount2": "Replies",
+      "posted": "posted",
+      "reputation2": "Reputation: {score}",
+      "loadPostStart": "Starting to load post",
+      "loadPostSkipDuplicate": "loadPost already executing, skipping duplicate call",
+      "loadPostComplete": "loadPost execution complete",
+      "directDataUse": "Using data directly, not data.post",
+      "getAuthorStatsFailed": "Failed to get author statistics",
+      "likeSuccess": "Liked successfully",
+      "likeSuccessDesc": "Thank you for your like!",
+      "unlikeSuccess": "Unliked successfully",
+      "unlikeSuccessDesc": "Removed like from this post",
+      "likeOperationFailed": "Like operation failed",
+      "likeError": "Like error",
+      "likeRetry": "Like operation failed, please try again",
+      "replyLikeSuccess": "Reply liked successfully",
+      "replyUnlikeSuccess": "Reply unliked successfully",
+      "replyLikeSuccessDesc": "Thank you for your like!",
+      "replyUnlikeSuccessDesc": "Removed like from reply",
+      "replyLikeError": "Reply like error",
+      "bookmarkSuccess": "Bookmarked successfully",
+      "unbookmarkSuccess": "Unbookmarked successfully",
+      "bookmarkSuccessDesc": "Added to bookmarks",
+      "unbookmarkSuccessDesc": "Removed from bookmarks",
+      "bookmarkOperationFailed": "Bookmark operation failed",
+      "bookmarkError": "Bookmark error",
+      "bookmarkRetry": "Bookmark operation failed, please try again",
+      "replySuccess": "Reply successful",
+      "replySuccessDesc": "Your reply has been posted",
+      "replyFailed": "Reply failed",
+      "replyFailedDesc": "An error occurred while posting reply, please try again",
+      "replyError": "Reply error",
+      "editPost": "Edit Post",
+      "deletePost": "Delete Post",
+      "title": "Title",
+      "titlePlaceholder": "Enter post title...",
+      "content": "Content",
+      "contentPlaceholder": "Enter post content...",
+      "saving": "Saving...",
+      "save": "Save",
+      "cancel": "Cancel",
+      "saveFailed": "Save failed",
+      "titleContentRequired": "Title and content cannot be empty",
+      "saveSuccess": "Save successful",
+      "postUpdated": "Post updated",
+      "saveFailedRetry": "Save failed, please try again",
+      "updatePostError": "Update post error",
+      "networkErrorRetry": "Network error, please try again",
+      "deleteConfirm": "Are you sure you want to delete this post? This action cannot be undone.",
+      "deleteSuccess": "Delete successful",
+      "postDeleted": "Post deleted",
+      "deleteFailed": "Delete failed",
+      "deletePostError": "Delete post error",
+      "share": "Share",
+      "viewsLabel": "{count} views",
+      "repliesLabel": "{count} replies",
+      "repliesTitle": "Replies ({count})",
+      "writeReply": "Write your reply...",
+      "postReply": "Post Reply",
+      "posting": "Posting...",
+      "postLocked": "This post has been locked and no new replies can be added.",
+      "replyTo": "Reply to @{name}...",
+      "noRepliesYet": "No replies yet, be the first to reply!",
+      "bookmarked": "Bookmarked",
+      "youLabel": "You"
+    },
+    "categories": {
+      "general": "General",
+      "technical": "Technical",
+      "showcase": "Showcase", 
+      "help": "Help",
+      "announcement": "Announcement"
+    },
+    "empty": {
+      "noPosts": "No posts found",
+      "adjustFilter": "Try adjusting search criteria or browse other categories",
+      "publishFirst": "Publish First Post"
+    },
+    "stats": {
+      "title": "Community Stats",
+      "totalPosts": "Total Posts",
+      "activeUsers": "Active Users",
+      "weeklyPosts": "Weekly Posts",
+      "totalLikes": "Total Likes",
+      "todayPosts": "Today's Posts",
+      "todayReplies": "Today's Replies"
+    },
+    "contributors": {
+      "title": "Top Contributors",
+      "reputation": "reputation"
+    },
+    "rules": {
+      "title": "Community Rules",
+      "rule1": "Be friendly and respectful, create a positive discussion environment",
+      "rule2": "Post valuable content, avoid spam and duplicates",
+      "rule3": "Use appropriate categories and tags for easy discovery",
+      "rule4": "No illegal, harmful, or inappropriate content",
+      "rule5": "Respect intellectual property, cite sources"
+    },
+    "sort": {
+      "latest": "Latest",
+      "popular": "Popular",
+      "trending": "Trending"
+    },
+    "bookmarks": {
+      "title": "My Bookmarks",
+      "subtitle": "Manage bookmarked posts",
+      "backToConsole": "Back to Console",
+      "loading": "Loading...",
+      "loadFailed": "Load Failed",
+      "loadError": "Failed to load bookmarks",
+      "networkError": "Network error, please try again later",
+      "retry": "Retry",
+      "empty": {
+        "title": "No bookmarks yet",
+        "description": "When you find interesting posts, click the bookmark button to save them",
+        "browse": "Browse Community"
+      },
+      "unbookmark": "Remove Bookmark",
+      "unbookmarkSuccess": "Bookmark removed successfully",
+      "unbookmarkSuccessDesc": "Removed from bookmarks",
+      "operationFailed": "Operation failed",
+      "unbookmarkFailed": "Failed to remove bookmark",
+      "reputation": "Reputation {score}",
+      "views": "{count} views",
+      "loadMore": "Load More"
+    },
+    "newPost": {
+      "title": "Create New Post",
+      "backToCommunity": "Back to Community",
+      "createPost": "Create Post",
+      "form": {
+        "title": "Title *",
+        "titlePlaceholder": "Enter an engaging title...",
+        "titleMinError": "Title must be at least 10 characters",
+        "titleMaxError": "Title cannot exceed 200 characters",
+        "titleRequired": "Please enter post title",
+        "category": "Category *",
+        "categoryPlaceholder": "Select post category",
+        "categoryRequired": "Please select post category",
+        "tags": "Tags (max 5)",
+        "tagsPlaceholder": "Enter tags and press Enter to add...",
+        "tagsCount": "{current}/5 tags",
+        "content": "Content *",
+        "contentPlaceholder": "Describe your thoughts, experiences or questions in detail...",
+        "contentRequired": "Please enter post content",
+        "contentMinError": "Content must be at least 50 characters",
+        "contentCharCount": "{count} characters (at least 50 characters)",
+        "preview": "Preview",
+        "write": "Write",
+        "cancel": "Cancel",
+        "publish": "Publish Post",
+        "publishing": "Publishing..."
+      },
+      "preview": {
+        "titlePreview": "Post Title Preview",
+        "contentPreview": "Post content preview..."
+      },
+      "sidebar": {
+        "writingTips": "Writing Tips",
+        "tip1": "Use clear, descriptive titles",
+        "tip2": "Choose appropriate categories and tags",
+        "tip3": "Provide detailed background information",
+        "tip4": "Include code examples or screenshots",
+        "tip5": "Maintain a friendly and constructive tone",
+        "formatHelp": "Format Help",
+        "boldText": "**Bold Text**",
+        "italicText": "*Italic Text*",
+        "code": "`Code`",
+        "link": "[Link](URL)",
+        "heading": "# Heading",
+        "guidelines": "Posting Guidelines",
+        "guidelinesDesc": "Please ensure content follows community rules and avoid duplicate posts."
+      },
+      "validation": {
+        "publishSuccess": "Published successfully",
+        "publishSuccessDesc": "Your post has been successfully published to the community",
+        "publishFailed": "Publish failed",
+        "publishFailedDesc": "An error occurred while publishing the post, please try again later",
+        "createError": "Create post error"
+      }
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAsRead": "Mark as Read",
+    "markAllAsRead": "Mark All as Read",
+    "clear": "Clear",
+    "settings": "Notification Settings",
+    "types": {
+      "teamInvite": "Team Invitation",
+      "applicationApproved": "Application Approved",
+      "applicationRejected": "Application Rejected",
+      "hackathonStarting": "Hackathon Starting",
+      "hackathonEnding": "Hackathon Ending",
+      "projectLiked": "Project Liked",
+      "systemAnnouncement": "System Announcement"
+    }
+  },
+  "admin": {
+    "title": "Admin Dashboard",
+    "users": "Users",
+    "hackathons": "Hackathons", 
+    "projects": "Projects",
+    "posts": "Posts",
+    "statistics": "Statistics",
+    "settings": "Settings",
+    "moderation": "Content Moderation",
+    "reports": "Reports"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "overview": "Overview",
+    "myHackathons": "My Hackathons", 
+    "myTeams": "My Teams",
+    "myProjects": "My Projects",
+    "myCommunity": "My Community",
+    "pleaseLogin": "Please login first",
+    "pleaseLoginDesc": "Login to view your personal dashboard, manage hackathon projects and teams",
+    "login": "Login",
+    "level": "Level",
+    "toNextLevel": "to next level",
+    "profile": {
+      "edit": "Edit",
+      "save": "Save",
+      "cancel": "Cancel",
+      "uploading": "Uploading...",
+      "userAvatar": "User Avatar",
+      "enterUsername": "Enter username",
+      "techStack": "Tech Stack",
+      "noTechStack": "No tech stack set yet, please add below",
+      "addTechStack": "Add tech stack (e.g.: React, Node.js)",
+      "addButton": "Add",
+      "skillExists": "Skill already exists",
+      "skillExistsDesc": "This skill is already in the list",
+      "skillLimit": "Skill limit reached",
+      "skillLimitDesc": "You can add up to 20 skills maximum",
+      "skillTooLong": "Skill name too long",
+      "skillTooLongDesc": "Skill name can be up to 50 characters maximum",
+      "skillInstructions": "Press Enter or click 'Add' button to add skills. Maximum 20 skills, 50 characters each.",
+      "notSetYet": "Not set yet"
+    },
+    "actions": {
+      "joinNewHackathon": "Join New Hackathon"
+    },
+    "statistics": {
+      "participatedHackathons": "Participated Hackathons",
+      "participatedDesc": "Total number of hackathons participated",
+      "submittedProjects": "Submitted Projects", 
+      "submittedDesc": "Total projects created and participated",
+      "wonPrizes": "Won Awards",
+      "wonPrizesDesc": "Total winning projects",
+      "reputationScore": "Reputation Score",
+      "participated": "Participated",
+      "won": "Won",
+      "created": "Created", 
+      "reputation": "Reputation",
+      "prizesTooltip": {
+        "title": "Award calculation rules:",
+        "rule1": "• Count projects with 'WINNER' status",
+        "rule2": "• Include winning projects you created",
+        "rule3": "• Include team projects you participated in that won"
+      },
+      "reputationTooltip": {
+        "title": "Reputation calculation formula:",
+        "rule1": "• Participated in hackathons: +50 points each",
+        "rule2": "• Submitted projects: +100 points each",
+        "rule3": "• Won awards: +200 points each",
+        "rule4": "• Maximum score: 1000 points",
+        "current": "Current: {participated}×50 + {projects}×100 + {prizes}×200 = {total}"
+      }
+    },
+    "tabs": {
+      "overview": "Overview",
+      "hackathons": "My Hackathons",
+      "projects": "My Projects",
+      "teams": "My Teams",
+      "community": "My Community"
+    },
+    "recentActivity": {
+      "title": "Recent Activity",
+      "description": "Your latest activities",
+      "noActivities": "No recent activities"
+    },
+    "recommendations": {
+      "title": "Recommended Hackathons",
+      "description": "Based on your skills and interests",
+      "loading": "Loading recommendations...",
+      "noRecommendations": "No recommended hackathons",
+      "browseAll": "Browse All Hackathons",
+      "view": "View",
+      "daysUntilStart": "{days} days until start",
+      "inProgress": "In progress"
+    },
+    "hackathons": {
+      "participated": "Participated Hackathons",
+      "participatedDesc": "Hackathons you joined as a participant",
+      "created": "Created Hackathons", 
+      "createdDesc": "Hackathons you created as an organizer",
+      "loading": "Loading...",
+      "noParticipated": "You haven't participated in any hackathons yet",
+      "noCreated": "You haven't created any hackathons yet",
+      "joinHackathons": "Join Hackathons",
+      "createHackathon": "Create Hackathon",
+      "viewDetails": "View Details",
+      "manage": "Manage",
+      "organizer": "Organizer",
+      "prizePool": "Prize Pool: ${amount}",
+      "inProgress": "In Progress"
+    },
+    "projects": {
+      "title": "My Projects",
+      "description": "All projects you submitted",
+      "loading": "Loading...",
+      "noProjects": "You haven't submitted any projects yet",
+      "joinAndSubmit": "Join hackathons and submit projects",
+      "viewProject": "View Project",
+      "code": "Code",
+      "demo": "Demo",
+      "score": "Score: {score}",
+      "team": "Team: {name} ({count} members)",
+      "status": {
+        "submitted": "Submitted"
+      }
+    },
+    "teams": {
+      "title": "My Teams",
+      "description": "Teams you participate in",
+      "loading": "Loading...",
+      "noTeams": "You haven't joined any teams yet",
+      "findTeams": "Find Teams",
+      "viewTeam": "View Team",
+      "manageTeam": "Manage Team",
+      "teamLeader": "Team Leader",
+      "members": "{count} members",
+      "projects": "{count} projects",
+      "status": {
+        "active": "Active"
+      }
+    },
+    "community": {
+      "myBookmarks": "My Bookmarks",
+      "myLikes": "My Likes", 
+      "myPosts": "My Posts",
+      "myFollowing": "My Following",
+      "viewBookmarks": "View Bookmarks",
+      "viewBookmarksDesc": "View posts I bookmarked",
+      "viewLikes": "View Likes",
+      "viewLikesDesc": "View posts I liked",
+      "managePosts": "Manage my published posts",
+      "viewMyPosts": "View My Posts",
+      "manageFollowing": "Manage users I follow", 
+      "viewFollowing": "View Following"
+    },
+    "toasts": {
+      "authRequired": "Authentication Required",
+      "reloginRequired": "Please login again",
+      "avatarUploadSuccess": "Avatar Upload Successful",
+      "avatarUploadSuccessDesc": "New avatar set, please click save to confirm changes",
+      "avatarUploadFailed": "Avatar Upload Failed",
+      "avatarUploadRetry": "Please try again later",
+      "avatarUploadServerError": "Server response error",
+      "avatarUploadNetworkError": "Network error, please try again later",
+      "fileFormatError": "File Format Error",
+      "fileFormatDesc": "Please select image files (JPG, PNG, GIF, WebP)",
+      "fileTooLarge": "File Too Large",
+      "fileTooLargeDesc": "Image size cannot exceed 5MB",
+      "saveSuccess": "Save Successful",
+      "saveSuccessDesc": "User information updated",
+      "saveFailed": "Save Failed",
+      "saveFailedRetry": "Please try again later",
+      "saveNetworkError": "Network error, please try again later"
+    },
+    "errors": {
+      "getUserStats": "Failed to get user statistics",
+      "getRecommendations": "Failed to get recommended hackathons",
+      "getUserHackathons": "Failed to get user hackathons",
+      "getUserProjects": "Failed to get user projects", 
+      "getUserTeams": "Failed to get user teams",
+      "debugInfo": "Debug info:"
+    }
+  },
+  "errors": {
+    "notFound": "Page not found",
+    "serverError": "Server error",
+    "networkError": "Network error",
+    "unauthorized": "Unauthorized",
+    "forbidden": "Forbidden",
+    "validation": "Validation error",
+    "required": "This field is required",
+    "invalidEmail": "Invalid email address",
+    "passwordTooShort": "Password too short",
+    "passwordMismatch": "Passwords do not match"
+  },
+  "success": {
+    "created": "Created successfully",
+    "updated": "Updated successfully", 
+    "deleted": "Deleted successfully",
+    "saved": "Saved successfully",
+    "submitted": "Submitted successfully",
+    "sent": "Sent successfully"
+  },
+  "enums": {
+    "hackathonStatus": {
+      "upcoming": "Upcoming",
+      "ongoing": "Ongoing", 
+      "completed": "Completed",
+      "ended": "Ended"
+    },
+    "teamStatus": {
+      "recruiting": "Recruiting",
+      "full": "Full",
+      "competing": "Competing",
+      "completed": "Completed",
+      "disbanded": "Disbanded"
+    },
+    "projectStatus": {
+      "draft": "Draft",
+      "submitted": "Submitted",
+      "reviewed": "Reviewed",
+      "winner": "Winner"
+    },
+    "applicationStatus": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled"
+    },
+    "userRole": {
+      "member": "Member",
+      "admin": "Admin",
+      "leader": "Leader"
+    },
+    "notificationType": {
+      "team_invite": "Team Invitation",
+      "team_application_approved": "Team Application Approved",
+      "team_application_rejected": "Team Application Rejected",
+      "team_member_joined": "Team Member Joined",
+      "team_status_changed": "Team Status Changed",
+      "hackathon_starting": "Hackathon Starting",
+      "hackathon_ending": "Hackathon Ending",
+      "hackathon_started": "Hackathon Started",
+      "hackathon_ended": "Hackathon Ended",
+      "hackathon_registration_reminder": "Registration Reminder",
+      "hackathon_submission_reminder": "Submission Reminder",
+      "hackathon_results_announced": "Results Announced",
+      "prize_awarded": "Prize Awarded",
+      "project_liked": "Project Liked",
+      "project_commented": "Project Commented",
+      "project_reviewed": "Project Reviewed",
+      "project_status_changed": "Project Status Changed",
+      "community_post_replied": "Post Replied",
+      "community_post_liked": "Post Liked",
+      "community_reply_liked": "Reply Liked",
+      "community_new_follower": "New Follower"
+    }
+  },
+  "technologies": {
+    "React": "React",
+    "VueJS": "Vue.js",
+    "Angular": "Angular",
+    "NodeJS": "Node.js",
+    "Python": "Python",
+    "Java": "Java",
+    "Go": "Go",
+    "Rust": "Rust",
+    "TypeScript": "TypeScript",
+    "JavaScript": "JavaScript",
+    "HTMLCSS": "HTML/CSS",
+    "TailwindCSS": "Tailwind CSS",
+    "NextJS": "Next.js",
+    "Solidity": "Solidity",
+    "TensorFlow": "TensorFlow",
+    "Machine Learning": "Machine Learning",
+    "MachineLearning": "Machine Learning",
+    "Blockchain": "Blockchain",
+    "Web3": "Web3",
+    "Web3JS": "Web3.js",
+    "DeFi": "DeFi",
+    "NFT": "NFT",
+    "IPFS": "IPFS",
+    "FastAPI": "FastAPI"
+  },
+  "categories": {
+    "DeFi": "DeFi",
+    "NFT": "NFT",
+    "DAO": "DAO",
+    "GameFi": "GameFi",
+    "AI": "AI",
+    "blockchain": "Blockchain",
+    "machineLearning": "Machine Learning",
+    "dataScience": "Data Science",
+    "sustainableDevelopment": "Sustainable Development",
+    "cleanEnergy": "Clean Energy",
+    "environmentalProtection": "Environmental Protection",
+    "socialImpact": "Social Impact"
+  },
+  "tags": {
+    "Web3": "Web3",
+    "blockchain": "Blockchain",
+    "smartContracts": "Smart Contracts",
+    "decentralization": "Decentralization",
+    "artificialIntelligence": "Artificial Intelligence",
+    "machineLearning": "Machine Learning",
+    "dataPrivacy": "Data Privacy",
+    "greenTechnology": "Green Technology",
+    "environmental": "Environmental Protection",
+    "socialInnovation": "Social Innovation",
+    "sustainableDevelopment": "Sustainable Development",
+    "frontendDevelopment": "Frontend Development",
+    "yieldOptimization": "Yield Optimization",
+    "riskManagement": "Risk Management",
+    "recommendationSystem": "Recommendation System"
+  },
+  "home": {
+    "stats": {
+      "title": "Platform Statistics",
+      "subtitle": "REAL-TIME METRICS from the Hackerverse",
+      "users": {
+        "label": "Registered Developers",
+        "description": "From the global developer community"
+      },
+      "hackathons": {
+        "label": "Hosted Hackathons",
+        "description": "Successfully hosted hackathon events"
+      },
+      "projects": {
+        "label": "Submitted Projects",
+        "description": "Innovative projects and solutions"
+      },
+      "countries": {
+        "label": "Countries Covered",
+        "description": "Global reach and influence"
+      },
+      "realTimeData": "Real-time data",
+      "globalMetrics": "Global metrics",
+      "growingCommunity": "Growing community"
+    },
+    "featured": {
+      "title": "Featured Hackathons",
+      "subtitle": "Join these exciting challenges and showcase your skills in the metaverse.",
+      "daysLeft": "days left",
+      "prizePool": "Prize Pool",
+      "participants": "Participants",
+      "joinHackathon": "Join Hackathon",
+      "viewDetails": "View Details",
+      "viewAllHackathons": "View All Hackathons"
+    },
+    "hero": {
+      "title": {
+        "part1": "Build the Future",
+        "part2": " Decentralized",
+        "part3": "Hackathon Platform"
+      },
+      "description": "IPFS-based open source hackathon platform connecting millions of global developers. Discover innovative projects, find investment opportunities, and build the Web3 future!",
+      "searchPlaceholder": "Search hackathons...",
+      "searching": "Searching...",
+      "startExploring": "Start Exploring",
+      "joinHackathon": "Join Hackathons",
+      "organizeEvent": "Organize Events",
+      "searchSuggestions": {
+        "history": {
+          "title": "Search History",
+          "clear": "Clear",
+          "loadError": "Failed to parse search history"
+        },
+        "popular": {
+          "title": "Popular Searches",
+          "loadingStart": "Loading popular searches...",
+          "loadSuccess": "Popular searches loaded successfully",
+          "loadError": "Failed to load popular searches",
+          "fallbackNote": "API response invalid, using fallback data",
+          "fallbackTerms": ["Web3", "DeFi", "NFT", "Blockchain", "AI", "Smart Contracts", "Metaverse", "GameFi", "DAO", "Layer2"]
+        },
+        "navigation": {
+          "searchRedirectError": "Search redirect failed"
+        }
+      }
+    },
+    "stats": {
+      "title": "Platform Data",
+      "subtitle": "HackX is becoming the world's largest decentralized hackathon platform!",
+      "users": {
+        "label": "Registered Developers",
+        "description": "Global developer community"
+      },
+      "hackathons": {
+        "label": "Hackathons Hosted",
+        "description": "Successfully organized hackathon events"
+      },
+      "projects": {
+        "label": "Projects Submitted",
+        "description": "Innovative projects and solutions"
+      },
+      "countries": {
+        "label": "Countries Covered",
+        "description": "Global reach and impact"
+      }
+    },
+    "howItWorks": {
+      "title": "How to Participate",
+      "subtitle": "Four simple steps to start your hackathon journey",
+      "steps": {
+        "discover": {
+          "title": "Discover Hackathons",
+          "description": "Browse and search for hackathons that suit you, filter by tech stack and prizes"
+        },
+        "team": {
+          "title": "Build Team",
+          "description": "Find like-minded teammates or join existing teams to start collaborating"
+        },
+        "develop": {
+          "title": "Develop Project",
+          "description": "Create innovative projects within the time limit, all files stored on IPFS"
+        },
+        "reward": {
+          "title": "Get Rewards",
+          "description": "Get evaluated by professional judges, earn prizes, investment opportunities and career development"
+        }
+      }
+    },
+    "community": {
+      "title": "Join Community",
+      "subtitle": "Connect with global developers, share experiences, get support, and build the Web3 future together",
+      "github": {
+        "description": "Open source code and contributions",
+        "action": "View Code"
+      },
+      "discord": {
+        "description": "Real-time communication and discussion",
+        "action": "Join Server"
+      },
+      "twitter": {
+        "description": "Latest updates and announcements",
+        "action": "Follow Us"
+      },
+      "forum": {
+        "title": "Forum",
+        "description": "In-depth discussions and Q&A",
+        "action": "Visit Forum"
+      },
+      "cta": {
+        "title": "Ready to Get Started?",
+        "description": "Join HackX now, discover the next world-changing project, or create your own hackathon event!",
+        "joinButton": "Connect Wallet to Join",
+        "createButton": "Create Hackathon"
+      }
+    }
+  }
+}

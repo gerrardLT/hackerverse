@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
       // 总用户数
       prisma.user.count({
         where: {
-          status: 'active'
+          status: 'ACTIVE'
         }
       }),
       
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
       prisma.hackathon.count({
         where: {
           isPublic: true,
-          status: 'active'
+          status: 'ACTIVE'
         }
       }),
       
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
       prisma.project.count({
         where: {
           status: {
-            in: ['submitted', 'approved']
+            in: ['SUBMITTED', 'REVIEWED']
           }
         }
       }),
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
       // 用户分布的国家数（模拟计算，基于用户数量）
       prisma.user.count({
         where: {
-          status: 'active'
+          status: 'ACTIVE'
         }
       }),
       

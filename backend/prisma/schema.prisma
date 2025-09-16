@@ -6,7 +6,180 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["hackathon_schema"]
+  schemas  = ["public", "hackathon_schema"]
+}
+
+// 枚举类型定义
+enum UserRole {
+  USER
+  ADMIN
+  MODERATOR
+  JUDGE
+
+  @@schema("hackathon_schema")
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  BANNED
+  PENDING
+
+  @@schema("hackathon_schema")
+}
+
+enum HackathonStatus {
+  DRAFT
+  ACTIVE
+  COMPLETED
+  CANCELLED
+
+  @@schema("hackathon_schema")
+}
+
+enum ProjectStatus {
+  DRAFT
+  SUBMITTED
+  REVIEWED
+  WINNER
+  REJECTED
+
+  @@schema("hackathon_schema")
+}
+
+enum ParticipationStatus {
+  REGISTERED
+  CONFIRMED
+  SUBMITTED
+  CANCELLED
+  COMPLETED
+
+  @@schema("hackathon_schema")
+}
+
+enum TeamApplicationStatus {
+  PENDING   // 待审核
+  APPROVED  // 已通过
+  REJECTED  // 已拒绝
+  CANCELLED // 已取消
+
+  @@schema("hackathon_schema")
+}
+
+enum TeamStatus {
+  RECRUITING // 招募中
+  FULL       // 已满员
+  COMPETING  // 比赛中
+  COMPLETED  // 已完成
+  DISBANDED  // 已解散
+
+  @@schema("hackathon_schema")
+}
+
+enum NotificationType {
+  // 团队相关
+  TEAM_INVITE                 // 团队邀请
+  TEAM_APPLICATION_APPROVED   // 申请被批准
+  TEAM_APPLICATION_REJECTED   // 申请被拒绝
+  TEAM_MEMBER_JOINED         // 新成员加入
+  TEAM_STATUS_CHANGED        // 团队状态变更
+  
+  // 黑客松相关
+  HACKATHON_STARTING         // 黑客松即将开始
+  HACKATHON_STARTED          // 黑客松已开始
+  HACKATHON_ENDING           // 黑客松即将结束
+  HACKATHON_ENDED            // 黑客松已结束
+  HACKATHON_REGISTRATION_REMINDER // 报名提醒
+  HACKATHON_SUBMISSION_REMINDER   // 提交提醒
+  HACKATHON_RESULTS_ANNOUNCED     // 结果公布
+  
+  // 项目相关
+  PROJECT_LIKED              // 项目被点赞
+  PROJECT_COMMENTED          // 项目收到评论
+  PROJECT_REVIEWED           // 项目被评审
+  PROJECT_STATUS_CHANGED     // 项目状态变更
+  PRIZE_AWARDED              // 获奖通知
+  
+  // 社区相关
+  COMMUNITY_POST_REPLIED     // 帖子被回复
+  COMMUNITY_POST_LIKED       // 帖子被点赞
+  COMMUNITY_REPLY_LIKED      // 回复被点赞
+  COMMUNITY_NEW_FOLLOWER     // 新关注者
+  COMMUNITY_FOLLOWER_POST    // 关注者发帖
+  
+  // 系统相关
+  SYSTEM_ANNOUNCEMENT        // 系统公告
+  SYSTEM_MAINTENANCE         // 系统维护
+  SECURITY_ALERT             // 安全提醒
+  FEATURE_UPDATE             // 功能更新
+  WELCOME_MESSAGE            // 欢迎消息
+
+  @@schema("hackathon_schema")
+}
+
+enum NotificationPriority {
+  URGENT  // 紧急 - 需要立即处理
+  HIGH    // 重要 - 需要及时处理
+  MEDIUM  // 普通 - 一般提醒
+  LOW     // 低级 - 信息提示
+
+  @@schema("hackathon_schema")
+}
+
+enum NotificationCategory {
+  TEAM      // 团队
+  HACKATHON // 黑客松
+  PROJECT   // 项目
+  COMMUNITY // 社区
+  SYSTEM    // 系统
+
+  @@schema("hackathon_schema")
+}
+
+enum DAOProposalStatus {
+  ACTIVE
+  PASSED
+  REJECTED
+  EXECUTED
+  EXPIRED
+
+  @@schema("hackathon_schema")
+}
+
+enum DAOProposalType {
+  TREASURY
+  GOVERNANCE
+  PROTOCOL
+  EMERGENCY
+
+  @@schema("hackathon_schema")
+}
+
+enum StakingTier {
+  BRONZE
+  SILVER
+  GOLD
+  PLATINUM
+
+  @@schema("hackathon_schema")
+}
+
+enum StakingTransactionType {
+  STAKE
+  UNSTAKE
+  CLAIM_REWARD
+  COMPOUND
+  EMERGENCY_UNLOCK
+
+  @@schema("hackathon_schema")
+}
+
+enum StakingTransactionStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+
+  @@schema("hackathon_schema")
 }
 
 model User {
@@ -16,6 +189,7 @@ model User {
   password             String?
   avatarUrl            String?
   bio                  String?
+  skills               Json                 @default("[]")
   walletAddress        String?              @unique
   reputationScore      Int                  @default(0)
   ipfsProfileHash      String?
@@ -24,8 +198,8 @@ model User {
   notificationSettings Json                 @default("{}")
   preferences          Json                 @default("{}")
   emailVerified        Boolean              @default(false)
-  role                 String               @default("user")
-  status               String               @default("active")
+  role                 UserRole             @default(USER)
+  status               UserStatus           @default(ACTIVE)
   lastLoginAt          DateTime?
   createdAt            DateTime             @default(now())
   updatedAt            DateTime             @updatedAt
@@ -38,6 +212,13 @@ model User {
   dataConsent          Json                 @default("{}") // 数据使用同意记录
   communityPosts       CommunityPost[]      @relation("CommunityPosts")
   communityReplies     CommunityReply[]     @relation("CommunityReplies")
+  postLikes            PostLike[]           @relation("PostLikes")
+  replyLikes           ReplyLike[]          @relation("ReplyLikes")
+  postBookmarks        PostBookmark[]       @relation("PostBookmarks")
+  following            UserFollow[]         @relation("UserFollowing")
+  followers            UserFollow[]         @relation("UserFollowers")
+  communityNotifications CommunityNotification[] @relation("UserNotifications")
+  triggeredNotifications CommunityNotification[] @relation("TriggeredNotifications")
   daoProposals         DAOProposal[]        @relation("DAOProposalCreator")
   daoVotes             DAOVote[]
   reputationRecords    ReputationRecord[]   @relation("UserReputation")
@@ -57,17 +238,20 @@ model User {
   stakingTransactions  StakingTransaction[]
   teamMemberships      TeamMember[]
   ledTeams             Team[]               @relation("TeamLeader")
+  teamApplications     TeamApplication[]
+  reviewedApplications TeamApplication[]    @relation("TeamApplicationReviewer")
 
   @@map("users")
   @@schema("hackathon_schema")
 }
 
 model Hackathon {
-  id                   String          @id @default(cuid())
+  id                   String           @id @default(cuid())
   title                String
   description          String?
   startDate            DateTime
   endDate              DateTime
+  registrationStartDate DateTime?
   registrationDeadline DateTime?
   maxParticipants      Int?
   prizePool            Decimal?        @db.Decimal(15, 2)
@@ -77,7 +261,7 @@ model Hackathon {
   rules                String?
   isPublic             Boolean         @default(true)
   featured             Boolean         @default(false)
-  status               String          @default("draft")
+  status               HackathonStatus @default(DRAFT)
   organizerId          String
   ipfsHash             String?
   metadata             Json?
@@ -114,7 +298,7 @@ model Project {
   videoUrl        String?
   presentationUrl String?
   ipfsHash        String?
-  status          String        @default("draft")
+  status          ProjectStatus @default(DRAFT)
   isPublic        Boolean       @default(true)
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
@@ -135,21 +319,23 @@ model Project {
 }
 
 model Team {
-  id          String       @id @default(cuid())
+  id          String     @id @default(cuid())
   name        String
   description String?
   hackathonId String
   leaderId    String
-  maxMembers  Int          @default(5)
-  skills      Json         @default("[]")
-  tags        Json         @default("[]")
-  isPublic    Boolean      @default(true)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  projects    Project[]
-  members     TeamMember[]
-  hackathon   Hackathon    @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
-  leader      User         @relation("TeamLeader", fields: [leaderId], references: [id])
+  maxMembers  Int        @default(5)
+  skills      Json       @default("[]")
+  tags        Json       @default("[]")
+  isPublic    Boolean    @default(true)
+  status      TeamStatus @default(RECRUITING)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  projects     Project[]
+  members      TeamMember[]
+  applications TeamApplication[]
+  hackathon    Hackathon    @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  leader       User         @relation("TeamLeader", fields: [leaderId], references: [id])
 
   @@map("teams")
   @@schema("hackathon_schema")
@@ -169,14 +355,35 @@ model TeamMember {
   @@schema("hackathon_schema")
 }
 
+model TeamApplication {
+  id          String                @id @default(cuid())
+  teamId      String
+  userId      String
+  message     String?               // 申请理由
+  skills      Json                  @default("[]") // 申请者的技能
+  status      TeamApplicationStatus @default(PENDING)
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+  reviewedAt  DateTime?
+  reviewedBy  String?               // 审批人ID
+  
+  team        Team                  @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user        User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reviewer    User?                 @relation("TeamApplicationReviewer", fields: [reviewedBy], references: [id])
+
+  @@unique([teamId, userId]) // 防止重复申请
+  @@map("team_applications")
+  @@schema("hackathon_schema")
+}
+
 model Participation {
-  id          String    @id @default(cuid())
+  id          String              @id @default(cuid())
   hackathonId String
   userId      String
-  status      String    @default("registered")
-  joinedAt    DateTime  @default(now())
-  hackathon   Hackathon @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status      ParticipationStatus @default(REGISTERED)
+  joinedAt    DateTime            @default(now())
+  hackathon   Hackathon           @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([hackathonId, userId])
   @@map("participations")
@@ -257,16 +464,24 @@ model ProjectLike {
 }
 
 model Notification {
-  id        String   @id @default(cuid())
-  type      String
-  title     String
-  message   String
-  data      Json?
-  read      Boolean  @default(false)
-  userId    String
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id          String              @id @default(cuid())
+  type        NotificationType
+  title       String
+  message     String
+  data        Json?
+  read        Boolean             @default(false)
+  priority    NotificationPriority @default(MEDIUM)
+  category    NotificationCategory @default(SYSTEM)
+  actionUrl   String?             // 点击跳转的URL
+  actionLabel String?             // 操作按钮文本
+  expiresAt   DateTime?           // 过期时间
+  userId      String
+  createdAt   DateTime            @default(now())
+  readAt      DateTime?           // 已读时间
+  user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId, read, createdAt])
+  @@index([userId, category, createdAt])
   @@map("notifications")
   @@schema("hackathon_schema")
 }
@@ -290,6 +505,8 @@ model CommunityPost {
   updatedAt        DateTime         @updatedAt
   author           User             @relation("CommunityPosts", fields: [authorId], references: [id], onDelete: Cascade)
   communityReplies CommunityReply[]
+  postLikes        PostLike[]       @relation("PostLikes")
+  postBookmarks    PostBookmark[]   @relation("PostBookmarks")
 
   @@map("community_posts")
   @@schema("hackathon_schema")
@@ -309,38 +526,128 @@ model CommunityReply {
   parent    CommunityReply?  @relation("ReplyReplies", fields: [parentId], references: [id])
   replies   CommunityReply[] @relation("ReplyReplies")
   post      CommunityPost    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  replyLikes ReplyLike[]     @relation("ReplyLikes")
 
   @@map("community_replies")
   @@schema("hackathon_schema")
 }
 
+model PostLike {
+  id     String @id @default(cuid())
+  userId String
+  postId String
+  createdAt DateTime @default(now())
+  
+  user User          @relation("PostLikes", fields: [userId], references: [id], onDelete: Cascade)
+  post CommunityPost @relation("PostLikes", fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@map("post_likes")
+  @@schema("hackathon_schema")
+}
+
+model ReplyLike {
+  id      String @id @default(cuid())
+  userId  String
+  replyId String
+  createdAt DateTime @default(now())
+  
+  user  User           @relation("ReplyLikes", fields: [userId], references: [id], onDelete: Cascade)
+  reply CommunityReply @relation("ReplyLikes", fields: [replyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, replyId])
+  @@map("reply_likes")
+  @@schema("hackathon_schema")
+}
+
+model PostBookmark {
+  id     String @id @default(cuid())
+  userId String
+  postId String
+  createdAt DateTime @default(now())
+  
+  user User          @relation("PostBookmarks", fields: [userId], references: [id], onDelete: Cascade)
+  post CommunityPost @relation("PostBookmarks", fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@map("post_bookmarks")
+  @@schema("hackathon_schema")
+}
+
+model UserFollow {
+  id         String @id @default(cuid())
+  followerId String
+  followingId String
+  createdAt  DateTime @default(now())
+  
+  follower  User @relation("UserFollowing", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("UserFollowers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@map("user_follows")
+  @@schema("hackathon_schema")
+}
+
+model CommunityNotification {
+  id           String                     @id @default(cuid())
+  userId       String                     // 接收通知的用户
+  type         CommunityNotificationType
+  title        String
+  content      String
+  entityType   String?                    // 关联实体类型: post, reply, user
+  entityId     String?                    // 关联实体ID
+  triggerUserId String?                   // 触发通知的用户ID
+  isRead       Boolean                    @default(false)
+  createdAt    DateTime                   @default(now())
+  readAt       DateTime?
+  
+  user         User                       @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+  triggerUser  User?                      @relation("TriggeredNotifications", fields: [triggerUserId], references: [id], onDelete: SetNull)
+
+  @@map("community_notifications")
+  @@schema("hackathon_schema")
+}
+
+enum CommunityNotificationType {
+  REPLY           // 有人回复了你的帖子
+  REPLY_MENTION   // 有人在回复中提到了你
+  POST_LIKE       // 有人点赞了你的帖子
+  REPLY_LIKE      // 有人点赞了你的回复
+  NEW_FOLLOWER    // 有新的粉丝关注了你
+  FOLLOWER_POST   // 你关注的人发布了新帖子
+  SYSTEM_ANNOUNCEMENT // 系统公告
+  WELCOME         // 欢迎消息
+
+  @@schema("hackathon_schema")
+}
+
 model DAOProposal {
-  id               String    @id @default(cuid())
+  id               String            @id @default(cuid())
   title            String
   description      String
-  proposalType     String    // treasury, governance, protocol, emergency
-  targetAmount     Decimal?  @db.Decimal(15, 2)
+  proposalType     DAOProposalType
+  targetAmount     Decimal?          @db.Decimal(15, 2)
   executionTime    DateTime
-  status           String    @default("active") // active, passed, rejected, executed, expired
-  forVotes         Int       @default(0)
-  againstVotes     Int       @default(0)
-  abstainVotes     Int       @default(0)
-  totalVotingPower Decimal   @default(0) @db.Decimal(15, 2)
-  minVotingPower   Decimal?  @db.Decimal(15, 2) // 最低投票权要求
-  quorum           Int       @default(20)       // 法定投票人数比例(%)
-  votingDeadline   DateTime                     // 投票截止时间
-  executionDelay   Int       @default(24)       // 执行延迟（小时）
-  proposalCategory String    @default("general") // general, technical, economic, governance
-  priority         String    @default("normal")  // low, normal, high, critical
+  status           DAOProposalStatus @default(ACTIVE)
+  forVotes         Int               @default(0)
+  againstVotes     Int               @default(0)
+  abstainVotes     Int               @default(0)
+  totalVotingPower Decimal           @default(0) @db.Decimal(15, 2)
+  minVotingPower   Decimal?          @db.Decimal(15, 2) // 最低投票权要求
+  quorum           Int               @default(20)       // 法定投票人数比例(%)
+  votingDeadline   DateTime                             // 投票截止时间
+  executionDelay   Int               @default(24)       // 执行延迟（小时）
+  proposalCategory String            @default("general") // general, technical, economic, governance
+  priority         String            @default("normal")  // low, normal, high, critical
   creatorId        String
   ipfsHash         String?
   metadata         Json?
-  isExecuted       Boolean   @default(false)
+  isExecuted       Boolean           @default(false)
   executedAt       DateTime?
   executedBy       String?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-  creator          User      @relation("DAOProposalCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  creator          User              @relation("DAOProposalCreator", fields: [creatorId], references: [id], onDelete: Cascade)
   votes            DAOVote[]
   multiSigProposal MultiSigProposal?
 
@@ -398,7 +705,7 @@ model Staking {
   lockUntil       DateTime?                             // 锁定到期时间
   boostMultiplier Decimal              @default(1.0) @db.Decimal(3, 2) // 加成倍数
   penaltyRate     Decimal              @default(0.1) @db.Decimal(3, 2) // 提前解锁惩罚率
-  stakingTier     String               @default("bronze") // bronze, silver, gold, platinum
+  stakingTier     StakingTier          @default(BRONZE)
   autoCompound    Boolean              @default(true)    // 自动复投
   lastRewardTime  DateTime             @default(now())
   stakingStarted  DateTime             @default(now())
@@ -414,22 +721,22 @@ model Staking {
 }
 
 model StakingTransaction {
-  id          String   @id @default(cuid())
+  id          String                    @id @default(cuid())
   stakingId   String
   userId      String
-  type        String   // stake, unstake, claim_reward, compound, emergency_unlock
-  amount      Decimal  @db.Decimal(15, 2)
-  fee         Decimal  @default(0) @db.Decimal(15, 2) // 交易手续费
-  penalty     Decimal  @default(0) @db.Decimal(15, 2) // 提前解锁惩罚
+  type        StakingTransactionType
+  amount      Decimal                   @db.Decimal(15, 2)
+  fee         Decimal                   @default(0) @db.Decimal(15, 2) // 交易手续费
+  penalty     Decimal                   @default(0) @db.Decimal(15, 2) // 提前解锁惩罚
   txHash      String?
   blockNumber BigInt?
   gasUsed     BigInt?
-  status      String   @default("pending") // pending, confirmed, failed
-  reason      String?  // 交易原因或失败原因
-  createdAt   DateTime @default(now())
+  status      StakingTransactionStatus @default(PENDING)
+  reason      String?                   // 交易原因或失败原因
+  createdAt   DateTime                  @default(now())
   confirmedAt DateTime?
-  staking     Staking  @relation(fields: [stakingId], references: [id], onDelete: Cascade)
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  staking     Staking                   @relation(fields: [stakingId], references: [id], onDelete: Cascade)
+  user        User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, type])
   @@index([status, createdAt])
