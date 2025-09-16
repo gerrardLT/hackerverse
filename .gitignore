@@ -50,6 +50,7 @@ dist/
 # IDE files
 .vscode/
 .idea/
-
+.cursor
+.cursorignore
 # OS files
 Thumbs.db
