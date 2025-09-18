@@ -320,15 +320,6 @@ npm run deploy:sepolia  # or other networks
 - 🎓 Educational institution collaboration features
 - 💼 Talent recruitment platform integration
 
-## 📚 Documentation
-
-- [📖 Product Design Document](./docs/产品设计文档.md)
-- [🏗️ Technical Architecture Design](./docs/技术方案与架构设计.md)
-- [🗄️ Database Design](./docs/数据库设计文档.md)
-- [📋 Development Task List](./docs/开发任务清单.md)
-- [🔧 API Documentation](./docs/API接口完整文档.md)
-- [📦 IPFS Integration Guide](./docs/ipfs/)
-- [🔐 Smart Contract Documentation](./docs/contracts/)
 
 ## 🤝 Contributing
 
