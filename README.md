@@ -371,7 +371,7 @@ This project is licensed under the [MIT License](./LICENSE).
 - **Project Homepage**: [Hackerverse Platform](#)
 - **Issue Reports**: [GitHub Issues](../../issues)
 - **Feature Suggestions**: [GitHub Discussions](../../discussions)
-- **Email**: contact@Hackerverse.dev
+- **Email**: traderluotao@gmail.com
 
 ---
 
