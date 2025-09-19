@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { AuthService } from '@/lib/auth'
-import { getLocaleFromRequest, createTFunction } from '@/lib/i18n'
+import { t, getLocaleFromRequest } from '@/lib/i18n'
 
 export async function POST(
   request: NextRequest,
@@ -9,7 +9,6 @@ export async function POST(
 ) {
   try {
     const locale = getLocaleFromRequest(request)
-    const t = createTFunction(locale)
     
     const hackathonId = params.id
     
@@ -72,7 +71,7 @@ export async function POST(
     // 检查是否是创建者
     if (hackathon.organizerId === payload.userId) {
       return NextResponse.json(
-        { success: false, error: '创建者不能参加自己创建的黑客松' },
+        { success: false, error: t('hackathons.creatorCannotJoin', getLocaleFromRequest(request)) },
         { status: 400 }
       )
     }
@@ -85,7 +84,7 @@ export async function POST(
       return NextResponse.json(
         { 
           success: false, 
-          error: '报名尚未开始',
+          error: t('hackathons.registrationNotStarted', getLocaleFromRequest(request)),
           details: `报名将于 ${hackathon.registrationStartDate.toLocaleString('zh-CN')} 开始`
         },
         { status: 400 }
@@ -97,7 +96,7 @@ export async function POST(
       return NextResponse.json(
         { 
           success: false, 
-          error: '报名已截止',
+          error: t('hackathons.registrationClosed', getLocaleFromRequest(request)),
           details: `报名已于 ${hackathon.registrationDeadline.toLocaleString('zh-CN')} 截止`
         },
         { status: 400 }
@@ -107,7 +106,7 @@ export async function POST(
     // 检查参与人数限制
     if (hackathon.maxParticipants && hackathon._count.participations >= hackathon.maxParticipants) {
       return NextResponse.json(
-        { success: false, error: '参与人数已达上限' },
+        { success: false, error: t('hackathons.participantLimitReached', getLocaleFromRequest(request)) },
         { status: 400 }
       )
     }
@@ -122,7 +121,7 @@ export async function POST(
     
     if (existingParticipation) {
       return NextResponse.json(
-        { success: false, error: '您已经报名参加该黑客松' },
+        { success: false, error: t('hackathons.alreadyRegistered', getLocaleFromRequest(request)) },
         { status: 400 }
       )
     }
@@ -169,9 +168,6 @@ export async function POST(
   } catch (error) {
     console.error('参加黑客松错误:', error)
     
-    const locale = getLocaleFromRequest(request)
-    const t = createTFunction(locale)
-    
     return NextResponse.json(
       { success: false, error: t('hackathons.joinError') },
       { status: 500 }
@@ -186,7 +182,6 @@ export async function DELETE(
 ) {
   try {
     const locale = getLocaleFromRequest(request)
-    const t = createTFunction(locale)
     
     const hackathonId = params.id
     
@@ -196,7 +191,7 @@ export async function DELETE(
     
     if (!token) {
       return NextResponse.json(
-        { success: false, error: '未提供认证token' },
+        { success: false, error: t('auth.unauthorized', getLocaleFromRequest(request)) },
         { status: 401 }
       )
     }
@@ -205,7 +200,7 @@ export async function DELETE(
     const payload = AuthService.verifyToken(token)
     if (!payload) {
       return NextResponse.json(
-        { success: false, error: '无效的认证token' },
+        { success: false, error: t('auth.tokenInvalid', getLocaleFromRequest(request)) },
         { status: 401 }
       )
     }
@@ -220,7 +215,7 @@ export async function DELETE(
     
     if (!participation) {
       return NextResponse.json(
-        { success: false, error: '您未报名参加该黑客松' },
+        { success: false, error: t('hackathons.notRegistered', getLocaleFromRequest(request)) },
         { status: 404 }
       )
     }
@@ -235,7 +230,7 @@ export async function DELETE(
     
     if (hackathon && new Date() >= hackathon.startDate) {
       return NextResponse.json(
-        { success: false, error: '黑客松已开始，无法取消报名' },
+        { success: false, error: t('hackathons.hackathonStarted', getLocaleFromRequest(request)) },
         { status: 400 }
       )
     }
@@ -247,13 +242,13 @@ export async function DELETE(
     
     return NextResponse.json({
       success: true,
-      message: '取消参加成功',
+      message: t('hackathons.leaveSuccess', getLocaleFromRequest(request)),
     })
     
   } catch (error) {
-    console.error('取消参加错误:', error)
+    console.error('Cancel registration error:', error)
     return NextResponse.json(
-      { success: false, error: '取消参加失败' },
+      { success: false, error: t('hackathons.cancelRegistrationFailed', getLocaleFromRequest(request)) },
       { status: 500 }
     )
   }

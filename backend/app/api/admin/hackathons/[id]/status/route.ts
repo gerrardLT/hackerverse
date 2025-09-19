@@ -4,7 +4,7 @@ import { auth } from '@/lib/auth';
 import { z } from 'zod';
 
 const statusSchema = z.object({
-  status: z.enum(['draft', 'active', 'completed'])
+  status: z.enum(['DRAFT', 'ACTIVE', 'COMPLETED', 'CANCELLED'])
 });
 
 export async function PUT(
@@ -22,7 +22,7 @@ export async function PUT(
     }
 
     // 检查管理员权限
-    if (user.role !== 'admin') {
+    if (user.role !== 'ADMIN') {
       return NextResponse.json(
         { success: false, error: '权限不足' },
         { status: 403 }

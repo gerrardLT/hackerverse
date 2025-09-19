@@ -16,6 +16,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { useNotificationStore } from '@/stores/notification-store'
 import { useAuth } from '@/hooks/use-auth'
 import { useToast } from '@/hooks/use-toast'
+import { useLocale } from 'next-intl'
 import { useEnumTranslations } from '@/lib/enum-utils'
 
 // 通知工具函数
@@ -137,21 +138,27 @@ function getCategoryLabel(category?: string) {
   }
 }
 
-function formatNotificationTime(createdAt: string): string {
+function formatNotificationTime(createdAt: string, locale: string = 'zh'): string {
   const now = new Date()
   const notificationTime = new Date(createdAt)
   const diffInMinutes = Math.floor((now.getTime() - notificationTime.getTime()) / (1000 * 60))
 
   if (diffInMinutes < 1) {
-    return '刚刚'
+    return locale === 'zh' ? '刚刚' : 'Just now'
   } else if (diffInMinutes < 60) {
-    return `${diffInMinutes} 分钟前`
+    return locale === 'zh' 
+      ? `${diffInMinutes} 分钟前` 
+      : `${diffInMinutes} minute${diffInMinutes > 1 ? 's' : ''} ago`
   } else if (diffInMinutes < 1440) {
     const hours = Math.floor(diffInMinutes / 60)
-    return `${hours} 小时前`
+    return locale === 'zh' 
+      ? `${hours} 小时前` 
+      : `${hours} hour${hours > 1 ? 's' : ''} ago`
   } else {
     const days = Math.floor(diffInMinutes / 1440)
-    return `${days} 天前`
+    return locale === 'zh' 
+      ? `${days} 天前` 
+      : `${days} day${days > 1 ? 's' : ''} ago`
   }
 }
 
@@ -159,6 +166,7 @@ export function NotificationDropdown() {
   const [open, setOpen] = useState(false)
   const { isAuthenticated } = useAuth()
   const { toast } = useToast()
+  const locale = useLocale()
   const enumT = useEnumTranslations()
   
   const {
@@ -324,7 +332,7 @@ export function NotificationDropdown() {
                         {notification.title}
                       </p>
                       <span className="text-xs text-muted-foreground ml-2">
-                        {formatNotificationTime(notification.createdAt)}
+                        {formatNotificationTime(notification.createdAt, locale)}
                       </span>
                     </div>
                     <p className="text-xs text-muted-foreground mt-1 line-clamp-2">

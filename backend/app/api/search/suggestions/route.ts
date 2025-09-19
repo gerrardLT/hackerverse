@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
       prisma.hackathon.findMany({
         where: {
           isPublic: true,
-          status: 'active'
+          status: 'ACTIVE'
         },
         select: {
           tags: true,

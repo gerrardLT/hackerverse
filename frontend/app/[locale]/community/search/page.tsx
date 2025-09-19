@@ -206,7 +206,7 @@ export default function CommunitySearchPage() {
                               </p>
                               <div className="flex items-center gap-4 text-xs text-muted-foreground">
                                 <span>{post.author.name}</span>
-                                <span>{formatTimeAgo(post.createdAt)}</span>
+                                <span>{formatTimeAgo(post.createdAt, locale)}</span>
                                 <span>{t('stats.likes', { count: post.likes })}</span>
                                 <span>{t('stats.replies', { count: post.replies })}</span>
                               </div>
@@ -324,7 +324,7 @@ export default function CommunitySearchPage() {
                           <div className="flex items-center justify-between text-sm text-muted-foreground">
                             <div className="flex items-center gap-4">
                               <span className="font-medium">{post.author.name}</span>
-                              <span>{formatTimeAgo(post.createdAt)}</span>
+                              <span>{formatTimeAgo(post.createdAt, locale)}</span>
                             </div>
                             <div className="flex items-center gap-4">
                               <span>{t('stats.views', { count: post.views })}</span>

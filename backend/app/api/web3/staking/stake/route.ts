@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
         userId: user.id,
         type: 'stake',
         amount,
-        status: 'completed'
+        status: 'CONFIRMED'
       }
     });
 

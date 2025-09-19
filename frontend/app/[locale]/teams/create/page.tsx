@@ -83,7 +83,7 @@ export default function CreateTeamPage() {
         } else if (value.length < 2) {
           errors.name = t('form.teamNameMinLength')
         } else if (value.length > 50) {
-          errors.name = "团队名称最多50个字符"
+          errors.name = t('validation.nameMaxLength')
         } else {
           delete errors.name
         }
@@ -95,7 +95,7 @@ export default function CreateTeamPage() {
         } else if (value.length < 10) {
           errors.description = t('form.descriptionMinLength')
         } else if (value.length > 500) {
-          errors.description = "团队描述最多500个字符"
+          errors.description = t('validation.descMaxLength')
         } else {
           delete errors.description
         }
@@ -121,7 +121,7 @@ export default function CreateTeamPage() {
         
       case 'tags':
         if (Array.isArray(value) && value.length > 5) {
-          errors.tags = "团队标签最多5个"
+          errors.tags = t('validation.tagsMaxCount')
         } else {
           delete errors.tags
         }
@@ -129,9 +129,9 @@ export default function CreateTeamPage() {
         
       case 'maxMembers':
         if (value < 2) {
-          errors.maxMembers = "团队规模至少2人"
+          errors.maxMembers = t('validation.minMembers')
         } else if (value > 10) {
-          errors.maxMembers = "团队规模最多10人"
+          errors.maxMembers = t('validation.maxMembersLimit')
         } else {
           delete errors.maxMembers
         }
@@ -159,10 +159,10 @@ export default function CreateTeamPage() {
           })))
         }
       } catch (error) {
-        console.error('获取黑客松列表失败:', error)
+        console.error('Failed to get hackathon list:', error)
         toast({
-          title: '加载失败',
-          description: '无法获取黑客松列表，请刷新页面重试',
+          title: t('loading.loadFailed'),
+          description: t('loading.noHackathons'),
           variant: 'destructive'
         })
       } finally {
@@ -252,13 +252,13 @@ export default function CreateTeamPage() {
       
       if (response.success) {
         toast({
-          title: "团队创建成功！",
-          description: "你的团队已成功创建，现在可以开始招募成员了"
+          title: t('success.teamCreated'),
+          description: t('success.teamCreatedDesc')
         })
         
         router.push('/teams')
       } else {
-        throw new Error(response.error || '创建失败')
+        throw new Error(response.error || t('validation.createFailed'))
       }
     } catch (error) {
       console.error(t('validation.createTeamError'), error)
@@ -279,8 +279,8 @@ export default function CreateTeamPage() {
     return (
       <div className="container mx-auto py-8">
         <div className="max-w-2xl mx-auto text-center">
-          <h1 className="text-2xl font-bold mb-4">请先登录</h1>
-          <p className="text-muted-foreground mb-6">登录后才能创建团队</p>
+          <h1 className="text-2xl font-bold mb-4">{t('auth.loginRequired')}</h1>
+          <p className="text-muted-foreground mb-6">{t('auth.loginDesc')}</p>
         </div>
       </div>
     )
@@ -364,7 +364,7 @@ export default function CreateTeamPage() {
                           <div className="flex flex-col">
                             <span>{hackathon.title}</span>
                             <span className="text-xs text-muted-foreground">
-                              截止时间: {new Date(hackathon.endDate).toLocaleDateString()}
+                              {t('hackathon.deadline')}: {new Date(hackathon.endDate).toLocaleDateString()}
                             </span>
                           </div>
                         </SelectItem>
@@ -378,16 +378,16 @@ export default function CreateTeamPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="maxMembers">团队规模</Label>
+                <Label htmlFor="maxMembers">{t('hackathon.teamSize')}</Label>
                 <Select value={formData.maxMembers.toString()} onValueChange={(value) => handleInputChange('maxMembers', parseInt(value))}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="3">3 人团队</SelectItem>
-                    <SelectItem value="4">4 人团队</SelectItem>
-                    <SelectItem value="5">5 人团队</SelectItem>
-                    <SelectItem value="6">6 人团队</SelectItem>
+                    <SelectItem value="3">{t('hackathon.members3')}</SelectItem>
+                    <SelectItem value="4">{t('hackathon.members4')}</SelectItem>
+                    <SelectItem value="5">{t('hackathon.members5')}</SelectItem>
+                    <SelectItem value="6">{t('hackathon.members6')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -397,9 +397,9 @@ export default function CreateTeamPage() {
           {/* 技术栈 */}
           <Card>
             <CardHeader>
-              <CardTitle>技术栈</CardTitle>
+              <CardTitle>{t('sections.techStack')}</CardTitle>
               <CardDescription>
-                选择团队将使用的技术栈
+                {t('sections.techStackDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -438,7 +438,7 @@ export default function CreateTeamPage() {
               )}
               
               <p className="text-xs text-muted-foreground">
-                已选择 {formData.skills.length}/10 项技能
+                {t('sections.skillsSelected', { count: formData.skills.length })}
               </p>
             </CardContent>
           </Card>
@@ -446,9 +446,9 @@ export default function CreateTeamPage() {
           {/* 团队标签 */}
           <Card>
             <CardHeader>
-              <CardTitle>团队标签（可选）</CardTitle>
+              <CardTitle>{t('sections.teamTags')}</CardTitle>
               <CardDescription>
-                添加标签来描述团队特色或招募需求
+                {t('sections.teamTagsDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -487,16 +487,16 @@ export default function CreateTeamPage() {
           {/* 隐私设置 */}
           <Card>
             <CardHeader>
-              <CardTitle>隐私设置</CardTitle>
+              <CardTitle>{t('sections.privacy')}</CardTitle>
               <CardDescription>
-                控制团队的可见性
+                {t('sections.privacyDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <Label htmlFor="isPublic">公开团队</Label>
-                  <p className="text-sm text-muted-foreground">允许其他用户搜索和查看你的团队</p>
+                  <Label htmlFor="isPublic">{t('sections.publicTeamLabel')}</Label>
+                  <p className="text-sm text-muted-foreground">{t('sections.publicTeamDesc')}</p>
                 </div>
                 <Switch
                   id="isPublic"

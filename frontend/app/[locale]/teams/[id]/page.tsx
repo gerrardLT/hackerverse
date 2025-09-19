@@ -136,19 +136,19 @@ export default function TeamDetailPage() {
           achievements: []
         })
       } else {
-        setError(response.error || '获取团队信息失败')
+        setError(response.error || t('errors.loadFailed'))
         toast({
-          title: '加载失败',
-          description: response.error || '无法获取团队信息',
+          title: t('loading.loadFailed'),
+          description: response.error || t('errors.loadFailed'),
           variant: 'destructive'
         })
       }
     } catch (error) {
-      console.error('获取团队信息错误:', error)
-      setError('网络错误，请检查网络连接')
+      console.error('Get team info error:', error)
+      setError(t('errors.networkError'))
       toast({
-        title: '网络错误',
-        description: '请检查网络连接并重试',
+        title: t('errors.networkError'),
+        description: t('errors.networkError'),
         variant: 'destructive'
       })
     } finally {
@@ -165,23 +165,23 @@ export default function TeamDetailPage() {
       
       if (response.success) {
       toast({
-        title: "申请已发送",
-        description: "你的加入申请已发送给团队队长，请等待审核"
+        title: t('toasts.applicationSent'),
+        description: t('toasts.applicationSentDesc')
       })
         // 重新加载团队信息
         loadTeam(team.id)
       } else {
         toast({
-          title: "申请失败",
-          description: response.error || "发送申请时出现错误，请重试",
+          title: t('toasts.applicationFailed'),
+          description: response.error || t('toasts.applicationFailedDesc'),
           variant: "destructive"
         })
       }
     } catch (error) {
-      console.error('加入团队错误:', error)
+      console.error('Join team error:', error)
       toast({
-        title: "申请失败",
-        description: "发送申请时出现错误，请重试",
+        title: t('toasts.applicationFailed'),
+        description: t('toasts.applicationFailedDesc'),
         variant: "destructive"
       })
     } finally {
@@ -202,24 +202,24 @@ export default function TeamDetailPage() {
       
       if (response.success) {
         toast({
-          title: "邀请已发送",
-          description: "已成功向用户发送团队邀请"
+          title: t('toasts.inviteSent'),
+          description: t('toasts.inviteSentDesc')
         })
         setInviteDialogOpen(false)
         setInviteUserId('')
         setInviteMessage('')
       } else {
         toast({
-          title: "邀请失败",
-          description: response.error || "发送邀请时出现错误",
+          title: t('toasts.inviteFailed'),
+          description: response.error || t('toasts.inviteFailedDesc'),
           variant: "destructive"
         })
       }
     } catch (error) {
-      console.error('邀请用户错误:', error)
+      console.error('Invite user error:', error)
       toast({
-        title: "邀请失败",
-        description: "发送邀请时出现错误，请重试",
+        title: t('toasts.inviteFailed'),
+        description: t('toasts.inviteError'),
         variant: "destructive"
       })
     } finally {
@@ -241,7 +241,7 @@ export default function TeamDetailPage() {
         setApplications(response.data.applications)
       }
     } catch (error) {
-      console.error('加载申请列表失败:', error)
+      console.error('Load application list failed:', error)
     } finally {
       setApplicationsLoading(false)
     }
@@ -260,7 +260,7 @@ export default function TeamDetailPage() {
 
       if (response.success) {
         toast({
-          title: action === 'approve' ? '申请已批准' : '申请已拒绝',
+          title: action === 'approve' ? t('toasts.applicationApproved') : t('toasts.applicationRejected'),
           description: response.message
         })
 
@@ -271,10 +271,10 @@ export default function TeamDetailPage() {
         throw new Error(response.error || '操作失败')
       }
     } catch (error) {
-      console.error('审批申请失败:', error)
+      console.error('Review application failed:', error)
       toast({
-        title: '操作失败',
-        description: error instanceof Error ? error.message : '操作失败，请重试',
+        title: t('toasts.operationFailed'),
+        description: error instanceof Error ? error.message : t('toasts.operationFailedDesc'),
         variant: 'destructive'
       })
     } finally {
@@ -319,7 +319,7 @@ export default function TeamDetailPage() {
       <div className="container mx-auto py-8">
         <div className="max-w-4xl mx-auto text-center py-12">
           <Loader2 className="h-12 w-12 text-primary animate-spin mx-auto mb-4" />
-          <p className="text-lg">加载团队详情中...</p>
+          <p className="text-lg">{t('loading.teamDetails')}</p>
         </div>
       </div>
     )
@@ -332,7 +332,7 @@ export default function TeamDetailPage() {
           <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
           <p className="text-lg">{error}</p>
           <Button onClick={() => loadTeam(params.id as string)} className="mt-4">
-            重试
+            {t('loading.retry')}
           </Button>
         </div>
       </div>
@@ -344,7 +344,7 @@ export default function TeamDetailPage() {
       <div className="container mx-auto py-8">
         <div className="max-w-4xl mx-auto text-center py-12">
           <AlertCircle className="h-12 w-12 text-gray-500 mx-auto mb-4" />
-          <p className="text-lg">团队信息未找到</p>
+          <p className="text-lg">{t('errors.teamNotFound')}</p>
         </div>
       </div>
     )
@@ -377,7 +377,7 @@ export default function TeamDetailPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <Users className="h-4 w-4" />
-                    {team.members.length}/{team.maxMembers} 成员
+                    {t('memberCount', { current: team.members.length, max: team.maxMembers })}
                   </div>
                 </div>
               </div>
@@ -394,38 +394,38 @@ export default function TeamDetailPage() {
                       <div className="space-y-2">
                         <Button variant="outline" disabled>
                           <Crown className="h-4 w-4 mr-2" />
-                          团队创建者
+                          {t('teamCreator')}
                         </Button>
                         {team.status === 'recruiting' && team.members && team.members.length < team.maxMembers && (
                           <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
                             <DialogTrigger asChild>
                               <Button variant="default" size="sm">
                                 <UserPlus className="h-4 w-4 mr-2" />
-                                邀请成员
+                                {t('actions.inviteMember')}
                               </Button>
                             </DialogTrigger>
                             <DialogContent>
                               <DialogHeader>
-                                <DialogTitle>邀请成员加入团队</DialogTitle>
+                                <DialogTitle>{t('invite.dialogTitle')}</DialogTitle>
                                 <DialogDescription>
-                                  输入用户ID邀请其加入您的团队
+                                  {t('invite.dialogDesc')}
                                 </DialogDescription>
                               </DialogHeader>
                               <div className="space-y-4">
                                 <div>
-                                  <Label htmlFor="userId">用户ID</Label>
+                                  <Label htmlFor="userId">{t('invite.userIdLabel')}</Label>
                                   <Input
                                     id="userId"
-                                    placeholder="输入要邀请的用户ID"
+                                    placeholder={t('invite.userIdPlaceholder')}
                                     value={inviteUserId}
                                     onChange={(e) => setInviteUserId(e.target.value)}
                                   />
                                 </div>
                                 <div>
-                                  <Label htmlFor="message">邀请消息 (可选)</Label>
+                                  <Label htmlFor="message">{t('invite.messageLabel')}</Label>
                                   <Textarea
                                     id="message"
-                                    placeholder="写一段邀请消息..."
+                                    placeholder={t('invite.messagePlaceholder')}
                                     value={inviteMessage}
                                     onChange={(e) => setInviteMessage(e.target.value)}
                                   />
@@ -433,10 +433,10 @@ export default function TeamDetailPage() {
                               </div>
                               <DialogFooter>
                                 <Button variant="outline" onClick={() => setInviteDialogOpen(false)}>
-                                  取消
+                                  {t('invite.cancel')}
                                 </Button>
                                 <Button onClick={handleInviteUser} disabled={isInviting || !inviteUserId.trim()}>
-                                  {isInviting ? '发送中...' : '发送邀请'}
+                                  {isInviting ? t('invite.sending') : t('invite.send')}
                                 </Button>
                               </DialogFooter>
                             </DialogContent>
@@ -450,7 +450,7 @@ export default function TeamDetailPage() {
                     return (
                       <Button variant="outline" disabled>
                         <UserPlus className="h-4 w-4 mr-2" />
-                        已加入团队
+                        {t('actions.joined')}
                       </Button>
                     )
                   }
@@ -459,7 +459,7 @@ export default function TeamDetailPage() {
                     return (
                       <Button onClick={handleJoinTeam} disabled={isJoining}>
                         <UserPlus className="h-4 w-4 mr-2" />
-                        {isJoining ? '申请中...' : '申请加入'}
+                        {isJoining ? t('actions.joining') : t('actions.applyJoin')}
                       </Button>
                     )
                   }
@@ -468,7 +468,7 @@ export default function TeamDetailPage() {
                 })()}
                 <Button variant="outline">
                   <MessageCircle className="h-4 w-4 mr-2" />
-                  联系队长
+                  {t('actions.contactLeader')}
                 </Button>
               </div>
             </div>
@@ -501,7 +501,7 @@ export default function TeamDetailPage() {
                 {/* 技术栈 */}
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-lg">技术栈</CardTitle>
+                    <CardTitle className="text-lg">{t('overview.techStack')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="flex flex-wrap gap-2">
@@ -510,7 +510,7 @@ export default function TeamDetailPage() {
                           <Badge key={tech} variant="secondary">{tech}</Badge>
                         ))
                       ) : (
-                        <p className="text-sm text-muted-foreground">暂未设置技术栈</p>
+                        <p className="text-sm text-muted-foreground">{t('overview.noTechStack')}</p>
                       )}
                     </div>
                   </CardContent>
@@ -520,7 +520,7 @@ export default function TeamDetailPage() {
                 {team.lookingFor && team.lookingFor.length > 0 && (
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-lg">招募职位</CardTitle>
+                      <CardTitle className="text-lg">{t('overview.recruitmentNeeds')}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="flex flex-wrap gap-2">
@@ -536,7 +536,7 @@ export default function TeamDetailPage() {
                 {team.projectIdea && (
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-lg">项目想法</CardTitle>
+                      <CardTitle className="text-lg">{t('overview.projectIdea')}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <p className="text-muted-foreground leading-relaxed">
@@ -552,20 +552,20 @@ export default function TeamDetailPage() {
                 {/* 团队统计 */}
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-lg">团队统计</CardTitle>
+                    <CardTitle className="text-lg">{t('stats.title')}</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">创建时间</span>
+                      <span className="text-muted-foreground">{t('stats.createdAt')}</span>
                       <span>{formatDate(team.createdAt)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">团队规模</span>
+                      <span className="text-muted-foreground">{t('stats.teamSize')}</span>
                       <span>{team.members.length}/{team.maxMembers}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">招募状态</span>
-                      <span>{team.status === 'recruiting' ? '招募中' : '已满员'}</span>
+                      <span className="text-muted-foreground">{t('stats.recruitmentStatus')}</span>
+                      <span>{team.status === 'recruiting' ? t('stats.recruiting') : t('stats.full')}</span>
                     </div>
                   </CardContent>
                 </Card>
@@ -574,7 +574,7 @@ export default function TeamDetailPage() {
                 {team.socialLinks && (
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-lg">社交链接</CardTitle>
+                      <CardTitle className="text-lg">{t('social.title')}</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                       {team.socialLinks.github && (
@@ -597,7 +597,7 @@ export default function TeamDetailPage() {
                           className="flex items-center gap-2 text-sm hover:text-primary"
                         >
                           <Globe className="h-4 w-4" />
-                          官网
+                          {t('social.website')}
                           <ExternalLink className="h-3 w-3" />
                         </a>
                       )}
@@ -615,7 +615,7 @@ export default function TeamDetailPage() {
                 {team.achievements && team.achievements.length > 0 && (
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-lg">团队成就</CardTitle>
+                      <CardTitle className="text-lg">{t('achievements.title')}</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                       {team.achievements.map((achievement, index) => (
@@ -641,7 +641,7 @@ export default function TeamDetailPage() {
                   <CardContent className="p-6">
                     <div className="flex items-start gap-4">
                       <Avatar className="h-16 w-16">
-                        <AvatarImage src={member.avatar || "/placeholder.jpg"} />
+                        <AvatarImage src={member.avatar || "/placeholder.svg"} />
                         <AvatarFallback>{member.name?.[0] || 'U'}</AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
@@ -664,7 +664,7 @@ export default function TeamDetailPage() {
                           </div>
                           
                           <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                            <span>加入时间: {formatDate(member.joinedAt)}</span>
+                            <span>{t('members.joinedAt')}: {formatDate(member.joinedAt)}</span>
                             {member.github && (
                               <a 
                                 href={member.github} 
@@ -685,8 +685,8 @@ export default function TeamDetailPage() {
               )) : (
                 <div className="col-span-full text-center py-12">
                   <Users className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">暂无团队成员</h3>
-                  <p className="text-muted-foreground">团队还没有成员加入</p>
+                  <h3 className="text-lg font-semibold mb-2">{t('members.noMembers')}</h3>
+                  <p className="text-muted-foreground">{t('members.noMembersDesc')}</p>
                 </div>
               )}
             </div>
@@ -695,17 +695,17 @@ export default function TeamDetailPage() {
           <TabsContent value="project" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>项目信息</CardTitle>
+                <CardTitle>{t('project.title')}</CardTitle>
                 <CardDescription>
-                  团队正在开发的项目详情
+                  {t('project.desc')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="text-center py-12">
                   <div className="text-6xl mb-4">🚧</div>
-                  <h3 className="text-lg font-medium mb-2">项目开发中</h3>
+                  <h3 className="text-lg font-medium mb-2">{t('project.developing')}</h3>
                   <p className="text-muted-foreground">
-                    团队正在努力开发项目，敬请期待！
+                    {t('project.developingDesc')}
                   </p>
                 </div>
               </CardContent>
@@ -715,9 +715,9 @@ export default function TeamDetailPage() {
           <TabsContent value="activity" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>团队动态</CardTitle>
+                <CardTitle>{t('activity.title')}</CardTitle>
                 <CardDescription>
-                  团队的最新活动和更新
+                  {t('activity.desc')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -726,7 +726,7 @@ export default function TeamDetailPage() {
                     <div key={activity.id}>
                       <div className="flex items-start gap-3">
                         <Avatar className="h-8 w-8">
-                          <AvatarImage src={activity.user.avatar || "/placeholder.jpg"} />
+                          <AvatarImage src={activity.user.avatar || "/placeholder.svg"} />
                           <AvatarFallback>{activity.user.name?.[0] || 'U'}</AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
@@ -743,8 +743,8 @@ export default function TeamDetailPage() {
                   )) : (
                     <div className="text-center py-12">
                       <MessageSquare className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                      <h3 className="text-lg font-semibold mb-2">暂无团队动态</h3>
-                      <p className="text-muted-foreground">团队还没有任何活动记录</p>
+                      <h3 className="text-lg font-semibold mb-2">{t('activity.noActivity')}</h3>
+                      <p className="text-muted-foreground">{t('activity.noActivityDesc')}</p>
                     </div>
                   )}
                 </div>
@@ -757,22 +757,22 @@ export default function TeamDetailPage() {
             <TabsContent value="applications" className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>申请管理</CardTitle>
+                  <CardTitle>{t('applications.title')}</CardTitle>
                   <CardDescription>
-                    管理用户的加入申请
+                    {t('applications.desc')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   {applicationsLoading ? (
                     <div className="flex items-center justify-center py-8">
                       <Loader2 className="h-8 w-8 animate-spin" />
-                      <span className="ml-2">加载中...</span>
+                      <span className="ml-2">{t('loading.applications')}</span>
                     </div>
                   ) : applications.length === 0 ? (
                     <div className="text-center py-12">
                       <Users className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                      <h3 className="text-lg font-semibold mb-2">暂无申请</h3>
-                      <p className="text-muted-foreground">还没有用户申请加入团队</p>
+                      <h3 className="text-lg font-semibold mb-2">{t('applications.noApplications')}</h3>
+                      <p className="text-muted-foreground">{t('applications.noApplicationsDesc')}</p>
                     </div>
                   ) : (
                     <div className="space-y-4">
@@ -782,14 +782,14 @@ export default function TeamDetailPage() {
                             <div className="flex items-start justify-between">
                               <div className="flex items-start gap-4">
                                 <Avatar className="h-12 w-12">
-                                  <AvatarImage src={application.user.avatarUrl || "/placeholder.jpg"} />
+                                  <AvatarImage src={application.user.avatarUrl || "/placeholder.svg"} />
                                   <AvatarFallback>{application.user.username?.[0] || 'U'}</AvatarFallback>
                                 </Avatar>
                                 <div className="flex-1">
                                   <div className="flex items-center gap-2 mb-2">
                                     <h4 className="font-medium">{application.user.username}</h4>
                                     <Badge variant="outline">
-                                      声誉: {application.user.reputationScore}
+                                      {t('applications.reputation')}: {application.user.reputationScore}
                                     </Badge>
                                   </div>
                                   {application.user.bio && (
@@ -812,7 +812,7 @@ export default function TeamDetailPage() {
                                     </div>
                                   )}
                                   <p className="text-xs text-muted-foreground mt-2">
-                                    申请时间: {new Date(application.createdAt).toLocaleString('zh-CN')}
+                                    {t('applications.appliedAt')}: {new Date(application.createdAt).toLocaleString()}
                                   </p>
                                 </div>
                               </div>
@@ -825,7 +825,7 @@ export default function TeamDetailPage() {
                                   {reviewingApplications.has(application.id) ? (
                                     <Loader2 className="h-4 w-4 animate-spin" />
                                   ) : (
-                                    '批准'
+                                    t('applications.approve')
                                   )}
                                 </Button>
                                 <Button
@@ -834,7 +834,7 @@ export default function TeamDetailPage() {
                                   onClick={() => handleReviewApplication(application.id, 'reject')}
                                   disabled={reviewingApplications.has(application.id)}
                                 >
-                                  拒绝
+                                  {t('applications.reject')}
                                 </Button>
                               </div>
                             </div>

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
+import { t, getLocaleFromRequest } from '@/lib/i18n'
 
 export async function POST(
   request: NextRequest,
@@ -13,7 +14,7 @@ export async function POST(
     const user = await auth(request)
     if (!user) {
       return NextResponse.json(
-        { success: false, error: '未认证' },
+        { success: false, error: t('auth.unauthorized', getLocaleFromRequest(request)) },
         { status: 401 }
       )
     }
@@ -30,7 +31,7 @@ export async function POST(
 
     if (!invitation) {
       return NextResponse.json(
-        { success: false, error: '邀请不存在或已处理' },
+        { success: false, error: t('teams.invitationNotFoundOrProcessed', getLocaleFromRequest(request)) },
         { status: 404 }
       )
     }
@@ -38,7 +39,7 @@ export async function POST(
     const teamId = (invitation.data as any)?.teamId
     if (!teamId) {
       return NextResponse.json(
-        { success: false, error: '邀请数据无效' },
+        { success: false, error: t('teams.invitationDataInvalid', getLocaleFromRequest(request)) },
         { status: 400 }
       )
     }
@@ -60,7 +61,7 @@ export async function POST(
 
     if (!team) {
       return NextResponse.json(
-        { success: false, error: '团队不存在' },
+        { success: false, error: t('teams.notFound', getLocaleFromRequest(request)) },
         { status: 404 }
       )
     }
@@ -68,7 +69,7 @@ export async function POST(
     // 检查团队是否已满员
     if (team._count.members >= team.maxMembers) {
       return NextResponse.json(
-        { success: false, error: '团队已满员' },
+        { success: false, error: t('teams.teamFull', getLocaleFromRequest(request)) },
         { status: 400 }
       )
     }
@@ -83,7 +84,7 @@ export async function POST(
 
     if (existingMember) {
       return NextResponse.json(
-        { success: false, error: '您已经是该团队成员' },
+        { success: false, error: t('teams.alreadyMember', getLocaleFromRequest(request)) },
         { status: 400 }
       )
     }
@@ -130,7 +131,7 @@ export async function POST(
   } catch (error) {
     console.error('接受邀请错误:', error)
     return NextResponse.json(
-      { success: false, error: '接受邀请失败' },
+      { success: false, error: t('teams.acceptInvitationFailed', getLocaleFromRequest(request)) },
       { status: 500 }
     )
   }

@@ -6,15 +6,15 @@ import { getLocaleFromRequest, createTFunction } from '@/lib/i18n'
 
 // 创建黑客松验证模式
 const createHackathonSchema = z.object({
-  title: z.string().min(1, '标题不能为空'),
-  description: z.string().min(10, '描述至少10个字符'),
-  startDate: z.string().datetime('开始日期格式不正确'),
-  endDate: z.string().datetime('结束日期格式不正确'),
-  registrationStartDate: z.string().datetime('报名开始日期格式不正确').optional(),
-  registrationDeadline: z.string().datetime('注册截止日期格式不正确'),
-  maxParticipants: z.number().min(1, '最大参与人数至少1人').optional(),
-  prizePool: z.number().min(0, '奖金池不能为负数').optional(),
-  categories: z.array(z.string()).min(1, '至少选择一个类别'),
+  title: z.string().min(1),
+  description: z.string().min(10),
+  startDate: z.string().datetime(),
+  endDate: z.string().datetime(),
+  registrationStartDate: z.string().datetime().optional(),
+  registrationDeadline: z.string().datetime(),
+  maxParticipants: z.number().min(1).optional(),
+  prizePool: z.number().min(0).optional(),
+  categories: z.array(z.string()).min(1),
   tags: z.array(z.string()).optional(),
   requirements: z.string().optional(),
   rules: z.string().optional(),
@@ -468,7 +468,7 @@ export async function POST(request: NextRequest) {
         },
         metadata: {
           organizer: organizer.id,
-          status: 'active' as const,
+          status: 'ACTIVE' as const,
           previousVersion: undefined
         }
       }
@@ -516,8 +516,8 @@ export async function POST(request: NextRequest) {
       console.error('IPFS上传失败:', ipfsError)
       return NextResponse.json({
         success: false,
-        error: 'IPFS上传失败，无法创建黑客松',
-        details: ipfsError instanceof Error ? ipfsError.message : '未知错误'
+        error: t('hackathons.ipfsUploadFailed', locale),
+        details: ipfsError instanceof Error ? ipfsError.message : t('errors.unknownError', locale)
       }, { status: 500 })
     }
     
@@ -533,7 +533,7 @@ export async function POST(request: NextRequest) {
       console.error('智能合约调用失败:', contractError)
       return NextResponse.json({
         success: false,
-        error: '智能合约调用失败，黑客松创建失败',
+        error: t('hackathons.smartContractCallFailed', locale),
         code: 'CONTRACT_ERROR',
         details: contractError instanceof Error ? contractError.message : '未知错误'
       }, { status: 500 })

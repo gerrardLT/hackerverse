@@ -127,13 +127,10 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;
-    /* Enhanced font smoothing */
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
   }
 }
 
@@ -357,6 +354,16 @@
 }
 
 @layer utilities {
+  /* Custom outline-ring utility - only visible on focus */
+  .outline-ring\/50:focus-visible {
+    outline: 2px solid oklch(0.4 0.25 280 / 0.5);
+    outline-offset: 2px;
+  }
+  
+  .outline-ring\/50 {
+    outline: none;
+  }
+  
   .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;

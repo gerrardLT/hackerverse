@@ -191,7 +191,7 @@ export default function BookmarksPage() {
                             </div>
                             <div className="flex items-center gap-1 text-xs text-muted-foreground">
                               <Calendar className="w-3 h-3" />
-                              {formatTimeAgo(post.createdAt)}
+                              {formatTimeAgo(post.createdAt, locale)}
                             </div>
                           </div>
 

@@ -265,14 +265,14 @@ export function HackathonGrid({ searchQuery, filters, viewMode = 'grid' }: Hacka
           <div className="glass border border-destructive/20 rounded-2xl p-8 text-center max-w-md">
             <AlertCircle className="h-16 w-16 text-destructive mx-auto mb-4 animate-bounce-gentle" />
             <div className="space-y-3">
-              <h3 className="text-xl font-semibold text-foreground">加载失败</h3>
+              <h3 className="text-xl font-semibold text-foreground">{t('loadingFailure')}</h3>
               <p className="text-muted-foreground leading-relaxed">{error}</p>
               <div className="pt-4">
                 <Button 
                   onClick={handleRetry}
                   className="glass hover-lift px-6 py-2 rounded-xl transition-all duration-300 hover:bg-primary/10"
                 >
-                  重试
+                  {t('retryAction')}
                 </Button>
               </div>
             </div>
@@ -297,13 +297,13 @@ export function HackathonGrid({ searchQuery, filters, viewMode = 'grid' }: Hacka
       {hackathons.length > 0 && !loading && (
         <div className="flex items-center justify-between text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
-            <span className="font-medium">共找到 {hackathons.length} 个黑客松</span>
+            <span className="font-medium">{t('foundCount', { count: hackathons.length })}</span>
             {total > hackathons.length && (
-              <span>/ 总计 {total} 个</span>
+              <span>/ {t('totalCount')} {total} 个</span>
             )}
           </div>
           <div className="hidden sm:block">
-            <span>视图模式: {viewMode === 'grid' ? '网格' : '列表'}</span>
+            <span>{t('viewMode', { mode: viewMode === 'grid' ? t('viewModeGrid') : t('viewModeList') })}</span>
           </div>
         </div>
       )}
@@ -331,17 +331,17 @@ export function HackathonGrid({ searchQuery, filters, viewMode = 'grid' }: Hacka
                 <span className="text-3xl">🏆</span>
               </div>
               <div className="space-y-3">
-                <h3 className="text-xl font-semibold text-foreground">暂无黑客松</h3>
+                <h3 className="text-xl font-semibold text-foreground">{t('noHackathons')}</h3>
                 <p className="text-muted-foreground leading-relaxed">
                   {searchQuery || filters.status !== 'all' 
-                    ? '没有找到符合条件的黑客松，请尝试调整筛选条件' 
-                    : '还没有举办任何黑客松，成为第一个创建者吧！'}
+                    ? t('noHackathonsDesc') 
+                    : t('noHackathonsEmpty')}
                 </p>
                 {(!searchQuery && filters.status === 'all') && (
                   <div className="pt-4">
                     <Button className="bg-primary hover:bg-primary/90 hover-lift hover-glow" asChild>
                       <Link href="/hackathons/create">
-                        创建黑客松
+                        {t('createHackathon')}
                       </Link>
                     </Button>
                   </div>
@@ -370,7 +370,7 @@ export function HackathonGrid({ searchQuery, filters, viewMode = 'grid' }: Hacka
                 </>
               ) : (
                 <>
-                  加载更多黑客松
+                  {t('loadMoreHackathons')}
                   <span className="ml-2 text-xs opacity-70">({hackathons.length}/{total})</span>
                 </>
               )}
@@ -378,7 +378,7 @@ export function HackathonGrid({ searchQuery, filters, viewMode = 'grid' }: Hacka
             
             {/* 自动加载提示 */}
             <p className="text-sm text-muted-foreground mt-3">
-              💡 向下滚动自动加载更多内容
+              💡 {t('scrollToLoad')}
             </p>
           </div>
         </div>
@@ -389,7 +389,7 @@ export function HackathonGrid({ searchQuery, filters, viewMode = 'grid' }: Hacka
         <div className="flex justify-center py-8">
           <div className="glass rounded-2xl p-4 flex items-center space-x-3">
             <Loader2 className="h-5 w-5 animate-spin text-primary" />
-            <span className="text-sm font-medium">正在加载更多精彩内容...</span>
+            <span className="text-sm font-medium">{t('loadingMore')}</span>
           </div>
         </div>
       )}
@@ -399,8 +399,8 @@ export function HackathonGrid({ searchQuery, filters, viewMode = 'grid' }: Hacka
         <div className="flex justify-center py-16">
           <div className="glass border border-primary/20 rounded-2xl p-8 text-center">
             <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
-            <p className="text-lg font-medium text-foreground mb-2">正在搜索黑客松</p>
-            <p className="text-sm text-muted-foreground">为您找寻最匹配的活动...</p>
+            <p className="text-lg font-medium text-foreground mb-2">{t('searchingHackathons')}</p>
+            <p className="text-sm text-muted-foreground">{t('findingMatches')}</p>
           </div>
         </div>
       )}
@@ -409,12 +409,12 @@ export function HackathonGrid({ searchQuery, filters, viewMode = 'grid' }: Hacka
       {hackathons.length > 0 && !loading && (
         <div className="glass border-t border-primary/10 rounded-t-2xl p-4 text-center">
           <div className="text-sm text-muted-foreground">
-            已展示 <span className="font-medium text-primary">{hackathons.length}</span> 个黑客松
+            {t('displayedCount')} <span className="font-medium text-primary">{hackathons.length}</span> 个黑客松
             {total > hackathons.length && (
-              <> / 共 <span className="font-medium text-primary">{total}</span> 个</>
+              <> / {t('totalCount')} <span className="font-medium text-primary">{total}</span> 个</>
             )}
             {!hasMore && total > 0 && (
-              <span className="ml-2 text-xs">🎉 全部加载完毕</span>
+              <span className="ml-2 text-xs">🎉 {t('allLoaded')}</span>
             )}
           </div>
         </div>

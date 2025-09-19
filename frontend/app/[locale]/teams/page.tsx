@@ -145,7 +145,7 @@ export default function TeamsPage() {
         })
       }
     } catch (error) {
-      console.error('加载团队列表错误:', error)
+      console.error(t('console.loadingTeamsError'), error)
       setError(t('loading.networkError'))
       toast({
         title: t('loading.networkError'),
@@ -215,7 +215,7 @@ export default function TeamsPage() {
         })
       }
     } catch (error) {
-      console.error('接受邀请失败:', error)
+      console.error(t('console.acceptInvitationFailed'), error)
       toast({
         title: t('toasts.operationFailed'),
         description: t('toasts.acceptInvitationFailed'),
@@ -253,7 +253,7 @@ export default function TeamsPage() {
         })
       }
     } catch (error) {
-      console.error('拒绝邀请失败:', error)
+      console.error(t('console.declineInvitationFailed'), error)
       toast({
         title: t('toasts.operationFailed'),
         description: t('toasts.declineInvitationFailed'),
@@ -319,7 +319,7 @@ export default function TeamsPage() {
         throw new Error(response.error || t('toasts.applicationFailed'))
       }
     } catch (error) {
-      console.error('申请提交失败:', error)
+      console.error(t('console.applicationSubmitFailed'), error)
       toast({
         title: t('toasts.applicationFailed'),
         description: error instanceof Error ? error.message : t('toasts.applicationFailedDesc'),
@@ -496,7 +496,7 @@ export default function TeamsPage() {
                     <div className="p-2 bg-gradient-primary rounded-xl">
                       <Search className="w-5 h-5 text-primary-foreground" />
                     </div>
-                    <h3 className="text-lg font-bold text-foreground">搜索团队</h3>
+                    <h3 className="text-lg font-bold text-foreground">{t('searchTitle')}</h3>
                   </div>
 
                   <div className="flex flex-col md:flex-row gap-4">
@@ -698,7 +698,7 @@ export default function TeamsPage() {
                               {/* 成员头像展示 */}
                               {team.members && team.members.length > 0 && (
                                 <div className="flex items-center gap-2">
-                                  <span className="text-sm text-muted-foreground">成员:</span>
+                                  <span className="text-sm text-muted-foreground">{t('members')}:</span>
                                   <div className="flex -space-x-2">
                                     {team.members.slice(0, 4).map((member, idx) => (
                                       <Avatar key={member.id} className="w-8 h-8 ring-2 ring-background">
@@ -761,9 +761,9 @@ export default function TeamsPage() {
                           <Crown className="h-12 w-12 text-white" />
                         </div>
                         <div className="space-y-2">
-                          <h3 className="text-lg font-medium">还没有加入任何团队</h3>
+                          <h3 className="text-lg font-medium">{t('noTeamsJoined')}</h3>
                           <p className="text-muted-foreground leading-relaxed">
-                            探索精彩的团队，开始你的协作之旅
+                            {t('exploreTeams')}
                           </p>
                         </div>
                         <Button className="bg-primary hover:bg-primary/90 hover-lift hover-glow" asChild>
@@ -790,7 +790,7 @@ export default function TeamsPage() {
                             <div className="absolute top-4 right-4">
                               <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-0 animate-pulse-slow">
                                 <Crown className="w-3 h-3 mr-1" />
-                                我的团队
+                                {t('myTeam')}
                               </Badge>
                             </div>
                             
@@ -895,7 +895,7 @@ export default function TeamsPage() {
                                 </Avatar>
                                 {/* 邀请指示器 */}
                                 <div className="absolute -top-1 -right-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs px-2 py-1 rounded-full animate-bounce-gentle">
-                                  新邀请
+                                  {t('newInvitation')}
                                 </div>
                               </div>
                               
@@ -912,14 +912,14 @@ export default function TeamsPage() {
                                     </Badge>
                                   </div>
                                   <p className="text-sm text-muted-foreground">
-                                    来自 <span className="font-medium text-foreground">{invitation.inviterName}</span> 的邀请
+                                    {t('fromInviter')} <span className="font-medium text-foreground">{invitation.inviterName}</span> 的邀请
                                   </p>
                                 </div>
                                 
                                 {/* 邀请消息 */}
                                 <div className="p-3 glass rounded-xl border border-primary/10">
                                   <p className="text-sm leading-relaxed">
-                                    {invitation.message || "诚邀您加入我们的团队，一起创造精彩项目！"}
+                                    {invitation.message || t('defaultInvitationMessage')}
                                   </p>
                                 </div>
                                 
@@ -946,7 +946,7 @@ export default function TeamsPage() {
                                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                     <Calendar className="w-3 h-3" />
                                     <span>
-                                      {new Date(invitation.createdAt).toLocaleDateString('zh-CN')}
+                                      {new Date(invitation.createdAt).toLocaleDateString()}
                                     </span>
                                   </div>
                                 </div>
@@ -1045,7 +1045,7 @@ export default function TeamsPage() {
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <TrendingUp className="w-3 h-3" />
-                    展示你的热情和能力
+                                    {t('showPassion')}
                   </span>
                   <span className={`${applicationMessage.length > 450 ? 'text-destructive' : ''}`}>
                     {applicationMessage.length}/500

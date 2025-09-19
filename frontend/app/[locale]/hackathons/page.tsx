@@ -140,13 +140,13 @@ export default function HackatonsPage() {
           </div>
 
           {/* 主要内容区域 */}
-          <div className="flex-1 space-y-6">
-            <div className={`transition-all duration-1000 delay-500 ${isVisible ? 'animate-slide-up opacity-100' : 'opacity-0 translate-y-10'}`}>
+          <div className="flex-1 space-y-6 overflow-visible">
+            <div className={`transition-all duration-1000 delay-500 overflow-visible ${isVisible ? 'animate-slide-up opacity-100' : 'opacity-0 translate-y-10'}`}>
               {/* 搜索和视图控制栏 */}
-              <div className="glass border border-primary/10 rounded-2xl p-6 space-y-4">
+              <div className="glass border border-primary/10 rounded-2xl p-6 space-y-4 overflow-visible">
                 <div className="flex flex-col md:flex-row gap-4">
-                  {/* 增强型搜索框 */}
-                  <div className="flex-1">
+                  {/* 增强型搜索框 - 添加相对定位确保下拉框正确显示 */}
+                  <div className="flex-1 relative" style={{ zIndex: 1001 }}>
                     <HackathonSearch 
                       searchQuery={searchQuery} 
                       onSearchChange={setSearchQuery} 

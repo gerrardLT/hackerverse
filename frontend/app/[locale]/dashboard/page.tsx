@@ -116,6 +116,12 @@ export default function DashboardPage() {
   const t = useTranslations('dashboard')
   const tCommon = useTranslations('common')
   const dashboardRef = useRef<HTMLDivElement>(null)
+  
+  // 格式化钱包地址显示
+  const formatWalletAddress = (address: string | undefined): string => {
+    if (!address) return ''
+    return `${address.slice(0, 6)}...${address.slice(-4)}`
+  }
   const [isVisible, setIsVisible] = useState(false)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [stats, setStats] = useState<DashboardStats>({
@@ -187,11 +193,6 @@ export default function DashboardPage() {
       setEditForm({
         username: user.username || '',
         avatarUrl: user.avatarUrl || '',
-        skills: Array.isArray(user.skills) ? user.skills : []
-      })
-      console.log('🔄 Sync user info to editForm:', {
-        username: user.username,
-        avatarUrl: user.avatarUrl,
         skills: Array.isArray(user.skills) ? user.skills : []
       })
     }
@@ -350,7 +351,6 @@ export default function DashboardPage() {
             ...prev, 
             avatarUrl: newAvatarUrl 
           }))
-          console.log('🖼️ Update editForm.avatarUrl:', newAvatarUrl)
           toast({
             title: t('toasts.avatarUploadSuccess'),
             description: t('toasts.avatarUploadSuccessDesc')
@@ -535,14 +535,6 @@ export default function DashboardPage() {
 
       <div className="container py-8 relative">
         {/* 开发调试信息 */}
-        {process.env.NODE_ENV === 'development' && isEditing && (
-          <div className="mb-4 p-2 glass rounded text-xs">
-            <strong>{t('errors.debugInfo')}</strong><br/>
-            editForm.avatarUrl: {editForm.avatarUrl || '(empty)'}<br/>
-            editForm.username: {editForm.username || '(empty)'}<br/>
-            uploading: {uploading ? 'Yes' : 'No'}
-          </div>
-        )}
         
         <div className="space-y-8">
           {/* 现代化用户信息头部 */}
@@ -555,17 +547,14 @@ export default function DashboardPage() {
                     <div className="relative">
                       <Avatar className="h-20 w-20 ring-2 ring-primary/30 hover:ring-primary/50 transition-all">
                         <AvatarImage 
-                          src={editForm.avatarUrl || '/placeholder.svg'} 
+                          src={editForm.avatarUrl} 
                           alt={t('profile.userAvatar')}
                           className="object-cover"
-                          onLoad={() => console.log('🖼️ Avatar loaded successfully:', editForm.avatarUrl)}
-                          onError={(e) => {
-                            console.error('❌ Avatar load failed:', editForm.avatarUrl, e)
-                            console.log('🔍 Current editForm state:', editForm)
-                          }}
+                          onLoad={() => {}}
+                          onError={(e) => {}}
                         />
                         <AvatarFallback className="text-xl bg-gradient-primary text-primary-foreground">
-                          {editForm.username?.[0]?.toUpperCase()}
+                          {editForm.username?.[0]?.toUpperCase() || 'U'}
                         </AvatarFallback>
                       </Avatar>
                       <Button
@@ -595,9 +584,9 @@ export default function DashboardPage() {
                     // 正常显示模式的头像
                     <div className="relative">
                       <Avatar className="h-20 w-20 ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all">
-                        <AvatarImage src={user.avatarUrl || '/placeholder.svg'} />
+                        <AvatarImage src={user.avatarUrl} />
                         <AvatarFallback className="text-xl bg-gradient-primary text-primary-foreground">
-                          {user.username?.[0]?.toUpperCase()}
+                          {user.username?.[0]?.toUpperCase() || 'U'}
                         </AvatarFallback>
                       </Avatar>
                       {/* 声望等级指示器 */}
@@ -617,7 +606,7 @@ export default function DashboardPage() {
                     className="text-2xl font-bold h-auto p-1 bg-transparent border-dashed"
                     placeholder={t('profile.enterUsername')}
                   />
-                  <p className="text-muted-foreground text-sm">{user.email}</p>
+                  <p className="text-muted-foreground text-sm font-mono">{formatWalletAddress(user.walletAddress)}</p>
                   
                   {/* 技术栈编辑 */}
                   <div className="space-y-2">
@@ -740,7 +729,7 @@ export default function DashboardPage() {
                 // 正常显示模式
             <div>
               <h2 className="text-2xl font-bold">{user.username}</h2>
-              <p className="text-muted-foreground">{user.email}</p>
+              <p className="text-muted-foreground font-mono">{formatWalletAddress(user.walletAddress)}</p>
                   {/* 技术栈展示 */}
                   <div className="mt-3">
                     <div className="flex flex-wrap gap-2">
@@ -802,7 +791,6 @@ export default function DashboardPage() {
                               avatarUrl: user.avatarUrl || '',
                               skills: Array.isArray(user.skills) ? user.skills : []
                             })
-                            console.log('🔧 设置editForm完成')
                             setIsEditing(true)
                           }}
                           className="glass hover-lift border-primary/30"
@@ -1070,7 +1058,7 @@ export default function DashboardPage() {
                         )) : (
                           <div className="text-center py-8">
                             <Activity className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                            <p className="text-sm text-muted-foreground">暂无最近活动</p>
+                            <p className="text-sm text-muted-foreground">{t('recentActivity.noActivities')}</p>
                           </div>
                         )}
                       </div>

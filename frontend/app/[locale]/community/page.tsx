@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { Search, Filter, Plus, TrendingUp, MessageSquare, Users, Eye, Loader2, AlertCircle, Heart, Sparkles, Flame, Clock, Star, Bookmark, Share2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -67,6 +67,7 @@ interface TopContributor {
 export default function CommunityPage() {
   const t = useTranslations('community')
   const tCommon = useTranslations('common')
+  const locale = useLocale()
   const pageRef = useRef<HTMLDivElement>(null)
 
   // 获取国际化的分类标签
@@ -117,7 +118,7 @@ export default function CommunityPage() {
         setError(postsResponse.error || t('loading.loadingFailed'))
       }
     } catch (error) {
-      console.error('加载社区数据失败:', error)
+      console.error(t('console.loadCommunityDataFailed'), error)
       setError(t('loading.networkError'))
     } finally {
       setLoading(false)
@@ -140,7 +141,7 @@ export default function CommunityPage() {
         ))
       }
     } catch (error) {
-      console.error(t('loading.toggleLikeFailed'), error)
+      console.error(t('console.toggleLikeFailed'), error)
     }
   }
 
@@ -156,7 +157,7 @@ export default function CommunityPage() {
         ))
       }
     } catch (error) {
-      console.error(t('loading.toggleBookmarkFailed'), error)
+      console.error(t('console.toggleBookmarkFailed'), error)
     }
   }
 
@@ -339,7 +340,7 @@ export default function CommunityPage() {
                         }}
                         className="text-xs"
                       >
-                        清除筛选
+                        {t('clearFilters')}
                       </Button>
                     )}
                   </div>
@@ -392,7 +393,7 @@ export default function CommunityPage() {
                             {/* 热门帖子指示器 */}
                             {post.likes > 10 && (
                               <Badge variant="outline" className="text-orange-600 border-orange-200 animate-slide-in" style={{ animationDelay: '0.3s' }}>
-                                🔥 热门
+                                🔥 {t('hotPost')}
                               </Badge>
                             )}
                           </div>
@@ -421,7 +422,7 @@ export default function CommunityPage() {
                                   {post.author.name}
                                 </span>
                                 <span>·</span>
-                                <span>{formatTimeAgo(post.createdAt)}</span>
+                                <span>{formatTimeAgo(post.createdAt, locale)}</span>
                               </div>
                             </div>
                             
@@ -511,7 +512,7 @@ export default function CommunityPage() {
                           <p className="text-muted-foreground leading-relaxed">
                             {searchQuery || selectedCategory !== 'all' 
                               ? t('empty.adjustFilter')
-                              : '社区正在等待您的第一篇帖子！'}
+                              : t('waitingForFirstPost')}
                           </p>
                           <div className="pt-4">
                             <Button className="bg-primary hover:bg-primary/90 hover-lift hover-glow" asChild>
@@ -642,11 +643,11 @@ export default function CommunityPage() {
                             <div className="flex items-center gap-3 text-xs text-muted-foreground">
                               <span className="flex items-center gap-1">
                                 <TrendingUp className="w-3 h-3" />
-                                {contributor.reputation} 声望
+                                {contributor.reputation} {t('reputation')}
                               </span>
                               <span className="flex items-center gap-1">
                                 <MessageSquare className="w-3 h-3" />
-                                {contributor.postsCount} 帖子
+                                {contributor.postsCount} {t('postsCount')}
                               </span>
                             </div>
                           </div>
@@ -699,11 +700,11 @@ export default function CommunityPage() {
                     <div className="mt-6 pt-4 border-t border-primary/20">
                       <div className="text-center">
                         <p className="text-xs text-muted-foreground mb-3">
-                          遵守社区规则，共建和谐氛围
+                          {t('followRules')}
                         </p>
                         <Button size="sm" variant="outline" className="glass hover-lift" asChild>
                           <Link href="/community/guidelines">
-                            查看完整规则
+                            {t('viewCompleteRules')}
                           </Link>
                         </Button>
                       </div>

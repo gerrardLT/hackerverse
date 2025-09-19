@@ -135,12 +135,12 @@ export function Web3AuthProvider({ children }: { children: React.ReactNode }) {
   // ⭐ 同步Web3用户到传统认证系统
   const syncWithTraditionalAuth = async (walletAddress: string, profileCID?: string) => {
     try {
-      console.log('🔄 检查Web3用户认证状态...')
+      console.log('[WEB3] Checking Web3 user authentication status...')
       
       // ⭐ 验证现有token是否与当前钱包地址匹配
       const existingToken = localStorage.getItem('hackx-token')
       if (existingToken) {
-        console.log('🔍 发现现有token，验证有效性和钱包地址匹配性...')
+        console.log('[WEB3] Found existing token, validating and checking wallet address match...')
         
         try {
           // 验证token有效性
@@ -154,34 +154,34 @@ export function Web3AuthProvider({ children }: { children: React.ReactNode }) {
               
               // 检查钱包地址是否匹配
               if (tokenWalletAddress === currentWalletAddress) {
-                console.log('✅ 现有token有效且钱包地址匹配，跳过重复登录')
+                console.log('[WEB3] Existing token valid and wallet address matches, skipping duplicate login')
                 return
               } else {
-                console.warn('⚠️ 钱包地址不匹配，需要重新认证', {
+                console.warn('[WEB3] Wallet address mismatch, re-authentication required', {
                   tokenAddress: tokenWalletAddress,
                   currentAddress: currentWalletAddress
                 })
               }
             }
           } else {
-            console.warn('⚠️ 现有token已失效')
+            console.warn('[WEB3] Existing token is invalid')
           }
         } catch (error) {
-          console.warn('⚠️ token验证失败:', error)
+          console.warn('[WEB3] Token validation failed:', error)
         }
         
-        // 清理无效或不匹配的token
+        // Clean up invalid or mismatched token
         localStorage.removeItem('hackx-token')
         localStorage.removeItem('hackx-user')
       }
       
-      console.log('🔑 开始钱包认证流程...')
+      console.log('[WEB3] Starting wallet authentication process...')
       
-      // 1. 尝试通过钱包地址登录
+      // 1. Try to login with wallet address
       const response = await apiService.signInWithWallet(walletAddress)
       
       if (response.success && response.data) {
-        console.log('✅ 找到现有用户，使用统一认证管理器')
+        console.log('[WEB3] Found existing user, using unified auth manager')
         
         // 使用统一的认证状态管理器
         const { useAuthStore } = await import('@/lib/auth-state-manager')
@@ -195,20 +195,20 @@ export function Web3AuthProvider({ children }: { children: React.ReactNode }) {
         authStore.setAuthenticated(userState, response.data.token, 'web3')
         
       } else {
-        console.log('📝 用户不存在，需要创建新用户')
+        console.log('[WEB3] User does not exist, need to create new user')
         
-        // 2. 用户不存在，创建新的Web3用户
-        console.log('📝 开始创建新Web3用户，可能需要IPFS上传...')
+        // 2. User doesn't exist, create new Web3 user
+        console.log('[WEB3] Starting to create new Web3 user, may require IPFS upload...')
         
         const createResponse = await apiService.createWeb3User({
           walletAddress,
           profileCID,
           username: `user_${walletAddress.slice(0, 8)}`, // 默认用户名
-          bio: profileCID ? '通过Web3连接的用户' : '新的Web3用户'
+          bio: profileCID ? 'User connected via Web3' : 'New Web3 user'
         })
         
         if (createResponse.success && createResponse.data) {
-          console.log('✅ 新用户创建成功，使用统一认证管理器')
+          console.log('[WEB3] New user created successfully, using unified auth manager')
           
           // 使用统一的认证状态管理器
           const { useAuthStore } = await import('@/lib/auth-state-manager')
@@ -221,17 +221,17 @@ export function Web3AuthProvider({ children }: { children: React.ReactNode }) {
           }
           authStore.setAuthenticated(userState, createResponse.data.token, 'web3')
         } else {
-          console.warn('⚠️ 创建新用户失败:', createResponse.error)
-          // 如果是IPFS相关错误，给用户友好提示
+          console.warn('[WEB3] Failed to create new user:', createResponse.error)
+          // Provide user-friendly message for IPFS-related errors
           if (createResponse.error && createResponse.error.includes('IPFS')) {
-            throw new Error('网络服务暂时不可用，请稍后重试')
+            throw new Error('Network service temporarily unavailable, please try again later')
           }
         }
       }
       
     } catch (error) {
-      console.error('❌ 同步认证系统失败:', error)
-      // 即使同步失败，Web3连接仍然有效
+      console.error('[WEB3] Failed to sync with auth system:', error)
+      // Web3 connection is still valid even if sync fails
     }
   }
 
@@ -242,12 +242,12 @@ export function Web3AuthProvider({ children }: { children: React.ReactNode }) {
         const provider = new ethers.BrowserProvider(window.ethereum)
         setProvider(provider)
 
-        // 不自动连接，让用户主动选择连接
-        // 这样确保连接的是MetaMask当前活跃的账户
-        console.log('🔗 Web3 provider已准备，等待用户主动连接钱包')
+        // Don't auto-connect, let users actively choose to connect
+        // This ensures connection to MetaMask's currently active account
+        console.log('[WEB3] Web3 provider ready, waiting for user to actively connect wallet')
       }
     } catch (error) {
-      console.error('Web3初始化失败:', error)
+      console.error('[WEB3] Web3 initialization failed:', error)
     } finally {
       setLoading(false)
     }

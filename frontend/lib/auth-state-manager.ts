@@ -187,16 +187,16 @@ export const useAuthStore = create<AuthState>()(
           const data = await response.json()
 
           if (!response.ok) {
-            throw new Error(data.error || '登录失败')
+            throw new Error(data.error || 'Login failed')
           }
 
           if (data.success && data.data) {
             setAuthenticated(data.data.user as UserState, data.data.token, 'traditional')
           } else {
-            throw new Error('登录响应格式错误')
+            throw new Error('Invalid login response format')
           }
         } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : '登录失败'
+          const errorMessage = error instanceof Error ? error.message : 'Login failed'
           setError(errorMessage)
           throw error
         }
@@ -209,7 +209,7 @@ export const useAuthStore = create<AuthState>()(
           setLoading(true)
           setError(null)
           
-          console.log('🚀 开始注册流程，包含IPFS上传...')
+          console.log('[AUTH] Starting registration process with IPFS upload...')
 
           const response = await fetch('/api/auth/signup', {
             method: 'POST',
@@ -219,7 +219,7 @@ export const useAuthStore = create<AuthState>()(
 
           const data = await response.json()
           
-          console.log('📥 注册API响应:', {
+          console.log('[AUTH] Registration API response:', {
             success: data.success,
             hasUser: !!data.data?.user,
             hasToken: !!data.data?.token,
@@ -227,22 +227,22 @@ export const useAuthStore = create<AuthState>()(
           })
 
           if (!response.ok) {
-            // 如果是IPFS相关错误，提供更友好的错误信息
+            // Provide user-friendly error message for IPFS-related errors
             if (data.error && data.error.includes('IPFS')) {
-              throw new Error('网络服务暂时不可用，请稍后重试')
+              throw new Error('Network service temporarily unavailable, please try again later')
             }
-            throw new Error(data.error || '注册失败')
+            throw new Error(data.error || 'Registration failed')
           }
 
           if (data.success && data.data) {
-            console.log('✅ 注册成功，设置认证状态')
+            console.log('[AUTH] Registration successful, setting auth state')
             setAuthenticated(data.data.user as UserState, data.data.token, 'traditional')
           } else {
-            throw new Error('注册响应格式错误')
+            throw new Error('Invalid registration response format')
           }
         } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : '注册失败'
-          console.error('❌ 注册失败:', errorMessage)
+          const errorMessage = error instanceof Error ? error.message : 'Registration failed'
+          console.error('[AUTH] Registration failed:', errorMessage)
           setError(errorMessage)
           throw error
         } finally {

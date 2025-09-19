@@ -31,27 +31,27 @@ export class DataService {
     if (cached) return cached
 
     try {
-      // 优先从后端 API 获取（稳定可靠）
-      console.log('🔍 DataService: 从API获取黑客松列表', params)
+      // Prioritize backend API (stable and reliable)
+      console.log('[DataService] Getting hackathon list from API', params)
       const response = await apiService.getHackathons(params)
       
       // 保持完整的响应结构，包括分页信息
       if (Array.isArray(response)) {
         // 旧格式：直接返回数组
         this.setCache(cacheKey, response)
-        console.log('✅ DataService: API获取成功，黑客松数量:', response.length)
+        console.log('[DataService] API fetch successful, hackathon count:', response.length)
         return response
       } else {
         // 新格式：返回完整的响应对象
         const apiData = response.data?.hackathons || response.hackathons || []
         this.setCache(cacheKey, response) // 缓存完整响应
-        console.log('✅ DataService: API获取成功，黑客松数量:', apiData.length)
+        console.log('[DataService] API fetch successful, hackathon count:', apiData.length)
         return response // 返回完整响应，包括分页信息
       }
       
     } catch (error) {
-      console.warn('⚠️ API获取失败:', error)
-      // API失败时直接返回空数组，不再尝试其他不稳定的数据源
+      console.warn('[DataService] API fetch failed:', error)
+      // Return empty array directly when API fails, no longer trying other unstable data sources
       return []
     }
   }
@@ -119,8 +119,8 @@ export class DataService {
     if (cached) return cached
 
     try {
-      // 直接从API获取指定黑客松的项目
-      console.log('🔍 DataService: 获取黑客松项目', { hackathonId, params })
+      // Get projects for specified hackathon directly from API
+      console.log('[DataService] Getting hackathon projects', { hackathonId, params })
       const response = await apiService.getProjects({
         hackathonId,
         ...params
@@ -128,10 +128,10 @@ export class DataService {
       
       const apiData = response.data?.projects || []
       this.setCache(cacheKey, apiData)
-      console.log('✅ DataService: 黑客松项目获取成功，数量:', apiData.length)
+      console.log('[DataService] Hackathon projects fetched successfully, count:', apiData.length)
       return apiData
     } catch (error) {
-      console.error('❌ 获取黑客松项目失败:', error)
+      console.error('[DataService] Failed to get hackathon projects:', error)
       return []
     }
   }

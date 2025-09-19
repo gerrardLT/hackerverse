@@ -1,4 +1,5 @@
 import { prisma } from './prisma'
+import { t } from './i18n'
 
 interface SimpleNotificationData {
   userId: string
@@ -21,17 +22,18 @@ export class SimpleNotificationService {
     userId: string,
     teamName: string,
     inviterName: string,
-    teamId: string
+    teamId: string,
+    locale: 'en' | 'zh' = 'en'
   ) {
     return this.createNotification({
       userId,
       type: 'TEAM_INVITE',
-      title: '团队邀请',
-      message: `${inviterName} 邀请你加入 "${teamName}" 团队`,
+      title: t('notificationTemplates.teamInvite', locale),
+      message: t('notificationTemplates.teamInviteMessage', locale, { inviterName, teamName }),
       priority: 'HIGH',
       category: 'TEAM',
       actionUrl: `/teams/${teamId}`,
-      actionLabel: '查看详情',
+      actionLabel: t('notificationTemplates.viewDetails', locale),
       data: {
         teamId,
         teamName,
@@ -47,19 +49,20 @@ export class SimpleNotificationService {
     userId: string,
     teamName: string,
     approved: boolean,
-    teamId: string
+    teamId: string,
+    locale: 'en' | 'zh' = 'en'
   ) {
     return this.createNotification({
       userId,
       type: approved ? 'TEAM_APPLICATION_APPROVED' : 'TEAM_APPLICATION_REJECTED',
-      title: approved ? '申请已批准' : '申请被拒绝',
+      title: approved ? t('notificationTemplates.applicationApproved', locale) : t('notificationTemplates.applicationRejected', locale),
       message: approved 
-        ? `恭喜！你的加入 "${teamName}" 团队的申请已被批准`
-        : `很遗憾，你的加入 "${teamName}" 团队的申请被拒绝`,
+        ? t('notificationTemplates.applicationApprovedMessage', locale, { teamName })
+        : t('notificationTemplates.applicationRejectedMessage', locale, { teamName }),
       priority: 'HIGH',
       category: 'TEAM',
       actionUrl: `/teams/${teamId}`,
-      actionLabel: '查看团队',
+      actionLabel: t('notificationTemplates.viewTeam', locale),
       data: {
         teamId,
         teamName,
@@ -75,17 +78,18 @@ export class SimpleNotificationService {
     userId: string,
     teamName: string,
     newMemberName: string,
-    teamId: string
+    teamId: string,
+    locale: 'en' | 'zh' = 'en'
   ) {
     return this.createNotification({
       userId,
       type: 'TEAM_MEMBER_JOINED',
-      title: '新成员加入',
-      message: `${newMemberName} 已加入你的团队 "${teamName}"`,
+      title: t('notificationTemplates.newMemberJoined', locale),
+      message: t('notificationTemplates.newMemberJoinedMessage', locale, { memberName: newMemberName, teamName }),
       priority: 'MEDIUM',
       category: 'TEAM',
       actionUrl: `/teams/${teamId}`,
-      actionLabel: '查看团队',
+      actionLabel: t('notificationTemplates.viewTeam', locale),
       data: {
         teamId,
         teamName,

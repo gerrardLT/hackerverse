@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     }
 
     // 检查管理员权限
-    if (user.role !== 'admin') {
+    if (user.role !== 'ADMIN') {
       return NextResponse.json(
         { success: false, error: '权限不足' },
         { status: 403 }

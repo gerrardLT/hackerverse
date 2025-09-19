@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     }
 
     // 检查管理员权限
-    if (user.role !== 'admin' && user.role !== 'moderator') {
+    if (user.role !== 'ADMIN' && user.role !== 'MODERATOR') {
       return NextResponse.json(
         { success: false, error: '权限不足' },
         { status: 403 }
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     const where: any = {};
     if (status === 'deleted') {
       where.isDeleted = true;
-    } else if (status === 'active') {
+    } else if (status === 'ACTIVE') {
       where.isDeleted = false;
     }
     if (category) {

@@ -123,6 +123,8 @@ interface Hackathon {
     }>
     schedule?: any[]
     coverImage?: string | null
+    location?: string
+    timezone?: string
   }
   organizer: {
     id: string
@@ -1607,7 +1609,7 @@ class ApiService {
   }
 
   // ============ 统计数据API ============
-  async getStats(): Promise<ApiResponse<{
+  async getStats(locale: string = 'zh'): Promise<ApiResponse<{
     users: { total: number; label: string; description: string }
     hackathons: { total: number; label: string; description: string }
     projects: { total: number; label: string; description: string }
@@ -1615,7 +1617,7 @@ class ApiService {
     participations?: number
     teams?: number
   }>> {
-    return this.request('/stats/public')
+    return this.request(`/stats/public?locale=${locale}`)
   }
 
   // ============ 搜索建议API ============

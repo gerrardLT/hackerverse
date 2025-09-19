@@ -1,5 +1,6 @@
 import { prisma } from './prisma'
 import { CommunityNotificationType } from '@prisma/client'
+import { t } from './i18n'
 
 export class NotificationService {
   // 创建回复通知
@@ -7,7 +8,8 @@ export class NotificationService {
     postAuthorId: string,
     replyAuthorId: string,
     postId: string,
-    postTitle: string
+    postTitle: string,
+    locale: 'en' | 'zh' = 'en'
   ) {
     // 不给自己发通知
     if (postAuthorId === replyAuthorId) return
@@ -16,8 +18,8 @@ export class NotificationService {
       data: {
         userId: postAuthorId,
         type: CommunityNotificationType.REPLY,
-        title: '有人回复了你的帖子',
-        content: `有用户回复了你的帖子《${postTitle}》`,
+        title: t('notificationTemplates.postReply', locale),
+        content: t('notificationTemplates.postReplyMessage', locale, { postTitle }),
         entityType: 'post',
         entityId: postId,
         triggerUserId: replyAuthorId
@@ -30,7 +32,8 @@ export class NotificationService {
     postAuthorId: string,
     likerUserId: string,
     postId: string,
-    postTitle: string
+    postTitle: string,
+    locale: 'en' | 'zh' = 'en'
   ) {
     // 不给自己发通知
     if (postAuthorId === likerUserId) return
@@ -39,8 +42,8 @@ export class NotificationService {
       data: {
         userId: postAuthorId,
         type: CommunityNotificationType.POST_LIKE,
-        title: '有人点赞了你的帖子',
-        content: `有用户点赞了你的帖子《${postTitle}》`,
+        title: t('notificationTemplates.postLiked', locale),
+        content: t('notificationTemplates.postLikedMessage', locale, { postTitle }),
         entityType: 'post',
         entityId: postId,
         triggerUserId: likerUserId
@@ -53,7 +56,8 @@ export class NotificationService {
     replyAuthorId: string,
     likerUserId: string,
     replyId: string,
-    postTitle: string
+    postTitle: string,
+    locale: 'en' | 'zh' = 'en'
   ) {
     // 不给自己发通知
     if (replyAuthorId === likerUserId) return
@@ -62,8 +66,8 @@ export class NotificationService {
       data: {
         userId: replyAuthorId,
         type: CommunityNotificationType.REPLY_LIKE,
-        title: '有人点赞了你的回复',
-        content: `有用户点赞了你在《${postTitle}》下的回复`,
+        title: t('notificationTemplates.replyLiked', locale),
+        content: t('notificationTemplates.replyLikedMessage', locale, { postTitle }),
         entityType: 'reply',
         entityId: replyId,
         triggerUserId: likerUserId
@@ -75,14 +79,15 @@ export class NotificationService {
   static async createNewFollowerNotification(
     followedUserId: string,
     followerUserId: string,
-    followerUsername: string
+    followerUsername: string,
+    locale: 'en' | 'zh' = 'en'
   ) {
     await prisma.communityNotification.create({
       data: {
         userId: followedUserId,
         type: CommunityNotificationType.NEW_FOLLOWER,
-        title: '有新的粉丝关注了你',
-        content: `${followerUsername} 关注了你`,
+        title: t('notificationTemplates.newFollower', locale),
+        content: t('notificationTemplates.newFollowerMessage', locale, { followerName: followerUsername }),
         entityType: 'user',
         entityId: followerUserId,
         triggerUserId: followerUserId

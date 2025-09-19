@@ -1,13 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { t } from '@/lib/i18n'
 
 /**
  * 获取公开的平台统计数据
- * GET /api/stats/public
+ * GET /api/stats/public?locale=zh|en
  */
 export async function GET(request: NextRequest) {
   try {
-    console.log('📊 获取平台公开统计数据...')
+    // 获取语言参数，默认为中文
+    const { searchParams } = new URL(request.url)
+    const locale = (searchParams.get('locale') || 'zh') as 'zh' | 'en'
+    
+    console.log(`📊 [${locale.toUpperCase()}] Getting public platform stats...`)
     
     // 并行查询所有统计数据
     const [
@@ -65,30 +70,30 @@ export async function GET(request: NextRequest) {
     const stats = {
       users: {
         total: totalUsers,
-        label: '注册开发者',
-        description: '来自全球的开发者社区'
+        label: t('stats.users.label', locale),
+        description: t('stats.users.description', locale)
       },
       hackathons: {
         total: totalHackathons,
-        label: '举办黑客松',
-        description: '成功举办的黑客松活动'
+        label: t('stats.hackathons.label', locale),
+        description: t('stats.hackathons.description', locale)
       },
       projects: {
         total: totalProjects,
-        label: '提交项目',
-        description: '创新项目和解决方案'
+        label: t('stats.projects.label', locale),
+        description: t('stats.projects.description', locale)
       },
       countries: {
         total: estimatedCountries,
-        label: '覆盖国家',
-        description: '全球范围的影响力'
+        label: t('stats.countries.label', locale),
+        description: t('stats.countries.description', locale)
       },
       // 额外统计信息
       participations: totalParticipations,
       teams: totalTeams
     }
 
-    console.log('📊 统计数据获取成功:', stats)
+    console.log(`📊 [${locale.toUpperCase()}] Platform stats retrieved successfully:`, stats)
 
     return NextResponse.json({
       success: true,
@@ -97,11 +102,12 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('获取平台统计数据错误:', error)
+    const locale = (new URL(request.url).searchParams.get('locale') || 'zh') as 'zh' | 'en'
+    console.error(`❌ [${locale.toUpperCase()}] Platform stats retrieval error:`, error)
     return NextResponse.json(
       { 
         success: false, 
-        error: '获取统计数据失败',
+        error: t('errors.getStatsError', locale),
         details: process.env.NODE_ENV === 'development' ? error : undefined
       },
       { status: 500 }

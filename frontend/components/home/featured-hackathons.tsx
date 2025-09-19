@@ -26,8 +26,7 @@ export function FeaturedHackathons() {
         setError(null)
 
         const response = await apiService.getHackathons({
-          featured: true,
-          limit: 3,
+          limit: 6,
           sortBy: 'startDate',
           sortOrder: 'asc'
         })
@@ -71,7 +70,7 @@ export function FeaturedHackathons() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {Array.from({ length: 3 }).map((_, index) => (
+            {Array.from({ length: 6 }).map((_, index) => (
               <Card key={index} className="flex flex-col overflow-hidden rounded-2xl p-6 group">
                 <CardHeader className="pb-4">
                   <div className="flex items-center justify-between mb-4">
@@ -143,31 +142,56 @@ export function FeaturedHackathons() {
           {hackathons.map((hackathon) => (
             <Card
               key={hackathon.id}
-              className="flex flex-col glass dark:glass-dark border-primary/20 hover:border-primary/40 transition-all duration-300 hover:scale-105 group relative overflow-hidden rounded-2xl p-6"
+              className="flex flex-col glass dark:glass-dark border-primary/20 hover:border-primary/40 transition-all duration-300 hover:scale-105 group relative overflow-hidden rounded-2xl"
             >
               <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-secondary`} />
 
-              <CardHeader className="relative pb-4">
-                <div className="flex items-center justify-between mb-4">
-                  <div className={`p-3 rounded-xl bg-gradient-to-r from-primary to-secondary text-white`}>
-                    <Trophy className="h-6 w-6" /> {/* Using Trophy icon as a placeholder */}
-                  </div>
-                  <Badge variant="secondary" className="glass border-primary/20">
+              {/* Cover Image */}
+              {(hackathon.metadata as any)?.coverImage && (
+                <div className="relative h-48 overflow-hidden rounded-t-xl">
+                  <img 
+                    src={(hackathon.metadata as any).coverImage} 
+                    alt={hackathon.title}
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  <Badge 
+                    variant="secondary" 
+                    className="absolute top-4 right-4 glass border-primary/20"
+                  >
                     {hackathon.status}
                   </Badge>
                 </div>
+              )}
 
-                <h3 className="text-xl font-bold group-hover:text-primary transition-colors line-clamp-2">
+              <CardHeader className="relative pb-4 px-6">
+                <h3 className="text-xl font-bold group-hover:text-primary transition-colors line-clamp-2 mb-2">
                   {hackathon.title}
                 </h3>
 
                 <div className="flex items-center text-sm text-muted-foreground">
                   <Calendar className="mr-2 h-4 w-4" />
-                  <span className="font-medium">{Math.ceil((new Date(hackathon.startDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} {t('daysLeft')}</span>
+                  <span className="font-medium">
+                    {(() => {
+                      const daysLeft = Math.ceil((new Date(hackathon.startDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+                      if (daysLeft > 0) {
+                        return `${daysLeft} ${t('daysLeft')}`;
+                      } else if (daysLeft === 0) {
+                        return '今天开始';
+                      } else {
+                        return '进行中';
+                      }
+                    })()}
+                  </span>
+                </div>
+
+                <div className="flex items-center text-sm text-muted-foreground mt-1">
+                  <Users className="mr-2 h-4 w-4" />
+                  <span>{(hackathon.metadata as any)?.location || 'Online'}</span>
                 </div>
               </CardHeader>
 
-              <CardContent className="flex-1 space-y-4">
+              <CardContent className="flex-1 space-y-4 px-6">
                 <p className="text-muted-foreground line-clamp-3">
                   {hackathon.description}
                 </p>
@@ -202,7 +226,7 @@ export function FeaturedHackathons() {
                 </div>
               </CardContent>
 
-              <CardFooter>
+              <CardFooter className="px-6 pb-6">
                 <Button asChild className="w-full group-hover:animate-glow">
                   <Link href={`/hackathons/${hackathon.id}`}>
                     {hackathon.status === 'Active' ? t('joinHackathon') : t('viewDetails')}

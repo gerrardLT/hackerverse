@@ -1,19 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
+import { t, getLocaleFromRequest, createTFunction } from '@/lib/i18n'
 import { prisma } from '@/lib/prisma'
 import { AuthService } from '@/lib/auth'
-import { getLocaleFromRequest, createTFunction } from '@/lib/i18n'
 
 // 强制使用Node.js运行时，避免Edge Runtime的crypto模块限制
 export const runtime = 'nodejs'
 
 // 创建团队验证模式
 const createTeamSchema = z.object({
-  name: z.string().min(2, '团队名称至少2个字符'),
-  description: z.string().min(10, '团队描述至少10个字符'),
-  hackathonId: z.string().min(1, '黑客松ID不能为空'),
-  maxMembers: z.number().min(1, '最大成员数至少1人').max(10, '最大成员数不能超过10人').default(5),
-  skills: z.array(z.string()).min(1, '至少选择一种技能'),
+  name: z.string().min(2),
+  description: z.string().min(10),
+  hackathonId: z.string().min(1),
+  maxMembers: z.number().min(1).max(10).default(5),
+  skills: z.array(z.string()).min(1),
   tags: z.array(z.string()).optional(),
   isPublic: z.boolean().default(true),
 })
@@ -25,7 +25,7 @@ const querySchema = z.object({
   search: z.string().optional(),
   hackathonId: z.string().optional(),
   skill: z.string().optional(),
-  status: z.enum(['recruiting', 'full', 'competing', 'completed', 'disbanded']).optional(),
+  status: z.enum(['RECRUITING', 'FULL', 'COMPETING', 'COMPLETED', 'DISBANDED']).optional(),
   hasOpenings: z.string().transform(val => val === 'true').optional(),
   sortBy: z.enum(['createdAt', 'name', 'memberCount']).default('createdAt'),
   sortOrder: z.enum(['asc', 'desc']).default('desc'),

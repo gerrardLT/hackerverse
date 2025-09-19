@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
       
       // 待审核项目数
       prisma.project.count({
-        where: { status: 'submitted' }
+        where: { status: 'SUBMITTED' }
       }),
       
       // 用户增长（本月新增用户数）

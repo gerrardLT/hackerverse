@@ -78,24 +78,24 @@ export const categoryIcons: Record<PostCategory, string> = {
   announcement: '📢',
 }
 
-export function formatTimeAgo(dateString: string): string {
+export function formatTimeAgo(dateString: string, locale: string = 'zh'): string {
   const date = new Date(dateString)
   const now = new Date()
   const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000)
 
   if (diffInSeconds < 60) {
-    return '刚刚'
+    return locale === 'zh' ? '刚刚' : 'Just now'
   } else if (diffInSeconds < 3600) {
     const minutes = Math.floor(diffInSeconds / 60)
-    return `${minutes}分钟前`
+    return locale === 'zh' ? `${minutes}分钟前` : `${minutes} minute${minutes > 1 ? 's' : ''} ago`
   } else if (diffInSeconds < 86400) {
     const hours = Math.floor(diffInSeconds / 3600)
-    return `${hours}小时前`
+    return locale === 'zh' ? `${hours}小时前` : `${hours} hour${hours > 1 ? 's' : ''} ago`
   } else if (diffInSeconds < 2592000) {
     const days = Math.floor(diffInSeconds / 86400)
-    return `${days}天前`
+    return locale === 'zh' ? `${days}天前` : `${days} day${days > 1 ? 's' : ''} ago`
   } else {
-    return date.toLocaleDateString('zh-CN')
+    return date.toLocaleDateString(locale === 'zh' ? 'zh-CN' : 'en-US')
   }
 }
 

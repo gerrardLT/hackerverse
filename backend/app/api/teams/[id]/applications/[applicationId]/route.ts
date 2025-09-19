@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
+import { t, getLocaleFromRequest } from '@/lib/i18n'
 import { SimpleNotificationService } from '@/lib/simple-notification-service'
 
 // 审批申请验证模式
@@ -23,7 +24,7 @@ export async function PATCH(
     const user = await auth(request)
     if (!user) {
       return NextResponse.json(
-        { success: false, error: '未认证' },
+        { success: false, error: t('auth.unauthorized', getLocaleFromRequest(request)) },
         { status: 401 }
       )
     }
@@ -51,14 +52,14 @@ export async function PATCH(
 
     if (!team) {
       return NextResponse.json(
-        { success: false, error: '团队不存在' },
+        { success: false, error: t('teams.notFound', getLocaleFromRequest(request)) },
         { status: 404 }
       )
     }
 
     if (team.leaderId !== user.id) {
       return NextResponse.json(
-        { success: false, error: '只有团队领导可以审批申请' },
+        { success: false, error: t('teams.onlyLeaderCanReviewApplications', getLocaleFromRequest(request)) },
         { status: 403 }
       )
     }
@@ -83,21 +84,21 @@ export async function PATCH(
 
     if (!application) {
       return NextResponse.json(
-        { success: false, error: '申请不存在' },
+        { success: false, error: t('teams.applicationNotFound', getLocaleFromRequest(request)) },
         { status: 404 }
       )
     }
 
     if (application.teamId !== teamId) {
       return NextResponse.json(
-        { success: false, error: '申请不属于该团队' },
+        { success: false, error: t('teams.applicationNotBelongToTeam', getLocaleFromRequest(request)) },
         { status: 400 }
       )
     }
 
     if (application.status !== 'PENDING') {
       return NextResponse.json(
-        { success: false, error: '申请已被处理' },
+        { success: false, error: t('teams.applicationAlreadyProcessed', getLocaleFromRequest(request)) },
         { status: 400 }
       )
     }
@@ -107,7 +108,7 @@ export async function PATCH(
       // 检查团队是否已满员
       if (team._count.members >= team.maxMembers) {
         return NextResponse.json(
-          { success: false, error: '团队已满员，无法批准申请' },
+          { success: false, error: t('teams.teamFull', getLocaleFromRequest(request)) },
           { status: 400 }
         )
       }
@@ -124,7 +125,7 @@ export async function PATCH(
 
       if (existingMembership) {
         return NextResponse.json(
-          { success: false, error: '申请人已加入该黑客松的其他团队' },
+          { success: false, error: t('teams.alreadyInOtherTeam', getLocaleFromRequest(request)) },
           { status: 400 }
         )
       }
@@ -241,7 +242,7 @@ export async function PATCH(
   } catch (error) {
     console.error('审批申请错误:', error)
     return NextResponse.json(
-      { success: false, error: '审批申请失败' },
+      { success: false, error: t('teams.reviewApplicationFailed', getLocaleFromRequest(request)) },
       { status: 500 }
     )
   }

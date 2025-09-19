@@ -99,11 +99,11 @@ export default function HackathonDetailPage() {
   const [isJoined, setIsJoined] = useState(false)
   const isFetchingRef = useRef(false)
 
-  // 检查用户参与状态
+  // Check user participation status
   const checkUserParticipation = async (hackathonId: string, organizerId?: string) => {
     if (!user) return
     
-    // 创建者永远不算"已参加"
+    // Creator is never considered "participated"
     if (organizerId && user.id === organizerId) {
       setIsJoined(false)
       return
@@ -115,7 +115,7 @@ export default function HackathonDetailPage() {
         setIsJoined(response.data.isParticipating)
       }
     } catch (error) {
-      console.error('检查参与状态失败:', error)
+      console.error('[HACKATHON] Failed to check participation status:', error)
     }
   }
 
@@ -127,20 +127,20 @@ export default function HackathonDetailPage() {
         const projects = response.data.projects.map((project: any) => ({
           id: project.id,
           name: project.title,
-          team: project.team?.name || project.creator?.username || '个人项目',
+          team: project.team?.name || project.creator?.username || t('project.individual'),
           members: project.team?._count?.members || 1,
-          track: project.category || '未分类'
+          track: project.category || t('project.uncategorized')
         }))
         
-        // 更新hackathon中的projects
+        // Update projects in hackathon
         setHackathon(prev => prev ? { ...prev, projects } : null)
       }
     } catch (error) {
-      console.error('获取项目列表失败:', error)
+      console.error('[HACKATHON] Failed to get project list:', error)
     }
   }
 
-  // 辅助函数：根据日期判断黑客松状态
+  // Helper function: Determine hackathon status based on dates
   const getHackathonStatus = (startDate: string, endDate: string): 'upcoming' | 'ongoing' | 'ended' => {
     const now = new Date()
     const start = new Date(startDate)
@@ -151,63 +151,63 @@ export default function HackathonDetailPage() {
     return 'ended'
   }
 
-  // 检查是否可以报名
+  // Check if registration is allowed
   const canRegister = (hackathon: Hackathon) => {
     const now = new Date()
     const registrationStart = hackathon.registrationStartDate ? new Date(hackathon.registrationStartDate) : null
     const registrationEnd = new Date(hackathon.registrationDeadline)
     
-    // 如果设置了报名开始时间，检查是否已到报名时间
+    // If registration start time is set, check if registration time has arrived
     if (registrationStart && now < registrationStart) {
-      return { canRegister: false, reason: '报名尚未开始' }
+      return { canRegister: false, reason: t('registration.notStarted') }
     }
     
-    // 检查是否已过报名截止时间
+    // Check if registration deadline has passed
     if (now > registrationEnd) {
-      return { canRegister: false, reason: '报名已截止' }
+      return { canRegister: false, reason: t('registration.expired') }
     }
     
     return { canRegister: true, reason: '' }
   }
 
-  // 检查是否可以提交项目
+  // Check if project submission is allowed
   const canSubmitProject = (hackathon: Hackathon) => {
     const now = new Date()
     const hackathonStart = new Date(hackathon.startDate)
     const hackathonEnd = new Date(hackathon.endDate)
     
-    // 项目提交必须在黑客松开始后
+    // Project submission must be after hackathon starts
     if (now < hackathonStart) {
-      return { canSubmit: false, reason: '黑客松尚未开始' }
+      return { canSubmit: false, reason: t('submission.notStarted') }
     }
     
-    // 项目提交必须在黑客松结束前
+    // Project submission must be before hackathon ends
     if (now > hackathonEnd) {
-      return { canSubmit: false, reason: '黑客松已结束' }
+      return { canSubmit: false, reason: t('submission.ended') }
     }
     
     return { canSubmit: true, reason: '' }
   }
 
-  // 提取fetchHackathon函数到组件级别，让其他函数可以调用
+  // Extract fetchHackathon function to component level for other functions to call
   const fetchHackathon = useCallback(async () => {
-      // 防止重复调用
+      // Prevent duplicate calls
       if (isFetchingRef.current) {
-        console.log('⏳ 正在获取中，跳过重复调用')
+        console.log('[HACKATHON] ⏳ Fetching in progress, skipping duplicate call')
         return
       }
       
       try {
         isFetchingRef.current = true
         setIsLoading(true)
-        console.log('🔍 获取黑客松详情:', params.id)
+        console.log('[HACKATHON] 🔍 Fetching hackathon details:', params.id)
         const response = await apiService.getHackathon(params.id as string)
-        console.log('📡 API响应:', response)
+        console.log('[HACKATHON] 📡 API response:', response)
         
         if (response.success && response.data) {
           const hackathonData = response.data.hackathon
           
-          // 转换API数据为页面所需格式
+          // Convert API data to the format required by the page
           const formattedHackathon: Hackathon = {
             id: hackathonData.id,
             title: hackathonData.title,
@@ -215,19 +215,19 @@ export default function HackathonDetailPage() {
             longDescription: hackathonData.description, // 可以从metadata中获取更详细描述
             startDate: hackathonData.startDate,
             endDate: hackathonData.endDate,
-            registrationStartDate: hackathonData.registrationStartDate,
+            registrationStartDate: (hackathonData as any).registrationStartDate,
             registrationDeadline: hackathonData.registrationDeadline || hackathonData.startDate,
             status: getHackathonStatus(hackathonData.startDate, hackathonData.endDate),
             participants: hackathonData._count?.participations || 0,
             maxParticipants: hackathonData.maxParticipants,
-            totalPrize: hackathonData.prizePool ? `$${hackathonData.prizePool.toLocaleString()}` : '待定',
-            location: '全球线上', // 可以从metadata中获取
+            totalPrize: hackathonData.prizePool ? `$${hackathonData.prizePool.toLocaleString()}` : t('prize.pending'),
+            location: t('location.globalOnline'), // 可以从metadata中获取
             organizer: {
               name: hackathonData.organizer?.username || 'Unknown',
               avatar: hackathonData.organizer?.avatarUrl || '/placeholder.svg',
-              description: '黑客松组织者' // bio字段不在API返回中
+              description: t('organizer.description') // bio字段不在API返回中
             },
-            organizerId: hackathonData.organizerId, // 添加组织者ID用于权限判断
+            organizerId: hackathonData.organizer?.id || '', // 添加组织者ID用于权限判断
             tags: hackathonData.tags || [],
             coverImage: getIPFSImageUrl(hackathonData.metadata?.coverImage, '/placeholder.svg?height=400&width=800'),
             // ⭐ 使用真实的奖项数据
@@ -238,46 +238,46 @@ export default function HackathonDetailPage() {
                   const totalAmount = singleAmount * winnerCount // ⭐ 计算该奖项的总金额
                   
                   return {
-                    name: prize.name || `第${prize.rank}名`, // ⭐ 使用正确的name字段
+                    name: prize.name || t('prize.rankName', { rank: prize.rank }), // ⭐ 使用正确的name字段
                     amount: formatPrizeAmount(singleAmount, winnerCount), // ⭐ 使用工具函数格式化金额
-                    description: prize.description || `第${prize.rank}名奖项`,
+                    description: prize.description || t('prize.rankDescription', { rank: prize.rank }),
                     winnerCount: winnerCount // ⭐ 添加获奖人数
                   }
                 })
               : [{
-                  name: '一等奖',
+                  name: t('prize.firstPrize'),
                   amount: hackathonData.prizePool ? `$${Math.floor(hackathonData.prizePool * 0.5).toLocaleString()}` : '$10,000',
-                  description: '最佳项目奖'
+                  description: t('prize.bestProject')
                 }],
             // ⭐ 使用真实的赛道数据
             tracks: hackathonData.metadata?.tracks && Array.isArray(hackathonData.metadata.tracks)
               ? hackathonData.metadata.tracks.map((track: any) => ({
-                  name: track.name || '未命名赛道',
-                  description: track.description || '无描述'
+                  name: track.name || t('track.unnamed'),
+                  description: track.description || t('track.noDescription')
                 }))
               : hackathonData.categories.map((category: string) => ({
                   name: category,
-                  description: `${category}相关项目`
+                  description: t('track.categoryRelated', { category })
                 })) || [{
-                  name: '开放赛道',
-                  description: '不限制技术栈和项目类型'
+                  name: t('track.open'),
+                  description: t('track.openDescription')
                 }],
             rules: typeof hackathonData.rules === 'string' 
               ? hackathonData.rules.split('\n').filter(rule => rule.trim()) 
-              : (Array.isArray(hackathonData.rules) ? hackathonData.rules : ['遵守比赛规则']),
+              : (Array.isArray(hackathonData.rules) ? hackathonData.rules : [t('rules.default')]),
             requirements: typeof hackathonData.requirements === 'string'
               ? hackathonData.requirements.split('\n').filter(req => req.trim())
-              : (Array.isArray(hackathonData.requirements) ? hackathonData.requirements : ['无特殊要求']),
+              : (Array.isArray(hackathonData.requirements) ? hackathonData.requirements : [t('requirements.none')]),
             // ⭐ 使用真实的评审标准
             judgingCriteria: hackathonData.metadata?.judgingCriteria && Array.isArray(hackathonData.metadata.judgingCriteria)
               ? hackathonData.metadata.judgingCriteria.map((criteria: any) => 
-                  typeof criteria === 'string' ? criteria : (criteria.description || criteria.category || '未命名标准')
+                  typeof criteria === 'string' ? criteria : (criteria.description || criteria.category || t('criteria.unnamed'))
                 )
               : [
-                  '技术创新性',
-                  '产品完成度', 
-                  '用户体验',
-                  '商业价值'
+                  t('criteria.innovation'),
+                  t('criteria.completion'), 
+                  t('criteria.userExperience'),
+                  t('criteria.businessValue')
                 ],
             // ⭐ 使用真实的时间线数据
             timeline: hackathonData.metadata?.timeline && Array.isArray(hackathonData.metadata.timeline)
@@ -290,14 +290,14 @@ export default function HackathonDetailPage() {
               : [
                   {
                     date: hackathonData.startDate,
-                    title: '比赛开始',
-                    description: '正式开始开发',
+                    title: t('timeline.hackingStart'),
+                    description: t('timeline.hackingStartDesc'),
                     completed: false
                   },
                   {
                     date: hackathonData.endDate,
-                    title: '比赛结束',
-                    description: '提交截止',
+                    title: t('timeline.hackingEnd'),
+                    description: t('timeline.submissionDeadline'),
                     completed: false
                   }
                 ],
@@ -316,20 +316,20 @@ export default function HackathonDetailPage() {
                   name: judge.name,
                   avatar: judge.avatarUrl || '/placeholder.svg',
                   title: judge.title,
-                  company: judge.bio || 'HackX评委'
+                  company: judge.bio || t('judge.defaultTitle')
                 }))
               : [],
             // ⭐ 使用真实的社交链接数据
-            socialLinks: hackathonData.metadata?.socialLinks || {},
+            socialLinks: (hackathonData as any).metadata?.socialLinks || {},
             projects: [] // 将在fetchProjects中填充
           }
           
           setHackathon(formattedHackathon)
           
-          // 获取项目数据
+          // Fetch project data
           await fetchProjects(hackathonData.id)
           
-          // 检查当前用户是否已参加
+          // Check if current user has joined
           if (user) {
             checkUserParticipation(hackathonData.id, hackathonData.organizer.id)
           }
@@ -341,7 +341,7 @@ export default function HackathonDetailPage() {
           })
         }
       } catch (error) {
-        console.error('获取黑客松详情失败:', error)
+        console.error('[HACKATHON] Failed to get hackathon details:', error)
         toast({
           title: t('error.title'), 
           description: t('error.loadHackathonFailed'),
@@ -362,8 +362,8 @@ export default function HackathonDetailPage() {
   const handleJoinHackathon = async () => {
     if (!user) {
       toast({
-        title: '请先登录',
-        description: '登录后才能参加黑客松',
+        title: t('auth.loginRequired'),
+        description: t('auth.loginToJoin'),
         variant: 'destructive',
       })
       return
@@ -371,11 +371,11 @@ export default function HackathonDetailPage() {
 
     if (!hackathon) return
 
-    // 创建者不能参加自己的黑客松
+    // Creator cannot join their own hackathon
     if (user.id === hackathon.organizerId) {
       toast({
-        title: '无法参加',
-        description: '作为创建者，您无法参加自己创建的黑客松',
+        title: t('auth.cannotJoin'),
+        description: t('auth.creatorRestriction'),
         variant: 'destructive',
       })
       return
@@ -387,20 +387,20 @@ export default function HackathonDetailPage() {
       if (response.success) {
         setIsJoined(true)
         toast({
-          title: '参加成功！',
-          description: '你已成功参加这个黑客松',
+          title: t('actions.joinSuccess'),
+          description: t('actions.joinSuccessDesc'),
         })
         
-        // 重新加载黑客松数据以更新参与人数
+        // Reload hackathon data to update participant count
         fetchHackathon()
       } else {
-        throw new Error(response.error || '参加失败')
+        throw new Error(response.error || t('actions.joinFailedError'))
       }
     } catch (error) {
-      console.error('加入黑客松失败:', error)
+      console.error('[HACKATHON] Join hackathon failed:', error)
       toast({
-        title: '参加失败',
-        description: error instanceof Error ? error.message : '网络错误，请稍后重试',
+        title: t('actions.joinFailed'),
+        description: error instanceof Error ? error.message : t('actions.networkError'),
         variant: 'destructive',
       })
     }
@@ -410,8 +410,8 @@ export default function HackathonDetailPage() {
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href)
     toast({
-      title: '链接已复制',
-      description: '黑客松链接已复制到剪贴板',
+      title: t('actions.linkCopied'),
+      description: t('actions.linkCopiedDesc'),
     })
   }
 
@@ -484,7 +484,7 @@ export default function HackathonDetailPage() {
               {hackathon.status === 'upcoming' && (
                 <Badge variant="secondary" className="bg-white/20 text-white">
                   <Timer className="h-3 w-3 mr-1" />
-                  {getDaysUntil(hackathon.startDate)} 天后开始
+                  {t('timing.startsIn', { days: getDaysUntil(hackathon.startDate) })}
                 </Badge>
               )}
             </div>
@@ -528,7 +528,7 @@ export default function HackathonDetailPage() {
                     <div className="flex items-center justify-center mb-2">
                       <MapPin className="h-5 w-5 text-primary" />
                     </div>
-                    <p className="text-sm text-muted-foreground">{t('location')}</p>
+                    <p className="text-sm text-muted-foreground">{t('locationLabel')}</p>
                     <p className="font-semibold">{hackathon.location}</p>
                   </div>
                 </div>
@@ -549,7 +549,7 @@ export default function HackathonDetailPage() {
                 {/* 时间安排信息 */}
                 <Card>
                   <CardHeader>
-                    <CardTitle>时间安排</CardTitle>
+                    <CardTitle>{t('schedule.title')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -558,7 +558,7 @@ export default function HackathonDetailPage() {
                           <div className="flex items-center justify-center mb-2">
                             <Timer className="h-5 w-5 text-green-600" />
                           </div>
-                          <p className="text-sm text-muted-foreground mb-1">报名开始</p>
+                          <p className="text-sm text-muted-foreground mb-1">{t('schedule.registrationStart')}</p>
                           <p className="font-semibold text-sm">{formatDate(hackathon.registrationStartDate)}</p>
                         </div>
                       )}
@@ -567,7 +567,7 @@ export default function HackathonDetailPage() {
                         <div className="flex items-center justify-center mb-2">
                           <AlertCircle className="h-5 w-5 text-orange-600" />
                         </div>
-                        <p className="text-sm text-muted-foreground mb-1">报名截止</p>
+                        <p className="text-sm text-muted-foreground mb-1">{t('schedule.registrationDeadline')}</p>
                         <p className="font-semibold text-sm">{formatDate(hackathon.registrationDeadline)}</p>
                       </div>
                       
@@ -575,7 +575,7 @@ export default function HackathonDetailPage() {
                         <div className="flex items-center justify-center mb-2">
                           <Calendar className="h-5 w-5 text-blue-600" />
                         </div>
-                        <p className="text-sm text-muted-foreground mb-1">活动开始</p>
+                        <p className="text-sm text-muted-foreground mb-1">{t('schedule.eventStart')}</p>
                         <p className="font-semibold text-sm">{formatDate(hackathon.startDate)}</p>
                       </div>
                       
@@ -583,7 +583,7 @@ export default function HackathonDetailPage() {
                         <div className="flex items-center justify-center mb-2">
                           <CheckCircle className="h-5 w-5 text-purple-600" />
                         </div>
-                        <p className="text-sm text-muted-foreground mb-1">活动结束</p>
+                        <p className="text-sm text-muted-foreground mb-1">{t('schedule.eventEnd')}</p>
                         <p className="font-semibold text-sm">{formatDate(hackathon.endDate)}</p>
                       </div>
                     </div>
@@ -592,7 +592,7 @@ export default function HackathonDetailPage() {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>活动介绍</CardTitle>
+                    <CardTitle>{t('sections.introduction')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="prose max-w-none">
@@ -607,7 +607,7 @@ export default function HackathonDetailPage() {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>赛道介绍</CardTitle>
+                    <CardTitle>{t('sections.tracks')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="grid gap-4">
@@ -623,7 +623,7 @@ export default function HackathonDetailPage() {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>技术栈</CardTitle>
+                    <CardTitle>{t('sections.techStack')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="flex flex-wrap gap-2">
@@ -651,7 +651,7 @@ export default function HackathonDetailPage() {
                               <h3 className="font-semibold text-lg">{prize.name}</h3>
                               <p className="text-2xl font-bold text-primary">{prize.amount}</p>
                               {(prize as any).winnerCount && (prize as any).winnerCount > 1 && (
-                                <p className="text-sm text-muted-foreground">获奖人数: {(prize as any).winnerCount}人</p>
+                                <p className="text-sm text-muted-foreground">{t('prize.winnerCount', { count: (prize as any).winnerCount })}</p>
                               )}
                             </div>
                           </div>
@@ -669,7 +669,7 @@ export default function HackathonDetailPage() {
               <TabsContent value="rules" className="space-y-4">
                 <Card>
                   <CardHeader>
-                    <CardTitle>参赛规则</CardTitle>
+                    <CardTitle>{t('sections.rules')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-2">
@@ -685,7 +685,7 @@ export default function HackathonDetailPage() {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>参与要求</CardTitle>
+                    <CardTitle>{t('sections.requirements')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-2">
@@ -701,7 +701,7 @@ export default function HackathonDetailPage() {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>评审标准</CardTitle>
+                    <CardTitle>{t('sections.criteria')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-2">
@@ -719,7 +719,7 @@ export default function HackathonDetailPage() {
               <TabsContent value="timeline" className="space-y-4">
                 <Card>
                   <CardHeader>
-                    <CardTitle>活动时间线</CardTitle>
+                    <CardTitle>{t('sections.timeline')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-6">
@@ -756,7 +756,7 @@ export default function HackathonDetailPage() {
                   <Card>
                     <CardContent className="p-4 text-center">
                       <div className="text-2xl font-bold text-primary">{hackathon.projects.length}</div>
-                      <div className="text-sm text-muted-foreground">已提交项目</div>
+                      <div className="text-sm text-muted-foreground">{t('stats.submittedProjects')}</div>
                     </CardContent>
                   </Card>
                   <Card>
@@ -764,7 +764,7 @@ export default function HackathonDetailPage() {
                       <div className="text-2xl font-bold text-primary">
                         {new Set(hackathon.projects.map(p => p.track)).size}
                       </div>
-                      <div className="text-sm text-muted-foreground">参与赛道</div>
+                      <div className="text-sm text-muted-foreground">{t('stats.activeTracks')}</div>
                     </CardContent>
                   </Card>
                   <Card>
@@ -772,7 +772,7 @@ export default function HackathonDetailPage() {
                       <div className="text-2xl font-bold text-primary">
                         {hackathon.projects.reduce((sum, p) => sum + p.members, 0)}
                       </div>
-                      <div className="text-sm text-muted-foreground">参与人数</div>
+                      <div className="text-sm text-muted-foreground">{t('stats.participants')}</div>
                     </CardContent>
                   </Card>
                   <Card>
@@ -780,7 +780,7 @@ export default function HackathonDetailPage() {
                       <div className="text-2xl font-bold text-primary">
                         {Math.round(hackathon.projects.reduce((sum, p) => sum + p.members, 0) / Math.max(hackathon.projects.length, 1))}
                       </div>
-                      <div className="text-sm text-muted-foreground">平均团队规模</div>
+                      <div className="text-sm text-muted-foreground">{t('stats.averageTeamSize')}</div>
                     </CardContent>
                   </Card>
                 </div>
@@ -790,9 +790,9 @@ export default function HackathonDetailPage() {
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <div>
-                        <CardTitle>参赛项目</CardTitle>
+                        <CardTitle>{t('sections.projects')}</CardTitle>
                         <CardDescription>
-                          按赛道分组显示已提交的项目
+                          {t('sections.projectsDescription')}
                         </CardDescription>
                       </div>
                       {/* 提交项目按钮 */}
@@ -802,7 +802,7 @@ export default function HackathonDetailPage() {
                           <Button asChild>
                             <Link href={`/hackathons/${hackathon.id}/submit`}>
                               <Code className="w-4 h-4 mr-2" />
-                              提交项目
+                              {t('actions.submitProject')}
                             </Link>
                           </Button>
                         ) : (
@@ -825,7 +825,7 @@ export default function HackathonDetailPage() {
                             <div key={track.name}>
                               <div className="flex items-center gap-2 mb-3">
                                 <h4 className="font-semibold">{track.name}</h4>
-                                <Badge variant="secondary">{trackProjects.length} 个项目</Badge>
+                                <Badge variant="secondary">{t('stats.projectCount', { count: trackProjects.length })}</Badge>
                               </div>
                               <div className="grid gap-3">
                                 {trackProjects.map((project) => (
@@ -834,11 +834,11 @@ export default function HackathonDetailPage() {
                                       <div className="flex items-center gap-2 mb-1">
                                         <h5 className="font-medium">{project.name}</h5>
                                         <Badge variant="outline">
-                                          {project.members} 人团队
+                                          {t('project.teamMembers', { count: project.members })}
                                         </Badge>
                                       </div>
                                       <p className="text-sm text-muted-foreground">
-                                        团队：{project.team}
+                                        {t('project.team', { name: project.team })}
                                       </p>
                                     </div>
                                     <div className="flex items-center gap-2">
@@ -847,7 +847,7 @@ export default function HackathonDetailPage() {
                                       </Button>
                                       <Button variant="outline" size="sm" asChild>
                                         <Link href={`/hackathons/${hackathon.id}/projects/${project.id}`}>
-                                          查看详情
+                                          {t('actions.viewDetails')}
                                         </Link>
                                       </Button>
                                     </div>
@@ -861,16 +861,16 @@ export default function HackathonDetailPage() {
                     ) : (
                       <div className="text-center py-12">
                         <Code className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                        <h3 className="text-lg font-semibold mb-2">还没有项目提交</h3>
+                        <h3 className="text-lg font-semibold mb-2">{t('project.noProjects')}</h3>
                         <p className="text-muted-foreground mb-6">
-                          成为第一个提交项目的团队！
+                          {t('project.beFirst')}
                         </p>
                         {user && user.id !== hackathon.organizerId && isJoined && (() => {
                           const submitStatus = canSubmitProject(hackathon)
                           return submitStatus.canSubmit ? (
                             <Button asChild>
                               <Link href={`/hackathons/${hackathon.id}/submit`}>
-                                立即提交项目
+                                {t('actions.submitProjectNow')}
                               </Link>
                             </Button>
                           ) : (
@@ -897,10 +897,10 @@ export default function HackathonDetailPage() {
                   {user && user.id === hackathon.organizerId && (
                     <div className="text-center p-4 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                       <div className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                        🎯 您是本次黑客松的创建者
+                        🎯 {t('creator.title')}
                       </div>
                       <div className="text-xs text-blue-700 dark:text-blue-300 mt-1">
-                        创建者无法参加自己创建的比赛，但可以管理和查看所有参赛项目
+                        {t('creator.description')}
                       </div>
                     </div>
                   )}
@@ -914,7 +914,7 @@ export default function HackathonDetailPage() {
                         onClick={handleJoinHackathon}
                         disabled={isJoined || !registrationStatus.canRegister}
                       >
-                        {isJoined ? '已参加' : (registrationStatus.canRegister ? '立即参加' : registrationStatus.reason)}
+                        {isJoined ? t('status.joined') : (registrationStatus.canRegister ? t('actions.joinNow') : registrationStatus.reason)}
                       </Button>
                     )
                   })()}
@@ -924,7 +924,7 @@ export default function HackathonDetailPage() {
                     return submitStatus.canSubmit ? (
                       <Button className="w-full" size="lg" asChild>
                         <Link href={`/hackathons/${hackathon.id}/submit`}>
-                          提交项目
+                          {t('actions.submitProject')}
                         </Link>
                       </Button>
                     ) : (
@@ -937,7 +937,7 @@ export default function HackathonDetailPage() {
                   <div className="flex gap-2">
                     <Button variant="outline" size="sm" onClick={handleShare} className="w-full">
                       <Share2 className="h-4 w-4 mr-2" />
-                      分享
+                      {t('actions.share')}
                     </Button>
                   </div>
                 </div>
@@ -949,20 +949,20 @@ export default function HackathonDetailPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Users className="h-5 w-5" />
-                  参与统计
+                  {t('stats.participation')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
                   <div className="flex justify-between text-sm mb-2">
-                    <span>参与者</span>
+                    <span>{t('stats.participants')}</span>
                     <span>{hackathon.participants.toLocaleString()}</span>
                   </div>
                   {hackathon.maxParticipants && (
                     <>
                       <Progress value={participationProgress} className="h-2" />
                       <p className="text-xs text-muted-foreground">
-                        还有 {hackathon.maxParticipants - hackathon.participants} 个名额
+                        {t('stats.remainingSlots', { count: hackathon.maxParticipants - hackathon.participants })}
                       </p>
                     </>
                   )}
@@ -972,15 +972,15 @@ export default function HackathonDetailPage() {
                 
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span>已提交项目</span>
+                    <span>{t('stats.submittedProjects')}</span>
                     <span>{hackathon.projects.length}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>赛道数量</span>
+                    <span>{t('stats.tracks')}</span>
                     <span>{hackathon.tracks.length}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>奖项数量</span>
+                    <span>{t('stats.prizes')}</span>
                     <span>{hackathon.prizes.length}</span>
                   </div>
                 </div>
@@ -990,7 +990,7 @@ export default function HackathonDetailPage() {
             {/* 组织者信息 */}
             <Card>
               <CardHeader>
-                <CardTitle>组织者</CardTitle>
+                <CardTitle>{t('organizer.title')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex items-start gap-3">
@@ -1007,7 +1007,7 @@ export default function HackathonDetailPage() {
                     {/* 社交链接 */}
                     {hackathon.socialLinks && Object.keys(hackathon.socialLinks).length > 0 && (
                       <div className="mt-3">
-                        <p className="text-xs font-medium text-muted-foreground mb-2">联系方式</p>
+                        <p className="text-xs font-medium text-muted-foreground mb-2">{t('organizer.contact')}</p>
                         <div className="flex flex-wrap gap-2">
                           {hackathon.socialLinks.website && (
                             <a 
@@ -1016,7 +1016,7 @@ export default function HackathonDetailPage() {
                               rel="noopener noreferrer"
                               className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 hover:underline"
                             >
-                              🌐 官网
+                              🌐 {t('organizer.website')}
                             </a>
                           )}
                           {hackathon.socialLinks.twitter && (
@@ -1080,7 +1080,7 @@ export default function HackathonDetailPage() {
             {/* 评委团 */}
             <Card>
               <CardHeader>
-                <CardTitle>评委团</CardTitle>
+                <CardTitle>{t('judges.title')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -1105,7 +1105,7 @@ export default function HackathonDetailPage() {
             {/* 赞助商 */}
             <Card>
               <CardHeader>
-                <CardTitle>赞助商</CardTitle>
+                <CardTitle>{t('sponsors.title')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-3">
@@ -1129,7 +1129,7 @@ export default function HackathonDetailPage() {
                             className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800"
                           >
                             <ExternalLink className="w-3 h-3" />
-                            访问官网
+                            {t('sponsors.visitWebsite')}
                           </a>
                         </div>
                       )}

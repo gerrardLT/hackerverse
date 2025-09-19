@@ -2,18 +2,26 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { AuthService } from '@/lib/auth'
+import { getLocaleFromRequest, createTFunction } from '@/lib/i18n'
 
-// 登录请求验证模式
-const signinSchema = z.object({
-  email: z.string().email('邮箱格式不正确'),
-  password: z.string().min(1, '密码不能为空'),
-})
+// 登录请求验证模式 - 动态创建以支持多语言
+function createSigninSchema(locale: 'en' | 'zh') {
+  const t = createTFunction(locale);
+  return z.object({
+    email: z.string().email(t('validation.emailFormatError')),
+    password: z.string().min(1, t('validation.passwordRequired')),
+  });
+}
 
 export async function POST(request: NextRequest) {
   try {
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
     const body = await request.json()
     
     // 验证请求数据
+    const signinSchema = createSigninSchema(locale)
     const validatedData = signinSchema.parse(body)
     
     // 查找用户
@@ -39,7 +47,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { 
           success: false, 
-          error: '邮箱或密码错误',
+          error: t('errors.invalidCredentials'),
           code: 'INVALID_CREDENTIALS'
         },
         { status: 401 }
@@ -56,7 +64,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { 
           success: false, 
-          error: '邮箱或密码错误',
+          error: t('errors.invalidCredentials'),
           code: 'INVALID_CREDENTIALS'
         },
         { status: 401 }
@@ -75,7 +83,7 @@ export async function POST(request: NextRequest) {
     
     return NextResponse.json({
       success: true,
-      message: '登录成功',
+      message: t('auth.loginSuccess'),
       data: {
         user: userWithoutPassword,
         token,
@@ -83,17 +91,20 @@ export async function POST(request: NextRequest) {
     })
     
   } catch (error) {
-    console.error('登录错误:', error)
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
+    console.error('Login error:', error)
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { success: false, error: '请求数据验证失败', details: error.errors },
+        { success: false, error: t('errors.validationError'), details: error.errors },
         { status: 400 }
       )
     }
     
     return NextResponse.json(
-      { success: false, error: '登录失败，请稍后重试' },
+      { success: false, error: t('auth.loginError') },
       { status: 500 }
     )
   }

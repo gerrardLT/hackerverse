@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Badge } from '@/components/ui/badge'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
-import { Menu, User, Settings, LogOut, Wallet, Trophy, Users, Calendar, Bell, ChevronDown, MessageSquare, X, Sparkles, Plus } from 'lucide-react'
+import { Menu, User, Settings, LogOut, Wallet, Trophy, Users, Calendar, Bell, ChevronDown, MessageSquare, X, Sparkles, Plus, Home } from 'lucide-react'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/hooks/use-auth'
@@ -50,8 +50,8 @@ export function Header() {
   }, [])
 
   const navigation = [
-    { name: t('home'), href: '/', icon: null },
-    { name: t('hackathons'), href: '/hackathons', icon: Calendar },
+    { name: t('homeNav'), href: '/', icon: Home },
+    { name: t('hackathons'), href: '/hackathons', icon: Trophy },
     { name: t('community'), href: '/community', icon: MessageSquare },
     { name: t('teams'), href: '/teams', icon: Users },
   ]
@@ -88,9 +88,9 @@ export function Header() {
           {/* Enhanced Logo */}
           <Link 
             href="/" 
-            className="flex items-center space-x-3"
+            className="group flex items-center space-x-3"
           >
-            <div className="text-primary">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-secondary text-primary-foreground shadow-[0_20px_25px_-5px] shadow-primary/70 group-hover:shadow-[0_35px_60px_-12px] group-hover:shadow-primary/90 transition-all duration-300 group-hover:scale-110 drop-shadow-2xl shadow-inner">
               <HackerverseLogo className="h-10 w-10" />
             </div>
             <span className="hidden sm:inline-block font-bold text-lg bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
@@ -155,23 +155,14 @@ export function Header() {
                 {/* Create Hackathon Button - Always visible when logged in */}
                 <Button 
                   asChild
-                  className="hidden lg:flex items-center gap-1.5 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground px-2 py-2 rounded-lg hover-lift transition-all duration-300"
+                  className="hidden lg:flex items-center gap-1.5 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground px-4 py-2 rounded-lg hover-lift transition-all duration-300"
                 >
                   <Link href="/hackathons/create">
                     <Plus className="h-4 w-4" />
-                    <span className="text-sm font-medium">{tCommon('createHackathon')}</span>
+                    <span className="text-sm font-medium">Create</span>
                   </Link>
                 </Button>
 
-                {/* Wallet Address Display */}
-                {web3User?.address && (
-                  <div className="hidden lg:flex items-center gap-2 px-3 py-2 glass border border-primary/20 rounded-xl">
-                    <Wallet className="h-4 w-4 text-primary" />
-                    <span className="text-sm font-mono text-muted-foreground">
-                      {formatWalletAddress(web3User.address)}
-                    </span>
-                  </div>
-                )}
 
                 {/* Enhanced User Menu */}
                 <DropdownMenu>
@@ -215,9 +206,9 @@ export function Header() {
                         </Avatar>
                         <div className="flex-1 min-w-0">
                           <p className="font-semibold leading-none truncate">{user.username || 'User'}</p>
-                          {user.email && (
-                            <p className="text-xs text-muted-foreground mt-1 truncate">{user.email}</p>
-                          )}
+                          {user.walletAddress && (
+                         <p className="text-xs text-muted-foreground font-mono">{formatWalletAddress(user.walletAddress)}</p>
+                      )}
                           {web3User?.address && (
                             <div className="flex items-center gap-1 mt-1">
                               <Wallet className="h-3 w-3 text-primary" />
@@ -348,8 +339,8 @@ export function Header() {
                     </Avatar>
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold leading-none truncate">{user.username || 'User'}</p>
-                      {user.email && (
-                        <p className="text-xs text-muted-foreground mt-1 truncate">{user.email}</p>
+                      {user.walletAddress && (
+                         <p className="text-xs text-muted-foreground font-mono">{formatWalletAddress(user.walletAddress)}</p>
                       )}
                       {web3User?.address && (
                         <div className="flex items-center gap-1 mt-1">
@@ -368,7 +359,7 @@ export function Header() {
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <Plus className="h-5 w-5 transition-transform group-hover:scale-110" />
-                    {tCommon('createHackathon')}
+                    Create
                   </Link>
                   
                   <Link

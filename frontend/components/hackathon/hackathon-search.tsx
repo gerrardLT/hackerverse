@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslations } from 'next-intl'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -17,12 +18,26 @@ export function HackathonSearch({ searchQuery, onSearchChange }: HackathonSearch
   const [isFocused, setIsFocused] = useState(false)
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [searchHistory, setSearchHistory] = useState<string[]>([])
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 })
   const inputRef = useRef<HTMLInputElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   // 热门搜索关键词
   const popularSearches = [
     'Web3', 'DeFi', 'NFT', 'AI', 'Blockchain', 'React', 'Node.js', 'Python'
   ]
+
+  // 计算下拉菜单位置
+  const updateDropdownPosition = () => {
+    if (containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect()
+      setDropdownPosition({
+        top: rect.bottom + window.scrollY + 8, // 8px margin
+        left: rect.left + window.scrollX,
+        width: rect.width
+      })
+    }
+  }
 
   // 加载搜索历史
   useEffect(() => {
@@ -35,6 +50,29 @@ export function HackathonSearch({ searchQuery, onSearchChange }: HackathonSearch
       }
     }
   }, [])
+
+  // 监听窗口变化，更新下拉菜单位置
+  useEffect(() => {
+    const handleResize = () => {
+      if (showSuggestions) {
+        updateDropdownPosition()
+      }
+    }
+
+    const handleScroll = () => {
+      if (showSuggestions) {
+        updateDropdownPosition()
+      }
+    }
+
+    window.addEventListener('resize', handleResize)
+    window.addEventListener('scroll', handleScroll, true)
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      window.removeEventListener('scroll', handleScroll, true)
+    }
+  }, [showSuggestions])
 
   // 保存搜索历史
   const saveSearchHistory = (query: string) => {
@@ -71,6 +109,21 @@ export function HackathonSearch({ searchQuery, onSearchChange }: HackathonSearch
     }
   }
 
+  const handleFocus = () => {
+    setIsFocused(true)
+    setShowSuggestions(true)
+    // 延迟一点时间让DOM更新
+    setTimeout(() => {
+      updateDropdownPosition()
+    }, 0)
+  }
+
+  const handleBlur = () => {
+    setIsFocused(false)
+    // 延迟隐藏建议，让用户有时间点击
+    setTimeout(() => setShowSuggestions(false), 200)
+  }
+
   const handleSuggestionClick = (suggestion: string) => {
     onSearchChange(suggestion)
     saveSearchHistory(suggestion)
@@ -89,30 +142,24 @@ export function HackathonSearch({ searchQuery, onSearchChange }: HackathonSearch
   }
 
   return (
-    <div className="relative">
-      <form onSubmit={handleSearchSubmit} className="relative">
-        <div className={`relative transition-all duration-300 ${isFocused ? 'scale-[1.02]' : ''}`}>
-          <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 transition-colors duration-300 ${
-            isFocused ? 'text-primary' : 'text-muted-foreground'
-          }`} />
-          <Input
-            ref={inputRef}
-            placeholder={t('placeholder')}
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            onFocus={() => {
-              setIsFocused(true)
-              setShowSuggestions(true)
-            }}
-            onBlur={() => {
-              setIsFocused(false)
-              // 延迟隐藏建议，让用户有时间点击
-              setTimeout(() => setShowSuggestions(false), 200)
-            }}
-            className={`pl-12 pr-20 h-12 text-base glass border-primary/20 transition-all duration-300 ${
-              isFocused ? 'border-primary/40 shadow-glow' : 'hover:border-primary/30'
-            }`}
-          />
+    <>
+      <div ref={containerRef} className="relative">
+        <form onSubmit={handleSearchSubmit} className="relative">
+          <div className={`relative transition-all duration-300 ${isFocused ? 'scale-[1.02]' : ''}`}>
+            <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 transition-colors duration-300 ${
+              isFocused ? 'text-primary' : 'text-muted-foreground'
+            }`} />
+            <Input
+              ref={inputRef}
+              placeholder={t('placeholder')}
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              className={`pl-12 pr-20 h-12 text-base glass border-primary/20 transition-all duration-300 ${
+                isFocused ? 'border-primary/40 shadow-glow' : 'hover:border-primary/30'
+              }`}
+            />
           <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
             {searchQuery && (
               <Button
@@ -136,10 +183,19 @@ export function HackathonSearch({ searchQuery, onSearchChange }: HackathonSearch
           </div>
         </div>
       </form>
+      </div>
 
-      {/* 搜索建议面板 */}
-      {showSuggestions && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-popover border rounded-2xl shadow-lg p-6 z-50 animate-slide-down">
+      {/* 使用Portal渲染搜索建议面板到body */}
+      {showSuggestions && typeof window !== 'undefined' && createPortal(
+        <div 
+          className="fixed bg-popover border rounded-2xl shadow-lg p-6 animate-slide-down"
+          style={{
+            top: dropdownPosition.top,
+            left: dropdownPosition.left,
+            width: dropdownPosition.width,
+            zIndex: 999999
+          }}
+        >
           <div className="space-y-6">
             {/* 搜索历史 */}
             {searchHistory.length > 0 && (
@@ -199,8 +255,9 @@ export function HackathonSearch({ searchQuery, onSearchChange }: HackathonSearch
               💡 {t('searchTips')}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
-    </div>
+    </>
   )
 }

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -90,6 +90,7 @@ export default function PostDetailPage() {
   const t = useTranslations('community.post')
   const tCommon = useTranslations('common')
   const tCommunity = useTranslations('community')
+  const locale = useLocale()
   const postId = params.id as string
 
   // 获取国际化的分类标签
@@ -233,8 +234,8 @@ export default function PostDetailPage() {
         setLikeCount(response.data.likeCount)
         
         toast({
-          title: response.data?.isLiked ? "点赞成功" : "取消点赞",
-          description: response.data?.isLiked ? "感谢您的点赞！" : "已取消对此帖子的点赞",
+          title: response.data?.isLiked ? t('likeSuccess') : t('unlikeSuccess'),
+          description: response.data?.isLiked ? t('likeSuccessDesc') : t('unlikeSuccessDesc'),
         })
       } else {
         throw new Error(response.error || '点赞操作失败')
@@ -266,8 +267,8 @@ export default function PostDetailPage() {
         setReplyLikes(prev => ({ ...prev, [replyId]: response.data.likeCount }))
         
         toast({
-          title: response.data.isLiked ? "点赞成功" : "取消点赞",
-          description: response.data.isLiked ? "感谢您的点赞！" : "已取消对回复的点赞",
+          title: response.data.isLiked ? t('likeSuccess') : t('unlikeSuccess'),
+          description: response.data.isLiked ? t('replyLikeSuccessDesc') : t('replyUnlikeSuccessDesc'),
         })
       } else {
         throw new Error(response.error || '点赞操作失败')
@@ -292,8 +293,8 @@ export default function PostDetailPage() {
         setIsBookmarked(response.data.isBookmarked)
         
         toast({
-          title: response.data.isBookmarked ? "收藏成功" : "取消收藏",
-          description: response.data.isBookmarked ? "已添加到收藏夹" : "已从收藏夹移除",
+          title: response.data.isBookmarked ? t('bookmarkSuccess') : t('unbookmarkSuccess'),
+          description: response.data.isBookmarked ? t('bookmarkSuccessDesc') : t('unbookmarkSuccessDesc'),
         })
       } else {
         throw new Error(response.error || '收藏操作失败')
@@ -323,8 +324,8 @@ export default function PostDetailPage() {
         setNewReply('')
         
         toast({
-          title: "回复成功",
-          description: "您的回复已发布",
+          title: t('replySuccess'),
+          description: t('replySuccessDesc'),
         })
       } else {
         throw new Error(response.error || '回复发布失败')
@@ -332,8 +333,8 @@ export default function PostDetailPage() {
     } catch (error) {
       console.error('回复错误:', error)
       toast({
-        title: "回复失败",
-        description: error instanceof Error ? error.message : "发布回复时出现错误，请重试",
+        title: t('replyFailed'),
+        description: error instanceof Error ? error.message : t('replyFailedDesc'),
         variant: "destructive"
       })
     } finally {
@@ -389,8 +390,8 @@ export default function PostDetailPage() {
         setReplyingTo(null)
         
         toast({
-          title: "回复成功",
-          description: "您的回复已发布",
+          title: t('replySuccess'),
+          description: t('replySuccessDesc'),
         })
       } else {
         throw new Error(response.error || '回复发布失败')
@@ -398,8 +399,8 @@ export default function PostDetailPage() {
     } catch (error) {
       console.error('回复发布错误:', error)
       toast({
-        title: "回复失败",
-        description: error instanceof Error ? error.message : '网络错误，请重试',
+        title: t('replyFailed'),
+        description: error instanceof Error ? error.message : t('networkError'),
         variant: "destructive"
       })
     } finally {
@@ -448,8 +449,8 @@ export default function PostDetailPage() {
   const handleSaveEdit = async () => {
     if (!post || !editTitle.trim() || !editContent.trim()) {
       toast({
-        title: "保存失败",
-        description: "标题和内容不能为空",
+        title: t('saveFailed'),
+        description: t('saveFailedDesc'),
         variant: "destructive"
       })
       return
@@ -473,8 +474,8 @@ export default function PostDetailPage() {
         
         setIsEditing(false)
         toast({
-          title: "保存成功",
-          description: "帖子已更新"
+          title: t('saveSuccess'),
+          description: t('saveSuccessDesc')
         })
       } else {
         throw new Error(response.error || '更新失败')
@@ -482,8 +483,8 @@ export default function PostDetailPage() {
     } catch (error) {
       console.error('更新帖子错误:', error)
       toast({
-        title: "保存失败",
-        description: error instanceof Error ? error.message : '网络错误，请重试',
+        title: t('saveFailed'),
+        description: error instanceof Error ? error.message : t('networkError'),
         variant: "destructive"
       })
     } finally {
@@ -504,8 +505,8 @@ export default function PostDetailPage() {
 
       if (response.success) {
         toast({
-          title: "删除成功",
-          description: "帖子已删除"
+          title: t('deleteSuccess'),
+          description: t('deleteSuccessDesc')
         })
         
         // 跳转回社区列表
@@ -516,8 +517,8 @@ export default function PostDetailPage() {
     } catch (error) {
       console.error('删除帖子错误:', error)
       toast({
-        title: "删除失败",
-        description: error instanceof Error ? error.message : '网络错误，请重试',
+        title: t('deleteFailed'),
+        description: error instanceof Error ? error.message : t('networkError'),
         variant: "destructive"
       })
     }
@@ -528,7 +529,7 @@ export default function PostDetailPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-12 w-12 text-primary animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground">加载帖子中...</p>
+          <p className="text-muted-foreground">{t('loading')}</p>
         </div>
       </div>
     )
@@ -539,10 +540,10 @@ export default function PostDetailPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <h3 className="text-lg font-medium mb-2">加载失败</h3>
+          <h3 className="text-lg font-medium mb-2">{t('loadFailed')}</h3>
           <p className="text-muted-foreground mb-4">{error}</p>
           <Button onClick={loadPost}>
-            重试
+            {t('retry')}
           </Button>
         </div>
       </div>
@@ -553,10 +554,10 @@ export default function PostDetailPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">帖子不存在</h1>
-          <p className="text-gray-600 mb-4">您要查看的帖子可能已被删除或不存在。</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('notFound')}</h1>
+          <p className="text-gray-600 mb-4">{t('notFoundDesc')}</p>
           <Link href="/community">
-            <Button>返回社区</Button>
+            <Button>{t('backToCommunity')}</Button>
           </Link>
         </div>
       </div>
@@ -598,13 +599,13 @@ export default function PostDetailPage() {
                       <div className="flex items-center gap-2">
                         <span className="font-semibold">{post.author.name}</span>
                         {post.author.reputation > 0 && (
-                          <Badge variant="outline" className="text-xs text-gray-600">声望: {post.author.reputation}</Badge>
+                          <Badge variant="outline" className="text-xs text-gray-600">{t('reputation')}: {post.author.reputation}</Badge>
                         )}
                       </div>
                       <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <span>{formatTimeAgo(post.createdAt)}</span>
+                        <span>{formatTimeAgo(post.createdAt, locale)}</span>
                         <span>•</span>
-                        <span>发帖</span>
+                        <span>{t('posted')}</span>
                       </div>
                     </div>
                   </div>
@@ -620,11 +621,11 @@ export default function PostDetailPage() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={handleStartEdit}>
                           <Edit className="w-4 h-4 mr-2" />
-                          编辑帖子
+                          {t('editPost')}
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={handleDeletePost} className="text-red-600">
                           <Trash2 className="w-4 h-4 mr-2" />
-                          删除帖子
+                          {t('deletePost')}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -635,20 +636,20 @@ export default function PostDetailPage() {
                 {isEditing ? (
                   <div className="mb-4 space-y-4">
                     <div>
-                      <label className="block text-sm font-medium mb-2">标题</label>
+                      <label className="block text-sm font-medium mb-2">{t('titleLabel')}</label>
                       <Input
                         value={editTitle}
                         onChange={(e) => setEditTitle(e.target.value)}
-                        placeholder="输入帖子标题..."
+                        placeholder={t('titlePlaceholder')}
                         className="text-xl"
                       />
                     </div>
                     <div className="flex items-center gap-2">
                       <Button onClick={handleSaveEdit} disabled={isSaving}>
-                        {isSaving ? '保存中...' : '保存'}
+                        {isSaving ? t('saving') : t('save')}
                       </Button>
                       <Button variant="outline" onClick={handleCancelEdit}>
-                        取消
+                        {t('cancel')}
                       </Button>
                     </div>
                   </div>
@@ -676,11 +677,11 @@ export default function PostDetailPage() {
                 {/* Post Content */}
                 {isEditing ? (
                   <div className="mb-6">
-                    <label className="block text-sm font-medium mb-2">内容</label>
+                    <label className="block text-sm font-medium mb-2">{t('contentLabel')}</label>
                     <Textarea
                       value={editContent}
                       onChange={(e) => setEditContent(e.target.value)}
-                      placeholder="输入帖子内容..."
+                      placeholder={t('contentPlaceholder')}
                       rows={10}
                       className="min-h-[200px]"
                     />
@@ -712,21 +713,21 @@ export default function PostDetailPage() {
                       className={isBookmarked ? 'text-blue-600' : ''}
                     >
                       <Bookmark className={`w-4 h-4 mr-2 ${isBookmarked ? 'fill-current' : ''}`} />
-                      {isBookmarked ? '已收藏' : '收藏'}
+                      {isBookmarked ? t('bookmarked') : t('bookmark')}
                     </Button>
                     <Button variant="ghost" size="sm" onClick={() => {}}>
-                      分享
+                      {t('share')}
                     </Button>
                   </div>
                   
                   <div className="flex items-center gap-4 text-sm text-gray-500">
                     <span className="flex items-center gap-1">
                       <Eye className="w-4 h-4" />
-                      {post.views} 浏览
+                      {post.views} {t('views')}
                     </span>
                     <span className="flex items-center gap-1">
                       <MessageSquare className="w-4 h-4" />
-                      {replies.length} 回复
+                      {replies.length} {t('replies')}
                     </span>
                   </div>
                 </div>
@@ -738,7 +739,7 @@ export default function PostDetailPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <MessageSquare className="w-5 h-5" />
-                  回复 ({replies.length})
+                  {t('repliesCount', { count: replies.length })}
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-6">
@@ -747,14 +748,14 @@ export default function PostDetailPage() {
                   <form onSubmit={(e) => { e.preventDefault(); handleSubmitReply(); }} className="mb-6">
                     <div className="flex gap-3">
                       <Avatar className="w-8 h-8">
-                        <AvatarImage src="/placeholder.svg?height=32&width=32" alt="您" />
-                        <AvatarFallback>您</AvatarFallback>
+                        <AvatarImage src="/placeholder.svg" alt={user?.username || 'User'} />
+                        <AvatarFallback>{user?.username?.[0]?.toUpperCase() || 'U'}</AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
                         <Textarea
                           value={newReply}
                           onChange={(e) => setNewReply(e.target.value)}
-                          placeholder="写下您的回复..."
+                          placeholder={t('replyPlaceholder')}
                           className="mb-3"
                           rows={3}
                         />
@@ -764,7 +765,7 @@ export default function PostDetailPage() {
                             disabled={!newReply.trim() || isSubmitting}
                             size="sm"
                           >
-                            {isSubmitting ? '发布中...' : '发布回复'}
+                            {isSubmitting ? t('publishing') : t('publishReply')}
                           </Button>
                         </div>
                       </div>
@@ -776,7 +777,7 @@ export default function PostDetailPage() {
                   <Alert className="mb-6">
                     <AlertCircle className="h-4 w-4" />
                     <AlertDescription>
-                      此帖子已被锁定，无法添加新回复。
+                      {t('lockedMessage')}
                     </AlertDescription>
                   </Alert>
                 )}
@@ -794,9 +795,9 @@ export default function PostDetailPage() {
                           <div className="flex items-center gap-2 mb-2">
                             <span className="font-semibold text-sm">{reply.author.name}</span>
                             {reply.author.reputation > 0 && (
-                              <Badge variant="outline" className="text-xs text-gray-600">声望: {reply.author.reputation}</Badge>
+                              <Badge variant="outline" className="text-xs text-gray-600">{t('reputation')}: {reply.author.reputation}</Badge>
                             )}
-                            <span className="text-xs text-gray-500">{formatTimeAgo(reply.createdAt)}</span>
+                            <span className="text-xs text-gray-500">{formatTimeAgo(reply.createdAt, locale)}</span>
                           </div>
                           <p className="text-gray-700 mb-2 leading-relaxed">{reply.content}</p>
                           <div className="flex items-center gap-2">
@@ -815,7 +816,7 @@ export default function PostDetailPage() {
                               className="text-xs h-6 px-2"
                               onClick={() => handleStartReply(reply.id)}
                             >
-                              回复
+                              {t('replyTo')}
                             </Button>
                           </div>
                         </div>
@@ -826,8 +827,8 @@ export default function PostDetailPage() {
                         <div className="ml-11 mt-4 p-4 bg-gray-50 rounded-lg">
                           <div className="flex gap-3">
                             <Avatar className="w-6 h-6">
-                              <AvatarImage src="/placeholder.svg?height=24&width=24" alt="您" />
-                              <AvatarFallback className="text-xs">您</AvatarFallback>
+                              <AvatarImage src="/placeholder.svg" alt={user?.username || 'User'} />
+                              <AvatarFallback className="text-xs">{user?.username?.[0]?.toUpperCase() || 'U'}</AvatarFallback>
                             </Avatar>
                             <div className="flex-1">
                               <Textarea
@@ -836,7 +837,7 @@ export default function PostDetailPage() {
                                   ...prev, 
                                   [reply.id]: e.target.value 
                                 }))}
-                                placeholder={`回复 @${reply.author.name}...`}
+                                placeholder={t('replyToPlaceholder', { name: reply.author.name })}
                                 className="mb-3"
                                 rows={2}
                               />
@@ -847,14 +848,14 @@ export default function PostDetailPage() {
                                   onClick={() => handleCancelReply(reply.id)}
                                 >
                                   <X className="w-3 h-3 mr-1" />
-                                  取消
+                                  {t('cancel')}
                                 </Button>
                                 <Button 
                                   size="sm"
                                   disabled={!replyContent[reply.id]?.trim() || isSubmitting}
                                   onClick={() => handleReplyToReply(reply.id)}
                                 >
-                                  {isSubmitting ? '发布中...' : '回复'}
+                                  {isSubmitting ? t('publishing') : t('replyTo')}
                                 </Button>
                               </div>
                             </div>
@@ -875,9 +876,9 @@ export default function PostDetailPage() {
                                 <div className="flex items-center gap-2 mb-1">
                                   <span className="font-medium text-sm">{subReply.author.name}</span>
                                   {subReply.author.reputation > 0 && (
-                                    <Badge variant="outline" className="text-xs">声望: {subReply.author.reputation}</Badge>
+                                    <Badge variant="outline" className="text-xs">{t('reputation')}: {subReply.author.reputation}</Badge>
                                   )}
-                                  <span className="text-xs text-gray-500">{formatTimeAgo(subReply.createdAt)}</span>
+                                  <span className="text-xs text-gray-500">{formatTimeAgo(subReply.createdAt, locale)}</span>
                                 </div>
                                 <p className="text-sm text-gray-700 leading-relaxed">{subReply.content}</p>
                               </div>
@@ -894,7 +895,7 @@ export default function PostDetailPage() {
                 {replies.length === 0 && (
                   <div className="text-center py-8 text-gray-500">
                     <MessageSquare className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                    <p>还没有回复，来发表第一个回复吧！</p>
+                    <p>{t('noReplies')}</p>
                   </div>
                 )}
               </CardContent>
@@ -906,7 +907,7 @@ export default function PostDetailPage() {
             {/* Author Info */}
             <Card>
               <CardHeader>
-                <CardTitle>作者信息</CardTitle>
+                <CardTitle>{t('authorInfo')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center gap-3 mb-4">
@@ -916,24 +917,24 @@ export default function PostDetailPage() {
                   </Avatar>
                   <div>
                     <p className="font-semibold">{post.author.name}</p>
-                    <p className="text-sm text-gray-500">声望: {post.author.reputation}</p>
+                    <p className="text-sm text-gray-500">{t('reputation')}: {post.author.reputation}</p>
                   </div>
                 </div>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">发帖数</span>
+                    <span className="text-gray-600">{t('postsCount')}</span>
                     <span className="font-semibold">
                       {authorStats ? authorStats.postsCount : '-'}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">回复数</span>
+                    <span className="text-gray-600">{t('repliesCount2')}</span>
                     <span className="font-semibold">
                       {authorStats ? authorStats.repliesCount : '-'}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">加入时间</span>
+                    <span className="text-gray-600">{t('joinTime')}</span>
                     <span className="font-semibold">
                       {authorStats ? new Date(authorStats.joinedAt).toLocaleDateString('zh-CN', {
                         year: 'numeric',
@@ -948,34 +949,34 @@ export default function PostDetailPage() {
             {/* Related Posts */}
             <Card>
               <CardHeader>
-                <CardTitle>相关帖子</CardTitle>
+                <CardTitle>{t('relatedPosts')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 {/* This section will be populated with actual related posts */}
-                <p>相关帖子功能待实现</p>
+                <p>{t('relatedPostsTodo')}</p>
               </CardContent>
             </Card>
 
             {/* Post Stats */}
             <Card>
               <CardHeader>
-                <CardTitle>帖子统计</CardTitle>
+                <CardTitle>{t('postStats')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">发布时间</span>
-                  <span className="font-semibold">{formatTimeAgo(post.createdAt)}</span>
+                  <span className="text-gray-600">{t('publishTime')}</span>
+                  <span className="font-semibold">{formatTimeAgo(post.createdAt, locale)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">浏览次数</span>
+                  <span className="text-gray-600">{t('viewCount')}</span>
                   <span className="font-semibold">{post.views}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">点赞数</span>
+                  <span className="text-gray-600">{t('likeCount')}</span>
                   <span className="font-semibold">{likeCount}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">回复数</span>
+                  <span className="text-gray-600">{t('replyCount')}</span>
                   <span className="font-semibold">{replies.length}</span>
                 </div>
               </CardContent>

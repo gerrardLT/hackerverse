@@ -48,7 +48,7 @@ export interface IPFSHackathonData {
   }
   metadata: {
     organizer: string
-    status: 'draft' | 'active' | 'completed'
+    status: 'DRAFT' | 'ACTIVE' | 'COMPLETED'
     previousVersion?: string
   }
 }

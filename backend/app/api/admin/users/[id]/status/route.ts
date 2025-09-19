@@ -4,7 +4,7 @@ import { auth } from '@/lib/auth';
 import { z } from 'zod';
 
 const statusSchema = z.object({
-  status: z.enum(['active', 'suspended', 'banned'])
+  status: z.enum(['ACTIVE', 'SUSPENDED', 'BANNED'])
 });
 
 export async function PUT(

@@ -653,41 +653,23 @@ export default function CreateHackathonPage() {
           <p className="text-muted-foreground mt-2">{t('description')}</p>
         </div>
 
-        {/* 步骤指示器 */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            {steps.map((step, index) => (
-              <div key={step.id} className="flex items-center">
-                <div className={cn(
-                  "flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium",
-                  currentStep >= step.id 
-                    ? "bg-primary text-primary-foreground" 
-                    : "bg-muted text-muted-foreground"
-                )}>
-                  {step.id}
-                </div>
-                <div className="ml-2 hidden sm:block">
-                  <p className={cn(
-                    "text-sm font-medium",
-                    currentStep >= step.id ? "text-foreground" : "text-muted-foreground"
-                  )}>
-                    {step.name}
-                  </p>
-                  <p className="text-xs text-muted-foreground">{step.description}</p>
-                </div>
-                {index < steps.length - 1 && (
-                  <div className="w-12 h-0.5 bg-muted mx-4" />
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
 
         <Card>
           <CardContent className="p-6">
             {/* 步骤 1: 基本信息 */}
             {currentStep === 1 && (
               <div className="space-y-6">
+                <div className="mb-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground text-lg font-bold">
+                      1
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold">{steps[0].name}</h2>
+                      <p className="text-sm text-muted-foreground">{steps[0].description}</p>
+                    </div>
+                  </div>
+                </div>
                 <div>
                   <h3 className="text-lg font-semibold mb-4">{t('basicInfo.title')}</h3>
                   
@@ -1114,6 +1096,17 @@ export default function CreateHackathonPage() {
             {/* 步骤 2: 奖项设置 */}
             {currentStep === 2 && (
               <div className="space-y-6">
+                <div className="mb-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground text-lg font-bold">
+                      2
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold">{steps[1].name}</h2>
+                      <p className="text-sm text-muted-foreground">{steps[1].description}</p>
+                    </div>
+                  </div>
+                </div>
                 <div>
                   <h3 className="text-lg font-semibold mb-4">{t('prizes.title')}</h3>
                   
@@ -1248,6 +1241,17 @@ export default function CreateHackathonPage() {
             {/* 步骤 3: 技术要求 */}
             {currentStep === 3 && (
               <div className="space-y-6">
+                <div className="mb-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground text-lg font-bold">
+                      3
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold">{steps[2].name}</h2>
+                      <p className="text-sm text-muted-foreground">{steps[2].description}</p>
+                    </div>
+                  </div>
+                </div>
                 <div>
                   <h3 className="text-lg font-semibold mb-4">{t('tech.title')}</h3>
                   <p className="text-sm text-muted-foreground mb-4">{t('tech.techDesc')}</p>
@@ -1286,6 +1290,17 @@ export default function CreateHackathonPage() {
             {/* 步骤 4: 规则说明 */}
             {currentStep === 4 && (
               <div className="space-y-6">
+                <div className="mb-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground text-lg font-bold">
+                      4
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold">{steps[3].name}</h2>
+                      <p className="text-sm text-muted-foreground">{steps[3].description}</p>
+                    </div>
+                  </div>
+                </div>
                 <div>
                   <h3 className="text-lg font-semibold mb-4">{t('rules.title')}</h3>
                   
@@ -1364,6 +1379,17 @@ export default function CreateHackathonPage() {
             {/* 步骤 5: 评委团队 */}
             {currentStep === 5 && (
               <div className="space-y-6">
+                <div className="mb-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground text-lg font-bold">
+                      5
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold">{steps[4].name}</h2>
+                      <p className="text-sm text-muted-foreground">{steps[4].description}</p>
+                    </div>
+                  </div>
+                </div>
                 <div>
                   <h3 className="text-lg font-semibold mb-4">{t('judges.title')}</h3>
                   
@@ -1573,6 +1599,17 @@ export default function CreateHackathonPage() {
             {/* 步骤 6: 预览发布 */}
             {currentStep === 6 && (
               <div className="space-y-6">
+                <div className="mb-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground text-lg font-bold">
+                      6
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold">{steps[5].name}</h2>
+                      <p className="text-sm text-muted-foreground">{steps[5].description}</p>
+                    </div>
+                  </div>
+                </div>
                 <div>
                   <h3 className="text-lg font-semibold mb-4">{t('preview.title')}</h3>
                   

@@ -7,6 +7,13 @@ import { Badge } from '@/components/ui/badge'
 import { TrendingUp, Clock, Search } from 'lucide-react'
 import { apiService } from '@/lib/api'
 
+// 为防重复请求添加全局标志
+declare global {
+  interface Window {
+    popularSearchesLoading?: boolean
+  }
+}
+
 interface SearchSuggestionsProps {
   onSuggestionClick: (suggestion: string) => void
   currentQuery?: string
@@ -33,9 +40,34 @@ export function SearchSuggestions({ onSuggestionClick, currentQuery }: SearchSug
       }
     }
       
-    // Load popular search terms
+    // Load popular search terms with caching and deduplication
     const loadPopularSearches = async () => {
+      // 🔄 检查缓存（缓存5分钟）
+      const CACHE_KEY = 'hackathon-popular-searches'
+      const CACHE_DURATION = 5 * 60 * 1000 // 5分钟
+      
       try {
+        const cachedData = localStorage.getItem(CACHE_KEY)
+        if (cachedData) {
+          const { data, timestamp } = JSON.parse(cachedData)
+          if (Date.now() - timestamp < CACHE_DURATION) {
+            console.log('🔍 使用缓存的热门搜索词:', data)
+            setPopularSearches(data)
+            return // 使用缓存，不发送请求
+          }
+        }
+      } catch (error) {
+        console.error('缓存解析错误:', error)
+      }
+
+      // 🚫 防止重复请求
+      if (window.popularSearchesLoading) {
+        console.log('🔍 搜索建议API请求正在进行中，跳过重复请求')
+        return
+      }
+
+      try {
+        window.popularSearchesLoading = true
         setLoading(true)
         console.log('🔍 ' + t('popular.loadingStart'))
         
@@ -48,18 +80,28 @@ export function SearchSuggestions({ onSuggestionClick, currentQuery }: SearchSug
           
         if (result.success && result.data?.popularSearches) {
           setPopularSearches(result.data.popularSearches)
+          
+          // 💾 缓存结果
+          localStorage.setItem(CACHE_KEY, JSON.stringify({
+            data: result.data.popularSearches,
+            timestamp: Date.now()
+          }))
+          
           console.log('🔍 ' + t('popular.loadSuccess') + ':', result.data.popularSearches)
         } else {
           console.log('🔍 ' + t('popular.fallbackNote'))
           // Use fallback data
-          setPopularSearches(t('popular.fallbackTerms'))
+          const fallbackTerms = ['Web3', 'DeFi', 'NFT', 'AI', '区块链', '智能合约', 'DAO', 'GameFi']
+          setPopularSearches(fallbackTerms)
         }
       } catch (error) {
         console.error('❌ ' + t('popular.loadError') + ':', error)
         // Use fallback data
-        setPopularSearches(t('popular.fallbackTerms'))
+        const fallbackTerms = ['Web3', 'DeFi', 'NFT', 'AI', '区块链', '智能合约', 'DAO', 'GameFi']
+        setPopularSearches(fallbackTerms)
       } finally {
         setLoading(false)
+        window.popularSearchesLoading = false
       }
     }
       

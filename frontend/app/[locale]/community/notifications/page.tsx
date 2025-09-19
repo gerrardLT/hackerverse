@@ -332,7 +332,7 @@ export default function NotificationsPage() {
                                   {notification.content}
                                 </p>
                                 <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                                  <span>{formatTimeAgo(notification.createdAt)}</span>
+                                  <span>{formatTimeAgo(notification.createdAt, locale)}</span>
                                   {notification.triggerUser && (
                                     <div className="flex items-center gap-1">
                                       <Avatar className="w-4 h-4">

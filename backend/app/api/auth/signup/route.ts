@@ -3,20 +3,28 @@ import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { AuthService } from '@/lib/auth'
 import { SimpleNotificationService } from '@/lib/simple-notification-service'
+import { getLocaleFromRequest, createTFunction } from '@/lib/i18n'
 
-// 注册请求验证模式
-const signupSchema = z.object({
-  email: z.string().email('邮箱格式不正确'),
-  password: z.string().min(6, '密码至少6位'),
-  username: z.string().min(2, '用户名至少2位').optional(),
-  walletAddress: z.string().regex(/^0x[a-fA-F0-9]{40}$/, '钱包地址格式不正确').optional(),
-})
+// 注册请求验证模式 - 动态创建以支持多语言
+function createSignupSchema(locale: 'en' | 'zh') {
+  const t = createTFunction(locale);
+  return z.object({
+    email: z.string().email(t('validation.emailFormatError')),
+    password: z.string().min(6, t('validation.passwordMinLength')),
+    username: z.string().min(2, t('validation.usernameMinLength')).optional(),
+    walletAddress: z.string().regex(/^0x[a-fA-F0-9]{40}$/, t('validation.walletAddressFormat')).optional(),
+  });
+}
 
 export async function POST(request: NextRequest) {
   try {
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
     const body = await request.json()
     
     // 验证请求数据
+    const signupSchema = createSignupSchema(locale)
     const validatedData = signupSchema.parse(body)
     
     // 检查邮箱是否已存在
@@ -26,7 +34,7 @@ export async function POST(request: NextRequest) {
     
     if (existingUser) {
       return NextResponse.json(
-        { success: false, error: '邮箱已被注册' },
+        { success: false, error: t('errors.emailAlreadyExists') },
         { status: 400 }
       )
     }
@@ -39,7 +47,7 @@ export async function POST(request: NextRequest) {
       
       if (existingUsername) {
         return NextResponse.json(
-          { success: false, error: '用户名已被使用' },
+          { success: false, error: t('errors.usernameAlreadyExists') },
           { status: 400 }
         )
       }
@@ -53,7 +61,7 @@ export async function POST(request: NextRequest) {
       
       if (existingWallet) {
         return NextResponse.json(
-          { success: false, error: '钱包地址已被绑定' },
+          { success: false, error: t('errors.walletAlreadyBound') },
           { status: 400 }
         )
       }
@@ -65,7 +73,7 @@ export async function POST(request: NextRequest) {
     // ⭐ 使用统一的IPFS服务创建用户资料
     let ipfsCID
     try {
-      console.log('🚀 开始IPFS上传用户资料...')
+      console.log('[AUTH] Starting IPFS profile upload...')
       const { IPFSService } = await import('@/lib/ipfs')
       
       // 构建标准的用户资料数据结构
@@ -76,7 +84,7 @@ export async function POST(request: NextRequest) {
           username: validatedData.username,
           email: validatedData.email,
           avatar: '',
-          bio: '新注册用户',
+          bio: 'New registered user',
           skills: [],
           socialLinks: {}
         },
@@ -89,31 +97,31 @@ export async function POST(request: NextRequest) {
       // 设置IPFS上传超时（30秒）
       const uploadPromise = IPFSService.uploadUserProfile(userProfileData)
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('IPFS上传超时')), 30000)
+        setTimeout(() => reject(new Error(t('ipfs.uploadTimeout'))), 30000)
       })
       
       ipfsCID = await Promise.race([uploadPromise, timeoutPromise]) as string
-      console.log('✅ IPFS上传成功，CID:', ipfsCID)
+      console.log('[AUTH] IPFS upload successful, CID:', ipfsCID)
       
     } catch (ipfsError) {
-      console.error('❌ IPFS上传失败:', ipfsError)
+      console.error('[AUTH] IPFS upload failed:', ipfsError)
       
       // 根据错误类型提供不同的错误信息
-      let errorMessage = 'IPFS上传失败，无法创建用户'
+      let errorMessage = t('ipfs.uploadFailed')
       if (ipfsError instanceof Error) {
         if (ipfsError.message.includes('timeout') || ipfsError.message.includes('超时')) {
-          errorMessage = 'IPFS网络响应超时，请检查网络连接后重试'
+          errorMessage = t('ipfs.networkTimeout')
         } else if (ipfsError.message.includes('gateway') || ipfsError.message.includes('网关')) {
-          errorMessage = 'IPFS网关服务暂时不可用，请稍后重试'
+          errorMessage = t('ipfs.gatewayUnavailable')
         } else if (ipfsError.message.includes('network') || ipfsError.message.includes('网络')) {
-          errorMessage = 'IPFS网络连接失败，请检查网络设置'
+          errorMessage = t('ipfs.networkConnectionFailed')
         }
       }
       
       return NextResponse.json({
         success: false,
         error: errorMessage,
-        details: ipfsError instanceof Error ? ipfsError.message : '未知错误'
+        details: ipfsError instanceof Error ? ipfsError.message : t('errors.unknownError')
       }, { status: 500 })
     }
     
@@ -167,13 +175,13 @@ export async function POST(request: NextRequest) {
         user.username || user.email
       )
     } catch (notificationError) {
-      console.error('发送欢迎通知失败:', notificationError)
+      console.error('[AUTH] Failed to send welcome notification:', notificationError)
       // 通知失败不影响注册流程
     }
     
     return NextResponse.json({
       success: true,
-      message: '注册成功',
+      message: t('auth.signupSuccess'),
       data: {
         user,
         token,
@@ -181,17 +189,20 @@ export async function POST(request: NextRequest) {
     })
     
   } catch (error) {
-    console.error('注册错误:', error)
+    const locale = getLocaleFromRequest(request)
+    const t = createTFunction(locale)
+    
+    console.error('[AUTH] Registration error:', error)
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { success: false, error: '请求数据验证失败', details: error.errors },
+        { success: false, error: t('errors.validationError'), details: error.errors },
         { status: 400 }
       )
     }
     
     return NextResponse.json(
-      { success: false, error: '注册失败，请稍后重试' },
+      { success: false, error: t('auth.signupError') },
       { status: 500 }
     )
   }

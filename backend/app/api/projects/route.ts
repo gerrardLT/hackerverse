@@ -1,28 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
+import { createProjectSchema, createQuerySchema } from '@/lib/validation-schemas'
+import { getLocaleFromRequest, t, createTFunction } from '@/lib/i18n'
 import { prisma } from '@/lib/prisma'
 import { AuthService } from '@/lib/auth'
 import { IPFSService } from '@/lib/ipfs'
-import { getLocaleFromRequest, createTFunction } from '@/lib/i18n'
 
 // 强制使用Node.js运行时，避免Edge Runtime的crypto模块限制
 export const runtime = 'nodejs'
 
-// 创建项目验证模式
-const createProjectSchema = z.object({
-  title: z.string().min(1, '项目标题不能为空'),
-  description: z.string().min(10, '项目描述至少10个字符'),
-  hackathonId: z.string().min(1, '黑客松ID不能为空'),
-  teamId: z.string().optional(),
-  technologies: z.array(z.string()).min(1, '至少选择一种技术'), // 统一使用technologies字段
-  tags: z.array(z.string()).optional(),
-  githubUrl: z.string().url('GitHub链接格式不正确').optional(),
-  demoUrl: z.string().url('演示链接格式不正确').optional(),
-  videoUrl: z.string().url('视频链接格式不正确').optional(),
-  presentationUrl: z.string().url('演示文稿链接格式不正确').optional(),
-  ipfsHash: z.string().optional(),
-  isPublic: z.boolean().default(true),
-})
+// 创建项目验证模式已从 @/lib/validation-schemas 导入
 
 // 查询参数验证模式
 const querySchema = z.object({
@@ -32,7 +19,7 @@ const querySchema = z.object({
   hackathonId: z.string().optional(),
   teamId: z.string().optional(),
   technology: z.string().optional(),
-  status: z.enum(['draft', 'submitted', 'reviewed', 'winner']).optional(),
+  status: z.enum(['DRAFT', 'SUBMITTED', 'REVIEWED', 'WINNER']).optional(),
   sortBy: z.enum(['createdAt', 'updatedAt', 'title']).default('createdAt'),
   sortOrder: z.enum(['asc', 'desc']).default('desc'),
 })
@@ -70,7 +57,7 @@ export async function GET(request: NextRequest) {
     }
 
     const userId = decoded.userId
-    console.log('🔍 项目API - 用户认证成功:', userId)
+    console.log('🔍 Project API - User authenticated successfully:', userId)
 
     const { searchParams } = new URL(request.url)
     const query = Object.fromEntries(searchParams.entries())
@@ -193,7 +180,7 @@ export async function GET(request: NextRequest) {
     })
     
   } catch (error) {
-    console.error('获取项目列表错误:', error)
+    console.error('Get project list error:', error)
     
     const locale = getLocaleFromRequest(request)
     const t = createTFunction(locale)
@@ -239,8 +226,8 @@ export async function POST(request: NextRequest) {
     
     const body = await request.json()
     
-    // 验证请求数据
-    const validatedData = createProjectSchema.parse(body)
+    // 验证请求数据  
+    const validatedData = createProjectSchema(locale).parse(body)
     
     // 检查黑客松是否存在
     const hackathon = await prisma.hackathon.findUnique({
@@ -384,13 +371,13 @@ export async function POST(request: NextRequest) {
       
       // 使用专用的项目数据上传方法
       ipfsCID = await IPFSService.uploadProjectData(projectData)
-      console.log('📦 IPFS项目数据上传成功:', ipfsCID)
+      console.log('📦 IPFS project data upload successful:', ipfsCID)
     } catch (ipfsError) {
-      console.error('IPFS上传失败:', ipfsError)
+      console.error('IPFS upload failed:', ipfsError)
       return NextResponse.json({
         success: false,
-        error: 'IPFS上传失败，无法创建项目',
-        details: ipfsError instanceof Error ? ipfsError.message : '未知错误'
+        error: t('ipfs.uploadFailedHackathon', locale),
+        details: ipfsError instanceof Error ? ipfsError.message : t('errors.unknownError', locale)
       }, { status: 500 })
     }
 
@@ -403,7 +390,7 @@ export async function POST(request: NextRequest) {
     } | null = null
     
     // TODO: 实现UUID到数字ID的映射机制后再启用智能合约调用
-    console.log('⚠️ 智能合约调用已暂时禁用，项目将仅存储在数据库中')
+    console.log('⚠️ Smart contract calls temporarily disabled, projects will only be stored in database')
     
     // 如果需要启用智能合约，需要先解决hackathonId映射问题
     // try {
@@ -419,7 +406,7 @@ export async function POST(request: NextRequest) {
     //   )
     //   // ... 其余逻辑
     // } catch (contractError) {
-    //   console.error('智能合约调用失败:', contractError)
+    //   console.error('Smart contract call failed:', contractError)
     //   // 不阻止项目创建，仅记录错误
     // }
 
@@ -494,7 +481,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
     
   } catch (error) {
-    console.error('创建项目错误:', error)
+    console.error('Create project error:', error)
     
     const locale = getLocaleFromRequest(request)
     const t = createTFunction(locale)

@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { useEffect, useState } from 'react'
 import { 
   Github, 
@@ -14,13 +14,27 @@ import {
   MapPin,
   ExternalLink,
   Heart,
-  ArrowUp
+  ArrowUp,
+  Loader2
 } from 'lucide-react'
 import HackerverseLogo from '@/components/ui/hackerverse-logo'
+import { apiService } from '@/lib/api'
 
 export function Footer() {
   const t = useTranslations('footer')
+  const locale = useLocale()
   const [showBackToTop, setShowBackToTop] = useState(false)
+  const [stats, setStats] = useState<{
+    projects: number
+    developers: number
+    loading: boolean
+    error: boolean
+  }>({
+    projects: 0,
+    developers: 0,
+    loading: true,
+    error: false
+  })
 
   // 监听滚动，显示回到顶部按钮
   useEffect(() => {
@@ -32,8 +46,44 @@ export function Footer() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  // 获取统计数据
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setStats(prev => ({ ...prev, loading: true, error: false }))
+        const response = await apiService.getStats(locale)
+        
+        if (response.success && response.data) {
+          setStats({
+            projects: response.data.projects.total,
+            developers: response.data.users.total,
+            loading: false,
+            error: false
+          })
+        } else {
+          setStats(prev => ({ ...prev, loading: false, error: true }))
+        }
+      } catch (error) {
+        console.error('Failed to fetch footer stats:', error)
+        setStats(prev => ({ ...prev, loading: false, error: true }))
+      }
+    }
+
+    fetchStats()
+  }, [locale])
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  // 格式化数字显示
+  const formatNumber = (num: number): string => {
+    if (num >= 1000000) {
+      return `${(num / 1000000).toFixed(1)}M+`
+    } else if (num >= 1000) {
+      return `${(num / 1000).toFixed(1)}K+`
+    }
+    return `${num}+`
   }
 
   return (
@@ -59,8 +109,8 @@ export function Footer() {
             <div className="lg:col-span-2 space-y-6">
               {/* Logo */}
               <div className="flex items-center space-x-3">
-                <div className="relative">
-                  <div className="text-primary">
+                <div className="relative group">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-secondary text-primary-foreground shadow-[0_20px_25px_-5px] shadow-primary/70 group-hover:shadow-[0_35px_60px_-12px] group-hover:shadow-primary/90 transition-all duration-300 group-hover:scale-110 drop-shadow-2xl shadow-inner">
                     <HackerverseLogo className="h-10 w-10" />
                   </div>
                   <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-ping" />
@@ -82,7 +132,15 @@ export function Footer() {
                     <Code2 className="w-5 h-5 text-primary" />
                     <span className="text-sm text-muted-foreground">{t('stats.projects')}</span>
                   </div>
-                  <p className="text-2xl font-bold text-foreground mt-1">12K+</p>
+                  <div className="text-2xl font-bold text-foreground mt-1 min-h-[2rem] flex items-center">
+                    {stats.loading ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : stats.error ? (
+                      <span className="text-muted-foreground text-lg">--</span>
+                    ) : (
+                      formatNumber(stats.projects)
+                    )}
+                  </div>
                 </div>
                 
                 <div className="glass p-4 rounded-xl border border-primary/10 hover-lift transition-all duration-300">
@@ -90,7 +148,15 @@ export function Footer() {
                     <Users className="w-5 h-5 text-secondary" />
                     <span className="text-sm text-muted-foreground">{t('stats.developers')}</span>
                   </div>
-                  <p className="text-2xl font-bold text-foreground mt-1">50K+</p>
+                  <div className="text-2xl font-bold text-foreground mt-1 min-h-[2rem] flex items-center">
+                    {stats.loading ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : stats.error ? (
+                      <span className="text-muted-foreground text-lg">--</span>
+                    ) : (
+                      formatNumber(stats.developers)
+                    )}
+                  </div>
                 </div>
               </div>
 

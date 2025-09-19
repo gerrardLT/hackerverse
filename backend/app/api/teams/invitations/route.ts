@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
+import { t, getLocaleFromRequest } from '@/lib/i18n'
 
 export async function GET(request: NextRequest) {
   try {
@@ -8,7 +9,7 @@ export async function GET(request: NextRequest) {
     const user = await auth(request)
     if (!user) {
       return NextResponse.json(
-        { success: false, error: '未认证' },
+        { success: false, error: t('auth.unauthorized', getLocaleFromRequest(request)) },
         { status: 401 }
       )
     }
@@ -54,7 +55,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('获取邀请列表错误:', error)
     return NextResponse.json(
-      { success: false, error: '获取邀请列表失败' },
+      { success: false, error: t('teams.getInvitationsError', getLocaleFromRequest(request)) },
       { status: 500 }
     )
   }

@@ -9,7 +9,7 @@ const querySchema = z.object({
   limit: z.string().transform(Number).pipe(z.number().min(1).max(100)).default('20'),
   search: z.string().optional(),
   role: z.enum(['admin', 'moderator', 'user']).optional(),
-  status: z.enum(['active', 'suspended', 'banned']).optional(),
+  status: z.enum(['ACTIVE', 'SUSPENDED', 'BANNED']).optional(),
   sortBy: z.enum(['createdAt', 'username', 'email', 'lastLoginAt']).default('createdAt'),
   sortOrder: z.enum(['asc', 'desc']).default('desc'),
 })

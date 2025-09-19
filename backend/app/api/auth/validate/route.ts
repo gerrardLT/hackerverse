@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 检查用户状态
-    if (user.status === 'suspended' || user.status === 'banned') {
+    if (user.status === 'SUSPENDED' || user.status === 'BANNED') {
       return NextResponse.json({
         success: false,
         error: '账户已被暂停或封禁',

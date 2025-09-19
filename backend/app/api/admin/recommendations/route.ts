@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     switch (action) {
       case 'report':
         // 获取详细推荐报告
-        const report = await recommendationService.getRecommendationReport()
+        const report = await RecommendationService.getRecommendationReport()
         return NextResponse.json({
           success: true,
           data: {

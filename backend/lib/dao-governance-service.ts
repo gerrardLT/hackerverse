@@ -74,7 +74,7 @@ export class DAOGovernanceService {
           creatorId: data.creatorId,
           ipfsHash,
           // @ts-ignore - Prisma枚举类型更新延迟
-          status: 'active'
+          status: 'ACTIVE'
         },
         include: {
           creator: {

@@ -222,7 +222,7 @@ export function ConnectWalletDialog({ open, onOpenChange, onConnect, onWalletCon
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg p-6">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Wallet className="h-5 w-5" />
@@ -253,23 +253,23 @@ export function ConnectWalletDialog({ open, onOpenChange, onConnect, onWalletCon
               return (
                 <div
                   key={wallet.id}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors"
+                  className="flex items-start gap-3 p-4 border rounded-lg hover:bg-accent/50 transition-colors"
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex-shrink-0 mt-1">
                     <WalletIcon walletId={wallet.id} />
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-medium">{wallet.name}</h3>
-                        {wallet.recommended && (
-                          <Badge variant="secondary" className="text-xs">{tCommon('recommended')}</Badge>
-                        )}
-                        {getWalletTypeIcon(wallet.type)}
-                      </div>
-                      <p className="text-sm text-muted-foreground">{wallet.description}</p>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="font-medium truncate">{wallet.name}</h3>
+                      {wallet.recommended && (
+                        <Badge variant="secondary" className="text-xs flex-shrink-0">{tCommon('recommended')}</Badge>
+                      )}
+                      {getWalletTypeIcon(wallet.type)}
                     </div>
+                    <p className="text-sm text-muted-foreground line-clamp-2">{wallet.description}</p>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-shrink-0 ml-2">
                     {isInstalled ? (
                       <Button
                         onClick={() => handleConnect(wallet)}

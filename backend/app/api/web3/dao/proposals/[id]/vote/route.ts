@@ -39,7 +39,7 @@ export async function POST(
     }
 
     // 检查提案状态
-    if (proposal.status !== 'active') {
+    if (proposal.status !== 'ACTIVE') {
       return NextResponse.json(
         { success: false, error: '提案已结束投票' },
         { status: 400 }

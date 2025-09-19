@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { Card, CardContent } from '@/components/ui/card'
 import { Users, Trophy, Code, Globe, Loader2, AlertCircle, TrendingUp } from 'lucide-react'
 import { apiService } from '@/lib/api'
@@ -24,6 +24,7 @@ interface StatsData {
 export function StatsSection() {
   const t = useTranslations('home.stats')
   const tCommon = useTranslations('common')
+  const locale = useLocale()
   const sectionRef = useRef<HTMLElement>(null)
   const [stats, setStats] = useState<Stat[]>([
     {
@@ -83,7 +84,7 @@ export function StatsSection() {
       try {
         setLoading(true)
         setError(null)
-        const response = await apiService.getStats()
+        const response = await apiService.getStats(locale)
         if (response.success && response.data) {
           const fetchedStats: StatsData = response.data
           setStats([
@@ -121,7 +122,7 @@ export function StatsSection() {
           })
         }
       } catch (err) {
-        console.error('获取统计数据错误:', err)
+        console.error('Failed to fetch stats:', err)
         setError(tCommon('errors.networkError'))
         toast({
           title: tCommon('errors.networkError'),
@@ -136,7 +137,7 @@ export function StatsSection() {
     if (isVisible) {
       fetchStats()
     }
-  }, [isVisible, t, tCommon, toast])
+  }, [isVisible, locale, t, tCommon, toast])
 
   if (loading) {
     return (
@@ -255,7 +256,7 @@ export function StatsSection() {
         </div>
 
         {/* 底部装饰性统计增强 */}
-        <div className={`mt-16 text-center transition-all duration-1000 delay-1000 ${isVisible ? 'animate-fade-in opacity-100' : 'opacity-0'}`}>
+        <div className="mt-16 text-center transition-all duration-1000 delay-1000 opacity-100">
           <div className="glass rounded-2xl p-6 max-w-2xl mx-auto">
             <p className="text-sm text-muted-foreground">
               🌟 {t('realTimeData')} • 📊 {t('globalMetrics')} • 🚀 {t('growingCommunity')}

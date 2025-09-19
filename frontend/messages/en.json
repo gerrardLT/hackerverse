@@ -32,8 +32,27 @@
     "retry": "Retry",
     "participants": "participants",
     "viewDetails": "View Details",
+    "characters": "characters",
     "noFeatured": "No Featured Hackathons",
     "noFeaturedDesc": "No featured hackathons available, please check back later",
+    "loadingFailure": "Loading Failed",
+    "retryAction": "Retry",
+    "foundCount": "Found {count} hackathons",
+    "viewMode": "View mode: {mode}",
+    "viewModeGrid": "Grid",
+    "viewModeList": "List",
+    "createHackathon": "Create Hackathon",
+    "loadMoreHackathons": "Load More Hackathons",
+    "scrollToLoad": "Scroll down to automatically load more content",
+    "loadingMore": "Loading more exciting content...",
+    "searchingHackathons": "Searching Hackathons",
+    "findingMatches": "Finding the best matches for you...",
+    "displayedCount": "Displayed",
+    "totalCount": "Total",
+    "allLoaded": "All loaded",
+    "noHackathons": "No Hackathons",
+    "noHackathonsDesc": "No hackathons match your criteria, please try adjusting filters",
+    "noHackathonsEmpty": "No hackathons have been organized yet, be the first creator!",
     "errors": {
       "fetchDataFailed": "Failed to fetch data",
       "dataLoadFailed": "Data Load Failed",
@@ -64,7 +83,7 @@
     }
   },
   "navigation": {
-    "home": "Home",
+    "homeNav": "Home",
     "hackathons": "Hackathons",
     "projects": "Projects",
     "teams": "Teams",
@@ -117,7 +136,7 @@
       "connectFailed": "Connection Failed",
       "checkWalletUnlocked": "Please check if wallet is unlocked",
       "selectWalletDesc": "Choose your preferred wallet to connect to HackX platform",
-      "ensureBSCTestnet": "Please ensure your wallet is connected to {strong}BSC Testnet (ChainID: 97){/strong}",
+      "ensureBSCTestnet": "Please ensure your wallet is connected to <strong>BSC Testnet (ChainID: 97)</strong>",
       "securityPromise": "We never store your private keys or seed phrases",
       "termsAgreement": "By connecting wallet, you agree to our terms of service",
       "loginWithWeb3": "Login to HackX platform with your Web3 wallet",
@@ -417,7 +436,16 @@
       "daysLeft": "{days} days left",
       "hoursLeft": "{hours} hours left",
       "minutesLeft": "{minutes} minutes left",
-      "ended": "Ended"
+      "ended": "Ended",
+      "status": {
+        "registered": "Joined",
+        "submitted": "Submitted",
+        "completed": "Completed"
+      },
+      "countdown": {
+        "startsIn": "Starts in {days} {days, plural, =1 {day} other {days}}"
+      },
+      "trending": "Trending"
     },
     "createForm": {
       "title": "Create Hackathon",
@@ -624,7 +652,7 @@
       "startTime": "Start Time",
       "duration": "Duration", 
       "totalPrize": "Total Prize",
-      "location": "Location",
+      "locationLabel": "Location",
       "days": "{count, plural, =1 {# day} other {# days}}",
       "status": {
         "upcoming": "Upcoming",
@@ -638,6 +666,141 @@
         "rules": "Rules",
         "timeline": "Timeline",
         "projects": "Projects"
+      },
+      "creator": {
+        "title": "You are the creator of this hackathon",
+        "description": "Creators cannot participate in their own competitions, but can manage and view all participating projects"
+      },
+      "registration": {
+        "notStarted": "Registration not started yet",
+        "expired": "Registration has expired"
+      },
+      "submission": {
+        "notStarted": "Hackathon has not started yet",
+        "ended": "Hackathon has ended"
+      },
+      "project": {
+        "individual": "Individual Project",
+        "uncategorized": "Uncategorized",
+        "teamMembers": "{count} {count, plural, =1 {member} other {members}} team",
+        "team": "Team: {name}",
+        "noProjects": "No projects submitted yet",
+        "beFirst": "Be the first team to submit a project!"
+      },
+      "prize": {
+        "rankName": "{rank}{rank, selectordinal, =1 {st} =2 {nd} =3 {rd} other {th}} Place",
+        "rankDescription": "{rank}{rank, selectordinal, =1 {st} =2 {nd} =3 {rd} other {th}} Place Prize",
+        "firstPrize": "First Prize",
+        "bestProject": "Best Project Award",
+        "winnerCount": "Winners: {count} {count, plural, =1 {person} other {people}}"
+      },
+      "track": {
+        "unnamed": "Unnamed Track",
+        "noDescription": "No description",
+        "categoryRelated": "{category} related projects",
+        "open": "Open Track",
+        "openDescription": "No restrictions on tech stack or project type"
+      },
+      "rules": {
+        "default": "Follow competition rules"
+      },
+      "requirements": {
+        "none": "No special requirements"
+      },
+      "criteria": {
+        "unnamed": "Unnamed Criteria",
+        "innovation": "Technical Innovation",
+        "completion": "Product Completion",
+        "userExperience": "User Experience",
+        "businessValue": "Business Value"
+      },
+      "timeline": {
+        "hackingStart": "Hacking Begins",
+        "hackingStartDesc": "Official development starts",
+        "hackingEnd": "Hacking Ends",
+        "submissionDeadline": "Submission deadline"
+      },
+      "judge": {
+        "defaultTitle": "HackX Judge"
+      },
+      "auth": {
+        "loginRequired": "Please login first",
+        "loginToJoin": "Login to join the hackathon",
+        "cannotJoin": "Cannot join",
+        "creatorRestriction": "As the creator, you cannot participate in your own hackathon"
+      },
+      "actions": {
+        "joinSuccess": "Successfully joined!",
+        "joinSuccessDesc": "You have successfully joined this hackathon",
+        "joinFailed": "Failed to join",
+        "networkError": "Network error, please try again later",
+        "linkCopied": "Link copied",
+        "linkCopiedDesc": "Hackathon link has been copied to clipboard",
+        "joinFailedError": "Failed to join",
+        "submitProject": "Submit Project",
+        "submitProjectNow": "Submit Project Now",
+        "viewDetails": "View Details",
+        "joinNow": "Join Now",
+        "share": "Share"
+      },
+      "timing": {
+        "startsIn": "Starts in {days} {days, plural, =1 {day} other {days}}"
+      },
+      "schedule": {
+        "title": "Schedule",
+        "registrationStart": "Registration Start",
+        "registrationDeadline": "Registration Deadline",
+        "eventStart": "Event Start",
+        "eventEnd": "Event End"
+      },
+      "sections": {
+        "introduction": "Introduction",
+        "tracks": "Tracks",
+        "techStack": "Tech Stack",
+        "rules": "Rules",
+        "requirements": "Requirements",
+        "criteria": "Judging Criteria",
+        "timeline": "Timeline",
+        "projects": "Projects",
+        "projectsDescription": "Projects grouped by track"
+      },
+      "stats": {
+        "submittedProjects": "Submitted Projects",
+        "activeTracks": "Active Tracks",
+        "participants": "Participants",
+        "averageTeamSize": "Average Team Size",
+        "projectCount": "{count} {count, plural, =1 {project} other {projects}}",
+        "participation": "Participation Stats",
+        "remainingSlots": "{count} {count, plural, =1 {slot} other {slots}} remaining",
+        "tracks": "Tracks",
+        "prizes": "Prizes"
+      },
+      "status": {
+        "upcoming": "Upcoming",
+        "ongoing": "Ongoing", 
+        "ended": "Ended",
+        "unknown": "Unknown",
+        "joined": "Joined"
+      },
+      "organizer": {
+        "title": "Organizer",
+        "contact": "Contact",
+        "website": "Website",
+        "description": "Hackathon Organizer"
+      },
+      "judges": {
+        "title": "Judges"
+      },
+      "sponsors": {
+        "title": "Sponsors",
+        "visitWebsite": "Visit Website"
+      },
+      "error": {
+        "title": "Error",
+        "loadHackathonFailed": "Failed to load hackathon details"
+      },
+      "location": {
+        "globalOnline": "Global Online"
       }
     },
     "submit": "Submit Project",
@@ -734,6 +897,21 @@
       "submitting": "Submitting...",
       "submitApplication": "Submit Application"
     },
+    "searchTitle": "Search Teams",
+    "members": "Members",
+    "newInvitation": "New Invitation",
+    "fromInviter": "from",
+    "defaultInvitationMessage": "We invite you to join our team and create amazing projects together!",
+    "myTeam": "My Team",
+    "showPassion": "Show your passion and skills",
+    "noTeamsJoined": "Haven't joined any teams yet",
+    "exploreTeams": "Explore amazing teams and start your collaboration journey",
+    "console": {
+      "loadingTeamsError": "Loading teams error:",
+      "acceptInvitationFailed": "Accept invitation failed:",
+      "declineInvitationFailed": "Decline invitation failed:",
+      "applicationSubmitFailed": "Application submit failed:"
+    },
     "search": {
       "placeholder": "Search teams...",
       "statusFilter": "Status Filter",
@@ -820,6 +998,7 @@
     "create": {
       "title": "Create Team",
       "subtitle": "Create your hackathon team",
+      "description": "Create your hackathon team",
       "backToTeams": "Back to Teams",
       "form": {
         "teamName": "Team Name",
@@ -859,8 +1038,11 @@
         "createTeamError": "Create team failed"
       },
       "success": {
-        "teamCreated": "Team created successfully",
-        "teamCreatedDesc": "Your team has been created and you can now invite members"
+        "teamCreated": "Team Created Successfully!",
+        "teamCreatedDesc": "Your team has been successfully created, you can now start recruiting members"
+      },
+      "console": {
+        "createTeamError": "Failed to create team"
       },
       "preview": {
         "title": "Preview",
@@ -875,6 +1057,43 @@
         "createTeam": "Create Team",
         "creating": "Creating...",
         "cancel": "Cancel"
+      },
+      "validation": {
+        "nameMaxLength": "Team name cannot exceed 50 characters",
+        "descMaxLength": "Team description cannot exceed 500 characters", 
+        "tagsMaxCount": "Maximum 5 team tags allowed",
+        "minMembers": "Team size must be at least 2 members",
+        "maxMembersLimit": "Team size cannot exceed 10 members"
+      },
+      "loading": {
+        "hackathons": "Failed to get hackathon list",
+        "loadFailed": "Loading failed",
+        "noHackathons": "Unable to get hackathon list, please refresh and try again"
+      },
+      "auth": {
+        "loginRequired": "Please login first",
+        "loginDesc": "Login required to create a team"
+      },
+      "hackathon": {
+        "deadline": "Deadline",
+        "teamSize": "Team Size",
+        "members3": "3 Member Team",
+        "members4": "4 Member Team",
+        "members5": "5 Member Team",
+        "members6": "6 Member Team"
+      },
+      "sections": {
+        "basicInfo": "Basic Information",
+        "techStack": "Tech Stack",
+        "techStackDesc": "Select technologies your team will use",
+        "skillsSelected": "Selected {count}/10 skills",
+        "teamTags": "Team Tags (Optional)",
+        "teamTagsDesc": "Add tags to describe team features or recruitment needs",
+        "privacy": "Privacy Settings",
+        "privacyDesc": "Control team visibility",
+        "publicTeamLabel": "Public Team",
+        "publicTeamDesc": "Allow other users to search and view your team",
+        "actions": "Action Buttons"
       }
     },
     "detail": {
@@ -886,10 +1105,103 @@
       },
       "tabs": {
         "overview": "Overview",
-        "members": "Members",
+        "members": "Members", 
         "project": "Project",
         "activity": "Activity",
         "applications": "Applications"
+      },
+      "loading": {
+        "teamDetails": "Loading team details...",
+        "retry": "Retry",
+        "applications": "Loading..."
+      },
+      "errors": {
+        "teamNotFound": "Team information not found",
+        "loadFailed": "Failed to get team information",
+        "networkError": "Network error, please check your connection"
+      },
+      "memberCount": "{current}/{max} members",
+      "teamCreator": "Team Creator",
+      "actions": {
+        "inviteMember": "Invite Member",
+        "joined": "Joined Team",
+        "joining": "Applying...",
+        "applyJoin": "Apply to Join",
+        "contactLeader": "Contact Leader"
+      },
+      "invite": {
+        "dialogTitle": "Invite Member to Team",
+        "dialogDesc": "Enter user ID to invite them to your team",
+        "userIdLabel": "User ID",
+        "userIdPlaceholder": "Enter user ID to invite",
+        "messageLabel": "Invitation Message (Optional)",
+        "messagePlaceholder": "Write an invitation message...",
+        "cancel": "Cancel",
+        "sending": "Sending...",
+        "send": "Send Invitation"
+      },
+      "overview": {
+        "techStack": "Tech Stack", 
+        "noTechStack": "No tech stack set yet",
+        "recruitmentNeeds": "Recruitment Needs",
+        "projectIdea": "Project Idea"
+      },
+      "stats": {
+        "title": "Team Statistics",
+        "createdAt": "Created",
+        "teamSize": "Team Size",
+        "recruitmentStatus": "Recruitment Status",
+        "recruiting": "Recruiting",
+        "full": "Full"
+      },
+      "social": {
+        "title": "Social Links",
+        "website": "Website"
+      },
+      "achievements": {
+        "title": "Team Achievements"
+      },
+      "members": {
+        "joinedAt": "Joined",
+        "noMembers": "No team members yet",
+        "noMembersDesc": "No members have joined the team yet"
+      },
+      "project": {
+        "title": "Project Information",
+        "desc": "Details of the project being developed by the team",
+        "developing": "Project in Development",
+        "developingDesc": "Team is working hard on developing the project, stay tuned!"
+      },
+      "activity": {
+        "title": "Team Activity",
+        "desc": "Latest activities and updates from the team",
+        "noActivity": "No team activity yet",
+        "noActivityDesc": "Team has no activity records yet"
+      },
+      "applications": {
+        "title": "Application Management",
+        "desc": "Manage user applications to join",
+        "noApplications": "No applications",
+        "noApplicationsDesc": "No users have applied to join the team yet",
+        "reputation": "Reputation",
+        "appliedAt": "Applied",
+        "approve": "Approve",
+        "reject": "Reject"
+      },
+      "toasts": {
+        "applicationSent": "Application Sent",
+        "applicationSentDesc": "Your application has been sent to the team leader, please wait for review",
+        "applicationFailed": "Application Failed",
+        "applicationFailedDesc": "Error sending application, please try again",
+        "inviteSent": "Invitation Sent",
+        "inviteSentDesc": "Successfully sent team invitation to user",
+        "inviteFailed": "Invitation Failed",
+        "inviteFailedDesc": "Error sending invitation",
+        "inviteError": "Error sending invitation, please try again",
+        "applicationApproved": "Application Approved",
+        "applicationRejected": "Application Rejected",
+        "operationFailed": "Operation Failed",
+        "operationFailedDesc": "Operation failed, please try again"
       }
     }
   },
@@ -952,6 +1264,18 @@
       "toggleLikeFailed": "Failed to toggle like status",
       "toggleBookmarkFailed": "Failed to toggle bookmark status"
     },
+    "clearFilters": "Clear Filters",
+    "hotPost": "Hot",
+    "waitingForFirstPost": "The community is waiting for your first post!",
+    "reputation": "reputation",
+    "postsCount": "posts",
+    "followRules": "Follow community rules and build a harmonious atmosphere",
+    "viewCompleteRules": "View Complete Rules",
+    "console": {
+      "loadCommunityDataFailed": "Load community data failed:",
+      "toggleLikeFailed": "Toggle like failed:",
+      "toggleBookmarkFailed": "Toggle bookmark failed:"
+    },
     "search": {
       "placeholder": "Search posts, tags or users...",
       "advancedSearch": "Advanced Search",
@@ -998,7 +1322,69 @@
       "publishPost": "Publish Post",
       "publishFirst": "Publish First Post",
       "pinned": "Pinned",
-      "locked": "Locked"
+      "locked": "Locked",
+      "loading": "Loading post...",
+      "loadFailed": "Loading failed",
+      "retry": "Retry",
+      "notFound": "Post not found",
+      "notFoundDesc": "The post you are looking for may have been deleted or does not exist.",
+      "reputation": "Reputation",
+      "posted": "Posted",
+      "editPost": "Edit Post",
+      "deletePost": "Delete Post",
+      "titleLabel": "Title",
+      "titlePlaceholder": "Enter post title...",
+      "saving": "Saving...",
+      "save": "Save",
+      "cancel": "Cancel",
+      "contentLabel": "Content",
+      "contentPlaceholder": "Enter post content...",
+      "bookmarked": "Bookmarked",
+      "bookmark": "Bookmark",
+      "share": "Share",
+      "views": "Views",
+      "replies": "Replies",
+      "repliesCount": "Replies ({count})",
+      "replyPlaceholder": "Write your reply...",
+      "publishing": "Publishing...",
+      "publishReply": "Publish Reply",
+      "lockedMessage": "This post is locked and cannot accept new replies.",
+      "replyTo": "Reply",
+      "replyToPlaceholder": "Reply to @{name}...",
+      "noReplies": "No replies yet, be the first to reply!",
+      "authorInfo": "Author Info",
+      "postsCount": "Posts",
+      "repliesCount2": "Replies",
+      "joinTime": "Join Time",
+      "relatedPosts": "Related Posts",
+      "relatedPostsTodo": "Related posts feature coming soon",
+      "postStats": "Post Statistics",
+      "publishTime": "Publish Time",
+      "viewCount": "View Count",
+      "likeCount": "Like Count",
+      "replyCount": "Reply Count",
+      "likeSuccess": "Liked",
+      "unlikeSuccess": "Unliked",
+      "likeSuccessDesc": "Thank you for your like!",
+      "unlikeSuccessDesc": "You have unliked this post",
+      "replyLikeSuccessDesc": "Thank you for your like!",
+      "replyUnlikeSuccessDesc": "You have unliked this reply",
+      "bookmarkSuccess": "Bookmarked",
+      "unbookmarkSuccess": "Unbookmarked",
+      "bookmarkSuccessDesc": "Added to bookmarks",
+      "unbookmarkSuccessDesc": "Removed from bookmarks",
+      "replySuccess": "Reply posted",
+      "replySuccessDesc": "Your reply has been published",
+      "replyFailed": "Reply failed",
+      "replyFailedDesc": "Error publishing reply, please try again",
+      "networkError": "Network error, please try again",
+      "saveFailed": "Save failed",
+      "saveFailedDesc": "Title and content cannot be empty",
+      "saveSuccess": "Save successful",
+      "saveSuccessDesc": "Post has been updated",
+      "deleteFailed": "Delete failed",
+      "deleteSuccess": "Delete successful",
+      "deleteSuccessDesc": "Post has been deleted"
     },
     "empty": {
       "noPosts": "No Posts Yet",
@@ -1583,10 +1969,7 @@
       "countries": {
         "label": "Countries Covered",
         "description": "Global reach and influence"
-      },
-      "realTimeData": "Real-time data",
-      "globalMetrics": "Global metrics",
-      "growingCommunity": "Growing community"
+      }
     },
     "featured": {
       "title": "Featured Hackathons",
@@ -1647,7 +2030,10 @@
       "countries": {
         "label": "Countries Covered",
         "description": "Global reach and impact"
-      }
+      },
+      "realTimeData": "Real-time data",
+      "globalMetrics": "Global metrics",
+      "growingCommunity": "Growing community"
     },
     "howItWorks": {
       "title": "How to Participate",
@@ -1698,5 +2084,8 @@
         "createButton": "Create Hackathon"
       }
     }
+  },
+  "prize": {
+    "pending": "TBD"
   }
 }

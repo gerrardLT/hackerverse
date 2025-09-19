@@ -22,7 +22,7 @@ export async function PUT(
     }
 
     // 检查管理员权限
-    if (user.role !== 'admin' && user.role !== 'moderator') {
+    if (user.role !== 'ADMIN' && user.role !== 'MODERATOR') {
       return NextResponse.json(
         { success: false, error: '权限不足' },
         { status: 403 }

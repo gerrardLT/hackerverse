@@ -4,19 +4,29 @@ import { AuthService } from '../lib/auth'
 const prisma = new PrismaClient()
 
 async function main() {
-  console.log('开始初始化数据库...')
-
-  // 清理现有数据
-  await prisma.score.deleteMany()
-  await prisma.feedback.deleteMany()
-  await prisma.project.deleteMany()
-  await prisma.teamMember.deleteMany()
-  await prisma.team.deleteMany()
-  await prisma.participation.deleteMany()
-  await prisma.hackathon.deleteMany()
-  await prisma.user.deleteMany()
-
-  console.log('清理完成，开始创建测试数据...')
+  console.log('🔒 安全模式：只添加测试数据，绝不删除现有数据')
+  
+  // 🛡️ 安全检查：确保绝不删除任何现有数据
+  console.log('📊 检查现有数据...')
+  
+  const existingUsersCount = await prisma.user.count()
+  const existingHackathonsCount = await prisma.hackathon.count()
+  
+  console.log(`现有用户数量: ${existingUsersCount}`)
+  console.log(`现有黑客松数量: ${existingHackathonsCount}`)
+  
+  // 检查是否已有测试数据，避免重复创建
+  const existingAdmin = await prisma.user.findUnique({
+    where: { email: 'admin@hackx.com' }
+  })
+  
+  if (existingAdmin) {
+    console.log('✅ 测试数据已存在，保护现有数据，不进行任何操作')
+    console.log('🔒 数据库数据完全安全，未做任何修改')
+    return
+  }
+  
+  console.log('🆕 开始添加测试数据（不影响现有数据）...')
 
   // 创建测试用户
   const hashedPassword = await AuthService.hashPassword('password123')
@@ -133,9 +143,9 @@ async function main() {
       data: {
         title: 'Web3 创新黑客松 2024',
         description: '探索Web3技术的无限可能，构建下一代去中心化应用。本次黑客松将聚焦于DeFi、NFT、DAO等热门领域，为开发者提供展示才华的平台。',
-        startDate: new Date('2024-03-15T09:00:00Z'),
-        endDate: new Date('2024-03-17T18:00:00Z'),
-        registrationDeadline: new Date('2024-03-10T23:59:59Z'),
+        startDate: new Date('2025-03-15T09:00:00Z'),
+        endDate: new Date('2025-03-17T18:00:00Z'),
+        registrationDeadline: new Date('2025-03-10T23:59:59Z'),
         maxParticipants: 200,
         prizePool: 50000,
         categories: ['DeFi', 'NFT', 'DAO', 'GameFi'],
@@ -145,15 +155,20 @@ async function main() {
         isPublic: true,
         featured: true,
         organizerId: users[0].id,
+        metadata: {
+          coverImage: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=400&fit=crop',
+          location: 'Online',
+          timezone: 'UTC+8'
+        },
       }
     }),
     prisma.hackathon.create({
       data: {
         title: 'AI + 区块链融合挑战赛',
         description: '将人工智能与区块链技术相结合，创造具有实际应用价值的创新项目。探索AI在区块链中的应用，以及区块链如何赋能AI发展。',
-        startDate: new Date('2024-04-20T09:00:00Z'),
-        endDate: new Date('2024-04-22T18:00:00Z'),
-        registrationDeadline: new Date('2024-04-15T23:59:59Z'),
+        startDate: new Date('2025-04-20T09:00:00Z'),
+        endDate: new Date('2025-04-22T18:00:00Z'),
+        registrationDeadline: new Date('2025-04-15T23:59:59Z'),
         maxParticipants: 150,
         prizePool: 30000,
         categories: ['AI', '区块链', '机器学习', '数据科学'],
@@ -163,15 +178,20 @@ async function main() {
         isPublic: true,
         featured: true,
         organizerId: users[0].id,
+        metadata: {
+          coverImage: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&h=400&fit=crop',
+          location: 'Online',
+          timezone: 'UTC+8'
+        },
       }
     }),
     prisma.hackathon.create({
       data: {
         title: '可持续发展技术马拉松',
         description: '利用技术解决环境和社会问题，推动可持续发展。从清洁能源到循环经济，从碳减排到社会包容，用创新技术改变世界。',
-        startDate: new Date('2024-05-10T09:00:00Z'),
-        endDate: new Date('2024-05-12T18:00:00Z'),
-        registrationDeadline: new Date('2024-05-05T23:59:59Z'),
+        startDate: new Date('2025-05-10T09:00:00Z'),
+        endDate: new Date('2025-05-12T18:00:00Z'),
+        registrationDeadline: new Date('2025-05-05T23:59:59Z'),
         maxParticipants: 100,
         prizePool: 20000,
         categories: ['可持续发展', '清洁能源', '环境保护', '社会影响'],
@@ -181,6 +201,103 @@ async function main() {
         isPublic: true,
         featured: false,
         organizerId: users[1].id,
+        metadata: {
+          coverImage: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=400&fit=crop',
+          location: '深圳科技园',
+          timezone: 'UTC+8'
+        },
+      }
+    }),
+    prisma.hackathon.create({
+      data: {
+        title: 'DeFi 协议创新大赛',
+        description: '构建下一代 DeFi 协议，重新定义去中心化金融。从 AMM 到借贷协议，从收益农场到衍生品交易，展现你的 DeFi 创新能力。',
+        startDate: new Date('2025-06-01T09:00:00Z'),
+        endDate: new Date('2025-06-03T18:00:00Z'),
+        registrationDeadline: new Date('2025-05-25T23:59:59Z'),
+        maxParticipants: 180,
+        prizePool: 40000,
+        categories: ['DeFi', '智能合约', '协议设计', '金融创新'],
+        tags: ['DeFi', 'AMM', '借贷', '收益农场', '衍生品'],
+        requirements: '熟悉 Solidity 开发，了解 DeFi 协议原理，有智能合约审计意识。',
+        rules: '1. 协议必须经过安全测试\n2. 提供详细的经济模型\n3. 考虑去中心化治理\n4. 提供用户友好的前端',
+        isPublic: true,
+        featured: true,
+        organizerId: users[0].id,
+        metadata: {
+          coverImage: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&h=400&fit=crop',
+          location: 'Online',
+          timezone: 'UTC+8'
+        },
+      }
+    }),
+    prisma.hackathon.create({
+      data: {
+        title: 'NFT 元宇宙建设者大赛',
+        description: '在虚拟世界中创造独特的 NFT 体验，构建元宇宙的基础设施。从 3D 艺术到虚拟土地，从游戏道具到数字身份，释放 NFT 的无限潜力。',
+        startDate: new Date('2025-07-15T09:00:00Z'),
+        endDate: new Date('2025-07-17T18:00:00Z'),
+        registrationDeadline: new Date('2025-07-10T23:59:59Z'),
+        maxParticipants: 120,
+        prizePool: 35000,
+        categories: ['NFT', '元宇宙', '3D建模', '游戏开发'],
+        tags: ['NFT', '元宇宙', '3D艺术', '虚拟现实', 'GameFi'],
+        requirements: '具备 3D 建模或游戏开发经验，了解 NFT 标准和元宇宙概念。',
+        rules: '1. 作品必须具备互动性\n2. 支持跨平台体验\n3. 注重用户体验设计\n4. 提供创新的 NFT 应用场景',
+        isPublic: true,
+        featured: false,
+        organizerId: users[1].id,
+        metadata: {
+          coverImage: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&h=400&fit=crop',
+          location: '上海张江',
+          timezone: 'UTC+8'
+        },
+      }
+    }),
+    prisma.hackathon.create({
+      data: {
+        title: 'Layer2 扩容解决方案竞赛',
+        description: '为以太坊构建高效的 Layer2 扩容方案，解决网络拥堵和高 Gas 费问题。从 Rollup 到状态通道，从侧链到混合方案，展现你的扩容创新思路。',
+        startDate: new Date('2025-08-20T09:00:00Z'),
+        endDate: new Date('2025-08-22T18:00:00Z'),
+        registrationDeadline: new Date('2025-08-15T23:59:59Z'),
+        maxParticipants: 160,
+        prizePool: 60000,
+        categories: ['Layer2', '扩容', '以太坊', '基础设施'],
+        tags: ['Layer2', 'Rollup', '状态通道', '侧链', '扩容'],
+        requirements: '深入理解以太坊架构，熟悉各种 Layer2 技术，有协议开发经验。',
+        rules: '1. 方案必须与以太坊兼容\n2. 提供性能基准测试\n3. 考虑安全性和去中心化\n4. 开源所有核心代码',
+        isPublic: true,
+        featured: true,
+        organizerId: users[0].id,
+        metadata: {
+          coverImage: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&h=400&fit=crop',
+          location: 'Online',
+          timezone: 'UTC+8'
+        },
+      }
+    }),
+    prisma.hackathon.create({
+      data: {
+        title: 'Web3 社交创新挑战',
+        description: '重新定义社交网络，构建去中心化的社交平台。从内容创作到社交治理，从隐私保护到经济激励，打造Web3时代的社交生态。',
+        startDate: new Date('2025-09-10T09:00:00Z'),
+        endDate: new Date('2025-09-12T18:00:00Z'),
+        registrationDeadline: new Date('2025-09-05T23:59:59Z'),
+        maxParticipants: 140,
+        prizePool: 25000,
+        categories: ['社交网络', 'Web3', 'DAO', '内容创作'],
+        tags: ['去中心化社交', '内容创作', '社区治理', '代币经济'],
+        requirements: '熟悉Web3开发，了解社交产品设计，有社区运营经验优先。',
+        rules: '1. 产品必须体现去中心化特色\n2. 注重用户隐私保护\n3. 提供可持续的经济模型\n4. 展示社区治理机制',
+        isPublic: true,
+        featured: false,
+        organizerId: users[2].id,
+        metadata: {
+          coverImage: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=800&h=400&fit=crop',
+          location: '北京中关村',
+          timezone: 'UTC+8'
+        },
       }
     })
   ])
@@ -193,7 +310,7 @@ async function main() {
       data: {
         hackathonId: hackathons[0].id,
         userId: users[1].id,
-        status: 'registered',
+        status: 'REGISTERED',
         joinedAt: new Date('2024-02-15T10:00:00Z'),
       }
     }),
@@ -201,7 +318,7 @@ async function main() {
       data: {
         hackathonId: hackathons[0].id,
         userId: users[2].id,
-        status: 'registered',
+        status: 'REGISTERED',
         joinedAt: new Date('2024-02-16T14:30:00Z'),
       }
     }),
@@ -209,7 +326,7 @@ async function main() {
       data: {
         hackathonId: hackathons[0].id,
         userId: users[3].id,
-        status: 'registered',
+        status: 'REGISTERED',
         joinedAt: new Date('2024-02-17T09:15:00Z'),
       }
     }),
@@ -217,7 +334,7 @@ async function main() {
       data: {
         hackathonId: hackathons[1].id,
         userId: users[1].id,
-        status: 'registered',
+        status: 'REGISTERED',
         joinedAt: new Date('2024-03-20T11:00:00Z'),
       }
     }),
@@ -225,7 +342,7 @@ async function main() {
       data: {
         hackathonId: hackathons[1].id,
         userId: users[2].id,
-        status: 'registered',
+        status: 'REGISTERED',
         joinedAt: new Date('2024-03-21T16:45:00Z'),
       }
     })
@@ -312,7 +429,7 @@ async function main() {
         videoUrl: 'https://youtube.com/watch?v=example',
         presentationUrl: 'https://slides.example.com/defi-yield-optimizer',
         ipfsHash: 'QmExampleHash123456789',
-        status: 'submitted',
+        status: 'SUBMITTED',
         isPublic: true,
       }
     }),
@@ -330,7 +447,7 @@ async function main() {
         videoUrl: 'https://youtube.com/watch?v=example2',
         presentationUrl: 'https://slides.example.com/ai-nft-marketplace',
         ipfsHash: 'QmExampleHash987654321',
-        status: 'submitted',
+        status: 'SUBMITTED',
         isPublic: true,
       }
     })

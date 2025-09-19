@@ -81,11 +81,11 @@ export function HackathonCard({ hackathon }: HackathonCardProps) {
 
     switch (userParticipation.status) {
       case 'REGISTERED':
-        return { text: '已参加', color: 'bg-blue-500', textColor: 'text-white' }
+        return { text: t('status.registered'), color: 'bg-blue-500', textColor: 'text-white' }
       case 'SUBMITTED':
-        return { text: '已提交', color: 'bg-green-500', textColor: 'text-white' }
+        return { text: t('status.submitted'), color: 'bg-green-500', textColor: 'text-white' }
       case 'COMPLETED':
-        return { text: '已完成', color: 'bg-purple-500', textColor: 'text-white' }
+        return { text: t('status.completed'), color: 'bg-purple-500', textColor: 'text-white' }
       default:
         return null
     }
@@ -174,7 +174,7 @@ export function HackathonCard({ hackathon }: HackathonCardProps) {
         {hackathon.status === 'upcoming' && (
           <div className="absolute bottom-4 right-4 glass rounded-lg px-3 py-1 text-white text-sm animate-pulse-slow">
             <Clock className="inline h-3 w-3 mr-1" />
-            {getDaysUntil(hackathon.startDate)} 天后开始
+            {t('countdown.startsIn', { days: getDaysUntil(hackathon.startDate) })}
           </div>
         )}
 
@@ -182,7 +182,7 @@ export function HackathonCard({ hackathon }: HackathonCardProps) {
         {hackathon.participants > 100 && (
           <div className="absolute bottom-4 left-4 flex items-center gap-1 glass rounded-lg px-2 py-1 text-white text-xs">
             <TrendingUp className="h-3 w-3 text-orange-400" />
-            <span>热门</span>
+            <span>{t('trending')}</span>
           </div>
         )}
       </div>
@@ -192,7 +192,7 @@ export function HackathonCard({ hackathon }: HackathonCardProps) {
         {/* 组织者信息 */}
         <div className="flex items-center gap-3">
           <Avatar className="h-8 w-8 ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all">
-            <AvatarImage src={hackathon.organizer.avatar || "/placeholder.jpg"} />
+            <AvatarImage src={hackathon.organizer.avatar || "/placeholder.svg"} />
             <AvatarFallback className="bg-gradient-primary text-primary-foreground text-xs">
               {hackathon.organizer.name[0]}
             </AvatarFallback>
@@ -254,7 +254,7 @@ export function HackathonCard({ hackathon }: HackathonCardProps) {
           <div className="flex items-center gap-2 text-muted-foreground group-hover:text-foreground transition-colors">
             <Users className="h-4 w-4 text-blue-500" />
             <span className="font-medium">{hackathon.participants.toLocaleString()}</span>
-            <span>参与者</span>
+            <span>{t('participants')}</span>
           </div>
           <div className="flex items-center gap-2 text-muted-foreground group-hover:text-foreground transition-colors">
             <Trophy className="h-4 w-4 text-yellow-500" />

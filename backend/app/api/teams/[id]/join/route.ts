@@ -19,7 +19,7 @@ export async function POST(
     const user = await auth(request)
     if (!user) {
       return NextResponse.json(
-        { success: false, error: '未认证' },
+        { success: false, error: t('auth.unauthorized', getLocaleFromRequest(request)) },
         { status: 401 }
       )
     }
@@ -46,14 +46,14 @@ export async function POST(
 
     if (!team) {
       return NextResponse.json(
-        { success: false, error: '团队不存在' },
+        { success: false, error: t('teams.notFound', getLocaleFromRequest(request)) },
         { status: 404 }
       )
     }
 
     if (!team.isPublic) {
       return NextResponse.json(
-        { success: false, error: '该团队不公开招募' },
+        { success: false, error: t('teams.notPublicRecruiting', getLocaleFromRequest(request)) },
         { status: 403 }
       )
     }
@@ -61,7 +61,7 @@ export async function POST(
     // 检查团队是否已满员
     if (team._count.members >= team.maxMembers) {
       return NextResponse.json(
-        { success: false, error: '团队已满员' },
+        { success: false, error: t('teams.teamFull', getLocaleFromRequest(request)) },
         { status: 400 }
       )
     }
@@ -76,7 +76,7 @@ export async function POST(
 
     if (existingMember) {
       return NextResponse.json(
-        { success: false, error: '您已经是该团队成员' },
+        { success: false, error: t('teams.alreadyMember', getLocaleFromRequest(request)) },
         { status: 400 }
       )
     }
@@ -94,7 +94,7 @@ export async function POST(
     if (existingApplication) {
       if (existingApplication.status === 'PENDING') {
         return NextResponse.json(
-          { success: false, error: '您已提交申请，请等待审核' },
+          { success: false, error: t('teams.applicationPending', getLocaleFromRequest(request)) },
           { status: 400 }
         )
       } else if (existingApplication.status === 'REJECTED') {
@@ -129,7 +129,7 @@ export async function POST(
 
     if (!participation) {
       return NextResponse.json(
-        { success: false, error: '请先报名参加该黑客松' },
+        { success: false, error: t('teams.needRegistration', getLocaleFromRequest(request)) },
         { status: 400 }
       )
     }
@@ -146,7 +146,7 @@ export async function POST(
 
     if (otherTeamMember) {
       return NextResponse.json(
-        { success: false, error: '您已加入该黑客松的其他团队' },
+        { success: false, error: t('teams.alreadyInOtherTeam', getLocaleFromRequest(request)) },
         { status: 400 }
       )
     }
@@ -196,7 +196,7 @@ export async function POST(
   } catch (error) {
     console.error('申请加入团队错误:', error)
     return NextResponse.json(
-      { success: false, error: '申请提交失败' },
+      { success: false, error: t('teams.applicationSubmitFailed', getLocaleFromRequest(request)) },
       { status: 500 }
     )
   }

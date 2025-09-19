@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
         userId: user.id,
         type: 'claim_rewards',
         amount: currentRewards,
-        status: 'completed'
+        status: 'CONFIRMED'
       }
     });
 

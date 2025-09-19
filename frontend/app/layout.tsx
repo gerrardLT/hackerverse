@@ -42,7 +42,7 @@ export default async function RootLayout({
               <Web3AuthProvider>
                 <NotificationProvider>
                   <Header />
-                  <NetworkStatus className="mx-4 mt-4" />
+                  <NetworkStatus className="container mt-4" />
                   <main className="flex-1">
                     {children}
                   </main>
