@@ -1,0 +1,52 @@
+{
+  "overview": {
+    "title": "概览",
+    "description": "平台分析和数据洞察概览",
+    "participants": "总参与者",
+    "projects": "总项目数",
+    "teams": "总团队数",
+    "avgProjectsPerTeam": "团队平均项目数",
+    "completionRate": "完成率",
+    "satisfactionScore": "满意度评分"
+  },
+  "participation": {
+    "title": "参与度",
+    "registrations": "总注册数",
+    "actualParticipants": "活跃参与者",
+    "dropoutRate": "流失率",
+    "peakRegistrationTime": "注册高峰时段",
+    "averageTeamSize": "平均团队规模",
+    "dailyRegistrations": "每日注册数"
+  },
+  "projects": {
+    "title": "项目",
+    "totalSubmissions": "总提交数",
+    "submissionRate": "提交率",
+    "averageScore": "平均分数",
+    "topProjects": "顶级项目",
+    "technologyDistribution": "技术分布"
+  },
+  "teams": {
+    "title": "团队",
+    "averageFormationTime": "平均组队时间",
+    "soloParticipants": "独立参与者",
+    "collaborationScore": "协作评分",
+    "communicationActivity": "沟通活跃度",
+    "teamSizeDistribution": "团队规模分布"
+  },
+  "report": {
+    "title": "报告",
+    "description": "创建和管理自定义分析报告",
+    "create": "创建报告",
+    "name": "报告名称",
+    "reportType": "报告类型",
+    "scope": "范围"
+  },
+  "export": {
+    "json": "导出为JSON",
+    "csv": "导出为CSV",
+    "excel": "导出为Excel",
+    "button": "导出"
+  },
+  "lastGenerated": "最后生成时间"
+}

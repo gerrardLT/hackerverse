@@ -152,7 +152,7 @@ export async function POST(
     const existingInvitation = await prisma.notification.findFirst({
       where: {
         userId: validatedData.userId,
-        type: 'team_invite',
+        type: 'TEAM_INVITE',
         read: false,
         data: {
           path: ['teamId'],

@@ -25,7 +25,9 @@ const querySchema = z.object({
   search: z.string().optional(),
   hackathonId: z.string().optional(),
   skill: z.string().optional(),
-  status: z.enum(['RECRUITING', 'FULL', 'COMPETING', 'COMPLETED', 'DISBANDED']).optional(),
+  status: z.string().transform(val => val.toUpperCase()).pipe(
+    z.enum(['RECRUITING', 'FULL', 'COMPETING', 'COMPLETED', 'DISBANDED'])
+  ).optional(),
   hasOpenings: z.string().transform(val => val === 'true').optional(),
   sortBy: z.enum(['createdAt', 'name', 'memberCount']).default('createdAt'),
   sortOrder: z.enum(['asc', 'desc']).default('desc'),
@@ -94,7 +96,7 @@ export async function GET(request: NextRequest) {
     
     // 状态筛选
     if (validatedQuery.status) {
-      where.status = validatedQuery.status.toUpperCase()
+      where.status = validatedQuery.status
     }
     
     // 有空位筛选

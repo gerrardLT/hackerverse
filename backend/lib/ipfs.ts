@@ -839,4 +839,271 @@ export class IPFSService {
       return false
     }
   }
+
+  // ===== IPFS凭证系统专用方法 =====
+
+  /**
+   * 凭证数据接口定义
+   */
+  static readonly CredentialSchema = {
+    version: '1.0.0',
+    type: 'object',
+    properties: {
+      id: { type: 'string' },
+      type: { type: 'string' },
+      title: { type: 'string' },
+      description: { type: 'string' },
+      issuer: { type: 'object' },
+      subject: { type: 'object' },
+      issuanceDate: { type: 'string' },
+      expirationDate: { type: 'string' },
+      credentialSubject: { type: 'object' },
+      proof: { type: 'object' },
+      evidence: { type: 'array' },
+      metadata: { type: 'object' }
+    },
+    required: ['id', 'type', 'title', 'issuer', 'subject', 'issuanceDate', 'credentialSubject']
+  }
+
+  /**
+   * 上传凭证数据到IPFS
+   */
+  static async uploadCredential(credentialData: IPFSCredentialData): Promise<string> {
+    try {
+      // 验证凭证数据结构
+      this.validateCredentialData(credentialData)
+
+      // 添加版本控制和时间戳
+      const dataWithVersion = {
+        ...credentialData,
+        version: credentialData.version || '1.0.0',
+        timestamp: new Date().toISOString(),
+        ipfsMetadata: {
+          uploadedAt: new Date().toISOString(),
+          platform: 'HackX',
+          contentType: 'credential'
+        }
+      }
+
+      return await this.uploadJSON(dataWithVersion, {
+        name: 'credential.json',
+        description: 'Digital credential for HackX platform',
+        tags: ['credential', 'verification', credentialData.credentialType || 'general']
+      })
+    } catch (error) {
+      console.error('凭证上传失败:', error)
+      throw new Error(`凭证上传失败: ${error}`)
+    }
+  }
+
+  /**
+   * 从IPFS获取凭证数据
+   */
+  static async getCredential(hash: string): Promise<IPFSCredentialData> {
+    try {
+      if (!this.isValidHash(hash)) {
+        throw new Error('无效的IPFS哈希格式')
+      }
+
+      const data = await this.getFromIPFS(hash)
+      
+      // 验证获取的数据是否为有效凭证
+      this.validateCredentialData(data)
+      
+      return data as IPFSCredentialData
+    } catch (error) {
+      console.error('凭证获取失败:', error)
+      throw new Error(`凭证获取失败: ${error}`)
+    }
+  }
+
+  /**
+   * 验证凭证数据结构
+   */
+  private static validateCredentialData(data: any): void {
+    if (!data || typeof data !== 'object') {
+      throw new Error('凭证数据必须是对象')
+    }
+
+    const requiredFields = ['id', 'type', 'title', 'issuer', 'subject', 'issuanceDate', 'credentialSubject']
+    for (const field of requiredFields) {
+      if (!data[field]) {
+        throw new Error(`缺少必需字段: ${field}`)
+      }
+    }
+
+    // 验证日期格式
+    if (data.issuanceDate && !this.isValidISODate(data.issuanceDate)) {
+      throw new Error('无效的颁发日期格式')
+    }
+
+    if (data.expirationDate && !this.isValidISODate(data.expirationDate)) {
+      throw new Error('无效的过期日期格式')
+    }
+  }
+
+  /**
+   * 验证ISO日期格式
+   */
+  private static isValidISODate(dateString: string): boolean {
+    const date = new Date(dateString)
+    return date instanceof Date && !isNaN(date.getTime()) && dateString === date.toISOString()
+  }
+
+  /**
+   * 批量上传凭证
+   */
+  static async batchUploadCredentials(credentials: IPFSCredentialData[]): Promise<{ successes: string[], failures: { index: number, error: string }[] }> {
+    const successes: string[] = []
+    const failures: { index: number, error: string }[] = []
+
+    for (let i = 0; i < credentials.length; i++) {
+      try {
+        const hash = await this.uploadCredential(credentials[i])
+        successes.push(hash)
+      } catch (error) {
+        failures.push({
+          index: i,
+          error: error instanceof Error ? error.message : String(error)
+        })
+      }
+    }
+
+    return { successes, failures }
+  }
+
+  /**
+   * 验证凭证完整性（检查IPFS数据是否与数据库记录一致）
+   */
+  static async verifyCredentialIntegrity(hash: string, expectedData: Partial<IPFSCredentialData>): Promise<boolean> {
+    try {
+      const actualData = await this.getCredential(hash)
+      
+      // 检查关键字段是否一致
+      const keyFields = ['id', 'type', 'title', 'issuer', 'subject', 'issuanceDate']
+      for (const field of keyFields) {
+        if (expectedData[field] && actualData[field] !== expectedData[field]) {
+          return false
+        }
+      }
+
+      return true
+    } catch (error) {
+      console.error('凭证完整性验证失败:', error)
+      return false
+    }
+  }
+
+  /**
+   * 生成凭证可分享链接
+   */
+  static generateShareableLink(hash: string, baseUrl: string = 'https://hackx.io'): string {
+    if (!this.isValidHash(hash)) {
+      throw new Error('无效的IPFS哈希')
+    }
+    return `${baseUrl}/verify/${hash}`
+  }
+
+  /**
+   * 获取凭证统计信息
+   */
+  static async getCredentialStats(hashes: string[]): Promise<{
+    total: number,
+    accessible: number,
+    inaccessible: number,
+    totalSize: number
+  }> {
+    let accessible = 0
+    let totalSize = 0
+
+    for (const hash of hashes) {
+      try {
+        const data = await this.getCredential(hash)
+        accessible++
+        totalSize += JSON.stringify(data).length
+      } catch (error) {
+        // 无法访问的凭证
+      }
+    }
+
+    return {
+      total: hashes.length,
+      accessible,
+      inaccessible: hashes.length - accessible,
+      totalSize
+    }
+  }
+}
+
+// 为了兼容评委评分系统，添加便捷的导出函数
+export async function uploadToIPFS(data: string): Promise<{ success: boolean; hash?: string; error?: string }> {
+  try {
+    const hash = await IPFSService.uploadJSON(JSON.parse(data))
+    return { success: true, hash }
+  } catch (error) {
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : String(error)
+    }
+  }
+}
+
+export async function retrieveFromIPFS(hash: string): Promise<{ success: boolean; data?: string; error?: string }> {
+  try {
+    const data = await IPFSService.getFromIPFS(hash)
+    return { success: true, data: JSON.stringify(data) }
+  } catch (error) {
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : String(error)
+    }
+  }
+}
+
+// IPFS凭证数据接口
+export interface IPFSCredentialData {
+  id: string
+  type: string
+  title: string
+  description?: string
+  credentialType?: string
+  issuer: {
+    id: string
+    name: string
+    type: 'platform' | 'organization' | 'peer'
+    metadata?: any
+  }
+  subject: {
+    id: string
+    name: string
+    metadata?: any
+  }
+  issuanceDate: string
+  expirationDate?: string
+  credentialSubject: {
+    [key: string]: any
+  }
+  proof?: {
+    type: string
+    created: string
+    verificationMethod: string
+    proofPurpose: string
+    proofValue: string
+  }
+  evidence?: Array<{
+    type: string
+    description: string
+    url?: string
+    metadata?: any
+  }>
+  metadata?: {
+    [key: string]: any
+  }
+  version?: string
+  timestamp?: string
+  ipfsMetadata?: {
+    uploadedAt: string
+    platform: string
+    contentType: string
+  }
 } 

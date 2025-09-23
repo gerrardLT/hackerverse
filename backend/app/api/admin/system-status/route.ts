@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/lib/auth';
+import { prepareApiResponse } from '@/lib/bigint-serializer';
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,7 +15,7 @@ export async function GET(request: NextRequest) {
     }
 
     // 检查管理员权限
-    if (user.role !== 'admin') {
+    if (user.role !== 'ADMIN') {
       return NextResponse.json(
         { success: false, error: '权限不足' },
         { status: 403 }
@@ -62,17 +63,20 @@ export async function GET(request: NextRequest) {
       }
     });
 
+    // 获取数据库连接数（处理BigInt）
+    const dbConnections = await prisma.$queryRaw`SELECT COUNT(*) as count FROM pg_stat_activity WHERE state = 'active'`
+    
     // 获取真实系统状态信息
     const systemStatus = {
       database: {
         status: 'healthy',
-        connections: await prisma.$queryRaw`SELECT COUNT(*) as count FROM pg_stat_activity WHERE state = 'active'` || 'N/A',
+        connections: (dbConnections as any[])[0]?.count || 'N/A',
         uptime: process.uptime() ? `${Math.floor(process.uptime() / 86400)} days` : 'N/A'
       },
       ipfs: {
         status: 'connected',
         gateway: process.env.IPFS_GATEWAY || 'https://ipfs.io',
-        pinnedFiles: totalProjects + totalNFTs
+        pinnedFiles: Number(totalProjects) + Number(totalNFTs)
       },
       web3: {
         status: 'connected',
@@ -86,7 +90,7 @@ export async function GET(request: NextRequest) {
       }
     };
 
-    return NextResponse.json({
+    const responseData = {
       success: true,
       data: {
         users: {
@@ -115,7 +119,9 @@ export async function GET(request: NextRequest) {
         },
         system: systemStatus
       }
-    });
+    }
+
+    return NextResponse.json(prepareApiResponse(responseData));
 
   } catch (error) {
     console.error('获取系统状态错误:', error);

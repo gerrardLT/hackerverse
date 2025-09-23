@@ -1,0 +1,200 @@
+{
+  "dashboard": {
+    "title": "Judge Dashboard",
+    "subtitle": "Review and score assigned projects",
+    "errors": {
+      "loadFailed": "Failed to load dashboard data",
+      "authRequired": "Please login to access judge dashboard",
+      "judgeOnly": "This dashboard is only accessible to authorized judges"
+    },
+    "stats": {
+      "totalAssigned": "Assigned Projects",
+      "completed": "Completed",
+      "pending": "In Progress",
+      "locked": "Locked",
+      "completion": "complete"
+    },
+    "timeStatus": {
+      "gracePeriod": "Grace period is active - submissions can still be modified",
+      "until": "until",
+      "nextDeadline": "Next deadline"
+    },
+    "status": {
+      "all": "All Projects",
+      "assigned": "Newly Assigned",
+      "pending": "In Progress",
+      "completed": "Completed",
+      "locked": "Locked"
+    },
+    "sort": {
+      "priority": "Priority",
+      "deadline": "Deadline",
+      "title": "Title",
+      "created": "Created Date",
+      "asc": "Ascending",
+      "desc": "Descending"
+    },
+    "filters": {
+      "title": "Filters & Search"
+    },
+    "search": {
+      "placeholder": "Search projects..."
+    },
+    "project": {
+      "finalized": "Finalized",
+      "noDescription": "No description provided",
+      "viewDetails": "View Details",
+      "startScoring": "Start Scoring",
+      "updateScore": "Update Score",
+      "scoringProgress": "Scoring Progress",
+      "criteriaScored": "criteria scored",
+      "lastUpdated": "Last updated"
+    },
+    "empty": {
+      "noProjects": "No Projects Assigned",
+      "noMatches": "No Matching Projects",
+      "waitForAssignment": "You haven't been assigned any projects yet. Check back later or contact the event organizer.",
+      "tryDifferentFilters": "Try adjusting your filters or search terms to find projects."
+    }
+  },
+  "filter": {
+    "title": "Advanced Project Filter",
+    "hackathon": "Hackathon",
+    "allHackathons": "All Hackathons",
+    "technologies": "Technologies",
+    "tags": "Tags",
+    "tracks": "Tracks",
+    "scoreStatus": {
+      "all": "All Score Status",
+      "unscored": "Not Scored",
+      "partial": "Partially Scored",
+      "completed": "Score Complete",
+      "finalized": "Finalized"
+    },
+    "dateRange": "Date Range",
+    "scoreRange": "Score Range",
+    "apply": "Apply Filters",
+    "reset": "Reset Filters",
+    "results": "Showing {count} projects"
+  },
+  "scoreForm": {
+    "title": "Score Project",
+    "subtitle": "Evaluate this project based on the criteria below",
+    "criteria": {
+      "innovation": "Innovation",
+      "technicalComplexity": "Technical Complexity",
+      "userExperience": "User Experience",
+      "businessPotential": "Business Potential",
+      "presentation": "Presentation"
+    },
+    "descriptions": {
+      "innovation": "Originality and creativity of the solution",
+      "technicalComplexity": "Technical difficulty and implementation quality",
+      "userExperience": "Usability and user interface design",
+      "businessPotential": "Market viability and business model",
+      "presentation": "Quality of project presentation and documentation"
+    },
+    "comments": "Comments & Feedback",
+    "commentsPlaceholder": "Provide detailed feedback about this project...",
+    "privateNote": "Private notes (visible only to you)",
+    "saveDraft": "Save as Draft",
+    "finalize": "Finalize Score",
+    "finalizeWarning": "Once finalized, this score cannot be modified. Are you sure?",
+    "walletRequired": "Wallet connection required for finalization",
+    "connectWallet": "Connect Wallet"
+  },
+  "timeControl": {
+    "title": "Review Period Control",
+    "status": {
+      "active": "Active",
+      "locked": "Locked",
+      "gracePeriod": "Grace Period",
+      "expired": "Expired"
+    },
+    "lockPeriod": "Lock Review Period",
+    "unlockPeriod": "Unlock Review Period",
+    "extendPeriod": "Extend Deadline",
+    "lockReason": "Lock Reason",
+    "lockReasonPlaceholder": "Explain why you are locking the review period...",
+    "extendMinutes": "Extend by (minutes)",
+    "gracePeriod": "Grace Period (minutes)",
+    "forceFinalize": "Force finalize all incomplete scores",
+    "confirmLock": "Confirm Lock",
+    "confirmUnlock": "Confirm Unlock"
+  },
+  "verification": {
+    "title": "Score Verification",
+    "verifyAll": "Verify All Scores",
+    "verifyProject": "Verify Project Scores",
+    "status": {
+      "all_verified": "All scores are verified ({verified}/{total})",
+      "partially_verified": "Some scores verified ({verified}/{total})",
+      "verification_failed": "Verification failed for all scores",
+      "no_scores": "No finalized scores to verify"
+    },
+    "ipfsAccessible": "IPFS Accessible",
+    "dataIntegrity": "Data Integrity",
+    "signatureValid": "Signature Valid",
+    "timestampValid": "Timestamp Valid",
+    "overallValid": "Overall Valid",
+    "recommendations": {
+      "hasFailures": "{count} scores failed verification",
+      "ipfsIssues": "{count} scores have IPFS accessibility issues",
+      "signatureIssues": "{count} scores have invalid signatures",
+      "integrityIssues": "{count} scores have data integrity issues",
+      "allGood": "All scores are properly verified"
+    },
+    "dataIntegrityFailed": "Data integrity check failed for: {mismatches}",
+    "timestampMismatch": "Timestamp mismatch ({diff} seconds difference)",
+    "signatureInvalid": "Wallet signature is invalid",
+    "signatureVerificationFailed": "Signature verification failed: {error}",
+    "noSignatureToVerify": "No signature available to verify",
+    "incompleteIPFSData": "IPFS data is incomplete",
+    "ipfsParseError": "Failed to parse IPFS data: {error}",
+    "ipfsNotAccessible": "IPFS hash {hash} is not accessible: {error}",
+    "noIPFSHash": "No IPFS hash available for verification",
+    "verificationError": "Verification process failed: {error}"
+  },
+  "notifications": {
+    "periodLocked": {
+      "title": "Review Period Locked",
+      "message": "The review period for {hackathonTitle} has been locked ({lockType}). Reason: {reason}",
+      "defaultReason": "Review period ended"
+    },
+    "periodUnlocked": {
+      "title": "Review Period Unlocked",
+      "message": "The review period for {hackathonTitle} has been unlocked. Reason: {reason}{extendedTime}",
+      "extended": " (extended by {minutes} minutes)"
+    },
+    "scoreFinalized": {
+      "title": "Score Finalized",
+      "message": "Your score for \"{projectTitle}\" has been finalized by {judgeName}. Total score: {score}/10"
+    },
+    "scoreFinalizedByAdmin": {
+      "title": "Score Finalized by Admin",
+      "message": "Your score for \"{projectTitle}\" has been finalized by administrator {adminName}"
+    }
+  },
+  "success": {
+    "scoreFinalized": "Score for \"{projectTitle}\" has been finalized (Score: {score}/10)",
+    "periodLocked": "Review period for {hackathonTitle} has been locked. {judgeCount} judges have been notified.",
+    "periodUnlocked": "Review period for {hackathonTitle} has been unlocked.{extendInfo}",
+    "timeExtended": " Time extended by {minutes} minutes."
+  },
+  "errors": {
+    "hackathonNotFound": "Hackathon not found",
+    "projectNotFound": "Project not found",
+    "scoreNotFound": "Score record not found",
+    "notAssignedJudge": "You are not assigned as a judge for this hackathon",
+    "periodLocked": "Review period is locked - no changes allowed",
+    "alreadyLocked": "Review period is already locked",
+    "notLocked": "Review period is not currently locked",
+    "alreadyFinalized": "Score has already been finalized",
+    "incompleteScore": "Score is incomplete - please provide a total score before finalizing",
+    "ipfsUploadFailed": "Failed to upload score data to IPFS",
+    "ipfsRetrievalFailed": "Failed to retrieve data from IPFS",
+    "ipfsDataParseError": "Failed to parse IPFS data",
+    "ipfsRecordNotFound": "IPFS record not found in database",
+    "invalidIPFSHash": "Invalid IPFS hash format"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "description": "基于 IPFS 的去中心化黑客松平台，连接全球开发者，构建 Web3 未来。",
+  "cta": {
+    "badge": "加入未来",
+    "title": "准备开始构建了吗？",
+    "description": "与全球开发者连接，参与前沿黑客松，共同构建去中心化的未来。",
+    "exploreHackathons": "探索黑客松",
+    "createTeam": "创建团队"
+  },
+  "stats": {
+    "projects": "项目",
+    "developers": "开发者"
+  },
+  "social": {
+    "title": "关注我们"
+  },
+  "platform": "平台",
+  "hackathons": "黑客松",
+  "projects": "项目展示",
+  "community": "开发者社区",
+  "teams": "团队",
+  "resources": "资源",
+  "docs": "开发文档",
+  "apiDocs": "API 文档",
+  "blog": "博客",
+  "helpCenter": "帮助中心",
+  "about": "关于",
+  "aboutUs": "关于我们",
+  "careers": "加入我们",
+  "privacy": "隐私政策",
+  "terms": "服务条款",
+  "location": "全球",
+  "madeWith": "用",
+  "forCommunity": "为社区而制作",
+  "copyright": "© 2024 HackX. 版权所有。用 ❤️ 为全球开发者社区打造。"
+}

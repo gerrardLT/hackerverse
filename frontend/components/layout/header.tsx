@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Badge } from '@/components/ui/badge'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
-import { Menu, User, Settings, LogOut, Wallet, Trophy, Users, Calendar, Bell, ChevronDown, MessageSquare, X, Sparkles, Plus, Home } from 'lucide-react'
+import { Menu, User, Settings, LogOut, Wallet, Trophy, Users, Calendar, Bell, ChevronDown, MessageSquare, X, Sparkles, Plus, Home, Medal, Shield, FolderOpen, Gavel } from 'lucide-react'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/hooks/use-auth'
@@ -52,6 +52,7 @@ export function Header() {
   const navigation = [
     { name: t('homeNav'), href: '/', icon: Home },
     { name: t('hackathons'), href: '/hackathons', icon: Trophy },
+    { name: t('leaderboard'), href: '/leaderboard', icon: Medal },
     { name: t('community'), href: '/community', icon: MessageSquare },
     { name: t('teams'), href: '/teams', icon: Users },
   ]
@@ -63,6 +64,18 @@ export function Header() {
 
   // 只有当真正认证且有用户信息时才显示用户菜单
   const shouldShowUserMenu = isAuthenticated && user
+
+  // 调试输出 - 用户角色信息
+  useEffect(() => {
+    if (user) {
+      console.log('🔍 Header - 当前用户信息:', {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+        isAuthenticated
+      })
+    }
+  }, [user, isAuthenticated])
 
   const formatWalletAddress = (address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`
@@ -227,6 +240,24 @@ export function Header() {
                         {t('dashboard')}
                       </Link>
                     </DropdownMenuItem>
+                    {/* Admin Menu - only show for ADMIN and MODERATOR */}
+                    {(user?.role === 'ADMIN' || user?.role === 'MODERATOR') && (
+                      <DropdownMenuItem asChild>
+                        <Link href="/admin/dashboard" className="flex items-center gap-3 p-3 hover:bg-muted/50 transition-colors">
+                          <Shield className="h-4 w-4" />
+                          {t('admin')}
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
+                    {/* Judge Menu - only show for JUDGE, ADMIN and MODERATOR */}
+                    {(user?.role === 'JUDGE' || user?.role === 'ADMIN' || user?.role === 'MODERATOR') && (
+                      <DropdownMenuItem asChild>
+                        <Link href="/judging/dashboard" className="flex items-center gap-3 p-3 hover:bg-muted/50 transition-colors">
+                          <Gavel className="h-4 w-4" />
+                          {t('judgingDashboard')}
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem 
                       onClick={handleSignOut} 
@@ -370,6 +401,30 @@ export function Header() {
                     <User className="h-5 w-5 transition-transform group-hover:scale-110" />
                     {t('dashboard')}
                   </Link>
+                  
+                  {/* Admin Menu - only show for ADMIN and MODERATOR */}
+                  {(user?.role === 'ADMIN' || user?.role === 'MODERATOR') && (
+                    <Link
+                      href="/admin/dashboard"
+                      className="flex items-center gap-3 p-3 rounded-xl text-base font-medium transition-all hover:bg-muted/50 group"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <Shield className="h-5 w-5 transition-transform group-hover:scale-110" />
+                      {t('admin')}
+                    </Link>
+                  )}
+                  
+                  {/* Judge Menu - only show for JUDGE, ADMIN and MODERATOR */}
+                  {(user?.role === 'JUDGE' || user?.role === 'ADMIN' || user?.role === 'MODERATOR') && (
+                    <Link
+                      href="/judging/dashboard"
+                      className="flex items-center gap-3 p-3 rounded-xl text-base font-medium transition-all hover:bg-muted/50 group"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <Gavel className="h-5 w-5 transition-transform group-hover:scale-110" />
+                      {t('judgingDashboard')}
+                    </Link>
+                  )}
                   
                   <Button
                     variant="ghost"

@@ -1,0 +1,39 @@
+{
+  "theme": {
+    "toggleTheme": "Toggle theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "fileUpload": {
+    "uploadFailed": "Upload failed",
+    "title": "Select files to upload to IPFS",
+    "supportedFormats": "Supports image, PDF, text files and other formats",
+    "uploading": "Uploading...",
+    "selectFiles": "Select Files"
+  },
+  "userRegistration": {
+    "connectWalletFirst": "Please connect wallet first",
+    "enterUsername": "Please enter username",
+    "registrationSuccess": "Registration successful",
+    "userRegisteredToBlockchain": "User registered to blockchain",
+    "registrationFailed": "Registration failed",
+    "tryAgainLater": "Please try again later",
+    "title": "User Registration",
+    "connectWalletToRegister": "Please connect wallet to register user",
+    "registerToDecentralizedPlatform": "Register user profile to decentralized platform",
+    "username": "Username",
+    "enterUsernamePlaceholder": "Enter username",
+    "registering": "Registering...",
+    "registerUser": "Register User",
+    "walletAddress": "Wallet Address",
+    "registrationStatus": "Registration Status",
+    "registered": "Registered",
+    "notRegistered": "Not Registered"
+  },
+  "walletConnect": {
+    "registering": "Registering...",
+    "registered": "Registered",
+    "connectWallet": "Connect Wallet"
+  }
+}

@@ -1,0 +1,419 @@
+{
+  "title": "管理员控制台",
+  "backToSite": "返回站点",
+  "nav": {
+    "dashboard": "仪表板",
+    "hackathons": "黑客松管理",
+    "users": "用户管理",
+    "content": "内容管理",
+    "analytics": "数据分析",
+    "settings": "系统设置"
+  },
+  "role": {
+    "admin": "管理员",
+    "moderator": "版主",
+    "judge": "评委",
+    "user": "用户"
+  },
+  "unauthorized": {
+    "title": "访问被拒绝",
+    "description": "您没有权限访问管理员面板。",
+    "backToDashboard": "返回仪表板"
+  },
+  "dashboard": {
+    "title": "管理员仪表板",
+    "description": "平台统计数据和最近活动的概览",
+    "loadError": "加载仪表板数据失败",
+    "unknownError": "发生未知错误",
+    "networkError": "网络错误，请稍后重试",
+    "noData": "无可用数据",
+    "noDataDescription": "无法加载仪表板数据，请重试",
+    "userStats": {
+      "title": "用户统计",
+      "active": "活跃用户",
+      "today": "今日",
+      "banned": "被封禁"
+    },
+    "contentStats": {
+      "title": "内容统计",
+      "total": "总内容数",
+      "hackathons": "黑客松",
+      "projects": "项目",
+      "posts": "帖子"
+    },
+    "moderationStats": {
+      "title": "审核队列",
+      "pending": "待审核",
+      "actions": "操作数"
+    },
+    "systemStats": {
+      "title": "系统活动",
+      "auditLogs": "审计日志",
+      "last30Days": "最近30天"
+    },
+    "recentActivity": {
+      "registrations": "最近注册",
+      "registrationsDesc": "最近7天加入的新用户",
+      "noRegistrations": "最近没有新注册",
+      "adminActions": "最近管理操作",
+      "adminActionsDesc": "最近的管理活动",
+      "noActions": "最近没有管理操作"
+    }
+  },
+  "content": {
+    "title": "内容审核",
+    "description": "审核和管理平台内容",
+    "loadError": "加载审核内容失败",
+    "unknownError": "发生未知错误",
+    "networkError": "网络错误，请稍后重试",
+    "reviewError": "审核操作失败",
+    "reviewing": "审核中...",
+    "noContent": {
+      "title": "没有需要审核的内容",
+      "description": "所有内容已审核完毕或没有匹配当前筛选条件的内容"
+    },
+    "status": {
+      "pending": "待审核",
+      "approved": "已通过",
+      "rejected": "已拒绝",
+      "flagged": "已标记"
+    },
+    "priority": {
+      "urgent": "紧急",
+      "high": "高",
+      "normal": "普通",
+      "low": "低"
+    },
+    "filters": {
+      "title": "筛选",
+      "contentType": {
+        "all": "所有内容类型",
+        "post": "帖子",
+        "project": "项目",
+        "hackathon": "黑客松",
+        "comment": "评论"
+      },
+      "priority": {
+        "all": "所有优先级"
+      },
+      "status": {
+        "all": "所有状态"
+      },
+      "sortBy": {
+        "createdAt": "创建时间",
+        "priority": "优先级",
+        "reportCount": "举报次数"
+      },
+      "sortOrder": {
+        "desc": "最新优先",
+        "asc": "最旧优先"
+      }
+    },
+    "actions": {
+      "approve": "通过",
+      "reject": "拒绝",
+      "flag": "标记"
+    },
+    "autoFlagged": "自动标记",
+    "reports": "举报",
+    "category": "分类",
+    "reviewedBy": "审核人",
+    "noPreview": "无内容预览",
+    "dialog": {
+      "approve": {
+        "title": "通过内容"
+      },
+      "reject": {
+        "title": "拒绝内容"
+      },
+      "flag": {
+        "title": "标记内容"
+      },
+      "contentInfo": "内容",
+      "reason": "原因",
+      "reasonPlaceholder": "请输入此操作的原因...",
+      "notes": "审核备注",
+      "notesPlaceholder": "内部审核的额外备注..."
+    },
+    "approveSuccess": "内容审核通过",
+    "rejectSuccess": "内容已拒绝",
+    "flagSuccess": "内容已标记"
+  },
+  "users": {
+    "title": "用户管理",
+    "description": "管理平台用户、角色和权限",
+    "loadError": "加载用户失败",
+    "unknownError": "发生未知错误",
+    "roleUpdateSuccess": "用户角色更新成功",
+    "roleUpdateSuccessDesc": "用户角色已更改",
+    "roleUpdateError": "更新用户角色失败",
+    "statusUpdateSuccess": "用户状态更新成功",
+    "statusUpdateSuccessDesc": "用户状态已更改",
+    "statusUpdateError": "更新用户状态失败",
+    "totalUsers": "用户总数",
+    "filters": "搜索和筛选",
+    "searchPlaceholder": "按用户名或邮箱搜索...",
+    "selectRole": "选择角色",
+    "selectStatus": "选择状态",
+    "sortBy": "排序方式",
+    "sortOptions": {
+      "newest": "最新优先",
+      "oldest": "最早优先",
+      "usernameAZ": "用户名 A-Z",
+      "usernameZA": "用户名 Z-A",
+      "highestReputation": "声誉最高",
+      "recentlyActive": "最近活跃"
+    },
+    "usersList": "用户列表",
+    "table": {
+      "user": "用户",
+      "role": "角色",
+      "status": "状态",
+      "reputation": "声誉",
+      "activity": "活动",
+      "lastLogin": "最后登录",
+      "actions": "操作",
+      "neverLoggedIn": "从未登录"
+    },
+    "roles": {
+      "admin": "管理员",
+      "moderator": "版主",
+      "judge": "评委",
+      "user": "用户"
+    },
+    "status": {
+      "active": "活跃",
+      "suspended": "暂停",
+      "banned": "封禁",
+      "pending": "待审核"
+    },
+    "activity": {
+      "hackathons": "黑客松",
+      "projects": "项目",
+      "organized": "组织"
+    },
+    "actions": {
+      "edit": "编辑用户"
+    },
+    "editUser": {
+      "title": "编辑用户",
+      "role": "用户角色",
+      "status": "用户状态",
+      "reputation": "声誉",
+      "participations": "参与次数",
+      "projects": "项目数"
+    },
+    "pagination": {
+      "showing": "显示第 {start} 到 {end} 项，共 {total} 个用户"
+    }
+  },
+  "settings": {
+    "title": "系统设置",
+    "description": "配置平台设置和集成",
+    "loadError": "加载设置失败",
+    "loadErrorDesc": "无法加载系统设置",
+    "saveSuccess": "设置保存成功",
+    "saveSuccessDesc": "所有设置已保存",
+    "saveError": "保存设置失败",
+    "saveErrorDesc": "无法保存系统设置",
+    "saving": "正在保存...",
+    "saveSettings": "保存设置",
+    "systemStatus": {
+      "title": "系统状态",
+      "database": "数据库",
+      "storage": "存储",
+      "api": "API",
+      "blockchain": "区块链",
+      "ipfs": "IPFS",
+      "email": "邮件",
+      "users": "用户",
+      "hackathons": "黑客松",
+      "projects": "项目",
+      "web3": "Web3",
+      "system": "系统"
+    },
+    "status": {
+      "healthy": "健康",
+      "warning": "警告",
+      "error": "错误",
+      "unknown": "未知"
+    },
+    "tabs": {
+      "general": "基本设置",
+      "security": "安全设置",
+      "integrations": "集成配置",
+      "appearance": "外观设置"
+    },
+    "general": {
+      "title": "基本设置",
+      "siteName": "网站名称",
+      "siteDescription": "网站描述",
+      "siteUrl": "网站URL",
+      "adminEmail": "管理员邮箱",
+      "features": "平台功能",
+      "registrationEnabled": "用户注册",
+      "registrationEnabledDesc": "允许新用户注册",
+      "hackathonCreationEnabled": "黑客松创建",
+      "hackathonCreationEnabledDesc": "允许用户创建黑客松",
+      "web3Enabled": "Web3功能",
+      "web3EnabledDesc": "启用区块链和钱包功能",
+      "ipfsEnabled": "IPFS存储",
+      "ipfsEnabledDesc": "启用IPFS去中心化存储"
+    },
+    "security": {
+      "title": "安全设置",
+      "requireEmailVerification": "邮箱验证",
+      "requireEmailVerificationDesc": "要求用户验证邮箱",
+      "enableCaptcha": "验证码保护",
+      "enableCaptchaDesc": "为表单启用验证码",
+      "maxLoginAttempts": "最大登录尝试次数",
+      "maxLoginAttemptsDesc": "锁定前的最大失败登录次数",
+      "sessionTimeout": "会话超时",
+      "sessionTimeoutDesc": "会话过期时间",
+      "minutes": "分钟",
+      "hour": "小时",
+      "hours": "小时"
+    },
+    "integrations": {
+      "email": {
+        "title": "邮件配置",
+        "fromAddress": "发件人地址",
+        "fromName": "发件人姓名",
+        "smtpHost": "SMTP主机",
+        "smtpPort": "SMTP端口",
+        "smtpUser": "SMTP用户名",
+        "smtpPassword": "SMTP密码"
+      },
+      "notifications": {
+        "title": "通知设置",
+        "emailEnabled": "邮件通知",
+        "emailEnabledDesc": "通过邮件发送通知",
+        "pushEnabled": "推送通知",
+        "pushEnabledDesc": "发送浏览器推送通知",
+        "slackEnabled": "Slack集成",
+        "slackEnabledDesc": "发送通知到Slack",
+        "slackWebhookUrl": "Slack Webhook URL"
+      },
+      "web3": {
+        "title": "Web3 & IPFS",
+        "chainId": "默认链",
+        "rpcEndpoint": "RPC端点",
+        "contractAddress": "合约地址"
+      },
+      "ipfs": {
+        "title": "IPFS配置",
+        "gateway": "IPFS网关",
+        "pinataApiKey": "Pinata API密钥",
+        "pinataSecretKey": "Pinata私钥"
+      }
+    },
+    "appearance": {
+      "title": "外观设置",
+      "primaryColor": "主色调",
+      "secondaryColor": "次色调",
+      "darkModeEnabled": "暗色模式",
+      "darkModeEnabledDesc": "默认启用暗色主题",
+      "customCss": "自定义CSS",
+      "customCssDesc": "为平台添加自定义样式"
+    }
+  },
+  "hackathons": {
+    "title": "黑客松审核",
+    "description": "审核和管理黑客松提交",
+    "loadError": "获取待审核黑客松失败",
+    "unknownError": "发生未知错误",
+    "networkError": "网络错误，请稍后重试",
+    "reviewing": "审核中...",
+    "historyError": "获取审核历史失败",
+    "noHackathons": {
+      "title": "没有需要审核的黑客松",
+      "description": "所有黑客松已审核完毕或没有匹配当前筛选条件的黑客松"
+    },
+    "status": {
+      "pendingReview": "待审核",
+      "approved": "已通过",
+      "rejected": "已拒绝",
+      "draft": "草稿"
+    },
+    "priority": {
+      "urgent": "紧急",
+      "high": "高",
+      "normal": "普通",
+      "low": "低"
+    },
+    "category": {
+      "content": "内容",
+      "legal": "法律",
+      "technical": "技术",
+      "business": "商业"
+    },
+    "filters": {
+      "title": "筛选",
+      "status": {
+        "all": "所有状态"
+      },
+      "priority": {
+        "all": "所有优先级"
+      },
+      "category": {
+        "all": "所有分类"
+      },
+      "sortBy": {
+        "submitted": "提交时间",
+        "created": "创建时间",
+        "title": "标题",
+        "prizePool": "奖金池"
+      },
+      "sortOrder": {
+        "desc": "最新优先",
+        "asc": "最旧优先"
+      },
+      "searchPlaceholder": "搜索黑客松..."
+    },
+    "actions": {
+      "approve": "通过",
+      "reject": "拒绝",
+      "requestChanges": "要求修改",
+      "history": "历史",
+      "view": "查看"
+    },
+    "daysAgo": "天前",
+    "justSubmitted": "刚刚提交",
+    "latestReview": "最新审核",
+    "noFeedback": "无反馈",
+    "dialog": {
+      "approve": {
+        "title": "通过黑客松"
+      },
+      "reject": {
+        "title": "拒绝黑客松"
+      },
+      "requestChanges": {
+        "title": "要求修改"
+      },
+      "hackathonInfo": "黑客松",
+      "tabs": {
+        "basic": "基础审核",
+        "advanced": "高级选项"
+      },
+      "score": "评分 (1-10)",
+      "priority": "优先级",
+      "feedback": "反馈",
+      "feedbackPlaceholder": "为此黑客松提供反馈...",
+      "rejectionReason": "拒绝原因",
+      "rejectionReasonPlaceholder": "解释为什么拒绝此黑客松...",
+      "recommendedChanges": "建议修改",
+      "recommendedChangesPlaceholder": "建议具体需要的修改...",
+      "category": "审核分类",
+      "isPublic": "公开审核反馈",
+      "history": {
+        "title": "审核历史"
+      }
+    },
+    "submitSuccess": "黑客松已提交审核",
+    "approveSuccess": "黑客松审核通过",
+    "rejectSuccess": "黑客松已拒绝",
+    "request_changesSuccess": "修改请求已发送",
+    "reviewError": "审核操作失败"
+  }
+}

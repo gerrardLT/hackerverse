@@ -4,7 +4,9 @@ import { auth } from '@/lib/auth';
 import { z } from 'zod';
 
 const statusSchema = z.object({
-  status: z.enum(['DRAFT', 'ACTIVE', 'COMPLETED', 'CANCELLED'])
+  status: z.enum(['DRAFT', 'PENDING_REVIEW', 'APPROVED', 'REJECTED', 'ACTIVE', 'COMPLETED', 'CANCELLED']),
+  reason: z.string().optional(), // 状态变更原因
+  notes: z.string().optional()   // 备注
 });
 
 export async function PUT(
@@ -31,11 +33,20 @@ export async function PUT(
 
     // 验证请求体
     const body = await request.json();
-    const { status } = statusSchema.parse(body);
+    const { status, reason, notes } = statusSchema.parse(body);
 
     // 检查黑客松是否存在
     const hackathon = await prisma.hackathon.findUnique({
-      where: { id: params.id }
+      where: { id: params.id },
+      include: {
+        organizer: {
+          select: {
+            id: true,
+            username: true,
+            email: true
+          }
+        }
+      }
     });
 
     if (!hackathon) {
@@ -45,10 +56,72 @@ export async function PUT(
       );
     }
 
-    // 更新黑客松状态
-    const updatedHackathon = await prisma.hackathon.update({
-      where: { id: params.id },
-      data: { status }
+    // 获取请求IP和User-Agent
+    const ipAddress = request.headers.get('x-forwarded-for') || 
+                      request.headers.get('x-real-ip') || 
+                      'unknown';
+    const userAgent = request.headers.get('user-agent') || 'unknown';
+
+    // 在事务中更新状态并记录日志
+    const result = await prisma.$transaction(async (tx) => {
+      // 更新黑客松状态
+      const updatedHackathon = await tx.hackathon.update({
+        where: { id: params.id },
+        data: { 
+          status,
+          reviewNotes: notes || hackathon.reviewNotes,
+          reviewedAt: ['APPROVED', 'REJECTED'].includes(status) ? new Date() : hackathon.reviewedAt,
+          submittedForReviewAt: status === 'PENDING_REVIEW' ? new Date() : hackathon.submittedForReviewAt
+        }
+      });
+
+      // 如果状态变更涉及审核，创建审核记录
+      if (['PENDING_REVIEW', 'APPROVED', 'REJECTED'].includes(status) && status !== hackathon.status) {
+        await tx.hackathonReview.create({
+          data: {
+            hackathonId: params.id,
+            reviewerId: user.id,
+            action: status === 'PENDING_REVIEW' ? 'submit' : (status === 'APPROVED' ? 'approve' : 'reject'),
+            status: status === 'PENDING_REVIEW' ? 'pending' : (status === 'APPROVED' ? 'approved' : 'rejected'),
+            feedback: notes,
+            rejectionReason: status === 'REJECTED' ? reason : undefined,
+            priority: 'normal',
+            ipAddress,
+            userAgent,
+            metadata: {
+              originalStatus: hackathon.status,
+              newStatus: status,
+              changeType: 'status_update',
+              reason
+            }
+          }
+        });
+      }
+
+      // 记录管理员操作日志
+      if ((tx as any).adminAction) {
+        await (tx as any).adminAction.create({
+          data: {
+            adminId: user.id,
+            action: 'hackathon_status_change',
+            targetType: 'hackathon',
+            targetId: params.id,
+            targetTitle: hackathon.title,
+            details: {
+              originalStatus: hackathon.status,
+              newStatus: status,
+              reason,
+              notes,
+              organizerId: hackathon.organizerId
+            },
+            ipAddress,
+            userAgent,
+            reason: reason || `Changed status from ${hackathon.status} to ${status}`
+          }
+        });
+      }
+
+      return updatedHackathon;
     });
 
     return NextResponse.json({
@@ -56,7 +129,10 @@ export async function PUT(
       message: '黑客松状态更新成功',
       data: {
         hackathonId: params.id,
-        newStatus: status
+        oldStatus: hackathon.status,
+        newStatus: status,
+        reason,
+        notes
       }
     });
 

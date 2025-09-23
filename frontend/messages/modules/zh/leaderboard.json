@@ -1,0 +1,39 @@
+{
+  "title": "声誉排行榜",
+  "description": "发现社区中的顶级贡献者及其成就",
+  "points": "积分",
+  "joined": "加入于",
+  "loadError": "排行榜加载失败",
+  "loadErrorDesc": "无法获取排行榜数据",
+  "networkError": "网络连接失败",
+  "refresh": "刷新",
+  "otherRanks": "其他排名",
+  "noData": {
+    "title": "暂无数据",
+    "description": "目前没有可用的排行榜数据"
+  },
+  "stats": {
+    "totalUsers": "总用户数",
+    "averageScore": "平均积分",
+    "timeRange": "时间范围",
+    "category": "分类"
+  },
+  "filters": {
+    "timeRange": "时间范围",
+    "category": "分类"
+  },
+  "timeRanges": {
+    "all": "全部时间",
+    "season": "本季度",
+    "month": "本月",
+    "week": "本周"
+  },
+  "categories": {
+    "all": "全部分类",
+    "general": "常规",
+    "hackathon": "黑客松",
+    "project": "项目",
+    "community": "社区",
+    "governance": "治理"
+  }
+}

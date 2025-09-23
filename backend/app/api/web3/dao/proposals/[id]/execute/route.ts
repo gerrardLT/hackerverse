@@ -17,7 +17,7 @@ export async function POST(
     }
 
     // 检查用户权限（只有管理员或提案创建者可以执行）
-    if (user.role !== 'admin') {
+    if (user.role !== 'ADMIN') {
       return NextResponse.json(
         { success: false, error: '权限不足' },
         { status: 403 }

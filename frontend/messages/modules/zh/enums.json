@@ -1,0 +1,55 @@
+{
+  "hackathonStatus": {
+    "upcoming": "即将开始",
+    "ongoing": "进行中",
+    "completed": "已结束",
+    "ended": "已结束"
+  },
+  "teamStatus": {
+    "recruiting": "招募中",
+    "full": "已满员",
+    "competing": "比赛中",
+    "completed": "已完成",
+    "disbanded": "已解散"
+  },
+  "projectStatus": {
+    "draft": "草稿",
+    "submitted": "已提交",
+    "reviewed": "已评审",
+    "winner": "获奖项目"
+  },
+  "applicationStatus": {
+    "pending": "待处理",
+    "approved": "已批准",
+    "rejected": "已拒绝",
+    "cancelled": "已取消"
+  },
+  "userRole": {
+    "member": "成员",
+    "admin": "管理员",
+    "leader": "队长"
+  },
+  "notificationType": {
+    "team_invite": "团队邀请",
+    "team_application_approved": "团队申请已批准",
+    "team_application_rejected": "团队申请已拒绝",
+    "team_member_joined": "团队成员加入",
+    "team_status_changed": "团队状态变更",
+    "hackathon_starting": "黑客松即将开始",
+    "hackathon_ending": "黑客松即将结束",
+    "hackathon_started": "黑客松已开始",
+    "hackathon_ended": "黑客松已结束",
+    "hackathon_registration_reminder": "报名提醒",
+    "hackathon_submission_reminder": "提交提醒",
+    "hackathon_results_announced": "结果公布",
+    "prize_awarded": "获奖通知",
+    "project_liked": "项目获赞",
+    "project_commented": "项目获评论",
+    "project_reviewed": "项目已评审",
+    "project_status_changed": "项目状态变更",
+    "community_post_replied": "帖子获回复",
+    "community_post_liked": "帖子获点赞",
+    "community_reply_liked": "回复获点赞",
+    "community_new_follower": "新粉丝"
+  }
+}

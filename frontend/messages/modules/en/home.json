@@ -1,0 +1,126 @@
+{
+  "stats": {
+    "title": "Platform Data",
+    "subtitle": "HackX is becoming the world's largest decentralized hackathon platform!",
+    "users": {
+      "label": "Registered Developers",
+      "description": "Global developer community"
+    },
+    "hackathons": {
+      "label": "Hackathons Hosted",
+      "description": "Successfully organized hackathon events"
+    },
+    "projects": {
+      "label": "Projects Submitted",
+      "description": "Innovative projects and solutions"
+    },
+    "countries": {
+      "label": "Countries Covered",
+      "description": "Global reach and impact"
+    },
+    "realTimeData": "Real-time data",
+    "globalMetrics": "Global metrics",
+    "growingCommunity": "Growing community"
+  },
+  "featured": {
+    "title": "Featured Hackathons",
+    "subtitle": "Join these exciting challenges and showcase your skills in the metaverse.",
+    "daysLeft": "days left",
+    "prizePool": "Prize Pool",
+    "participants": "Participants",
+    "joinHackathon": "Join Hackathon",
+    "viewDetails": "View Details",
+    "viewAllHackathons": "View All Hackathons"
+  },
+  "hero": {
+    "title": {
+      "part1": "Build the Future",
+      "part2": " Decentralized",
+      "part3": "Hackathon Platform"
+    },
+    "description": "IPFS-based open source hackathon platform connecting millions of global developers. Discover innovative projects, find investment opportunities, and build the Web3 future!",
+    "searchPlaceholder": "Search hackathons...",
+    "searching": "Searching...",
+    "startExploring": "Start Exploring",
+    "joinHackathon": "Join Hackathons",
+    "organizeEvent": "Organize Events",
+    "searchSuggestions": {
+      "history": {
+        "title": "Search History",
+        "clear": "Clear",
+        "loadError": "Failed to parse search history"
+      },
+      "popular": {
+        "title": "Popular Searches",
+        "loadingStart": "Loading popular searches...",
+        "loadSuccess": "Popular searches loaded successfully",
+        "loadError": "Failed to load popular searches",
+        "fallbackNote": "API response invalid, using fallback data",
+        "fallbackTerms": [
+          "Web3",
+          "DeFi",
+          "NFT",
+          "Blockchain",
+          "AI",
+          "Smart Contracts",
+          "Metaverse",
+          "GameFi",
+          "DAO",
+          "Layer2"
+        ]
+      },
+      "navigation": {
+        "searchRedirectError": "Search redirect failed"
+      }
+    }
+  },
+  "howItWorks": {
+    "title": "How to Participate",
+    "subtitle": "Four simple steps to start your hackathon journey",
+    "steps": {
+      "discover": {
+        "title": "Discover Hackathons",
+        "description": "Browse and search for hackathons that suit you, filter by tech stack and prizes"
+      },
+      "team": {
+        "title": "Build Team",
+        "description": "Find like-minded teammates or join existing teams to start collaborating"
+      },
+      "develop": {
+        "title": "Develop Project",
+        "description": "Create innovative projects within the time limit, all files stored on IPFS"
+      },
+      "reward": {
+        "title": "Get Rewards",
+        "description": "Get evaluated by professional judges, earn prizes, investment opportunities and career development"
+      }
+    }
+  },
+  "community": {
+    "title": "Join Community",
+    "subtitle": "Connect with global developers, share experiences, get support, and build the Web3 future together",
+    "github": {
+      "description": "Open source code and contributions",
+      "action": "View Code"
+    },
+    "discord": {
+      "description": "Real-time communication and discussion",
+      "action": "Join Server"
+    },
+    "twitter": {
+      "description": "Latest updates and announcements",
+      "action": "Follow Us"
+    },
+    "forum": {
+      "title": "Forum",
+      "description": "In-depth discussions and Q&A",
+      "action": "Visit Forum"
+    },
+    "cta": {
+      "title": "Ready to Get Started?",
+      "description": "Join HackX now, discover the next world-changing project, or create your own hackathon event!",
+      "joinButton": "Connect Wallet to Join",
+      "createButton": "Create Hackathon"
+    }
+  }
+}

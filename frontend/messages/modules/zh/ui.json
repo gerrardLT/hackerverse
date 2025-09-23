@@ -1,0 +1,39 @@
+{
+  "theme": {
+    "toggleTheme": "切换主题",
+    "light": "亮色",
+    "dark": "暗色",
+    "system": "系统"
+  },
+  "fileUpload": {
+    "uploadFailed": "上传失败",
+    "title": "选择文件上传到IPFS",
+    "supportedFormats": "支持图片、PDF、文本文件等格式",
+    "uploading": "上传中...",
+    "selectFiles": "选择文件"
+  },
+  "userRegistration": {
+    "connectWalletFirst": "请先连接钱包",
+    "enterUsername": "请填写用户名",
+    "registrationSuccess": "注册成功",
+    "userRegisteredToBlockchain": "用户已注册到区块链",
+    "registrationFailed": "注册失败",
+    "tryAgainLater": "请稍后重试",
+    "title": "用户注册",
+    "connectWalletToRegister": "请先连接钱包以注册用户",
+    "registerToDecentralizedPlatform": "注册用户资料到去中心化平台",
+    "username": "用户名",
+    "enterUsernamePlaceholder": "输入用户名",
+    "registering": "注册中...",
+    "registerUser": "注册用户",
+    "walletAddress": "钱包地址",
+    "registrationStatus": "注册状态",
+    "registered": "已注册",
+    "notRegistered": "未注册"
+  },
+  "walletConnect": {
+    "registering": "注册中...",
+    "registered": "已注册",
+    "connectWallet": "连接钱包"
+  }
+}

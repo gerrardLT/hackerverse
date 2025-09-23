@@ -1,0 +1,42 @@
+{
+  "userNotFound": "User not found",
+  "userInactive": "User is inactive",
+  "fetchError": "Failed to fetch user reputation information",
+  "score": "Score",
+  "level": "Level",
+  "tooltip": {
+    "title": "User Reputation",
+    "description": "Reputation score based on contributions and achievements",
+    "currentScore": "Current Score",
+    "currentLevel": "Current Level"
+  },
+  "levelNames": {
+    "beginner": "Beginner",
+    "intermediate": "Intermediate",
+    "advanced": "Advanced",
+    "epic": "Epic",
+    "legendary": "Legendary"
+  },
+  "leaderboard": {
+    "error": "Failed to fetch leaderboard"
+  },
+  "unauthorizedCalculate": "Unauthorized to perform reputation calculation",
+  "invalidCalculateParams": "Invalid parameters",
+  "calculateAllSuccess": "All users reputation scores recalculated successfully",
+  "calculateUserSuccess": "User reputation score recalculated successfully",
+  "calculateError": "Failed to calculate reputation scores",
+  "rules": {
+    "fetchError": "Failed to fetch reputation rules",
+    "missingFields": "Missing required fields",
+    "actionExists": "Action type already exists",
+    "createSuccess": "Reputation rule created successfully",
+    "createError": "Failed to create reputation rule",
+    "missingId": "Missing rule ID",
+    "notFound": "Rule not found",
+    "updateSuccess": "Reputation rule updated successfully",
+    "updateError": "Failed to update reputation rule",
+    "deactivateSuccess": "Rule deactivated (due to existing records)",
+    "deleteSuccess": "Reputation rule deleted successfully",
+    "deleteError": "Failed to delete reputation rule"
+  }
+}

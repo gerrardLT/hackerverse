@@ -11,12 +11,16 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Progress } from '@/components/ui/progress'
 import { Separator } from '@/components/ui/separator'
-import { Calendar, Users, Trophy, Clock, MapPin, ExternalLink, Share2, Heart, Star, Code, Award, Target, CheckCircle, AlertCircle, Timer } from 'lucide-react'
+import { Calendar, Users, Trophy, Clock, MapPin, ExternalLink, Share2, Heart, Star, Code, Award, Target, CheckCircle, AlertCircle, Timer, Gavel } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
 import { useToast } from '@/hooks/use-toast'
 import { getIPFSImageUrl, formatPrizeAmount } from '@/lib/utils'
 import { formatDate, getDaysUntil } from '@/lib/utils'
 import { apiService } from '@/lib/api'
+import { ProjectFilter, type FilterOptions, type FilterValues } from '@/components/projects/project-filter'
+import { LikeButtonWithCount } from '@/components/projects/like-button'
+import { CommentSystem } from '@/components/projects/comment-system'
+import { InteractionStats } from '@/components/projects/interaction-stats'
 
 interface Hackathon {
   id: string
@@ -81,9 +85,26 @@ interface Hackathon {
   projects: Array<{
     id: string
     name: string
+    title: string
+    description?: string
     team: string
     members: number
     track: string
+    technologies?: string[]
+    tags?: string[]
+    likes: number
+    comments: number
+    feedbacks: number
+    creator?: {
+      id: string
+      username: string
+      avatarUrl?: string
+    }
+    githubUrl?: string
+    demoUrl?: string
+    videoUrl?: string
+    createdAt: string
+    updatedAt: string
   }>
 }
 
@@ -98,6 +119,67 @@ export default function HackathonDetailPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isJoined, setIsJoined] = useState(false)
   const isFetchingRef = useRef(false)
+  
+  // 项目过滤状态
+  const [projectFilters, setProjectFilters] = useState<FilterOptions>({
+    tracks: [],
+    tags: [],
+    technologies: []
+  })
+  const [filterValues, setFilterValues] = useState<FilterValues>({
+    search: '',
+    tags: [],
+    technologies: [],
+    tracks: [],
+    sortBy: 'created',
+    sortOrder: 'desc'
+  })
+  const [filteredProjects, setFilteredProjects] = useState<typeof hackathon.projects>([])
+  const [isLoadingProjects, setIsLoadingProjects] = useState(false)
+
+  // 加载项目数据
+  const loadProjects = useCallback(async (hackathonId: string, filters?: FilterValues) => {
+    try {
+      setIsLoadingProjects(true)
+      
+      // 构建查询参数
+      const params = new URLSearchParams()
+      if (filters?.search) params.append('search', filters.search)
+      if (filters?.tags.length) params.append('tags', filters.tags.join(','))
+      if (filters?.technologies.length) params.append('technologies', filters.technologies.join(','))
+      if (filters?.tracks.length) params.append('tracks', filters.tracks.join(','))
+      if (filters?.sortBy) params.append('sortBy', filters.sortBy)
+      if (filters?.sortOrder) params.append('sortOrder', filters.sortOrder)
+      
+      const url = `/hackathons/${hackathonId}/projects${params.toString() ? `?${params.toString()}` : ''}`
+      const response = await apiService.get(url)
+      
+      if (response.success) {
+        const { projects, filters: filterOptions } = response.data
+        setFilteredProjects(projects || [])
+        setProjectFilters(filterOptions || { tracks: [], tags: [], technologies: [] })
+      } else {
+        throw new Error(response.error || '加载项目失败')
+      }
+    } catch (error) {
+      console.error('加载项目失败:', error)
+      toast({
+        title: '加载项目失败',
+        description: error instanceof Error ? error.message : '请稍后重试',
+        variant: 'destructive',
+      })
+    } finally {
+      setIsLoadingProjects(false)
+    }
+  }, [toast])
+
+  // 处理过滤器变化
+  const handleFilterChange = useCallback((newFilters: FilterValues) => {
+    setFilterValues(newFilters)
+    if (hackathon) {
+      loadProjects(hackathon.id, newFilters)
+    }
+  }, [hackathon, loadProjects])
 
   // Check user participation status
   const checkUserParticipation = async (hackathonId: string, organizerId?: string) => {
@@ -326,8 +408,8 @@ export default function HackathonDetailPage() {
           
           setHackathon(formattedHackathon)
           
-          // Fetch project data
-          await fetchProjects(hackathonData.id)
+          // Fetch project data with new API
+          await loadProjects(hackathonData.id, filterValues)
           
           // Check if current user has joined
           if (user) {
@@ -755,14 +837,14 @@ export default function HackathonDetailPage() {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <Card>
                     <CardContent className="p-4 text-center">
-                      <div className="text-2xl font-bold text-primary">{hackathon.projects.length}</div>
+                      <div className="text-2xl font-bold text-primary">{filteredProjects.length}</div>
                       <div className="text-sm text-muted-foreground">{t('stats.submittedProjects')}</div>
                     </CardContent>
                   </Card>
                   <Card>
                     <CardContent className="p-4 text-center">
                       <div className="text-2xl font-bold text-primary">
-                        {new Set(hackathon.projects.map(p => p.track)).size}
+                        {new Set(filteredProjects.map(p => p.track)).size}
                       </div>
                       <div className="text-sm text-muted-foreground">{t('stats.activeTracks')}</div>
                     </CardContent>
@@ -770,20 +852,29 @@ export default function HackathonDetailPage() {
                   <Card>
                     <CardContent className="p-4 text-center">
                       <div className="text-2xl font-bold text-primary">
-                        {hackathon.projects.reduce((sum, p) => sum + p.members, 0)}
+                        {filteredProjects.reduce((sum, p) => sum + p.likes, 0)}
                       </div>
-                      <div className="text-sm text-muted-foreground">{t('stats.participants')}</div>
+                      <div className="text-sm text-muted-foreground">{t('stats.totalLikes')}</div>
                     </CardContent>
                   </Card>
                   <Card>
                     <CardContent className="p-4 text-center">
                       <div className="text-2xl font-bold text-primary">
-                        {Math.round(hackathon.projects.reduce((sum, p) => sum + p.members, 0) / Math.max(hackathon.projects.length, 1))}
+                        {filteredProjects.reduce((sum, p) => sum + p.comments, 0)}
                       </div>
-                      <div className="text-sm text-muted-foreground">{t('stats.averageTeamSize')}</div>
+                      <div className="text-sm text-muted-foreground">{t('stats.totalComments')}</div>
                     </CardContent>
                   </Card>
                 </div>
+
+                {/* 项目过滤器 */}
+                <ProjectFilter
+                  filters={projectFilters}
+                  values={filterValues}
+                  onChange={handleFilterChange}
+                  isLoading={isLoadingProjects}
+                  totalResults={filteredProjects.length}
+                />
 
                 {/* 按赛道分组的项目 */}
                 <Card>
@@ -815,10 +906,15 @@ export default function HackathonDetailPage() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    {hackathon.projects.length > 0 ? (
+                    {isLoadingProjects ? (
+                      <div className="text-center py-12">
+                        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+                        <p className="text-muted-foreground">{tCommon('loading')}</p>
+                      </div>
+                    ) : filteredProjects.length > 0 ? (
                       <div className="space-y-6">
                         {hackathon.tracks.map((track) => {
-                          const trackProjects = hackathon.projects.filter(p => p.track === track.name)
+                          const trackProjects = filteredProjects.filter(p => p.track === track.name)
                           if (trackProjects.length === 0) return null
                           
                           return (
@@ -842,12 +938,14 @@ export default function HackathonDetailPage() {
                                       </p>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                      <Button variant="ghost" size="sm">
-                                        <Heart className="h-4 w-4" />
-                                      </Button>
+                                      <LikeButtonWithCount
+                                        projectId={project.id}
+                                        initialCount={project.likes || 0}
+                                        size="sm"
+                                      />
                                       <Button variant="outline" size="sm" asChild>
                                         <Link href={`/hackathons/${hackathon.id}/projects/${project.id}`}>
-                                          {t('actions.viewDetails')}
+                                          {tCommon('viewDetails')}
                                         </Link>
                                       </Button>
                                     </div>
@@ -905,9 +1003,10 @@ export default function HackathonDetailPage() {
                     </div>
                   )}
                   
-                  {hackathon.status === 'upcoming' && user && user.id !== hackathon.organizerId && (() => {
+                  {user && user.id !== hackathon.organizerId && (() => {
                     const registrationStatus = canRegister(hackathon)
-                    return (
+                    // 只要在注册期内就显示按钮，不管黑客松是否已经开始
+                    return registrationStatus.canRegister || isJoined ? (
                       <Button 
                         className="w-full" 
                         size="lg"
@@ -916,7 +1015,7 @@ export default function HackathonDetailPage() {
                       >
                         {isJoined ? t('status.joined') : (registrationStatus.canRegister ? t('actions.joinNow') : registrationStatus.reason)}
                       </Button>
-                    )
+                    ) : null
                   })()}
                   
                   {user && user.id !== hackathon.organizerId && isJoined && (() => {
@@ -933,6 +1032,16 @@ export default function HackathonDetailPage() {
                       </Button>
                     )
                   })()}
+
+                  {/* 评委仪表盘入口 - 仅JUDGE、ADMIN、MODERATOR角色可见 */}
+                  {user && ['JUDGE', 'ADMIN', 'MODERATOR'].includes(user.role) && (
+                    <Button asChild className="w-full" size="lg" variant="secondary">
+                      <Link href="/judging/dashboard">
+                        <Gavel className="h-4 w-4 mr-2" />
+                        {t('actions.judgePanel')}
+                      </Link>
+                    </Button>
+                  )}
 
                   <div className="flex gap-2">
                     <Button variant="outline" size="sm" onClick={handleShare} className="w-full">

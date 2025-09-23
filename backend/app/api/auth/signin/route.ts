@@ -71,6 +71,12 @@ export async function POST(request: NextRequest) {
       )
     }
     
+    // 更新最后登录时间
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { lastLoginAt: new Date() }
+    })
+    
     // 生成 JWT Token
     const token = AuthService.generateToken({
       userId: user.id,

@@ -1,0 +1,42 @@
+{
+  "userNotFound": "用户不存在",
+  "userInactive": "用户已停用",
+  "fetchError": "获取用户声誉信息失败",
+  "score": "积分",
+  "level": "等级",
+  "tooltip": {
+    "title": "用户声誉",
+    "description": "基于贡献和成就的声誉积分",
+    "currentScore": "当前积分",
+    "currentLevel": "当前等级"
+  },
+  "levelNames": {
+    "beginner": "新手",
+    "intermediate": "中级",
+    "advanced": "高级",
+    "epic": "史诗",
+    "legendary": "传奇"
+  },
+  "leaderboard": {
+    "error": "获取排行榜失败"
+  },
+  "unauthorizedCalculate": "无权限执行声誉计算",
+  "invalidCalculateParams": "参数无效",
+  "calculateAllSuccess": "所有用户声誉积分重新计算完成",
+  "calculateUserSuccess": "用户声誉积分重新计算完成",
+  "calculateError": "声誉积分计算失败",
+  "rules": {
+    "fetchError": "获取声誉规则失败",
+    "missingFields": "缺少必填字段",
+    "actionExists": "该行为类型已存在",
+    "createSuccess": "声誉规则创建成功",
+    "createError": "创建声誉规则失败",
+    "missingId": "缺少规则ID",
+    "notFound": "规则不存在",
+    "updateSuccess": "声誉规则更新成功",
+    "updateError": "更新声誉规则失败",
+    "deactivateSuccess": "规则已停用（因为存在相关记录）",
+    "deleteSuccess": "声誉规则删除成功",
+    "deleteError": "删除声誉规则失败"
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "overview": {
+    "title": "Overview",
+    "description": "Platform analytics and insights overview",
+    "participants": "Total Participants",
+    "projects": "Total Projects",
+    "teams": "Total Teams",
+    "avgProjectsPerTeam": "Avg Projects per Team",
+    "completionRate": "Completion Rate",
+    "satisfactionScore": "Satisfaction Score"
+  },
+  "participation": {
+    "title": "Participation",
+    "registrations": "Total Registrations",
+    "actualParticipants": "Active Participants",
+    "dropoutRate": "Dropout Rate",
+    "peakRegistrationTime": "Peak Registration Time",
+    "averageTeamSize": "Average Team Size",
+    "dailyRegistrations": "Daily Registrations"
+  },
+  "projects": {
+    "title": "Projects",
+    "totalSubmissions": "Total Submissions",
+    "submissionRate": "Submission Rate",
+    "averageScore": "Average Score",
+    "topProjects": "Top Projects",
+    "technologyDistribution": "Technology Distribution"
+  },
+  "teams": {
+    "title": "Teams",
+    "averageFormationTime": "Avg Formation Time",
+    "soloParticipants": "Solo Participants",
+    "collaborationScore": "Collaboration Score",
+    "communicationActivity": "Communication Activity",
+    "teamSizeDistribution": "Team Size Distribution"
+  },
+  "report": {
+    "title": "Reports",
+    "description": "Create and manage custom analytics reports",
+    "create": "Create Report",
+    "name": "Report Name",
+    "reportType": "Report Type",
+    "scope": "Scope"
+  },
+  "export": {
+    "json": "Export as JSON",
+    "csv": "Export as CSV",
+    "excel": "Export as Excel",
+    "button": "Export"
+  },
+  "lastGenerated": "Last Generated"
+}

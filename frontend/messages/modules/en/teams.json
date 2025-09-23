@@ -1,0 +1,323 @@
+{
+  "title": "Teams",
+  "createTeam": "Create Team",
+  "join": "Join Team",
+  "leave": "Leave Team",
+  "apply": "Apply to Join",
+  "invite": "Invite Members",
+  "manage": "Manage Team",
+  "members": "Members",
+  "leader": "Leader",
+  "pageTitle": "Team Management",
+  "pageDescription": "Discover teams, manage your teams, handle invitations",
+  "loading": {
+    "teams": "Loading teams...",
+    "hackathons": "Loading hackathons failed",
+    "invitations": "Loading invitations failed",
+    "failed": "Loading Failed",
+    "retry": "Retry",
+    "networkError": "Network error, please check your connection",
+    "getTeamsFailed": "Failed to get team list",
+    "submitting": "Submitting...",
+    "submitApplication": "Submit Application"
+  },
+  "searchTitle": "Search Teams",
+  "newInvitation": "New Invitation",
+  "fromInviter": "from",
+  "defaultInvitationMessage": "We invite you to join our team and create amazing projects together!",
+  "myTeam": "My Team",
+  "showPassion": "Show your passion and skills",
+  "noTeamsJoined": "Haven't joined any teams yet",
+  "exploreTeams": "Explore amazing teams and start your collaboration journey",
+  "console": {
+    "loadingTeamsError": "Loading teams error:",
+    "acceptInvitationFailed": "Accept invitation failed:",
+    "declineInvitationFailed": "Decline invitation failed:",
+    "applicationSubmitFailed": "Application submit failed:"
+  },
+  "search": {
+    "placeholder": "Search teams...",
+    "statusFilter": "Status Filter",
+    "allStatuses": "All Statuses",
+    "hackathonFilter": "Hackathon Filter",
+    "allHackathons": "All Hackathons"
+  },
+  "tabs": {
+    "allTeams": "All Teams",
+    "myTeams": "My Teams",
+    "invitations": "Team Invitations"
+  },
+  "status": {
+    "recruiting": "Recruiting",
+    "full": "Full",
+    "competing": "Competing",
+    "completed": "Completed",
+    "disbanded": "Disbanded"
+  },
+  "actions": {
+    "viewDetails": "View Details",
+    "applyToJoin": "Apply to Join",
+    "manageTeam": "Manage Team",
+    "acceptInvitation": "Accept Invitation",
+    "decline": "Decline",
+    "cancel": "Cancel",
+    "retry": "Retry"
+  },
+  "memberCount": "{current}/{max} members",
+  "roleLeader": "Leader",
+  "roleMember": "Member",
+  "roleRecruiting": "Recruiting",
+  "unknownHackathon": "Unknown Hackathon",
+  "empty": {
+    "noTeamsFound": "No teams found",
+    "adjustSearchCriteria": "Try adjusting search criteria or create a new team",
+    "noInvitations": "No Invitations",
+    "noInvitationsDesc": "You currently have no team invitations"
+  },
+  "invitations": {
+    "teamInvitation": "Team Invitation",
+    "fromInviter": "From {inviterName}'s invitation",
+    "acceptInvitation": "Accept Invitation",
+    "decline": "Decline"
+  },
+  "joinDialog": {
+    "title": "Apply to Join Team",
+    "description": "Apply to join \"{teamName}\" team",
+    "skillsLabel": "Skills (Optional)",
+    "skillsPlaceholder": "Enter your skills, separated by commas, e.g.: React, Node.js, Python",
+    "skillsHelp": "Show your skills to help the team understand your abilities",
+    "messageLabel": "Application Reason (Optional)",
+    "messagePlaceholder": "Please briefly explain why you want to join this team, or introduce yourself...",
+    "characterCount": "{current}/500 characters"
+  },
+  "toasts": {
+    "loginRequired": "Please login first",
+    "loginRequiredDesc": "You need to login to accept invitations",
+    "loginRequiredToDecline": "You need to login to decline invitations",
+    "loginRequiredToApply": "You need to login to apply",
+    "applicationSubmitted": "Application Submitted",
+    "applicationSubmittedDesc": "Application submitted, please wait for team leader review",
+    "applicationFailed": "Application Failed",
+    "applicationFailedDesc": "Application submission failed, please try again",
+    "invitationAccepted": "Success",
+    "invitationAcceptedDesc": "Team invitation accepted",
+    "invitationDeclined": "Success",
+    "invitationDeclinedDesc": "Team invitation declined",
+    "operationFailed": "Operation Failed",
+    "acceptInvitationFailed": "Failed to accept invitation",
+    "declineInvitationFailed": "Failed to decline invitation"
+  },
+  "applications": {
+    "title": "Applications",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "approve": "Approve",
+    "reject": "Reject",
+    "message": "Application Message",
+    "skills": "Skills",
+    "experience": "Experience"
+  },
+  "create": {
+    "title": "Create Team",
+    "subtitle": "Create your hackathon team",
+    "description": "Create your hackathon team",
+    "backToTeams": "Back to Teams",
+    "form": {
+      "teamName": "Team Name",
+      "teamNamePlaceholder": "Enter team name",
+      "teamNameRequired": "Team name cannot be empty",
+      "teamNameMinLength": "Team name must be at least 2 characters",
+      "description": "Team Description",
+      "descriptionPlaceholder": "Describe your team, goals, and what you're looking for...",
+      "descriptionRequired": "Team description cannot be empty",
+      "descriptionMinLength": "Team description must be at least 10 characters",
+      "hackathon": "Select Hackathon",
+      "hackathonPlaceholder": "Choose the hackathon to participate in",
+      "hackathonRequired": "Please select a hackathon to participate in",
+      "maxMembers": "Maximum Members",
+      "maxMembersDesc": "Set the maximum number of team members (including yourself)",
+      "techStack": "Technology Stack",
+      "techStackDesc": "Select the technologies your team will use",
+      "selectTechStack": "Select technology stack",
+      "addTech": "Add",
+      "skillsRequired": "At least one skill must be selected",
+      "skillsMaxLimit": "Maximum 10 skills can be selected",
+      "roles": "Team Roles",
+      "rolesDesc": "Add the roles you need for your team",
+      "selectRole": "Select role",
+      "addRole": "Add",
+      "teamVisibility": "Team Visibility",
+      "publicTeam": "Public Team",
+      "publicTeamDesc": "Other users can discover and apply to join your team",
+      "privateTeam": "Private Team",
+      "privateTeamDesc": "Only invited users can join your team"
+    },
+    "validation": {
+      "nameMaxLength": "Team name cannot exceed 50 characters",
+      "descMaxLength": "Team description cannot exceed 500 characters",
+      "tagsMaxCount": "Maximum 5 team tags allowed",
+      "minMembers": "Team size must be at least 2 members",
+      "maxMembersLimit": "Team size cannot exceed 10 members"
+    },
+    "success": {
+      "teamCreated": "Team Created Successfully!",
+      "teamCreatedDesc": "Your team has been successfully created, you can now start recruiting members"
+    },
+    "console": {
+      "createTeamError": "Failed to create team"
+    },
+    "preview": {
+      "title": "Preview",
+      "teamOverview": "Team Overview",
+      "noTechStack": "No technology stack selected",
+      "noRoles": "No roles added",
+      "maxMembersLabel": "Max Members: {count}",
+      "visibilityPublic": "Public Team",
+      "visibilityPrivate": "Private Team"
+    },
+    "actions": {
+      "createTeam": "Create Team",
+      "creating": "Creating...",
+      "cancel": "Cancel"
+    },
+    "loading": {
+      "hackathons": "Failed to get hackathon list",
+      "loadFailed": "Loading failed",
+      "noHackathons": "Unable to get hackathon list, please refresh and try again"
+    },
+    "auth": {
+      "loginRequired": "Please login first",
+      "loginDesc": "Login required to create a team"
+    },
+    "hackathon": {
+      "deadline": "Deadline",
+      "teamSize": "Team Size",
+      "members3": "3 Member Team",
+      "members4": "4 Member Team",
+      "members5": "5 Member Team",
+      "members6": "6 Member Team"
+    },
+    "sections": {
+      "basicInfo": "Basic Information",
+      "techStack": "Tech Stack",
+      "techStackDesc": "Select technologies your team will use",
+      "skillsSelected": "Selected {count}/10 skills",
+      "teamTags": "Team Tags (Optional)",
+      "teamTagsDesc": "Add tags to describe team features or recruitment needs",
+      "privacy": "Privacy Settings",
+      "privacyDesc": "Control team visibility",
+      "publicTeamLabel": "Public Team",
+      "publicTeamDesc": "Allow other users to search and view your team",
+      "actions": "Action Buttons"
+    }
+  },
+  "detail": {
+    "status": {
+      "recruiting": "Recruiting",
+      "full": "Full",
+      "competing": "Competing",
+      "completed": "Completed"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "members": "Members",
+      "project": "Project",
+      "activity": "Activity",
+      "applications": "Applications"
+    },
+    "loading": {
+      "teamDetails": "Loading team details...",
+      "retry": "Retry",
+      "applications": "Loading..."
+    },
+    "errors": {
+      "teamNotFound": "Team information not found",
+      "loadFailed": "Failed to get team information",
+      "networkError": "Network error, please check your connection"
+    },
+    "memberCount": "{current}/{max} members",
+    "teamCreator": "Team Creator",
+    "actions": {
+      "inviteMember": "Invite Member",
+      "joined": "Joined Team",
+      "joining": "Applying...",
+      "applyJoin": "Apply to Join",
+      "contactLeader": "Contact Leader"
+    },
+    "invite": {
+      "dialogTitle": "Invite Member to Team",
+      "dialogDesc": "Enter user ID to invite them to your team",
+      "userIdLabel": "User ID",
+      "userIdPlaceholder": "Enter user ID to invite",
+      "messageLabel": "Invitation Message (Optional)",
+      "messagePlaceholder": "Write an invitation message...",
+      "cancel": "Cancel",
+      "sending": "Sending...",
+      "send": "Send Invitation"
+    },
+    "overview": {
+      "techStack": "Tech Stack",
+      "noTechStack": "No tech stack set yet",
+      "recruitmentNeeds": "Recruitment Needs",
+      "projectIdea": "Project Idea"
+    },
+    "stats": {
+      "title": "Team Statistics",
+      "createdAt": "Created",
+      "teamSize": "Team Size",
+      "recruitmentStatus": "Recruitment Status",
+      "recruiting": "Recruiting",
+      "full": "Full"
+    },
+    "social": {
+      "title": "Social Links",
+      "website": "Website"
+    },
+    "achievements": {
+      "title": "Team Achievements"
+    },
+    "members": {
+      "joinedAt": "Joined",
+      "noMembers": "No team members yet",
+      "noMembersDesc": "No members have joined the team yet"
+    },
+    "project": {
+      "title": "Project Information",
+      "desc": "Details of the project being developed by the team",
+      "developing": "Project in Development",
+      "developingDesc": "Team is working hard on developing the project, stay tuned!"
+    },
+    "activity": {
+      "title": "Team Activity",
+      "desc": "Latest activities and updates from the team",
+      "noActivity": "No team activity yet",
+      "noActivityDesc": "Team has no activity records yet"
+    },
+    "applications": {
+      "title": "Application Management",
+      "desc": "Manage user applications to join",
+      "noApplications": "No applications",
+      "noApplicationsDesc": "No users have applied to join the team yet",
+      "reputation": "Reputation",
+      "appliedAt": "Applied",
+      "approve": "Approve",
+      "reject": "Reject"
+    },
+    "toasts": {
+      "applicationSent": "Application Sent",
+      "applicationSentDesc": "Your application has been sent to the team leader, please wait for review",
+      "applicationFailed": "Application Failed",
+      "applicationFailedDesc": "Error sending application, please try again",
+      "inviteSent": "Invitation Sent",
+      "inviteSentDesc": "Successfully sent team invitation to user",
+      "inviteFailed": "Invitation Failed",
+      "inviteFailedDesc": "Error sending invitation",
+      "inviteError": "Error sending invitation, please try again",
+      "applicationApproved": "Application Approved",
+      "applicationRejected": "Application Rejected",
+      "operationFailed": "Operation Failed",
+      "operationFailedDesc": "Operation failed, please try again"
+    }
+  }
+}

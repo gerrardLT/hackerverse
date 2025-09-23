@@ -1,0 +1,340 @@
+{
+  "title": "仪表板",
+  "overview": "概览",
+  "myHackathons": "我的黑客松",
+  "myTeams": "我的团队",
+  "myProjects": "我的项目",
+  "myCommunity": "我的社区",
+  "pleaseLogin": "请先登录",
+  "pleaseLoginDesc": "登录后查看您的个人仪表板，管理黑客松项目和团队",
+  "login": "登录",
+  "level": "级",
+  "toNextLevel": "至下一级",
+  "profile": {
+    "edit": "编辑",
+    "save": "保存",
+    "cancel": "取消",
+    "uploading": "上传中...",
+    "userAvatar": "用户头像",
+    "enterUsername": "输入用户名",
+    "techStack": "技术栈",
+    "noTechStack": "暂无技术栈，请在下方添加",
+    "addTechStack": "添加技术栈（如：React, Node.js）",
+    "addButton": "添加",
+    "skillExists": "技能已存在",
+    "skillExistsDesc": "该技能已经在列表中了",
+    "skillLimit": "技能数量限制",
+    "skillLimitDesc": "最多只能添加20个技能",
+    "skillTooLong": "技能名称过长",
+    "skillTooLongDesc": "技能名称最多50个字符",
+    "skillInstructions": "按回车键或点击添加按钮来添加技能。最多添加20个技能，每个技能名称最多50个字符。",
+    "notSetYet": "暂未设置技术栈"
+  },
+  "actions": {
+    "joinNewHackathon": "参加新的黑客松"
+  },
+  "quickActions": {
+    "title": "快捷操作",
+    "description": "快速访问您最常用的功能",
+    "projects": "我的项目",
+    "hackathons": "黑客松",
+    "teams": "团队",
+    "community": "社区"
+  },
+  "statistics": {
+    "participatedHackathons": "参与黑客松",
+    "participatedDesc": "所有参与的黑客松数量",
+    "submittedProjects": "提交项目",
+    "submittedDesc": "创建和参与的项目总数",
+    "wonPrizes": "获得奖项",
+    "wonPrizesDesc": "获奖项目总数",
+    "reputationScore": "声誉分数",
+    "reputationScoreDesc": "基于参与和成就的声誉分数",
+    "participated": "参与",
+    "won": "获奖",
+    "created": "创建",
+    "reputation": "声誉",
+    "prizesTooltip": {
+      "title": "获奖计算规则:",
+      "rule1": "• 统计项目状态为WINNER的数量",
+      "rule2": "• 包括您创建的获奖项目",
+      "rule3": "• 包括您参与团队的获奖项目"
+    },
+    "reputationTooltip": {
+      "title": "声誉计算公式:",
+      "rule1": "• 参与黑客松: 每次 +50分",
+      "rule2": "• 提交项目: 每个 +100分",
+      "rule3": "• 获得奖项: 每个 +200分",
+      "rule4": "• 最高分数: 1000分",
+      "current": "当前: {participated}×50 + {projects}×100 + {prizes}×200 = {total}"
+    }
+  },
+  "tabs": {
+    "overview": "概览",
+    "hackathons": "我的黑客松",
+    "projects": "我的项目",
+    "teams": "我的团队",
+    "community": "我的社区",
+    "enhanced": "增强统计",
+    "achievements": "我的成就",
+    "activity": "活动记录",
+    "reputation": "声誉分析",
+    "credentials": "我的凭证"
+  },
+  "enhanced": {
+    "title": "增强统计",
+    "loading": "加载统计数据中...",
+    "loadFailed": "加载失败",
+    "networkError": "网络错误，请稍后重试",
+    "noDataError": "无法加载统计数据",
+    "hackathons": {
+      "title": "黑客松参与",
+      "organizer": "组织者",
+      "participant": "参与者",
+      "participated": "参与",
+      "organized": "组织"
+    },
+    "projects": {
+      "title": "项目提交",
+      "winRate": "胜率",
+      "submitted": "提交项目",
+      "winningProjects": "获奖项目"
+    },
+    "reputation": {
+      "title": "声誉系统",
+      "level": "等级",
+      "score": "声誉积分",
+      "progress": "升级进度",
+      "points": "分"
+    },
+    "achievements": {
+      "title": "成就系统",
+      "completed": "完成",
+      "completionRate": "完成率",
+      "totalAchievements": "总成就"
+    },
+    "teams": {
+      "title": "团队参与",
+      "asJudge": "评委",
+      "times": "次"
+    },
+    "community": {
+      "title": "社区活跃度",
+      "posts": "帖子",
+      "replies": "回复",
+      "likes": "点赞"
+    },
+    "social": {
+      "title": "社交网络",
+      "followers": "关注者",
+      "following": "关注",
+      "people": "人"
+    },
+    "trend": {
+      "title": "活动趋势",
+      "recent3Months": "近3月活动",
+      "monthlyTrend": "活动趋势",
+      "trendDesc": "最近12个月的参与和项目提交趋势",
+      "participationTrend": "黑客松参与趋势",
+      "projectTrend": "项目提交趋势",
+      "month": "月"
+    }
+  },
+  "achievements": {
+    "title": "我的成就",
+    "loading": "加载成就中...",
+    "filters": "筛选",
+    "category": "分类",
+    "rarity": "稀有度",
+    "completed": "完成状态",
+    "all": "全部",
+    "general": "通用",
+    "hackathon": "黑客松",
+    "project": "项目",
+    "team": "团队",
+    "community": "社区",
+    "common": "普通",
+    "rare": "稀有",
+    "epic": "史诗",
+    "legendary": "传说",
+    "completedOnly": "仅已完成",
+    "progress": "进度",
+    "level": "等级",
+    "noAchievements": "未找到成就",
+    "completedAt": "完成于",
+    "stats": {
+      "total": "总成就数",
+      "completed": "已完成",
+      "inProgress": "进行中"
+    }
+  },
+  "activity": {
+    "title": "活动记录",
+    "loading": "加载中...",
+    "loadMore": "加载更多",
+    "noActivity": "暂无最近活动",
+    "filters": "按类型筛选",
+    "all": "所有活动",
+    "loadFailed": "加载失败",
+    "loadFailedDesc": "无法加载活动记录",
+    "description": "记录您在平台上的所有活动",
+    "types": {
+      "hackathon_joined": "参加黑客松",
+      "project_submitted": "提交项目",
+      "team_joined": "加入团队",
+      "project_scored": "项目评分",
+      "reputation_gained": "声誉变动",
+      "prize_won": "获得奖项",
+      "project_liked": "点赞项目",
+      "community_posted": "发布帖子"
+    },
+    "time": {
+      "justNow": "刚刚",
+      "minutesAgo": "{minutes}分钟前",
+      "hoursAgo": "{hours}小时前",
+      "daysAgo": "{days}天前",
+      "monthsAgo": "{months}个月前"
+    },
+    "viewDetails": "查看详情",
+    "totalActivities": "总活动",
+    "stats": {
+      "title": "活动统计"
+    }
+  },
+  "reputation": {
+    "title": "声誉分析",
+    "loading": "加载声誉数据中...",
+    "loadFailed": "加载失败",
+    "networkError": "网络错误，请稍后重试",
+    "totalScore": "总声誉分",
+    "currentLevel": "当前等级",
+    "nextLevel": "下一等级",
+    "progress": "进度",
+    "trend": "30天趋势",
+    "recentRecords": "最近记录",
+    "noRecords": "暂无声誉记录",
+    "level": "等级",
+    "pointsToUpgrade": "还需 {points} 积分升级",
+    "last7Days": "最近7天",
+    "overview": "统计概览",
+    "records": "积分记录",
+    "analysis": "趋势分析",
+    "categoryStats": "按分类统计",
+    "actionStats": "按行为统计",
+    "times": "次",
+    "points": "分",
+    "allCategories": "全部分类",
+    "recordsDesc": "查看详细的积分获得记录",
+    "trendDesc": "最近30天的积分获得趋势",
+    "multiplier": "倍数",
+    "cumulativeTrend": "累计积分趋势",
+    "categories": {
+      "hackathon": "黑客松",
+      "project": "项目",
+      "team": "团队",
+      "community": "社区"
+    }
+  },
+  "recentActivity": {
+    "title": "最近活动",
+    "description": "你的最新动态",
+    "noActivities": "暂无最近活动"
+  },
+  "recommendations": {
+    "title": "推荐黑客松",
+    "description": "基于你的技能和兴趣",
+    "loading": "加载推荐中...",
+    "noRecommendations": "暂无推荐的黑客松",
+    "browseAll": "浏览所有黑客松",
+    "view": "查看",
+    "daysUntilStart": "{days} 天后开始",
+    "inProgress": "正在进行中"
+  },
+  "hackathons": {
+    "participated": "参与的黑客松",
+    "participatedDesc": "你作为参与者加入的黑客松活动",
+    "created": "创建的黑客松",
+    "createdDesc": "你作为组织者创建的黑客松活动",
+    "loading": "加载中...",
+    "noParticipated": "你还没有参与任何黑客松",
+    "noCreated": "你还没有创建任何黑客松",
+    "joinHackathons": "参加黑客松",
+    "createHackathon": "创建黑客松",
+    "viewDetails": "查看详情",
+    "manage": "管理",
+    "organizer": "组织者",
+    "prizePool": "奖金池: ${amount}",
+    "inProgress": "进行中"
+  },
+  "projects": {
+    "title": "我的项目",
+    "description": "你提交的所有项目",
+    "loading": "加载中...",
+    "noProjects": "你还没有提交任何项目",
+    "joinAndSubmit": "参加黑客松并提交项目",
+    "viewProject": "查看项目",
+    "code": "代码",
+    "demo": "演示",
+    "score": "评分: {score}",
+    "team": "团队: {name} ({count}人)",
+    "status": {
+      "submitted": "已提交"
+    }
+  },
+  "teams": {
+    "title": "我的团队",
+    "description": "你参与的团队",
+    "loading": "加载中...",
+    "noTeams": "你还没有加入任何团队",
+    "findTeams": "寻找团队",
+    "viewTeam": "查看团队",
+    "manageTeam": "管理团队",
+    "teamLeader": "团队领导",
+    "members": "{count} 成员",
+    "projects": "{count} 个项目",
+    "status": {
+      "active": "活跃"
+    }
+  },
+  "community": {
+    "myBookmarks": "我的收藏",
+    "myLikes": "我的点赞",
+    "myPosts": "我的帖子",
+    "myFollowing": "我的关注",
+    "viewBookmarks": "查看收藏",
+    "viewBookmarksDesc": "查看我收藏的帖子",
+    "viewLikes": "查看点赞",
+    "viewLikesDesc": "查看我点赞的帖子",
+    "managePosts": "管理我发布的帖子",
+    "viewMyPosts": "查看我的帖子",
+    "manageFollowing": "管理我关注的用户",
+    "viewFollowing": "查看关注"
+  },
+  "toasts": {
+    "authRequired": "认证失败",
+    "reloginRequired": "请重新登录后再试",
+    "avatarUploadSuccess": "头像上传成功",
+    "avatarUploadSuccessDesc": "新头像已设置，请点击保存确认更改",
+    "avatarUploadFailed": "头像上传失败",
+    "avatarUploadRetry": "请稍后重试",
+    "avatarUploadServerError": "服务器响应错误",
+    "avatarUploadNetworkError": "网络错误，请稍后重试",
+    "fileFormatError": "文件格式错误",
+    "fileFormatDesc": "请选择图片文件（JPG、PNG、GIF、WebP）",
+    "fileTooLarge": "文件过大",
+    "fileTooLargeDesc": "图片大小不能超过5MB",
+    "saveSuccess": "保存成功",
+    "saveSuccessDesc": "用户信息已更新",
+    "saveFailed": "保存失败",
+    "saveFailedRetry": "请稍后重试",
+    "saveNetworkError": "网络错误，请稍后重试"
+  },
+  "errors": {
+    "getUserStats": "获取用户统计数据失败",
+    "getRecommendations": "获取推荐黑客松失败",
+    "getUserHackathons": "获取用户黑客松失败",
+    "getUserProjects": "获取用户项目失败",
+    "getUserTeams": "获取用户团队失败",
+    "debugInfo": "调试信息:"
+  }
+}

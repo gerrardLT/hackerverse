@@ -54,3 +54,4 @@ dist/
 .cursorignore
 # OS files
 Thumbs.db
+docs

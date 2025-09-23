@@ -306,11 +306,18 @@ class ApiService {
     }
 
     try {
+      console.log('🌐 发送API请求:', {
+        method: options.method || 'GET',
+        url,
+        headers: Object.keys(headers),
+        hasToken: !!currentToken
+      })
+      
       const response = await fetch(url, {
         ...options,
         headers,
-        // 禁用缓存，确保每次刷新都会重新请求
-        cache: 'no-store',
+        mode: 'cors',
+        credentials: 'omit'
       })
 
       const data = await response.json()
@@ -358,6 +365,46 @@ class ApiService {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('hackx-token')
     }
+  }
+
+  // ============ 通用HTTP方法 ============
+
+  /**
+   * GET请求
+   */
+  async get<T>(endpoint: string): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, {
+      method: 'GET'
+    })
+  }
+
+  /**
+   * POST请求
+   */
+  async post<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, {
+      method: 'POST',
+      body: data ? JSON.stringify(data) : undefined
+    })
+  }
+
+  /**
+   * PUT请求
+   */
+  async put<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, {
+      method: 'PUT',
+      body: data ? JSON.stringify(data) : undefined
+    })
+  }
+
+  /**
+   * DELETE请求
+   */
+  async delete<T>(endpoint: string): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, {
+      method: 'DELETE'
+    })
   }
 
   // ============ 认证API ============
@@ -435,6 +482,255 @@ class ApiService {
     }>
   }>> {
     return this.request('/users/me/stats')
+  }
+
+  // ============ Dashboard增强API ============
+  async getDashboardStats(): Promise<ApiResponse<{
+    stats: {
+      hackathons: {
+        participated: number
+        organized: number
+        total: number
+      }
+      projects: {
+        submitted: number
+        won: number
+        winRate: number
+      }
+      teams: {
+        joined: number
+        asJudge: number
+      }
+      reputation: {
+        score: number
+        level: number
+        pointsToNextLevel: number
+        nextLevelPoints: number
+        progressPercentage: number
+        totalEarned: number
+      }
+      achievements: {
+        completed: number
+        total: number
+        completionRate: number
+      }
+      community: {
+        posts: number
+        replies: number
+        likesGiven: number
+        followers: number
+        following: number
+        engagement: number
+      }
+      trends: {
+        participations: Array<{ month: string; count: number }>
+        projects: Array<{ month: string; count: number }>
+      }
+    }
+  }>> {
+    return this.request('/dashboard/stats')
+  }
+
+  async getDashboardAchievements(params?: {
+    category?: string
+    rarity?: string
+    completed?: boolean
+  }): Promise<ApiResponse<{
+    achievements: Array<{
+      id: string
+      type: string
+      title: string
+      description: string
+      icon?: string
+      badge?: string
+      level: number
+      rarity: string
+      progress: number
+      target: number
+      isCompleted: boolean
+      completedAt?: string
+      category: string
+      metadata?: any
+    }>
+    stats: {
+      total: number
+      completed: number
+      inProgress: number
+      byCategory: Record<string, { total: number; completed: number }>
+      byRarity: Record<string, { total: number; completed: number }>
+    }
+  }>> {
+    const searchParams = new URLSearchParams()
+    if (params?.category) searchParams.append('category', params.category)
+    if (params?.rarity) searchParams.append('rarity', params.rarity)
+    if (params?.completed !== undefined) searchParams.append('completed', params.completed.toString())
+    
+    return this.request(`/dashboard/achievements?${searchParams.toString()}`)
+  }
+
+  async getDashboardActivity(params?: {
+    limit?: number
+    offset?: number
+    type?: string
+  }): Promise<ApiResponse<{
+    activities: Array<{
+      id: string
+      type: string
+      title: string
+      description: string
+      date: string
+      metadata?: any
+    }>
+    stats: {
+      total: number
+      byType: Record<string, number>
+    }
+    pagination: {
+      total: number
+      limit: number
+      offset: number
+      hasMore: boolean
+    }
+  }>> {
+    const searchParams = new URLSearchParams()
+    if (params?.limit) searchParams.append('limit', params.limit.toString())
+    if (params?.offset) searchParams.append('offset', params.offset.toString())
+    if (params?.type) searchParams.append('type', params.type)
+    
+    return this.request(`/dashboard/activity?${searchParams.toString()}`)
+  }
+
+  async getDashboardReputation(params?: {
+    limit?: number
+    offset?: number
+    category?: string
+    season?: string
+  }): Promise<ApiResponse<{
+    records: Array<{
+      id: string
+      action: string
+      points: number
+      multiplier: number
+      description?: string
+      category: string
+      season?: string
+      createdAt: string
+    }>
+    stats: {
+      totalPoints: number
+      level: number
+      pointsToNextLevel: number
+      nextLevelPoints: number
+      progressPercentage: number
+      byCategory: Array<{ category: string; points: number; count: number }>
+      byAction: Array<{ action: string; points: number; count: number }>
+      trend: {
+        daily: Array<{ date: string; points: number }>
+        cumulative: Array<{ date: string; points: number; cumulative: number }>
+      }
+    }
+    pagination: {
+      total: number
+      limit: number
+      offset: number
+      hasMore: boolean
+    }
+  }>> {
+    const searchParams = new URLSearchParams()
+    if (params?.limit) searchParams.append('limit', params.limit.toString())
+    if (params?.offset) searchParams.append('offset', params.offset.toString())
+    if (params?.category) searchParams.append('category', params.category)
+    if (params?.season) searchParams.append('season', params.season)
+    
+    return this.request(`/dashboard/reputation?${searchParams.toString()}`)
+  }
+
+  // ============ 声誉系统API ============
+  async getReputationLeaderboard(params?: {
+    timeRange?: string
+    category?: string
+    limit?: number
+    offset?: number
+  }): Promise<ApiResponse<{
+    leaderboard: Array<{
+      userId: string
+      username: string
+      avatarUrl?: string
+      bio?: string
+      skills: string[]
+      totalPoints: number
+      rank: number
+      joinedAt: string
+    }>
+    meta: {
+      timeRange: string
+      category?: string
+      totalUsers: number
+      averageScore: number
+      categoryStats: Array<{
+        category: string
+        totalPoints: number
+        userCount: number
+      }>
+    }
+    pagination: {
+      limit: number
+      offset: number
+      hasMore: boolean
+    }
+  }>> {
+    const searchParams = new URLSearchParams()
+    if (params?.timeRange) searchParams.append('timeRange', params.timeRange)
+    if (params?.category) searchParams.append('category', params.category)
+    if (params?.limit) searchParams.append('limit', params.limit.toString())
+    if (params?.offset) searchParams.append('offset', params.offset.toString())
+    
+    return this.request(`/reputation/leaderboard?${searchParams.toString()}`)
+  }
+
+  async getUserReputation(userId: string): Promise<ApiResponse<{
+    user: {
+      id: string
+      username: string
+      avatarUrl?: string
+      reputationScore: number
+      createdAt: string
+    }
+    totalPoints: number
+    records: Array<{
+      id: string
+      action: string
+      points: number
+      multiplier: number
+      description?: string
+      category: string
+      season?: string
+      createdAt: string
+    }>
+    byCategory: Array<{
+      category: string
+      points: number
+      count: number
+    }>
+    byAction: Array<{
+      action: string
+      points: number
+      count: number
+    }>
+  }>> {
+    return this.request(`/reputation/${userId}`)
+  }
+
+  async recalculateUserReputation(data: {
+    userId?: string
+    recalculateAll?: boolean
+  }): Promise<ApiResponse<{
+    message: string
+  }>> {
+    return this.request('/reputation/calculate', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
   }
 
   // 用户黑客松参与历史
@@ -1651,6 +1947,107 @@ class ApiService {
     bio?: string
   }): Promise<ApiResponse<{ user: User; token: string }>> {
     return this.request('/auth/wallet-signup', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
+  // ==================== 凭证管理 ====================
+
+  /**
+   * 获取用户凭证列表
+   */
+  async getUserCredentials(params?: {
+    page?: number
+    limit?: number
+    category?: string
+    status?: string
+    sort?: string
+    order?: string
+  }): Promise<ApiResponse<{
+    credentials: any[]
+    pagination: {
+      page: number
+      limit: number
+      total: number
+      totalPages: number
+    }
+    stats: {
+      total: number
+      verified: number
+      public: number
+      revoked: number
+      totalViews: number
+    }
+  }>> {
+    const searchParams = new URLSearchParams()
+    if (params?.page) searchParams.set('page', params.page.toString())
+    if (params?.limit) searchParams.set('limit', params.limit.toString())
+    if (params?.category) searchParams.set('category', params.category)
+    if (params?.status) searchParams.set('status', params.status)
+    if (params?.sort) searchParams.set('sort', params.sort)
+    if (params?.order) searchParams.set('order', params.order)
+
+    const url = searchParams.toString() 
+      ? `/dashboard/credentials?${searchParams.toString()}`
+      : '/dashboard/credentials'
+
+    return this.request(url)
+  }
+
+  /**
+   * 生成新凭证
+   */
+  async generateCredential(data: {
+    templateId?: string
+    title: string
+    description?: string
+    credentialType: string
+    category: string
+    tags: string[]
+    skillsProven: string[]
+    expirationDays?: number
+    isPublic: boolean
+    credentialSubject: any
+    evidence?: any[]
+  }): Promise<ApiResponse<{
+    credential: any
+    ipfsHash: string
+  }>> {
+    return this.request('/credentials/generate', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+
+  /**
+   * 验证凭证
+   */
+  async verifyCredential(hash: string): Promise<ApiResponse<{
+    credential: any
+    isValid: boolean
+    verificationRecord: any
+  }>> {
+    return this.request(`/credentials/${hash}/verify`)
+  }
+
+  /**
+   * 获取凭证模板
+   */
+  async getCredentialTemplates(): Promise<ApiResponse<{
+    templates: any[]
+  }>> {
+    return this.request('/credentials/templates')
+  }
+
+  /**
+   * 直接上传凭证数据到IPFS
+   */
+  async uploadCredentialToIPFS(data: any): Promise<ApiResponse<{
+    hash: string
+    url: string
+  }>> {
+    return this.request('/credentials/ipfs/upload', {
       method: 'POST',
       body: JSON.stringify(data),
     })

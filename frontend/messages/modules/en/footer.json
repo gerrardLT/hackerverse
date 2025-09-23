@@ -1,0 +1,36 @@
+{
+  "description": "IPFS-based decentralized hackathon platform, connecting global developers to build the Web3 future.",
+  "cta": {
+    "badge": "Join the Future",
+    "title": "Ready to Start Building?",
+    "description": "Connect with global developers, participate in cutting-edge hackathons, and build the decentralized future together.",
+    "exploreHackathons": "Explore Hackathons",
+    "createTeam": "Create Team"
+  },
+  "stats": {
+    "projects": "Projects",
+    "developers": "Developers"
+  },
+  "social": {
+    "title": "Follow Us"
+  },
+  "platform": "Platform",
+  "hackathons": "Hackathons",
+  "projects": "Projects",
+  "community": "Developer Community",
+  "teams": "Teams",
+  "resources": "Resources",
+  "docs": "Documentation",
+  "apiDocs": "API Docs",
+  "blog": "Blog",
+  "helpCenter": "Help Center",
+  "about": "About",
+  "aboutUs": "About Us",
+  "careers": "Join Us",
+  "privacy": "Privacy Policy",
+  "terms": "Terms of Service",
+  "location": "Global",
+  "madeWith": "Made with",
+  "forCommunity": "for the community",
+  "copyright": "© 2024 HackX. All rights reserved. Built with ❤️ for the global developer community."
+}

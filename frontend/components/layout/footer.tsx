@@ -193,7 +193,6 @@ export function Footer() {
               <ul className="space-y-3">
                 {[
                   { href: "/hackathons", label: t('hackathons') },
-                  { href: "/projects", label: t('projects') },
                   { href: "/community", label: t('community') },
                   { href: "/teams", label: t('teams') }
                 ].map(({ href, label }) => (

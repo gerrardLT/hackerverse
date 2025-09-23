@@ -1,0 +1,323 @@
+{
+  "title": "我的项目",
+  "description": "管理和跟踪您在不同黑客松中的 {total} 个项目",
+  "auth": {
+    "loginRequired": "需要登录",
+    "login": "登录"
+  },
+  "actions": {
+    "create": "创建项目",
+    "createFirst": "创建您的第一个项目",
+    "confirmDelete": "确认删除",
+    "deleteWarning": "确定要删除'{title}'吗？此操作无法撤销。",
+    "edit": "编辑",
+    "delete": "删除",
+    "deleting": "删除中...",
+    "share": "分享",
+    "goBack": "返回",
+    "backToProjects": "返回项目列表",
+    "save": "保存更改",
+    "viewProject": "查看项目"
+  },
+  "stats": {
+    "total": "总计",
+    "draft": "草稿",
+    "readyToSubmit": "准备提交",
+    "submitted": "已提交",
+    "reviewed": "已评审",
+    "winner": "获奖",
+    "rejected": "被拒绝",
+    "submissions": "提交记录"
+  },
+  "tabs": {
+    "all": "全部",
+    "draft": "草稿",
+    "ready": "准备提交",
+    "submitted": "已提交",
+    "reviewed": "已评审",
+    "winner": "获奖",
+    "rejected": "被拒绝"
+  },
+  "search": {
+    "placeholder": "按标题或描述搜索项目..."
+  },
+  "sort": {
+    "updated": "最后更新",
+    "created": "创建时间",
+    "title": "标题",
+    "status": "状态",
+    "desc": "降序",
+    "asc": "升序"
+  },
+  "empty": {
+    "noProjects": "还没有项目。创建您的第一个项目开始吧！",
+    "noProjectsWithStatus": "没有找到此状态的项目。",
+    "noTechnologies": "未指定技术栈",
+    "noTags": "未指定标签"
+  },
+  "links": {
+    "code": "代码",
+    "demo": "演示",
+    "video": "视频",
+    "presentation": "演示文稿"
+  },
+  "create": {
+    "title": "创建项目",
+    "description": "为黑客松和比赛创建新项目",
+    "autoSaving": "自动保存中...",
+    "hidePreview": "隐藏预览",
+    "showPreview": "显示预览",
+    "projectDetails": "项目详情",
+    "fillDetails": "在下方填写项目信息",
+    "completion": "完成度",
+    "basicInfo": "基础信息",
+    "techStack": "技术栈",
+    "links": "项目链接",
+    "settings": "项目设置",
+    "saving": "保存中...",
+    "saveAsDraft": "保存为草稿",
+    "markAsReady": "标记为准备提交",
+    "preview": "预览",
+    "previewDescription": "预览您的项目显示效果",
+    "previewEmpty": "请先添加项目标题来查看预览"
+  },
+  "form": {
+    "title": "项目标题",
+    "titlePlaceholder": "输入您的项目标题...",
+    "description": "项目描述",
+    "descriptionPlaceholder": "描述您的项目、目标和功能...",
+    "characters": "字符",
+    "technologies": "使用技术",
+    "technologiesPlaceholder": "例如：React, Node.js, Python...",
+    "pressEnterToAdd": "按回车键添加",
+    "tags": "项目标签",
+    "tagsPlaceholder": "例如：web3, 移动应用, AI...",
+    "githubUrl": "GitHub 仓库",
+    "githubUrlPlaceholder": "https://github.com/username/project",
+    "demoUrl": "在线演示链接",
+    "demoUrlPlaceholder": "https://your-demo-site.com",
+    "videoUrl": "演示视频链接",
+    "videoUrlPlaceholder": "https://youtube.com/watch?v=...",
+    "presentationUrl": "演示文稿链接",
+    "presentationUrlPlaceholder": "https://slides.com/presentation",
+    "isPublic": "公开项目",
+    "isPublicDescription": "让所有人都能看到此项目",
+    "public": "公开",
+    "private": "私有",
+    "publicDescription": "对所有人可见",
+    "privateDescription": "仅对您可见",
+    "visibility": "可见性",
+    "status": "状态"
+  },
+  "validation": {
+    "titleRequired": "项目标题不能为空",
+    "titleTooLong": "项目标题不能超过100个字符",
+    "descriptionTooLong": "项目描述不能超过2000个字符",
+    "invalidUrl": "请输入有效的URL",
+    "error": "验证错误",
+    "fixErrors": "请修复验证错误后继续"
+  },
+  "success": {
+    "created": "项目创建成功",
+    "savedAsDraft": "项目已保存为草稿，您可以稍后继续编辑。",
+    "readyToSubmit": "项目已标记为准备提交到黑客松。",
+    "projectUpdated": "项目更新成功"
+  },
+  "errors": {
+    "createFailed": "创建项目失败",
+    "unknown": "发生未知错误"
+  },
+  "status": {
+    "draft": "草稿",
+    "ready_to_submit": "准备提交"
+  },
+  "filter": {
+    "title": "项目筛选",
+    "description": "通过多种条件筛选和搜索项目",
+    "results": "找到 {count} 个项目",
+    "activeFilters": "{count} 个活跃筛选条件",
+    "search": {
+      "label": "搜索",
+      "placeholder": "按标题或描述搜索项目..."
+    },
+    "sort": {
+      "label": "排序方式",
+      "created": "创建时间",
+      "updated": "最后更新",
+      "likes": "点赞数",
+      "comments": "评论数"
+    },
+    "order": {
+      "label": "排序",
+      "desc": "降序",
+      "asc": "升序"
+    },
+    "tracks": {
+      "label": "赛道"
+    },
+    "tags": {
+      "label": "标签"
+    },
+    "technologies": {
+      "label": "技术栈"
+    }
+  },
+  "like": {
+    "like": "点赞",
+    "unlike": "取消点赞",
+    "loginRequired": "需要登录",
+    "loginRequiredDesc": "请先登录后再点赞项目",
+    "likeSuccess": "点赞成功！",
+    "likeSuccessDesc": "您已点赞此项目",
+    "unlikeSuccess": "取消点赞",
+    "unlikeSuccessDesc": "您已取消点赞此项目",
+    "likeFailed": "点赞失败",
+    "unlikeFailed": "取消点赞失败",
+    "operationFailed": "操作失败",
+    "networkError": "网络错误，请重试"
+  },
+  "comments": {
+    "title": "评论",
+    "description": "分享您对此项目的想法和反馈",
+    "placeholder": "写下您的评论...",
+    "replyPlaceholder": "回复 {username}...",
+    "editPlaceholder": "编辑您的评论...",
+    "submit": "发表评论",
+    "submitReply": "发表回复",
+    "edit": "编辑",
+    "delete": "删除",
+    "cancel": "取消",
+    "save": "保存",
+    "reply": "回复",
+    "replies": "{count} 条回复",
+    "edited": "已编辑",
+    "loading": "加载评论中...",
+    "loadFailed": "加载评论失败",
+    "loadError": "加载评论失败",
+    "loginRequired": "需要登录",
+    "loginRequiredDesc": "请先登录后再评论",
+    "contentRequired": "需要内容",
+    "contentRequiredDesc": "请输入评论内容",
+    "submitSuccess": "评论已发表",
+    "submitSuccessDesc": "您的评论已成功发表",
+    "submitFailed": "发表失败",
+    "submitError": "发表评论失败",
+    "replySuccess": "回复已发表",
+    "replySuccessDesc": "您的回复已成功发表",
+    "replyFailed": "回复失败",
+    "replyError": "发表回复失败",
+    "editSuccess": "评论已更新",
+    "editSuccessDesc": "您的评论已成功更新",
+    "editFailed": "更新失败",
+    "editError": "更新评论失败",
+    "deleteSuccess": "评论已删除",
+    "deleteSuccessDesc": "您的评论已成功删除",
+    "deleteFailed": "删除失败",
+    "deleteError": "删除评论失败",
+    "deleteConfirm": "删除评论",
+    "deleteConfirmDesc": "确定要删除此评论吗？此操作无法撤销。",
+    "noComments": "暂无评论",
+    "loginToComment": "请登录后发表评论"
+  },
+  "details": {
+    "projectInfo": "项目信息",
+    "statistics": "统计数据",
+    "creator": "创建者",
+    "visibility": "可见性",
+    "created": "创建时间",
+    "updated": "最后更新",
+    "averageScore": "平均评分"
+  },
+  "tabs": {
+    "overview": "概览",
+    "team": "团队",
+    "submissions": "提交历史",
+    "scores": "评分",
+    "activity": "活动",
+    "comments": "评论"
+  },
+  "team": {
+    "members": "成员",
+    "noTeam": "无团队",
+    "individualProject": "这是个人项目"
+  },
+  "submissions": {
+    "title": "提交历史",
+    "submittedAt": "提交时间",
+    "empty": "暂无提交",
+    "noSubmissions": "此项目尚未提交到任何黑客松"
+  },
+  "scores": {
+    "title": "评委评分",
+    "innovation": "创新性",
+    "technical": "技术性",
+    "userExperience": "用户体验",
+    "business": "商业价值",
+    "presentation": "展示效果",
+    "empty": "暂无评分",
+    "noScores": "此项目尚未被评委评分"
+  },
+  "activity": {
+    "title": "活动时间线",
+    "comingSoon": "即将推出",
+    "description": "活动时间线功能即将推出"
+  },
+  "loading": {
+    "project": "正在加载项目详情..."
+  },
+  "edit": {
+    "title": "编辑项目",
+    "description": "更新您的项目信息和设置"
+  },
+  "interactions": {
+    "title": "项目互动",
+    "description": "查看此项目的互动统计",
+    "loading": "加载统计中...",
+    "loadError": "加载统计失败",
+    "likes": "点赞",
+    "comments": "评论",
+    "stats": {
+      "likes": "点赞",
+      "comments": "评论",
+      "feedbacks": "反馈"
+    },
+    "engagement": {
+      "high": "高活跃度",
+      "medium": "中等活跃度",
+      "low": "低活跃度"
+    },
+    "engagementScore": "互动得分",
+    "totalInteractions": "总互动数",
+    "daysSince": "创建天数",
+    "mostActiveType": "最活跃",
+    "mostActive": {
+      "likes": "点赞",
+      "comments": "评论",
+      "feedbacks": "反馈",
+      "general": "一般活动"
+    },
+    "recentActivity": "最近活动",
+    "recentComments": "最近评论",
+    "recentLikes": "最近点赞",
+    "more": "更多",
+    "yourInteractions": "您的互动",
+    "youLiked": "您已点赞",
+    "youCommented": "您已评论",
+    "youFeedback": "您已反馈"
+  },
+  "tabs": {
+    "all": "所有项目",
+    "draft": "草稿",
+    "ready": "准备提交",
+    "submitted": "已提交",
+    "reviewed": "审核中",
+    "winner": "获奖项目",
+    "rejected": "已拒绝",
+    "overview": "概览",
+    "team": "团队",
+    "submissions": "提交历史",
+    "scores": "评分",
+    "activity": "活动时间线",
+    "comments": "评论"
+  }
+}

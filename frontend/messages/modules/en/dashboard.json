@@ -1,0 +1,340 @@
+{
+  "title": "Dashboard",
+  "overview": "Overview",
+  "myHackathons": "My Hackathons",
+  "myTeams": "My Teams",
+  "myProjects": "My Projects",
+  "myCommunity": "My Community",
+  "pleaseLogin": "Please login first",
+  "pleaseLoginDesc": "Login to view your personal dashboard, manage hackathon projects and teams",
+  "login": "Login",
+  "level": "Level",
+  "toNextLevel": "to next level",
+  "profile": {
+    "edit": "Edit",
+    "save": "Save",
+    "cancel": "Cancel",
+    "uploading": "Uploading...",
+    "userAvatar": "User Avatar",
+    "enterUsername": "Enter username",
+    "techStack": "Tech Stack",
+    "noTechStack": "No tech stack set yet, please add below",
+    "addTechStack": "Add tech stack (e.g.: React, Node.js)",
+    "addButton": "Add",
+    "skillExists": "Skill already exists",
+    "skillExistsDesc": "This skill is already in the list",
+    "skillLimit": "Skill limit reached",
+    "skillLimitDesc": "You can add up to 20 skills maximum",
+    "skillTooLong": "Skill name too long",
+    "skillTooLongDesc": "Skill name can be up to 50 characters maximum",
+    "skillInstructions": "Press Enter or click 'Add' button to add skills. Maximum 20 skills, 50 characters each.",
+    "notSetYet": "Not set yet"
+  },
+  "actions": {
+    "joinNewHackathon": "Join New Hackathon"
+  },
+  "quickActions": {
+    "title": "Quick Actions",
+    "description": "Access your most used features quickly",
+    "projects": "My Projects",
+    "hackathons": "Hackathons",
+    "teams": "Teams",
+    "community": "Community"
+  },
+  "statistics": {
+    "participatedHackathons": "Participated Hackathons",
+    "participatedDesc": "Total number of hackathons participated",
+    "submittedProjects": "Submitted Projects",
+    "submittedDesc": "Total projects created and participated",
+    "wonPrizes": "Won Awards",
+    "wonPrizesDesc": "Total winning projects",
+    "reputationScore": "Reputation Score",
+    "reputationScoreDesc": "Reputation score based on participation and achievements",
+    "participated": "Participated",
+    "won": "Won",
+    "created": "Created",
+    "reputation": "Reputation",
+    "prizesTooltip": {
+      "title": "Award calculation rules:",
+      "rule1": "• Count projects with 'WINNER' status",
+      "rule2": "• Include winning projects you created",
+      "rule3": "• Include team projects you participated in that won"
+    },
+    "reputationTooltip": {
+      "title": "Reputation calculation formula:",
+      "rule1": "• Participated in hackathons: +50 points each",
+      "rule2": "• Submitted projects: +100 points each",
+      "rule3": "• Won awards: +200 points each",
+      "rule4": "• Maximum score: 1000 points",
+      "current": "Current: {participated}×50 + {projects}×100 + {prizes}×200 = {total}"
+    }
+  },
+  "tabs": {
+    "overview": "Overview",
+    "hackathons": "My Hackathons",
+    "projects": "My Projects",
+    "teams": "My Teams",
+    "community": "My Community",
+    "enhanced": "Enhanced Stats",
+    "achievements": "My Achievements",
+    "activity": "Activity Timeline",
+    "reputation": "Reputation Analysis",
+    "credentials": "My Credentials"
+  },
+  "enhanced": {
+    "title": "Enhanced Statistics",
+    "loading": "Loading statistics...",
+    "loadFailed": "Load Failed",
+    "networkError": "Network error, please try again later",
+    "noDataError": "Unable to load statistics",
+    "hackathons": {
+      "title": "Hackathon Participation",
+      "organizer": "Organizer",
+      "participant": "Participant",
+      "participated": "Participated",
+      "organized": "Organized"
+    },
+    "projects": {
+      "title": "Project Submissions",
+      "winRate": "Win Rate",
+      "submitted": "Submitted Projects",
+      "winningProjects": "Winning Projects"
+    },
+    "reputation": {
+      "title": "Reputation System",
+      "level": "Level",
+      "score": "Reputation Score",
+      "progress": "Upgrade Progress",
+      "points": "points"
+    },
+    "achievements": {
+      "title": "Achievement System",
+      "completed": "Completed",
+      "completionRate": "Completion Rate",
+      "totalAchievements": "Total Achievements"
+    },
+    "teams": {
+      "title": "Team Participation",
+      "asJudge": "Judge",
+      "times": "times"
+    },
+    "community": {
+      "title": "Community Activity",
+      "posts": "Posts",
+      "replies": "Replies",
+      "likes": "Likes"
+    },
+    "social": {
+      "title": "Social Network",
+      "followers": "Followers",
+      "following": "Following",
+      "people": "people"
+    },
+    "trend": {
+      "title": "Activity Trends",
+      "recent3Months": "Recent 3 months",
+      "monthlyTrend": "Activity Trends",
+      "trendDesc": "Recent 12 months participation and project submission trends",
+      "participationTrend": "Hackathon Participation Trend",
+      "projectTrend": "Project Submission Trend",
+      "month": "Month"
+    }
+  },
+  "recentActivity": {
+    "title": "Recent Activity",
+    "description": "Your latest activities",
+    "noActivities": "No recent activities"
+  },
+  "recommendations": {
+    "title": "Recommended Hackathons",
+    "description": "Based on your skills and interests",
+    "loading": "Loading recommendations...",
+    "noRecommendations": "No recommended hackathons",
+    "browseAll": "Browse All Hackathons",
+    "view": "View",
+    "daysUntilStart": "{days} days until start",
+    "inProgress": "In progress"
+  },
+  "hackathons": {
+    "participated": "Participated Hackathons",
+    "participatedDesc": "Hackathons you joined as a participant",
+    "created": "Created Hackathons",
+    "createdDesc": "Hackathons you created as an organizer",
+    "loading": "Loading...",
+    "noParticipated": "You haven't participated in any hackathons yet",
+    "noCreated": "You haven't created any hackathons yet",
+    "joinHackathons": "Join Hackathons",
+    "createHackathon": "Create Hackathon",
+    "viewDetails": "View Details",
+    "manage": "Manage",
+    "organizer": "Organizer",
+    "prizePool": "Prize Pool: ${amount}",
+    "inProgress": "In Progress"
+  },
+  "projects": {
+    "title": "My Projects",
+    "description": "All projects you submitted",
+    "loading": "Loading...",
+    "noProjects": "You haven't submitted any projects yet",
+    "joinAndSubmit": "Join hackathons and submit projects",
+    "viewProject": "View Project",
+    "code": "Code",
+    "demo": "Demo",
+    "score": "Score: {score}",
+    "team": "Team: {name} ({count} members)",
+    "status": {
+      "submitted": "Submitted"
+    }
+  },
+  "teams": {
+    "title": "My Teams",
+    "description": "Teams you participate in",
+    "loading": "Loading...",
+    "noTeams": "You haven't joined any teams yet",
+    "findTeams": "Find Teams",
+    "viewTeam": "View Team",
+    "manageTeam": "Manage Team",
+    "teamLeader": "Team Leader",
+    "members": "{count} members",
+    "projects": "{count} projects",
+    "status": {
+      "active": "Active"
+    }
+  },
+  "community": {
+    "myBookmarks": "My Bookmarks",
+    "myLikes": "My Likes",
+    "myPosts": "My Posts",
+    "myFollowing": "My Following",
+    "viewBookmarks": "View Bookmarks",
+    "viewBookmarksDesc": "View posts I bookmarked",
+    "viewLikes": "View Likes",
+    "viewLikesDesc": "View posts I liked",
+    "managePosts": "Manage my published posts",
+    "viewMyPosts": "View My Posts",
+    "manageFollowing": "Manage users I follow",
+    "viewFollowing": "View Following"
+  },
+  "toasts": {
+    "authRequired": "Authentication Required",
+    "reloginRequired": "Please login again",
+    "avatarUploadSuccess": "Avatar Upload Successful",
+    "avatarUploadSuccessDesc": "New avatar set, please click save to confirm changes",
+    "avatarUploadFailed": "Avatar Upload Failed",
+    "avatarUploadRetry": "Please try again later",
+    "avatarUploadServerError": "Server response error",
+    "avatarUploadNetworkError": "Network error, please try again later",
+    "fileFormatError": "File Format Error",
+    "fileFormatDesc": "Please select image files (JPG, PNG, GIF, WebP)",
+    "fileTooLarge": "File Too Large",
+    "fileTooLargeDesc": "Image size cannot exceed 5MB",
+    "saveSuccess": "Save Successful",
+    "saveSuccessDesc": "User information updated",
+    "saveFailed": "Save Failed",
+    "saveFailedRetry": "Please try again later",
+    "saveNetworkError": "Network error, please try again later"
+  },
+  "errors": {
+    "getUserStats": "Failed to get user statistics",
+    "getRecommendations": "Failed to get recommended hackathons",
+    "getUserHackathons": "Failed to get user hackathons",
+    "getUserProjects": "Failed to get user projects",
+    "getUserTeams": "Failed to get user teams",
+    "debugInfo": "Debug info:"
+  },
+  "achievements": {
+    "title": "My Achievements",
+    "loading": "Loading achievements...",
+    "filters": "Filters",
+    "category": "Category",
+    "rarity": "Rarity",
+    "completed": "Completed",
+    "all": "All",
+    "general": "General",
+    "hackathon": "Hackathon",
+    "project": "Project",
+    "team": "Team",
+    "community": "Community",
+    "common": "Common",
+    "rare": "Rare",
+    "epic": "Epic",
+    "legendary": "Legendary",
+    "completedOnly": "Completed Only",
+    "progress": "Progress",
+    "level": "Level",
+    "noAchievements": "No achievements found",
+    "completedAt": "Completed on",
+    "stats": {
+      "total": "Total Achievements",
+      "completed": "Completed",
+      "inProgress": "In Progress"
+    }
+  },
+  "activity": {
+    "title": "Activity Timeline",
+    "loading": "Loading...",
+    "loadMore": "Load More",
+    "noActivity": "No recent activity",
+    "filters": "Filter by Type",
+    "all": "All Activities",
+    "loadFailed": "Load Failed",
+    "loadFailedDesc": "Unable to load activity records",
+    "description": "Record all your activities on the platform",
+    "types": {
+      "hackathon_joined": "Joined Hackathon",
+      "project_submitted": "Submitted Project",
+      "team_joined": "Joined Team",
+      "project_scored": "Project Scored",
+      "reputation_gained": "Reputation Gained",
+      "prize_won": "Won Prize",
+      "project_liked": "Liked Project",
+      "community_posted": "Posted in Community"
+    },
+    "time": {
+      "justNow": "Just now",
+      "minutesAgo": "{minutes} minutes ago",
+      "hoursAgo": "{hours} hours ago",
+      "daysAgo": "{days} days ago",
+      "monthsAgo": "{months} months ago"
+    },
+    "viewDetails": "View Details",
+    "totalActivities": "Total Activities",
+    "stats": {
+      "title": "Activity Statistics"
+    }
+  },
+  "reputation": {
+    "title": "Reputation Analysis",
+    "loading": "Loading reputation data...",
+    "loadFailed": "Load Failed",
+    "networkError": "Network error, please try again later",
+    "totalScore": "Total Reputation",
+    "currentLevel": "Current Level",
+    "nextLevel": "Next Level",
+    "progress": "Progress",
+    "trend": "30-Day Trend",
+    "recentRecords": "Recent Records",
+    "noRecords": "No reputation records",
+    "level": "Level",
+    "pointsToUpgrade": "Still need {points} points to upgrade",
+    "last7Days": "Last 7 days",
+    "overview": "Overview",
+    "records": "Records",
+    "analysis": "Trend Analysis",
+    "categoryStats": "Statistics by Category",
+    "actionStats": "Statistics by Action",
+    "times": "times",
+    "points": "points",
+    "allCategories": "All Categories",
+    "recordsDesc": "View detailed point earning records",
+    "trendDesc": "Recent 30 days point earning trends",
+    "multiplier": "Multiplier",
+    "cumulativeTrend": "Cumulative Point Trends",
+    "categories": {
+      "hackathon": "Hackathon",
+      "project": "Project",
+      "team": "Team",
+      "community": "Community"
+    }
+  }
+}

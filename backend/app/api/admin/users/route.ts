@@ -8,7 +8,7 @@ const querySchema = z.object({
   page: z.string().transform(Number).pipe(z.number().min(1)).default('1'),
   limit: z.string().transform(Number).pipe(z.number().min(1).max(100)).default('20'),
   search: z.string().optional(),
-  role: z.enum(['admin', 'moderator', 'user']).optional(),
+  role: z.enum(['ADMIN', 'MODERATOR', 'JUDGE', 'USER']).optional(),
   status: z.enum(['ACTIVE', 'SUSPENDED', 'BANNED']).optional(),
   sortBy: z.enum(['createdAt', 'username', 'email', 'lastLoginAt']).default('createdAt'),
   sortOrder: z.enum(['asc', 'desc']).default('desc'),
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     }
 
     // 检查用户是否是管理员
-    if (user.role !== 'admin') {
+    if (user.role !== 'ADMIN') {
       return NextResponse.json(
         { success: false, error: '权限不足' },
         { status: 403 }
@@ -81,13 +81,16 @@ export async function GET(request: NextRequest) {
           avatarUrl: true,
           role: true,
           status: true,
+          reputationScore: true,
+          emailVerified: true,
+          lastLoginAt: true,
           createdAt: true,
           updatedAt: true,
           _count: {
             select: {
               participations: true,
               projects: true,
-              communityPosts: true,
+              organizedHackathons: true
             }
           }
         }

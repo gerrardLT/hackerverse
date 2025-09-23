@@ -424,13 +424,17 @@ export default function CreateHackathonPage() {
         return
       }
 
-      if (registrationDeadline && startDate && registrationDeadline >= startDate) {
-        toast({
-          title: t('validation.dateError'),
-          description: t('validation.registrationBeforeStart'),
-          variant: 'destructive',
-        })
-        return
+      // 允许注册截止时间等于或晚于开始时间，但不能超过开始后24小时
+      if (registrationDeadline && startDate) {
+        const maxRegistrationTime = new Date(startDate.getTime() + 24 * 60 * 60 * 1000) // 开始后24小时
+        if (registrationDeadline > maxRegistrationTime) {
+          toast({
+            title: t('validation.dateError'),
+            description: t('validation.registrationTooLate'),
+            variant: 'destructive',
+          })
+          return
+        }
       }
 
       if (registrationStartDate && registrationDeadline && registrationStartDate >= registrationDeadline) {
@@ -598,7 +602,10 @@ export default function CreateHackathonPage() {
           title: t('toasts.hackathonCreated'),
           description: (
             <div className="space-y-1">
-              <p>{t('toasts.createdOnBlockchain')}</p>
+              <p>{t('toasts.pendingReview')}</p>
+              <p className="text-xs text-muted-foreground">
+                {t('toasts.reviewNotice')}
+              </p>
               <p className="text-xs text-muted-foreground">
                 {t('toasts.contractId', { contractId: response.data.hackathon.contractId })}
               </p>
@@ -609,7 +616,7 @@ export default function CreateHackathonPage() {
               )}
             </div>
           ),
-          duration: 5000, // 延长显示时间
+          duration: 6000, // 延长显示时间以便用户阅读审核提示
         })
         
         // ⭐ 创建成功后跳转回黑客松列表页

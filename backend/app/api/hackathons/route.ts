@@ -410,12 +410,14 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    if (registrationDeadline >= startDate) {
+    // 允许注册截止时间等于或晚于开始时间，但不能超过开始后24小时
+    const maxRegistrationTime = new Date(startDate.getTime() + 24 * 60 * 60 * 1000) // 开始后24小时
+    if (registrationDeadline > maxRegistrationTime) {
       return NextResponse.json(
         { 
           success: false,
-          error: t('hackathons.invalidRegistrationDeadline'),
-          code: 'INVALID_REGISTRATION_DEADLINE'
+          error: t('hackathons.registrationTooLate'),
+          code: 'REGISTRATION_TOO_LATE'
         },
         { status: 400 }
       )
@@ -516,8 +518,8 @@ export async function POST(request: NextRequest) {
       console.error('IPFS上传失败:', ipfsError)
       return NextResponse.json({
         success: false,
-        error: t('hackathons.ipfsUploadFailed', locale),
-        details: ipfsError instanceof Error ? ipfsError.message : t('errors.unknownError', locale)
+        error: t('hackathons.ipfsUploadFailed'),
+        details: ipfsError instanceof Error ? ipfsError.message : t('errors.unknownError')
       }, { status: 500 })
     }
     
@@ -533,7 +535,7 @@ export async function POST(request: NextRequest) {
       console.error('智能合约调用失败:', contractError)
       return NextResponse.json({
         success: false,
-        error: t('hackathons.smartContractCallFailed', locale),
+        error: t('hackathons.smartContractCallFailed'),
         code: 'CONTRACT_ERROR',
         details: contractError instanceof Error ? contractError.message : '未知错误'
       }, { status: 500 })
@@ -556,7 +558,7 @@ export async function POST(request: NextRequest) {
         rules: validatedData.rules,
         isPublic: validatedData.isPublic,
         featured: validatedData.featured,
-        status: 'ACTIVE', // 新创建的黑客松设为活跃状态
+        status: 'PENDING_REVIEW', // 新创建的黑客松需要审核后才能发布
         organizerId: user.id,
         
         // ⭐ 新增区块链相关字段

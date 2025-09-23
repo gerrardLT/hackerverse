@@ -1,0 +1,126 @@
+{
+  "stats": {
+    "title": "平台数据",
+    "subtitle": "HackX 正在成为全球最大的去中心化黑客松平台！",
+    "users": {
+      "label": "注册开发者",
+      "description": "来自全球的开发者社区"
+    },
+    "hackathons": {
+      "label": "举办黑客松",
+      "description": "成功举办的黑客松活动"
+    },
+    "projects": {
+      "label": "提交项目",
+      "description": "创新项目和解决方案"
+    },
+    "countries": {
+      "label": "覆盖国家",
+      "description": "全球范围的影响力"
+    },
+    "realTimeData": "实时数据",
+    "globalMetrics": "全球指标",
+    "growingCommunity": "不断增长的社区"
+  },
+  "featured": {
+    "title": "特色黑客松",
+    "subtitle": "加入这些令人兴奋的挑战，在元宇宙中展示你的技能。",
+    "daysLeft": "天剩余",
+    "prizePool": "奖金池",
+    "participants": "参与者",
+    "joinHackathon": "加入黑客松",
+    "viewDetails": "查看详情",
+    "viewAllHackathons": "查看所有黑客松"
+  },
+  "hero": {
+    "title": {
+      "part1": "构建未来",
+      "part2": " 去中心化",
+      "part3": "黑客松平台"
+    },
+    "description": "基于 IPFS 的开源黑客松平台，连接全球数百万开发者，发现创新项目，获得投资机会，构建 Web3 未来！",
+    "searchPlaceholder": "搜索黑客松...",
+    "searching": "搜索中...",
+    "startExploring": "开始探索",
+    "joinHackathon": "参与黑客松",
+    "organizeEvent": "组织活动",
+    "searchSuggestions": {
+      "history": {
+        "title": "搜索历史",
+        "clear": "清空",
+        "loadError": "解析搜索历史失败"
+      },
+      "popular": {
+        "title": "热门搜索",
+        "loadingStart": "开始加载热门搜索词...",
+        "loadSuccess": "热门搜索词加载成功",
+        "loadError": "加载热门搜索词失败",
+        "fallbackNote": "API响应无效，使用后备数据",
+        "fallbackTerms": [
+          "Web3",
+          "DeFi",
+          "NFT",
+          "区块链",
+          "AI",
+          "智能合约",
+          "元宇宙",
+          "GameFi",
+          "DAO",
+          "Layer2"
+        ]
+      },
+      "navigation": {
+        "searchRedirectError": "搜索跳转失败"
+      }
+    }
+  },
+  "howItWorks": {
+    "title": "如何参与",
+    "subtitle": "四个简单步骤，开启你的黑客松之旅",
+    "steps": {
+      "discover": {
+        "title": "发现黑客松",
+        "description": "浏览和搜索适合你的黑客松活动，筛选技术栈和奖金"
+      },
+      "team": {
+        "title": "组建团队",
+        "description": "找到志同道合的队友，或者加入现有团队开始协作"
+      },
+      "develop": {
+        "title": "开发项目",
+        "description": "在规定时间内开发创新项目，所有文件存储在 IPFS 上"
+      },
+      "reward": {
+        "title": "获得奖励",
+        "description": "接受专业评委评审，获得奖金、投资机会和职业发展"
+      }
+    }
+  },
+  "community": {
+    "title": "加入社区",
+    "subtitle": "与全球开发者连接，分享经验，获得支持，共同构建 Web3 未来",
+    "github": {
+      "description": "开源代码和贡献",
+      "action": "查看代码"
+    },
+    "discord": {
+      "description": "实时交流和讨论",
+      "action": "加入服务器"
+    },
+    "twitter": {
+      "description": "最新动态和公告",
+      "action": "关注我们"
+    },
+    "forum": {
+      "title": "论坛",
+      "description": "深度讨论和问答",
+      "action": "访问论坛"
+    },
+    "cta": {
+      "title": "准备好开始了吗？",
+      "description": "立即加入 HackX，发现下一个改变世界的项目，或者创建你自己的黑客松活动！",
+      "joinButton": "连接钱包加入",
+      "createButton": "创建黑客松"
+    }
+  }
+}

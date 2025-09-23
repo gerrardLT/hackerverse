@@ -1,0 +1,477 @@
+{
+  "title": "黑客松",
+  "subtitle": "发现并参与全球精彩的黑客松活动",
+  "filters": {
+    "title": "筛选条件",
+    "all": "全部",
+    "status": "状态",
+    "technology": "技术",
+    "prizeRange": "奖金范围",
+    "dateRange": "时间范围",
+    "featured": "精选",
+    "activeFilters": "已选筛选条件",
+    "clearAll": "清除全部",
+    "statusOptions": {
+      "all": "全部",
+      "upcoming": "即将开始",
+      "ongoing": "进行中",
+      "completed": "已结束"
+    },
+    "prizeRangeOptions": {
+      "all": "全部",
+      "0-1000": "$0 - $1,000",
+      "1000-10000": "$1,000 - $10,000",
+      "10000+": "$10,000+"
+    },
+    "dateRangeOptions": {
+      "all": "全部",
+      "this-week": "本周",
+      "this-month": "本月",
+      "next-month": "下个月"
+    }
+  },
+  "myHackathons": "我的黑客松",
+  "myProjects": "我的项目",
+  "create": {
+    "title": "创建",
+    "basicInfo": "基本信息",
+    "timeSettings": "时间设置",
+    "prizeSettings": "奖项设置",
+    "rules": "规则要求",
+    "preview": "预览",
+    "publish": "发布",
+    "titlePlaceholder": "输入黑客松标题",
+    "descriptionPlaceholder": "描述您的黑客松...",
+    "requirementsPlaceholder": "列出参与要求...",
+    "rulesPlaceholder": "定义比赛规则...",
+    "success": "黑客松创建成功！",
+    "error": "创建黑客松失败"
+  },
+  "searchResults": "搜索: \"{query}\"",
+  "createHackathon": "创建黑客松",
+  "join": "加入",
+  "leave": "退出",
+  "search": {
+    "placeholder": "搜索黑客松...",
+    "searchHistory": "搜索历史",
+    "clearHistory": "清除",
+    "popularSearches": "热门搜索",
+    "searchTips": "小贴士：试试通过技术栈、主题或奖金数额来搜索，找到最适合你的黑客松活动！"
+  },
+  "card": {
+    "startTime": "开始时间",
+    "endTime": "结束时间",
+    "participants": "参与者",
+    "prizePool": "奖金池",
+    "status": {
+      "registered": "已参加",
+      "submitted": "已提交",
+      "completed": "已完成"
+    },
+    "technologies": "技术栈",
+    "difficulty": "难度",
+    "organizer": "主办方",
+    "location": "地点",
+    "online": "线上",
+    "hybrid": "混合",
+    "inPerson": "线下",
+    "beginner": "初级",
+    "intermediate": "中级",
+    "advanced": "高级",
+    "expert": "专家",
+    "teamSize": "团队规模",
+    "maxTeamSize": "最多{size}人",
+    "individual": "个人",
+    "team": "团队",
+    "viewDetails": "查看详情",
+    "register": "报名",
+    "registered": "已报名",
+    "full": "已满员",
+    "closed": "报名已截止",
+    "upcoming": "即将开始",
+    "ongoing": "进行中",
+    "completed": "已完成",
+    "cancelled": "已取消",
+    "daysLeft": "还有{days}天",
+    "hoursLeft": "还有{hours}小时",
+    "minutesLeft": "还有{minutes}分钟",
+    "ended": "已结束",
+    "countdown": {
+      "startsIn": "{days} 天后开始"
+    },
+    "trending": "热门"
+  },
+  "createForm": {
+    "title": "创建黑客松",
+    "description": "创建你的黑客松活动，吸引全球开发者参与",
+    "auth": {
+      "loginRequired": "请先登录",
+      "login": "登录"
+    },
+    "steps": {
+      "basicInfo": "基本信息",
+      "basicInfoDesc": "设置黑客松的基本信息和时间安排",
+      "prizeSettings": "奖项设置",
+      "prizeSettingsDesc": "配置奖项和赛道",
+      "techRequirements": "技术要求",
+      "techRequirementsDesc": "选择技术栈和要求",
+      "rulesExplanation": "规则说明",
+      "rulesExplanationDesc": "设置规则和评审标准",
+      "judgeTeam": "评委团队",
+      "judgeTeamDesc": "添加评委和赞助商",
+      "previewPublish": "预览发布",
+      "previewPublishDesc": "预览并发布黑客松"
+    },
+    "navigation": {
+      "previous": "上一页",
+      "next": "下一页",
+      "creating": "创建中...",
+      "createHackathon": "创建黑客松"
+    },
+    "basicInfo": {
+      "title": "基本信息",
+      "coverImage": "封面图片",
+      "coverImageDesc": "上传黑客松的封面图片（可选，最大5MB）",
+      "selectImage": "选择图片",
+      "uploading": "上传中...",
+      "supportedFormats": "支持 JPG、PNG、GIF 格式",
+      "hackathonName": "黑客松名称",
+      "hackathonNamePlaceholder": "输入黑客松名称",
+      "eventDescription": "活动描述",
+      "eventDescriptionPlaceholder": "详细描述你的黑客松活动...",
+      "startTime": "开始时间",
+      "selectStartTime": "选择开始时间",
+      "endTime": "结束时间",
+      "selectEndTime": "选择结束时间",
+      "registrationStartTime": "报名开始时间",
+      "selectRegistrationStartTime": "选择报名开始时间",
+      "registrationDeadline": "报名截止时间",
+      "selectRegistrationDeadline": "选择报名截止时间",
+      "eventLocation": "活动地点",
+      "eventLocationPlaceholder": "线上/线下地点",
+      "maxParticipants": "最大参与人数",
+      "maxParticipantsPlaceholder": "不限制请留空",
+      "timeSchedule": "时间安排",
+      "timeScheduleDesc": "设置黑客松的关键时间节点",
+      "timelineEvent": "时间节点 {index}",
+      "eventTitle": "事件标题",
+      "eventTitlePlaceholder": "例如：比赛开始",
+      "time": "时间",
+      "selectTime": "选择时间",
+      "eventDesc": "描述",
+      "eventDescPlaceholder": "描述这个时间节点...",
+      "addTimelineEvent": "添加时间节点",
+      "socialLinks": "项目方社交账号（可选）",
+      "socialLinksDesc": "添加项目方或组织的社交媒体链接，便于参赛者了解更多信息",
+      "officialWebsite": "官方网站",
+      "twitter": "Twitter / X",
+      "discord": "Discord",
+      "telegram": "Telegram",
+      "github": "GitHub",
+      "linkedin": "LinkedIn",
+      "socialLinksAdded": "已添加的社交链接：",
+      "website": "官网",
+      "validationMinLength": "至少需要10个字符（当前：{current}）",
+      "validationEntered": "已输入{current}个字符",
+      "validationValid": "✓"
+    },
+    "prizes": {
+      "title": "奖项设置",
+      "prize": "奖项 {index}",
+      "addPrize": "添加奖项",
+      "prizeName": "奖项名称",
+      "prizeNamePlaceholder": "例如：一等奖",
+      "prizeAmount": "奖金金额（美金 $）",
+      "prizeAmountPlaceholder": "例如：10,000",
+      "winnerCount": "获奖人数",
+      "prizeDescription": "奖项描述",
+      "prizeDescPlaceholder": "描述这个奖项...",
+      "tracks": "赛道设置",
+      "track": "赛道 {index}",
+      "addTrack": "添加赛道",
+      "trackName": "赛道名称",
+      "trackNamePlaceholder": "例如：DeFi 赛道",
+      "trackDescription": "赛道描述",
+      "trackDescPlaceholder": "描述这个赛道的重点和要求..."
+    },
+    "tech": {
+      "title": "技术栈选择",
+      "techDesc": "选择推荐的技术栈，帮助参与者了解活动重点",
+      "selectedTech": "已选择的技术栈"
+    },
+    "rules": {
+      "title": "活动规则",
+      "detailedRules": "详细规则",
+      "detailedRulesPlaceholder": "详细描述黑客松的规则和注意事项...",
+      "participationRequirements": "参与要求",
+      "addRequirement": "添加要求",
+      "requirementPlaceholder": "输入参与要求...",
+      "judgingCriteria": "评审标准",
+      "addCriteria": "添加标准",
+      "criteriaPlaceholder": "输入评审标准..."
+    },
+    "judges": {
+      "title": "评委团队",
+      "judge": "评委 {index}",
+      "addJudge": "添加评委",
+      "judgeName": "姓名",
+      "judgeNamePlaceholder": "评委姓名",
+      "judgePosition": "职位",
+      "judgePositionPlaceholder": "职位/头衔",
+      "judgeBio": "个人简介",
+      "judgeBioPlaceholder": "评委的个人简介...",
+      "judgeAvatar": "头像URL",
+      "judgeAvatarPlaceholder": "头像图片URL",
+      "sponsors": "赞助商",
+      "sponsor": "赞助商 {index}",
+      "addSponsor": "添加赞助商",
+      "companyName": "公司名称",
+      "companyNamePlaceholder": "赞助商名称",
+      "sponsorTier": "赞助等级",
+      "selectSponsorTier": "选择赞助等级",
+      "platinum": "白金赞助商",
+      "gold": "金牌赞助商",
+      "silver": "银牌赞助商",
+      "bronze": "铜牌赞助商",
+      "companyLogo": "公司Logo",
+      "clickUploadLogo": "点击上传公司Logo",
+      "logoFormats": "支持 PNG, JPG, GIF 格式，建议尺寸 200x100px",
+      "changeLogo": "更换Logo",
+      "deleteLogo": "删除",
+      "websiteLink": "官网链接"
+    },
+    "preview": {
+      "title": "预览黑客松",
+      "timeTBD": "时间待定",
+      "totalPrizePool": "总奖金池: ${amount}",
+      "maxPeople": "最多 {count} 人",
+      "unlimited": "不限人数",
+      "techStack": "技术栈",
+      "prizeSettings": "奖项设置",
+      "people": "人",
+      "judgeTeam": "评委团队",
+      "schedule": "时间安排",
+      "tbd": "待定"
+    },
+    "defaults": {
+      "firstPrize": "一等奖",
+      "mainTrack": "主赛道",
+      "registrationDeadline": "报名截止",
+      "registrationDeadlineDesc": "参赛报名截止",
+      "competitionBegins": "比赛开始",
+      "competitionBeginsDesc": "正式开始开发",
+      "submissionDeadline": "提交截止",
+      "submissionDeadlineDesc": "项目提交截止"
+    },
+    "validation": {
+      "incompleteInfo": "信息不完整",
+      "fillAllRequired": "请填写所有必填字段",
+      "descriptionTooShort": "描述过短",
+      "descriptionMinLength": "黑客松描述至少需要10个字符",
+      "dateError": "日期错误",
+      "endAfterStart": "结束日期必须晚于开始日期",
+      "registrationTooLate": "注册截止时间不能超过开始时间后24小时",
+      "registrationStartBeforeEnd": "报名开始时间必须早于报名截止时间"
+    },
+    "toasts": {
+      "fileTypeError": "文件类型错误",
+      "selectImageFile": "请选择图片文件",
+      "fileTooLarge": "文件过大",
+      "imageSizeLimit": "图片大小不能超过5MB",
+      "retryLater": "请稍后重试",
+      "logoUploadSuccess": "Logo上传成功",
+      "logoUploadedToIPFS": "{fileName} 已成功上传到IPFS",
+      "logoUploadFailed": "Logo上传失败",
+      "hackathonCreated": "黑客松创建成功！",
+      "pendingReview": "您的黑客松已提交，正在等待审核",
+      "reviewNotice": "管理员审核通过后将正式发布",
+      "createdOnBlockchain": "黑客松已在区块链上创建",
+      "contractId": "合约ID: {contractId}",
+      "txHash": "交易哈希: {txHash}",
+      "creationFailed": "创建失败",
+      "networkError": "网络错误，请检查网络连接并重试",
+      "imageUploadFailed": "图片上传失败",
+      "imageUploadFailedContinue": "封面图片上传失败，但仍将继续创建黑客松"
+    }
+  },
+  "submit": "提交项目",
+  "detail": {
+    "notFound": "黑客松不存在",
+    "backToList": "返回黑客松列表",
+    "startTime": "开始时间",
+    "duration": "持续时间",
+    "totalPrize": "总奖金",
+    "locationLabel": "地点",
+    "days": "{count} 天",
+    "status": {
+      "upcoming": "即将开始",
+      "ongoing": "进行中",
+      "ended": "已结束",
+      "unknown": "未知",
+      "joined": "已参加"
+    },
+    "tabs": {
+      "overview": "概览",
+      "prizes": "奖项",
+      "rules": "规则",
+      "timeline": "时间线",
+      "projects": "项目"
+    },
+    "creator": {
+      "title": "您是本次黑客松的创建者",
+      "description": "创建者无法参加自己创建的比赛，但可以管理和查看所有参赛项目"
+    },
+    "registration": {
+      "notStarted": "报名尚未开始",
+      "expired": "报名已截止"
+    },
+    "submission": {
+      "notStarted": "黑客松尚未开始",
+      "ended": "黑客松已结束"
+    },
+    "project": {
+      "individual": "个人项目",
+      "uncategorized": "未分类",
+      "teamMembers": "{count} 人团队",
+      "team": "团队：{name}",
+      "noProjects": "还没有项目提交",
+      "beFirst": "成为第一个提交项目的团队！"
+    },
+    "prize": {
+      "rankName": "第{rank}名",
+      "rankDescription": "第{rank}名奖项",
+      "firstPrize": "一等奖",
+      "bestProject": "最佳项目奖",
+      "winnerCount": "获奖人数: {count}人"
+    },
+    "track": {
+      "unnamed": "未命名赛道",
+      "noDescription": "无描述",
+      "categoryRelated": "{category}相关项目",
+      "open": "开放赛道",
+      "openDescription": "不限制技术栈和项目类型"
+    },
+    "rules": {
+      "default": "遵守比赛规则"
+    },
+    "requirements": {
+      "none": "无特殊要求"
+    },
+    "criteria": {
+      "unnamed": "未命名标准",
+      "innovation": "技术创新性",
+      "completion": "产品完成度",
+      "userExperience": "用户体验",
+      "businessValue": "商业价值"
+    },
+    "timeline": {
+      "hackingStart": "比赛开始",
+      "hackingStartDesc": "正式开始开发",
+      "hackingEnd": "比赛结束",
+      "submissionDeadline": "提交截止"
+    },
+    "judge": {
+      "defaultTitle": "HackX评委"
+    },
+    "auth": {
+      "loginRequired": "请先登录",
+      "loginToJoin": "登录后才能参加黑客松",
+      "cannotJoin": "无法参加",
+      "creatorRestriction": "作为创建者，您无法参加自己创建的黑客松"
+    },
+    "actions": {
+      "joinSuccess": "参加成功！",
+      "joinSuccessDesc": "你已成功参加这个黑客松",
+      "joinFailed": "参加失败",
+      "networkError": "网络错误，请稍后重试",
+      "linkCopied": "链接已复制",
+      "linkCopiedDesc": "黑客松链接已复制到剪贴板",
+      "joinFailedError": "参加失败",
+      "submitProject": "提交项目",
+      "submitProjectNow": "立即提交项目",
+      "viewDetails": "查看详情",
+      "joinNow": "立即参加",
+      "share": "分享",
+      "judgePanel": "评委仪表板"
+    },
+    "timing": {
+      "startsIn": "{days} 天后开始"
+    },
+    "schedule": {
+      "title": "时间安排",
+      "registrationStart": "报名开始",
+      "registrationDeadline": "报名截止",
+      "eventStart": "活动开始",
+      "eventEnd": "活动结束"
+    },
+    "sections": {
+      "introduction": "活动介绍",
+      "tracks": "赛道介绍",
+      "techStack": "技术栈",
+      "rules": "参赛规则",
+      "requirements": "参与要求",
+      "criteria": "评审标准",
+      "timeline": "活动时间线",
+      "projects": "参赛项目",
+      "projectsDescription": "按赛道分组显示已提交的项目"
+    },
+    "stats": {
+      "submittedProjects": "已提交项目",
+      "activeTracks": "参与赛道",
+      "participants": "参与者",
+      "averageTeamSize": "平均团队规模",
+      "projectCount": "{count} 个项目",
+      "participation": "参与统计",
+      "remainingSlots": "还有 {count} 个名额",
+      "tracks": "赛道数量",
+      "prizes": "奖项数量",
+      "totalLikes": "总点赞数",
+      "totalComments": "总评论数"
+    },
+    "organizer": {
+      "title": "组织者",
+      "contact": "联系方式",
+      "website": "官网",
+      "description": "黑客松组织者"
+    },
+    "judges": {
+      "title": "评委团"
+    },
+    "sponsors": {
+      "title": "赞助商",
+      "visitWebsite": "访问官网"
+    },
+    "error": {
+      "title": "错误",
+      "loadHackathonFailed": "加载黑客松详情失败"
+    },
+    "location": {
+      "globalOnline": "全球线上"
+    }
+  },
+  "register": "报名",
+  "registered": "已报名",
+  "status": {
+    "upcoming": "即将开始",
+    "ongoing": "进行中",
+    "completed": "已结束",
+    "cancelled": "已取消",
+    "draft": "草稿"
+  },
+  "details": {
+    "description": "活动描述",
+    "rules": "比赛规则",
+    "prizes": "奖项设置",
+    "schedule": "日程安排",
+    "participants": "参与者",
+    "projects": "项目",
+    "organizer": "组织者",
+    "startDate": "开始时间",
+    "endDate": "结束时间",
+    "registrationDeadline": "报名截止",
+    "maxParticipants": "最大参与人数",
+    "prizePool": "奖金池",
+    "categories": "分类",
+    "techStack": "技术栈"
+  }
+}

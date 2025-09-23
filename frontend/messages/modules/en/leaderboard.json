@@ -1,0 +1,39 @@
+{
+  "title": "Reputation Leaderboard",
+  "description": "Discover top contributors in our community and their achievements",
+  "points": "Points",
+  "joined": "Joined",
+  "loadError": "Failed to load leaderboard",
+  "loadErrorDesc": "Unable to fetch leaderboard data",
+  "networkError": "Network connection failed",
+  "refresh": "Refresh",
+  "otherRanks": "Other Rankings",
+  "noData": {
+    "title": "No Data",
+    "description": "No leaderboard data available at the moment"
+  },
+  "stats": {
+    "totalUsers": "Total Users",
+    "averageScore": "Average Score",
+    "timeRange": "Time Range",
+    "category": "Category"
+  },
+  "filters": {
+    "timeRange": "Time Range",
+    "category": "Category"
+  },
+  "timeRanges": {
+    "all": "All Time",
+    "season": "This Season",
+    "month": "This Month",
+    "week": "This Week"
+  },
+  "categories": {
+    "all": "All Categories",
+    "general": "General",
+    "hackathon": "Hackathon",
+    "project": "Project",
+    "community": "Community",
+    "governance": "Governance"
+  }
+}

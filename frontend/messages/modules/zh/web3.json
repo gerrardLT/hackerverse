@@ -1,0 +1,47 @@
+{
+  "network": {
+    "switchToNetwork": "请切换到 {networkName} (ChainID: {chainId})",
+    "walletNotDetected": "未检测到钱包",
+    "bscNodeSyncIssue": "BSC Testnet节点同步问题，请稍后重试",
+    "networkUnstable": "网络连接不稳定，正在使用备用数据源",
+    "networkError": "网络连接异常",
+    "retry": "重试",
+    "addBSCTestnetFailed": "添加BSC Testnet失败"
+  },
+  "wallet": {
+    "walletNotDetected": "未检测到钱包",
+    "installWalletPrompt": "请安装 MetaMask 或其他以太坊钱包",
+    "connectSuccess": "钱包连接成功",
+    "connectSuccessDesc": "已成功连接到您的钱包",
+    "connectFailed": "连接失败",
+    "connectFailedDesc": "无法连接到钱包",
+    "loadWalletInfoFailed": "加载钱包信息失败",
+    "refreshAndRetry": "请刷新页面重试",
+    "walletDisconnected": "钱包已断开",
+    "reconnectWallet": "请重新连接钱包",
+    "addressCopied": "地址已复制",
+    "addressCopiedDesc": "钱包地址已复制到剪贴板",
+    "mainnet": "主网",
+    "testnet": "测试网",
+    "unknownNetwork": "未知网络",
+    "connectWallet": "连接钱包",
+    "connectWalletDesc": "连接您的以太坊钱包以使用 Web3 功能",
+    "connectMetaMask": "连接 MetaMask",
+    "supportedWallets": "支持的钱包",
+    "walletConnected": "钱包已连接",
+    "ethBalance": "ETH 余额",
+    "hxtBalance": "HXT 余额",
+    "network": "网络",
+    "chainId": "链 ID",
+    "copyAddress": "复制地址",
+    "viewDetails": "查看详情",
+    "walletAddress": "钱包地址"
+  },
+  "dao": {
+    "loadProposalsFailed": "获取提案列表失败",
+    "loadFailed": "加载失败",
+    "cannotLoadProposals": "无法获取提案列表",
+    "networkError": "网络错误",
+    "checkNetworkConnection": "请检查网络连接并重试"
+  }
+}

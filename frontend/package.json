@@ -3,14 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "next build",
+    "build": "npm run i18n:merge && next build",
     "dev": "next dev",
     "lint": "next lint",
     "start": "next start",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "i18n:split": "node ../scripts/split-i18n-simple.js",
+    "i18n:merge": "node ../scripts/merge-i18n.js",
+    "i18n:validate": "node ../scripts/merge-i18n.js validate",
+    "i18n:help": "echo 'Available i18n commands: npm run i18n:split, npm run i18n:merge, npm run i18n:validate'"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",

@@ -1,0 +1,323 @@
+{
+  "title": "My Projects",
+  "description": "Manage and track your {total} projects across different hackathons",
+  "auth": {
+    "loginRequired": "Login Required",
+    "login": "Login"
+  },
+  "actions": {
+    "create": "Create Project",
+    "createFirst": "Create Your First Project",
+    "confirmDelete": "Confirm Delete",
+    "deleteWarning": "Are you sure you want to delete '{title}'? This action cannot be undone.",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleting": "Deleting...",
+    "share": "Share",
+    "goBack": "Go Back",
+    "backToProjects": "Back to Projects",
+    "save": "Save Changes",
+    "viewProject": "View Project"
+  },
+  "stats": {
+    "total": "Total",
+    "draft": "Draft",
+    "readyToSubmit": "Ready",
+    "submitted": "Submitted",
+    "reviewed": "Reviewed",
+    "winner": "Winner",
+    "rejected": "Rejected",
+    "submissions": "Submissions"
+  },
+  "tabs": {
+    "all": "All",
+    "draft": "Draft",
+    "ready": "Ready",
+    "submitted": "Submitted",
+    "reviewed": "Reviewed",
+    "winner": "Winner",
+    "rejected": "Rejected"
+  },
+  "search": {
+    "placeholder": "Search projects by title or description..."
+  },
+  "sort": {
+    "updated": "Last Updated",
+    "created": "Created Date",
+    "title": "Title",
+    "status": "Status",
+    "desc": "Descending",
+    "asc": "Ascending"
+  },
+  "empty": {
+    "noProjects": "No projects yet. Create your first project to get started!",
+    "noProjectsWithStatus": "No projects found with this status.",
+    "noTechnologies": "No technologies specified",
+    "noTags": "No tags specified"
+  },
+  "links": {
+    "code": "Code",
+    "demo": "Demo",
+    "video": "Video",
+    "presentation": "Presentation"
+  },
+  "create": {
+    "title": "Create Project",
+    "description": "Create a new project for hackathons and competitions",
+    "autoSaving": "Auto-saving...",
+    "hidePreview": "Hide Preview",
+    "showPreview": "Show Preview",
+    "projectDetails": "Project Details",
+    "fillDetails": "Fill in the project information below",
+    "completion": "Completion",
+    "basicInfo": "Basic Information",
+    "techStack": "Technology Stack",
+    "links": "Project Links",
+    "settings": "Project Settings",
+    "saving": "Saving...",
+    "saveAsDraft": "Save as Draft",
+    "markAsReady": "Mark as Ready to Submit",
+    "preview": "Preview",
+    "previewDescription": "Preview how your project will appear",
+    "previewEmpty": "Start by adding a project title to see the preview"
+  },
+  "form": {
+    "title": "Project Title",
+    "titlePlaceholder": "Enter your project title...",
+    "description": "Description",
+    "descriptionPlaceholder": "Describe your project, its goals and features...",
+    "characters": "characters",
+    "technologies": "Technologies",
+    "technologiesPlaceholder": "e.g., React, Node.js, Python...",
+    "pressEnterToAdd": "Press Enter to add",
+    "tags": "Tags",
+    "tagsPlaceholder": "e.g., web3, mobile, AI...",
+    "githubUrl": "GitHub Repository",
+    "githubUrlPlaceholder": "https://github.com/username/project",
+    "demoUrl": "Live Demo URL",
+    "demoUrlPlaceholder": "https://your-demo-site.com",
+    "videoUrl": "Demo Video URL",
+    "videoUrlPlaceholder": "https://youtube.com/watch?v=...",
+    "presentationUrl": "Presentation URL",
+    "presentationUrlPlaceholder": "https://slides.com/presentation",
+    "isPublic": "Public Project",
+    "isPublicDescription": "Make this project visible to everyone",
+    "public": "Public",
+    "private": "Private",
+    "publicDescription": "Visible to everyone",
+    "privateDescription": "Only visible to you",
+    "visibility": "Visibility",
+    "status": "Status"
+  },
+  "validation": {
+    "titleRequired": "Project title is required",
+    "titleTooLong": "Project title cannot exceed 100 characters",
+    "descriptionTooLong": "Description cannot exceed 2000 characters",
+    "invalidUrl": "Please enter a valid URL",
+    "error": "Validation Error",
+    "fixErrors": "Please fix the validation errors before proceeding"
+  },
+  "success": {
+    "created": "Project Created Successfully",
+    "savedAsDraft": "Project saved as draft. You can continue editing later.",
+    "readyToSubmit": "Project marked as ready to submit to hackathons.",
+    "projectUpdated": "Project updated successfully"
+  },
+  "errors": {
+    "createFailed": "Failed to Create Project",
+    "unknown": "An unknown error occurred"
+  },
+  "status": {
+    "draft": "Draft",
+    "ready_to_submit": "Ready to Submit"
+  },
+  "filter": {
+    "title": "Project Filter",
+    "description": "Filter and search projects by various criteria",
+    "results": "{count} projects found",
+    "activeFilters": "{count} active filters",
+    "search": {
+      "label": "Search",
+      "placeholder": "Search projects by title or description..."
+    },
+    "sort": {
+      "label": "Sort by",
+      "created": "Creation Date",
+      "updated": "Last Updated",
+      "likes": "Likes",
+      "comments": "Comments"
+    },
+    "order": {
+      "label": "Order",
+      "desc": "Descending",
+      "asc": "Ascending"
+    },
+    "tracks": {
+      "label": "Tracks"
+    },
+    "tags": {
+      "label": "Tags"
+    },
+    "technologies": {
+      "label": "Technologies"
+    }
+  },
+  "like": {
+    "like": "Like",
+    "unlike": "Unlike",
+    "loginRequired": "Login Required",
+    "loginRequiredDesc": "Please log in to like projects",
+    "likeSuccess": "Liked!",
+    "likeSuccessDesc": "You liked this project",
+    "unlikeSuccess": "Unliked",
+    "unlikeSuccessDesc": "You unliked this project",
+    "likeFailed": "Like failed",
+    "unlikeFailed": "Unlike failed",
+    "operationFailed": "Operation failed",
+    "networkError": "Network error, please try again"
+  },
+  "comments": {
+    "title": "Comments",
+    "description": "Share your thoughts and feedback on this project",
+    "placeholder": "Write your comment...",
+    "replyPlaceholder": "Reply to {username}...",
+    "editPlaceholder": "Edit your comment...",
+    "submit": "Post Comment",
+    "submitReply": "Post Reply",
+    "edit": "Edit",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "save": "Save",
+    "reply": "Reply",
+    "replies": "{count} replies",
+    "edited": "Edited",
+    "loading": "Loading comments...",
+    "loadFailed": "Failed to load comments",
+    "loadError": "Failed to load comments",
+    "loginRequired": "Login Required",
+    "loginRequiredDesc": "Please log in to comment",
+    "contentRequired": "Content Required",
+    "contentRequiredDesc": "Please enter comment content",
+    "submitSuccess": "Comment Posted",
+    "submitSuccessDesc": "Your comment has been posted successfully",
+    "submitFailed": "Failed to Post",
+    "submitError": "Failed to post comment",
+    "replySuccess": "Reply Posted",
+    "replySuccessDesc": "Your reply has been posted successfully",
+    "replyFailed": "Failed to Reply",
+    "replyError": "Failed to post reply",
+    "editSuccess": "Comment Updated",
+    "editSuccessDesc": "Your comment has been updated successfully",
+    "editFailed": "Failed to Update",
+    "editError": "Failed to update comment",
+    "deleteSuccess": "Comment Deleted",
+    "deleteSuccessDesc": "Your comment has been deleted successfully",
+    "deleteFailed": "Failed to Delete",
+    "deleteError": "Failed to delete comment",
+    "deleteConfirm": "Delete Comment",
+    "deleteConfirmDesc": "Are you sure you want to delete this comment? This action cannot be undone.",
+    "noComments": "No comments yet",
+    "loginToComment": "Please log in to leave a comment"
+  },
+  "details": {
+    "projectInfo": "Project Information",
+    "statistics": "Statistics",
+    "creator": "Creator",
+    "visibility": "Visibility",
+    "created": "Created",
+    "updated": "Last Updated",
+    "averageScore": "Average Score"
+  },
+  "tabs": {
+    "overview": "Overview",
+    "team": "Team",
+    "submissions": "Submissions",
+    "scores": "Scores",
+    "activity": "Activity",
+    "comments": "Comments"
+  },
+  "team": {
+    "members": "Members",
+    "noTeam": "No Team",
+    "individualProject": "This is an individual project"
+  },
+  "submissions": {
+    "title": "Submission History",
+    "submittedAt": "Submitted at",
+    "empty": "No Submissions Yet",
+    "noSubmissions": "This project hasn't been submitted to any hackathons yet"
+  },
+  "scores": {
+    "title": "Judge Scores",
+    "innovation": "Innovation",
+    "technical": "Technical",
+    "userExperience": "UX",
+    "business": "Business",
+    "presentation": "Presentation",
+    "empty": "No Scores Yet",
+    "noScores": "This project hasn't been scored by judges yet"
+  },
+  "activity": {
+    "title": "Activity Timeline",
+    "comingSoon": "Coming Soon",
+    "description": "Activity timeline feature will be available soon"
+  },
+  "loading": {
+    "project": "Loading project details..."
+  },
+  "edit": {
+    "title": "Edit Project",
+    "description": "Update your project information and settings"
+  },
+  "interactions": {
+    "title": "Project Interactions",
+    "description": "View engagement statistics for this project",
+    "loading": "Loading statistics...",
+    "loadError": "Failed to load statistics",
+    "likes": "Likes",
+    "comments": "Comments",
+    "stats": {
+      "likes": "Likes",
+      "comments": "Comments",
+      "feedbacks": "Feedbacks"
+    },
+    "engagement": {
+      "high": "High Engagement",
+      "medium": "Medium Engagement",
+      "low": "Low Engagement"
+    },
+    "engagementScore": "Engagement Score",
+    "totalInteractions": "Total Interactions",
+    "daysSince": "Days Since Creation",
+    "mostActiveType": "Most Active",
+    "mostActive": {
+      "likes": "Likes",
+      "comments": "Comments",
+      "feedbacks": "Feedbacks",
+      "general": "General Activity"
+    },
+    "recentActivity": "Recent Activity",
+    "recentComments": "Recent Comments",
+    "recentLikes": "Recent Likes",
+    "more": "more",
+    "yourInteractions": "Your Interactions",
+    "youLiked": "You liked this",
+    "youCommented": "You commented",
+    "youFeedback": "You provided feedback"
+  },
+  "tabs": {
+    "all": "All Projects",
+    "draft": "Drafts",
+    "ready": "Ready to Submit",
+    "submitted": "Submitted",
+    "reviewed": "Under Review",
+    "winner": "Winners",
+    "rejected": "Rejected",
+    "overview": "Overview",
+    "team": "Team",
+    "submissions": "Submissions",
+    "scores": "Scores",
+    "activity": "Activity",
+    "comments": "Comments"
+  }
+}

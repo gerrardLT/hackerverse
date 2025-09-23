@@ -1,0 +1,16 @@
+{
+  "title": "Notifications",
+  "markAsRead": "Mark as Read",
+  "markAllAsRead": "Mark All as Read",
+  "clear": "Clear",
+  "settings": "Notification Settings",
+  "types": {
+    "teamInvite": "Team Invitation",
+    "applicationApproved": "Application Approved",
+    "applicationRejected": "Application Rejected",
+    "hackathonStarting": "Hackathon Starting",
+    "hackathonEnding": "Hackathon Ending",
+    "projectLiked": "Project Liked",
+    "systemAnnouncement": "System Announcement"
+  }
+}

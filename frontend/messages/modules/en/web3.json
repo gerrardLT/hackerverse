@@ -1,0 +1,47 @@
+{
+  "network": {
+    "switchToNetwork": "Please switch to {networkName} (ChainID: {chainId})",
+    "walletNotDetected": "Wallet not detected",
+    "bscNodeSyncIssue": "BSC Testnet node sync issue, please try again later",
+    "networkUnstable": "Network connection unstable, using backup data source",
+    "networkError": "Network connection error",
+    "retry": "Retry",
+    "addBSCTestnetFailed": "Failed to add BSC Testnet"
+  },
+  "wallet": {
+    "walletNotDetected": "Wallet not detected",
+    "installWalletPrompt": "Please install MetaMask or other Ethereum wallet",
+    "connectSuccess": "Wallet connected successfully",
+    "connectSuccessDesc": "Successfully connected to your wallet",
+    "connectFailed": "Connection failed",
+    "connectFailedDesc": "Unable to connect to wallet",
+    "loadWalletInfoFailed": "Failed to load wallet information",
+    "refreshAndRetry": "Please refresh the page and try again",
+    "walletDisconnected": "Wallet disconnected",
+    "reconnectWallet": "Please reconnect wallet",
+    "addressCopied": "Address copied",
+    "addressCopiedDesc": "Wallet address copied to clipboard",
+    "mainnet": "Mainnet",
+    "testnet": "Testnet",
+    "unknownNetwork": "Unknown Network",
+    "connectWallet": "Connect Wallet",
+    "connectWalletDesc": "Connect your Ethereum wallet to use Web3 features",
+    "connectMetaMask": "Connect MetaMask",
+    "supportedWallets": "Supported wallets",
+    "walletConnected": "Wallet Connected",
+    "ethBalance": "ETH Balance",
+    "hxtBalance": "HXT Balance",
+    "network": "Network",
+    "chainId": "Chain ID",
+    "copyAddress": "Copy Address",
+    "viewDetails": "View Details",
+    "walletAddress": "Wallet Address"
+  },
+  "dao": {
+    "loadProposalsFailed": "Failed to load proposal list",
+    "loadFailed": "Load failed",
+    "cannotLoadProposals": "Cannot load proposal list",
+    "networkError": "Network error",
+    "checkNetworkConnection": "Please check network connection and retry"
+  }
+}

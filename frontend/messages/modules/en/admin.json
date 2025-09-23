@@ -1,0 +1,419 @@
+{
+  "title": "Admin Control Panel",
+  "backToSite": "Back to Site",
+  "nav": {
+    "dashboard": "Dashboard",
+    "hackathons": "Hackathons",
+    "users": "Users",
+    "content": "Content",
+    "analytics": "Analytics",
+    "settings": "Settings"
+  },
+  "role": {
+    "admin": "Administrator",
+    "moderator": "Moderator",
+    "judge": "Judge",
+    "user": "User"
+  },
+  "unauthorized": {
+    "title": "Access Denied",
+    "description": "You don't have permission to access the admin panel.",
+    "backToDashboard": "Back to Dashboard"
+  },
+  "dashboard": {
+    "title": "Admin Dashboard",
+    "description": "Overview of platform statistics and recent activities",
+    "loadError": "Failed to load dashboard data",
+    "unknownError": "Unknown error occurred",
+    "networkError": "Network error, please try again later",
+    "noData": "No Data Available",
+    "noDataDescription": "Unable to load dashboard data, please try again",
+    "userStats": {
+      "title": "User Statistics",
+      "active": "Active",
+      "today": "today",
+      "banned": "banned"
+    },
+    "contentStats": {
+      "title": "Content Statistics",
+      "total": "Total Content",
+      "hackathons": "Hackathons",
+      "projects": "Projects",
+      "posts": "Posts"
+    },
+    "moderationStats": {
+      "title": "Moderation Queue",
+      "pending": "Pending Reviews",
+      "actions": "Actions"
+    },
+    "systemStats": {
+      "title": "System Activity",
+      "auditLogs": "Audit Logs",
+      "last30Days": "Last 30 days"
+    },
+    "recentActivity": {
+      "registrations": "Recent Registrations",
+      "registrationsDesc": "New users who joined in the last 7 days",
+      "noRegistrations": "No recent registrations",
+      "adminActions": "Recent Admin Actions",
+      "adminActionsDesc": "Recent administrative activities",
+      "noActions": "No recent admin actions"
+    }
+  },
+  "content": {
+    "title": "Content Moderation",
+    "description": "Review and moderate platform content",
+    "loadError": "Failed to load content reviews",
+    "unknownError": "Unknown error occurred",
+    "networkError": "Network error, please try again later",
+    "reviewError": "Review operation failed",
+    "reviewing": "Reviewing...",
+    "noContent": {
+      "title": "No Content to Review",
+      "description": "All content has been reviewed or no content matches the current filters"
+    },
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "flagged": "Flagged"
+    },
+    "priority": {
+      "urgent": "Urgent",
+      "high": "High",
+      "normal": "Normal",
+      "low": "Low"
+    },
+    "filters": {
+      "title": "Filters",
+      "contentType": {
+        "all": "All Content Types",
+        "post": "Posts",
+        "project": "Projects",
+        "hackathon": "Hackathons",
+        "comment": "Comments"
+      },
+      "priority": {
+        "all": "All Priorities"
+      },
+      "status": {
+        "all": "All Statuses"
+      },
+      "sortBy": {
+        "createdAt": "Created Date",
+        "priority": "Priority",
+        "reportCount": "Report Count"
+      },
+      "sortOrder": {
+        "desc": "Newest First",
+        "asc": "Oldest First"
+      }
+    },
+    "actions": {
+      "approve": "Approve",
+      "reject": "Reject",
+      "flag": "Flag"
+    },
+    "autoFlagged": "Auto-flagged",
+    "reports": "reports",
+    "category": "Category",
+    "reviewedBy": "Reviewed by",
+    "noPreview": "No content preview available",
+    "dialog": {
+      "approve": {
+        "title": "Approve Content"
+      },
+      "reject": {
+        "title": "Reject Content"
+      },
+      "flag": {
+        "title": "Flag Content"
+      },
+      "contentInfo": "Content",
+      "reason": "Reason",
+      "reasonPlaceholder": "Enter reason for this action...",
+      "notes": "Review Notes",
+      "notesPlaceholder": "Additional notes for internal review..."
+    },
+    "approveSuccess": "Content approved successfully",
+    "rejectSuccess": "Content rejected successfully",
+    "flagSuccess": "Content flagged successfully"
+  },
+  "users": {
+    "title": "User Management",
+    "description": "Manage platform users, roles, and permissions",
+    "loadError": "Failed to load users",
+    "unknownError": "Unknown error occurred",
+    "roleUpdateSuccess": "User role updated successfully",
+    "roleUpdateSuccessDesc": "The user's role has been changed",
+    "roleUpdateError": "Failed to update user role",
+    "statusUpdateSuccess": "User status updated successfully",
+    "statusUpdateSuccessDesc": "The user's status has been changed",
+    "statusUpdateError": "Failed to update user status",
+    "totalUsers": "Total Users",
+    "filters": "Search and Filter",
+    "searchPlaceholder": "Search by username or email...",
+    "selectRole": "Select Role",
+    "selectStatus": "Select Status",
+    "sortBy": "Sort By",
+    "sortOptions": {
+      "newest": "Newest First",
+      "oldest": "Oldest First",
+      "usernameAZ": "Username A-Z",
+      "usernameZA": "Username Z-A",
+      "highestReputation": "Highest Reputation",
+      "recentlyActive": "Recently Active"
+    },
+    "usersList": "Users List",
+    "table": {
+      "user": "User",
+      "role": "Role",
+      "status": "Status",
+      "reputation": "Reputation",
+      "activity": "Activity",
+      "lastLogin": "Last Login",
+      "actions": "Actions",
+      "neverLoggedIn": "Never logged in"
+    },
+    "roles": {
+      "admin": "Admin",
+      "moderator": "Moderator",
+      "judge": "Judge",
+      "user": "User"
+    },
+    "status": {
+      "active": "Active",
+      "suspended": "Suspended",
+      "banned": "Banned",
+      "pending": "Pending"
+    },
+    "activity": {
+      "hackathons": "Hackathons",
+      "projects": "Projects",
+      "organized": "Organized"
+    },
+    "actions": {
+      "edit": "Edit User"
+    },
+    "editUser": {
+      "title": "Edit User",
+      "role": "User Role",
+      "status": "User Status",
+      "reputation": "Reputation",
+      "participations": "Participations",
+      "projects": "Projects"
+    },
+    "pagination": {
+      "showing": "Showing {start} to {end} of {total} users"
+    }
+  },
+  "settings": {
+    "title": "System Settings",
+    "description": "Configure platform settings and integrations",
+    "loadError": "Failed to load settings",
+    "loadErrorDesc": "Unable to load system settings",
+    "saveSuccess": "Settings saved successfully",
+    "saveSuccessDesc": "All settings have been saved",
+    "saveError": "Failed to save settings",
+    "saveErrorDesc": "Unable to save system settings",
+    "saving": "Saving...",
+    "saveSettings": "Save Settings",
+    "systemStatus": {
+      "title": "System Status",
+      "database": "Database",
+      "storage": "Storage",
+      "api": "API",
+      "blockchain": "Blockchain",
+      "ipfs": "IPFS",
+      "email": "Email",
+      "users": "Users",
+      "hackathons": "Hackathons",
+      "projects": "Projects",
+      "web3": "Web3",
+      "system": "System"
+    },
+    "status": {
+      "healthy": "Healthy",
+      "warning": "Warning",
+      "error": "Error",
+      "unknown": "Unknown"
+    },
+    "tabs": {
+      "general": "General",
+      "security": "Security",
+      "integrations": "Integrations",
+      "appearance": "Appearance"
+    },
+    "general": {
+      "title": "General Settings",
+      "siteName": "Site Name",
+      "siteDescription": "Site Description",
+      "siteUrl": "Site URL",
+      "adminEmail": "Admin Email",
+      "features": "Platform Features",
+      "registrationEnabled": "User Registration",
+      "registrationEnabledDesc": "Allow new users to register",
+      "hackathonCreationEnabled": "Hackathon Creation",
+      "hackathonCreationEnabledDesc": "Allow users to create hackathons",
+      "web3Enabled": "Web3 Features",
+      "web3EnabledDesc": "Enable blockchain and wallet features",
+      "ipfsEnabled": "IPFS Storage",
+      "ipfsEnabledDesc": "Enable IPFS for decentralized storage"
+    },
+    "security": {
+      "title": "Security Settings",
+      "requireEmailVerification": "Email Verification",
+      "requireEmailVerificationDesc": "Require users to verify their email",
+      "enableCaptcha": "CAPTCHA Protection",
+      "enableCaptchaDesc": "Enable CAPTCHA for forms",
+      "maxLoginAttempts": "Max Login Attempts",
+      "maxLoginAttemptsDesc": "Maximum failed login attempts before lockout",
+      "sessionTimeout": "Session Timeout",
+      "sessionTimeoutDesc": "Session expiration time",
+      "minutes": "minutes",
+      "hour": "hour",
+      "hours": "hours"
+    },
+    "integrations": {
+      "email": {
+        "title": "Email Configuration",
+        "fromAddress": "From Address",
+        "fromName": "From Name",
+        "smtpHost": "SMTP Host",
+        "smtpPort": "SMTP Port",
+        "smtpUser": "SMTP Username",
+        "smtpPassword": "SMTP Password"
+      },
+      "notifications": {
+        "title": "Notification Settings",
+        "emailEnabled": "Email Notifications",
+        "emailEnabledDesc": "Send notifications via email",
+        "pushEnabled": "Push Notifications",
+        "pushEnabledDesc": "Send browser push notifications",
+        "slackEnabled": "Slack Integration",
+        "slackEnabledDesc": "Send notifications to Slack",
+        "slackWebhookUrl": "Slack Webhook URL"
+      },
+      "web3": {
+        "title": "Web3 & IPFS",
+        "chainId": "Default Chain",
+        "rpcEndpoint": "RPC Endpoint",
+        "contractAddress": "Contract Address"
+      },
+      "ipfs": {
+        "title": "IPFS Configuration",
+        "gateway": "IPFS Gateway",
+        "pinataApiKey": "Pinata API Key",
+        "pinataSecretKey": "Pinata Secret Key"
+      }
+    },
+    "appearance": {
+      "title": "Appearance Settings",
+      "primaryColor": "Primary Color",
+      "secondaryColor": "Secondary Color",
+      "darkModeEnabled": "Dark Mode",
+      "darkModeEnabledDesc": "Enable dark theme by default",
+      "customCss": "Custom CSS",
+      "customCssDesc": "Add custom styles to the platform"
+    }
+  },
+  "hackathons": {
+    "title": "Hackathon Review",
+    "description": "Review and moderate hackathon submissions",
+    "loadError": "Failed to load hackathons for review",
+    "unknownError": "Unknown error occurred",
+    "networkError": "Network error, please try again later",
+    "reviewing": "Reviewing...",
+    "historyError": "Failed to load review history",
+    "noHackathons": {
+      "title": "No Hackathons to Review",
+      "description": "All hackathons have been reviewed or no hackathons match the current filters"
+    },
+    "status": {
+      "pendingReview": "Pending Review",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "draft": "Draft"
+    },
+    "priority": {
+      "urgent": "Urgent",
+      "high": "High",
+      "normal": "Normal",
+      "low": "Low"
+    },
+    "category": {
+      "content": "Content",
+      "legal": "Legal",
+      "technical": "Technical",
+      "business": "Business"
+    },
+    "filters": {
+      "title": "Filters",
+      "status": {
+        "all": "All Statuses"
+      },
+      "priority": {
+        "all": "All Priorities"
+      },
+      "category": {
+        "all": "All Categories"
+      },
+      "sortBy": {
+        "submitted": "Submission Date",
+        "created": "Creation Date",
+        "title": "Title",
+        "prizePool": "Prize Pool"
+      },
+      "sortOrder": {
+        "desc": "Newest First",
+        "asc": "Oldest First"
+      },
+      "searchPlaceholder": "Search hackathons..."
+    },
+    "actions": {
+      "approve": "Approve",
+      "reject": "Reject",
+      "requestChanges": "Request Changes",
+      "history": "History",
+      "view": "View"
+    },
+    "daysAgo": "days ago",
+    "justSubmitted": "Just submitted",
+    "latestReview": "Latest review",
+    "noFeedback": "No feedback provided",
+    "dialog": {
+      "approve": {
+        "title": "Approve Hackathon"
+      },
+      "reject": {
+        "title": "Reject Hackathon"
+      },
+      "requestChanges": {
+        "title": "Request Changes"
+      },
+      "hackathonInfo": "Hackathon",
+      "tabs": {
+        "basic": "Basic Review",
+        "advanced": "Advanced Options"
+      },
+      "score": "Score (1-10)",
+      "priority": "Priority",
+      "feedback": "Feedback",
+      "feedbackPlaceholder": "Provide feedback for this hackathon...",
+      "rejectionReason": "Rejection Reason",
+      "rejectionReasonPlaceholder": "Explain why this hackathon is being rejected...",
+      "recommendedChanges": "Recommended Changes",
+      "recommendedChangesPlaceholder": "Suggest specific changes needed...",
+      "category": "Review Category",
+      "isPublic": "Make review feedback public",
+      "history": {
+        "title": "Review History"
+      }
+    },
+    "submitSuccess": "Hackathon submitted for review",
+    "approveSuccess": "Hackathon approved successfully",
+    "rejectSuccess": "Hackathon rejected successfully",
+    "request_changesSuccess": "Change request sent successfully",
+    "reviewError": "Review operation failed"
+  }
+}

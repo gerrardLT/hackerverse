@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     const notifications = await prisma.notification.findMany({
       where: {
         userId: user.id,
-        type: 'team_invite',
+        type: 'TEAM_INVITE',
         read: false
       },
       select: {

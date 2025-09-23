@@ -339,17 +339,17 @@ export async function DELETE(request: NextRequest) {
 // 辅助函数：根据通知类型获取操作URL
 function getActionUrl(type: string, data: any): string | undefined {
   switch (type) {
-    case 'team_invite':
+    case 'TEAM_INVITE':
       return data?.teamId ? `/teams/${data.teamId}` : undefined
-    case 'hackathon_reminder':
+    case 'HACKATHON_REMINDER':
       return data?.hackathonId ? `/hackathons/${data.hackathonId}` : undefined
-    case 'project_update':
+    case 'PROJECT_UPDATE':
       return data?.projectId ? `/projects/${data.projectId}` : undefined
-    case 'review_complete':
+    case 'REVIEW_COMPLETE':
       return data?.hackathonId ? `/hackathons/${data.hackathonId}/results` : undefined
-    case 'prize_awarded':
+    case 'PRIZE_AWARDED':
       return data?.hackathonId ? `/hackathons/${data.hackathonId}/results` : undefined
-    case 'system_message':
+    case 'SYSTEM_MESSAGE':
       return data?.actionUrl || undefined
     default:
       return undefined
@@ -359,17 +359,17 @@ function getActionUrl(type: string, data: any): string | undefined {
 // 辅助函数：根据通知类型获取操作标签
 function getActionLabel(type: string): string | undefined {
   switch (type) {
-    case 'team_invite':
+    case 'TEAM_INVITE':
       return '查看邀请'
-    case 'hackathon_reminder':
+    case 'HACKATHON_REMINDER':
       return '查看详情'
-    case 'project_update':
+    case 'PROJECT_UPDATE':
       return '查看评论'
-    case 'review_complete':
+    case 'REVIEW_COMPLETE':
       return '查看结果'
-    case 'prize_awarded':
+    case 'PRIZE_AWARDED':
       return '查看证书'
-    case 'system_message':
+    case 'SYSTEM_MESSAGE':
       return '了解更多'
     default:
       return undefined
@@ -379,14 +379,14 @@ function getActionLabel(type: string): string | undefined {
 // 辅助函数：根据通知类型获取优先级
 function getPriority(type: string): 'low' | 'medium' | 'high' {
   switch (type) {
-    case 'team_invite':
-    case 'review_complete':
-    case 'prize_awarded':
+    case 'TEAM_INVITE':
+    case 'REVIEW_COMPLETE':
+    case 'PRIZE_AWARDED':
       return 'high'
-    case 'hackathon_reminder':
-    case 'system_message':
+    case 'HACKATHON_REMINDER':
+    case 'SYSTEM_MESSAGE':
       return 'medium'
-    case 'project_update':
+    case 'PROJECT_UPDATE':
     default:
       return 'low'
   }
@@ -395,15 +395,15 @@ function getPriority(type: string): 'low' | 'medium' | 'high' {
 // 辅助函数：根据通知类型获取分类
 function getCategory(type: string): 'team' | 'project' | 'hackathon' | 'system' {
   switch (type) {
-    case 'team_invite':
+    case 'TEAM_INVITE':
       return 'team'
-    case 'project_update':
+    case 'PROJECT_UPDATE':
       return 'project'
-    case 'hackathon_reminder':
-    case 'review_complete':
-    case 'prize_awarded':
+    case 'HACKATHON_REMINDER':
+    case 'REVIEW_COMPLETE':
+    case 'PRIZE_AWARDED':
       return 'hackathon'
-    case 'system_message':
+    case 'SYSTEM_MESSAGE':
     default:
       return 'system'
   }

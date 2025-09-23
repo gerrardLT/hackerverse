@@ -1,0 +1,17 @@
+{
+  "homeNav": "首页",
+  "hackathons": "黑客松",
+  "leaderboard": "排行榜",
+  "projects": "项目",
+  "teams": "团队",
+  "community": "社区",
+  "dashboard": "仪表板",
+  "profile": "个人资料",
+  "settings": "设置",
+  "admin": "管理",
+  "judgingDashboard": "评委仪表板",
+  "notifications": "通知",
+  "user": "用户",
+  "disconnectWallet": "断开钱包",
+  "toggleMenu": "切换菜单"
+}

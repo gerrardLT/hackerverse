@@ -72,13 +72,13 @@ export function HeroSection() {
     <section className="relative py-24 md:py-32 overflow-hidden">
       <div className="container">
         <div className="mx-auto max-w-3xl text-center">
-          <Badge variant="outline" className="mb-6">
+          <Badge variant="default" className="mb-6 bg-gradient-to-r from-primary to-accent text-primary-foreground">
             🚀 Build the Future Together
           </Badge>
           
           <h1 className="text-4xl font-bold tracking-tight sm:text-6xl mb-6">
             Welcome to the{" "}
-            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            <span className="text-gradient animate-shimmer">
               Hackerverse
             </span>
           </h1>

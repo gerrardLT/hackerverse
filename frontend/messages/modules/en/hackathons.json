@@ -1,0 +1,477 @@
+{
+  "title": "Hackathons",
+  "subtitle": "Discover and join amazing hackathon events worldwide",
+  "filters": {
+    "title": "Filters",
+    "all": "All",
+    "status": "Status",
+    "technology": "Technology",
+    "prizeRange": "Prize Range",
+    "dateRange": "Date Range",
+    "featured": "Featured",
+    "activeFilters": "Active Filters",
+    "clearAll": "Clear All",
+    "statusOptions": {
+      "all": "All",
+      "upcoming": "Upcoming",
+      "ongoing": "Ongoing",
+      "completed": "Completed"
+    },
+    "prizeRangeOptions": {
+      "all": "All",
+      "0-1000": "$0 - $1,000",
+      "1000-10000": "$1,000 - $10,000",
+      "10000+": "$10,000+"
+    },
+    "dateRangeOptions": {
+      "all": "All",
+      "this-week": "This Week",
+      "this-month": "This Month",
+      "next-month": "Next Month"
+    }
+  },
+  "myHackathons": "My Hackathons",
+  "myProjects": "My Projects",
+  "create": {
+    "title": "Create",
+    "basicInfo": "Basic Information",
+    "timeSettings": "Time Settings",
+    "prizeSettings": "Prize Settings",
+    "rules": "Rules & Requirements",
+    "preview": "Preview",
+    "publish": "Publish",
+    "titlePlaceholder": "Enter hackathon title",
+    "descriptionPlaceholder": "Describe your hackathon...",
+    "requirementsPlaceholder": "List participation requirements...",
+    "rulesPlaceholder": "Define hackathon rules...",
+    "success": "Hackathon created successfully!",
+    "error": "Failed to create hackathon"
+  },
+  "searchResults": "Search: \"{query}\"",
+  "createHackathon": "Create Hackathon",
+  "join": "Join",
+  "leave": "Leave",
+  "search": {
+    "placeholder": "Search hackathons...",
+    "searchHistory": "Search History",
+    "clearHistory": "Clear",
+    "popularSearches": "Popular Searches",
+    "searchTips": "Tip: Try searching by technology stack, theme, or prize amount to find the perfect hackathon for you!"
+  },
+  "card": {
+    "startTime": "Start Time",
+    "endTime": "End Time",
+    "participants": "Participants",
+    "prizePool": "Prize Pool",
+    "status": {
+      "registered": "Joined",
+      "submitted": "Submitted",
+      "completed": "Completed"
+    },
+    "technologies": "Technologies",
+    "difficulty": "Difficulty",
+    "organizer": "Organizer",
+    "location": "Location",
+    "online": "Online",
+    "hybrid": "Hybrid",
+    "inPerson": "In Person",
+    "beginner": "Beginner",
+    "intermediate": "Intermediate",
+    "advanced": "Advanced",
+    "expert": "Expert",
+    "teamSize": "Team Size",
+    "maxTeamSize": "Max {size} members",
+    "individual": "Individual",
+    "team": "Team",
+    "viewDetails": "View Details",
+    "register": "Register",
+    "registered": "Registered",
+    "full": "Full",
+    "closed": "Registration Closed",
+    "upcoming": "Upcoming",
+    "ongoing": "Ongoing",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "daysLeft": "{days} days left",
+    "hoursLeft": "{hours} hours left",
+    "minutesLeft": "{minutes} minutes left",
+    "ended": "Ended",
+    "countdown": {
+      "startsIn": "Starts in {days} {days, plural, =1 {day} other {days}}"
+    },
+    "trending": "Trending"
+  },
+  "createForm": {
+    "title": "Create Hackathon",
+    "description": "Create your hackathon event and attract developers worldwide",
+    "auth": {
+      "loginRequired": "Please login first",
+      "login": "Login"
+    },
+    "steps": {
+      "basicInfo": "Basic Information",
+      "basicInfoDesc": "Set basic information and schedule",
+      "prizeSettings": "Prize Settings",
+      "prizeSettingsDesc": "Configure prizes and tracks",
+      "techRequirements": "Technical Requirements",
+      "techRequirementsDesc": "Select tech stack and requirements",
+      "rulesExplanation": "Rules Explanation",
+      "rulesExplanationDesc": "Set rules and judging criteria",
+      "judgeTeam": "Judge Team",
+      "judgeTeamDesc": "Add judges and sponsors",
+      "previewPublish": "Preview & Publish",
+      "previewPublishDesc": "Preview and publish hackathon"
+    },
+    "navigation": {
+      "previous": "Previous",
+      "next": "Next",
+      "creating": "Creating...",
+      "createHackathon": "Create Hackathon"
+    },
+    "basicInfo": {
+      "title": "Basic Information",
+      "coverImage": "Cover Image",
+      "coverImageDesc": "Upload hackathon cover image (optional, max 5MB)",
+      "selectImage": "Select Image",
+      "uploading": "Uploading...",
+      "supportedFormats": "Supports JPG, PNG, GIF formats",
+      "hackathonName": "Hackathon Name",
+      "hackathonNamePlaceholder": "Enter hackathon name",
+      "eventDescription": "Event Description",
+      "eventDescriptionPlaceholder": "Describe your hackathon event in detail...",
+      "startTime": "Start Time",
+      "selectStartTime": "Select start time",
+      "endTime": "End Time",
+      "selectEndTime": "Select end time",
+      "registrationStartTime": "Registration Start Time",
+      "selectRegistrationStartTime": "Select registration start time",
+      "registrationDeadline": "Registration Deadline",
+      "selectRegistrationDeadline": "Select registration deadline",
+      "eventLocation": "Event Location",
+      "eventLocationPlaceholder": "Online/Offline location",
+      "maxParticipants": "Max Participants",
+      "maxParticipantsPlaceholder": "Leave empty for no limit",
+      "timeSchedule": "Time Schedule",
+      "timeScheduleDesc": "Set key milestones for the hackathon",
+      "timelineEvent": "Timeline Event {index}",
+      "eventTitle": "Event Title",
+      "eventTitlePlaceholder": "e.g.: Competition Begins",
+      "time": "Time",
+      "selectTime": "Select time",
+      "eventDesc": "Description",
+      "eventDescPlaceholder": "Describe this milestone...",
+      "addTimelineEvent": "Add Timeline Event",
+      "socialLinks": "Project Social Links (Optional)",
+      "socialLinksDesc": "Add project or organization social media links for participants to learn more",
+      "officialWebsite": "Official Website",
+      "twitter": "Twitter / X",
+      "discord": "Discord",
+      "telegram": "Telegram",
+      "github": "GitHub",
+      "linkedin": "LinkedIn",
+      "socialLinksAdded": "Added social links:",
+      "website": "Website",
+      "validationMinLength": "At least 10 characters required (current: {current})",
+      "validationEntered": "Entered {current} characters",
+      "validationValid": "✓"
+    },
+    "prizes": {
+      "title": "Prize Settings",
+      "prize": "Prize {index}",
+      "addPrize": "Add Prize",
+      "prizeName": "Prize Name",
+      "prizeNamePlaceholder": "e.g.: First Place",
+      "prizeAmount": "Prize Amount (USD $)",
+      "prizeAmountPlaceholder": "e.g.: 10,000",
+      "winnerCount": "Number of Winners",
+      "prizeDescription": "Prize Description",
+      "prizeDescPlaceholder": "Describe this prize...",
+      "tracks": "Track Settings",
+      "track": "Track {index}",
+      "addTrack": "Add Track",
+      "trackName": "Track Name",
+      "trackNamePlaceholder": "e.g.: DeFi Track",
+      "trackDescription": "Track Description",
+      "trackDescPlaceholder": "Describe the focus and requirements of this track..."
+    },
+    "tech": {
+      "title": "Technology Stack Selection",
+      "techDesc": "Select recommended technology stacks to help participants understand the event focus",
+      "selectedTech": "Selected Technology Stack"
+    },
+    "rules": {
+      "title": "Event Rules",
+      "detailedRules": "Detailed Rules",
+      "detailedRulesPlaceholder": "Describe hackathon rules and guidelines in detail...",
+      "participationRequirements": "Participation Requirements",
+      "addRequirement": "Add Requirement",
+      "requirementPlaceholder": "Enter participation requirement...",
+      "judgingCriteria": "Judging Criteria",
+      "addCriteria": "Add Criteria",
+      "criteriaPlaceholder": "Enter judging criteria..."
+    },
+    "judges": {
+      "title": "Judge Team",
+      "judge": "Judge {index}",
+      "addJudge": "Add Judge",
+      "judgeName": "Name",
+      "judgeNamePlaceholder": "Judge name",
+      "judgePosition": "Position",
+      "judgePositionPlaceholder": "Position/Title",
+      "judgeBio": "Personal Bio",
+      "judgeBioPlaceholder": "Judge's personal bio...",
+      "judgeAvatar": "Avatar URL",
+      "judgeAvatarPlaceholder": "Avatar image URL",
+      "sponsors": "Sponsors",
+      "sponsor": "Sponsor {index}",
+      "addSponsor": "Add Sponsor",
+      "companyName": "Company Name",
+      "companyNamePlaceholder": "Sponsor name",
+      "sponsorTier": "Sponsor Tier",
+      "selectSponsorTier": "Select sponsor tier",
+      "platinum": "Platinum Sponsor",
+      "gold": "Gold Sponsor",
+      "silver": "Silver Sponsor",
+      "bronze": "Bronze Sponsor",
+      "companyLogo": "Company Logo",
+      "clickUploadLogo": "Click to upload company logo",
+      "logoFormats": "Supports PNG, JPG, GIF formats, recommended size 200x100px",
+      "changeLogo": "Change Logo",
+      "deleteLogo": "Delete",
+      "websiteLink": "Website Link"
+    },
+    "preview": {
+      "title": "Preview Hackathon",
+      "timeTBD": "Time TBD",
+      "totalPrizePool": "Total Prize Pool: ${amount}",
+      "maxPeople": "Max {count} people",
+      "unlimited": "Unlimited",
+      "techStack": "Tech Stack",
+      "prizeSettings": "Prize Settings",
+      "people": "people",
+      "judgeTeam": "Judge Team",
+      "schedule": "Schedule",
+      "tbd": "TBD"
+    },
+    "defaults": {
+      "firstPrize": "First Prize",
+      "mainTrack": "Main Track",
+      "registrationDeadline": "Registration Deadline",
+      "registrationDeadlineDesc": "Registration deadline",
+      "competitionBegins": "Competition Begins",
+      "competitionBeginsDesc": "Official development starts",
+      "submissionDeadline": "Submission Deadline",
+      "submissionDeadlineDesc": "Project submission deadline"
+    },
+    "validation": {
+      "incompleteInfo": "Incomplete Information",
+      "fillAllRequired": "Please fill in all required fields",
+      "descriptionTooShort": "Description Too Short",
+      "descriptionMinLength": "Hackathon description requires at least 10 characters",
+      "dateError": "Date Error",
+      "endAfterStart": "End date must be after start date",
+      "registrationTooLate": "Registration deadline cannot be more than 24 hours after start time",
+      "registrationStartBeforeEnd": "Registration start time must be before registration deadline"
+    },
+    "toasts": {
+      "fileTypeError": "File Type Error",
+      "selectImageFile": "Please select an image file",
+      "fileTooLarge": "File Too Large",
+      "imageSizeLimit": "Image size cannot exceed 5MB",
+      "retryLater": "Please try again later",
+      "logoUploadSuccess": "Logo Upload Success",
+      "logoUploadedToIPFS": "{fileName} has been successfully uploaded to IPFS",
+      "logoUploadFailed": "Logo Upload Failed",
+      "hackathonCreated": "Hackathon Created Successfully!",
+      "pendingReview": "Your hackathon has been submitted and is pending review",
+      "reviewNotice": "It will be published after admin approval",
+      "createdOnBlockchain": "Hackathon has been created on blockchain",
+      "contractId": "Contract ID: {contractId}",
+      "txHash": "Transaction Hash: {txHash}",
+      "creationFailed": "Creation Failed",
+      "networkError": "Network error, please check connection and retry",
+      "imageUploadFailed": "Image Upload Failed",
+      "imageUploadFailedContinue": "Cover image upload failed, but will continue creating hackathon"
+    }
+  },
+  "submit": "Submit Project",
+  "detail": {
+    "notFound": "Hackathon not found",
+    "backToList": "Back to Hackathons",
+    "startTime": "Start Time",
+    "duration": "Duration",
+    "totalPrize": "Total Prize",
+    "locationLabel": "Location",
+    "days": "{count, plural, =1 {# day} other {# days}}",
+    "status": {
+      "upcoming": "Upcoming",
+      "ongoing": "Ongoing",
+      "ended": "Ended",
+      "unknown": "Unknown",
+      "joined": "Joined"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "prizes": "Prizes",
+      "rules": "Rules",
+      "timeline": "Timeline",
+      "projects": "Projects"
+    },
+    "creator": {
+      "title": "You are the creator of this hackathon",
+      "description": "Creators cannot participate in their own competitions, but can manage and view all participating projects"
+    },
+    "registration": {
+      "notStarted": "Registration not started yet",
+      "expired": "Registration has expired"
+    },
+    "submission": {
+      "notStarted": "Hackathon has not started yet",
+      "ended": "Hackathon has ended"
+    },
+    "project": {
+      "individual": "Individual Project",
+      "uncategorized": "Uncategorized",
+      "teamMembers": "{count} {count, plural, =1 {member} other {members}} team",
+      "team": "Team: {name}",
+      "noProjects": "No projects submitted yet",
+      "beFirst": "Be the first team to submit a project!"
+    },
+    "prize": {
+      "rankName": "{rank}{rank, selectordinal, =1 {st} =2 {nd} =3 {rd} other {th}} Place",
+      "rankDescription": "{rank}{rank, selectordinal, =1 {st} =2 {nd} =3 {rd} other {th}} Place Prize",
+      "firstPrize": "First Prize",
+      "bestProject": "Best Project Award",
+      "winnerCount": "Winners: {count} {count, plural, =1 {person} other {people}}"
+    },
+    "track": {
+      "unnamed": "Unnamed Track",
+      "noDescription": "No description",
+      "categoryRelated": "{category} related projects",
+      "open": "Open Track",
+      "openDescription": "No restrictions on tech stack or project type"
+    },
+    "rules": {
+      "default": "Follow competition rules"
+    },
+    "requirements": {
+      "none": "No special requirements"
+    },
+    "criteria": {
+      "unnamed": "Unnamed Criteria",
+      "innovation": "Technical Innovation",
+      "completion": "Product Completion",
+      "userExperience": "User Experience",
+      "businessValue": "Business Value"
+    },
+    "timeline": {
+      "hackingStart": "Hacking Begins",
+      "hackingStartDesc": "Official development starts",
+      "hackingEnd": "Hacking Ends",
+      "submissionDeadline": "Submission deadline"
+    },
+    "judge": {
+      "defaultTitle": "HackX Judge"
+    },
+    "auth": {
+      "loginRequired": "Please login first",
+      "loginToJoin": "Login to join the hackathon",
+      "cannotJoin": "Cannot join",
+      "creatorRestriction": "As the creator, you cannot participate in your own hackathon"
+    },
+    "actions": {
+      "joinSuccess": "Successfully joined!",
+      "joinSuccessDesc": "You have successfully joined this hackathon",
+      "joinFailed": "Failed to join",
+      "networkError": "Network error, please try again later",
+      "linkCopied": "Link copied",
+      "linkCopiedDesc": "Hackathon link has been copied to clipboard",
+      "joinFailedError": "Failed to join",
+      "submitProject": "Submit Project",
+      "submitProjectNow": "Submit Project Now",
+      "viewDetails": "View Details",
+      "joinNow": "Join Now",
+      "share": "Share",
+      "judgePanel": "Judge Panel"
+    },
+    "timing": {
+      "startsIn": "Starts in {days} {days, plural, =1 {day} other {days}}"
+    },
+    "schedule": {
+      "title": "Schedule",
+      "registrationStart": "Registration Start",
+      "registrationDeadline": "Registration Deadline",
+      "eventStart": "Event Start",
+      "eventEnd": "Event End"
+    },
+    "sections": {
+      "introduction": "Introduction",
+      "tracks": "Tracks",
+      "techStack": "Tech Stack",
+      "rules": "Rules",
+      "requirements": "Requirements",
+      "criteria": "Judging Criteria",
+      "timeline": "Timeline",
+      "projects": "Projects",
+      "projectsDescription": "Projects grouped by track"
+    },
+    "stats": {
+      "submittedProjects": "Submitted Projects",
+      "activeTracks": "Active Tracks",
+      "participants": "Participants",
+      "averageTeamSize": "Average Team Size",
+      "projectCount": "{count} {count, plural, =1 {project} other {projects}}",
+      "participation": "Participation Stats",
+      "remainingSlots": "{count} {count, plural, =1 {slot} other {slots}} remaining",
+      "tracks": "Tracks",
+      "prizes": "Prizes",
+      "totalLikes": "Total Likes",
+      "totalComments": "Total Comments"
+    },
+    "organizer": {
+      "title": "Organizer",
+      "contact": "Contact",
+      "website": "Website",
+      "description": "Hackathon Organizer"
+    },
+    "judges": {
+      "title": "Judges"
+    },
+    "sponsors": {
+      "title": "Sponsors",
+      "visitWebsite": "Visit Website"
+    },
+    "error": {
+      "title": "Error",
+      "loadHackathonFailed": "Failed to load hackathon details"
+    },
+    "location": {
+      "globalOnline": "Global Online"
+    }
+  },
+  "register": "Register",
+  "registered": "Registered",
+  "status": {
+    "upcoming": "Upcoming",
+    "ongoing": "Ongoing",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "draft": "Draft"
+  },
+  "details": {
+    "description": "Description",
+    "rules": "Rules",
+    "prizes": "Prizes",
+    "schedule": "Schedule",
+    "participants": "Participants",
+    "projects": "Projects",
+    "organizer": "Organizer",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "registrationDeadline": "Registration Deadline",
+    "maxParticipants": "Max Participants",
+    "prizePool": "Prize Pool",
+    "categories": "Categories",
+    "techStack": "Tech Stack"
+  }
+}

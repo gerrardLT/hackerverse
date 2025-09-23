@@ -8,15 +8,13 @@ export const runtime = 'nodejs'
 export async function POST(request: NextRequest) {
   try {
     // 验证用户身份
-    const authResult = await auth(request)
-    if (!authResult.success || !authResult.user) {
+    const user = await auth(request)
+    if (!user) {
       return NextResponse.json(
         { success: false, error: '用户认证失败' },
         { status: 401 }
       )
     }
-
-    const user = authResult.user
 
     // 创建各种类型的测试通知
     const notifications = []
@@ -139,15 +137,13 @@ export async function POST(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     // 验证用户身份
-    const authResult = await auth(request)
-    if (!authResult.success || !authResult.user) {
+    const user = await auth(request)
+    if (!user) {
       return NextResponse.json(
         { success: false, error: '用户认证失败' },
         { status: 401 }
       )
     }
-
-    const user = authResult.user
 
     // 删除用户的所有通知（仅用于测试）
     const { prisma } = require('@/lib/prisma')

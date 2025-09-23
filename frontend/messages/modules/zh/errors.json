@@ -1,0 +1,12 @@
+{
+  "notFound": "页面未找到",
+  "serverError": "服务器错误",
+  "networkError": "网络错误",
+  "unauthorized": "未授权",
+  "forbidden": "禁止访问",
+  "validation": "验证错误",
+  "required": "此字段为必填项",
+  "invalidEmail": "邮箱格式不正确",
+  "passwordTooShort": "密码太短",
+  "passwordMismatch": "密码不匹配"
+}

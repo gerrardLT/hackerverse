@@ -1,0 +1,16 @@
+{
+  "title": "通知",
+  "markAsRead": "标记已读",
+  "markAllAsRead": "全部标记已读",
+  "clear": "清除",
+  "settings": "通知设置",
+  "types": {
+    "teamInvite": "团队邀请",
+    "applicationApproved": "申请通过",
+    "applicationRejected": "申请拒绝",
+    "hackathonStarting": "黑客松即将开始",
+    "hackathonEnding": "黑客松即将结束",
+    "projectLiked": "项目被点赞",
+    "systemAnnouncement": "系统公告"
+  }
+}

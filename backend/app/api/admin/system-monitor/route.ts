@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
   try {
     // 验证管理员权限
     const user = await auth(request)
-    if (!user || user.role !== 'admin') {
+    if (!user || user.role !== 'ADMIN') {
       return ApiResponseHandler.forbidden('需要管理员权限')
     }
 
@@ -125,7 +125,7 @@ export async function DELETE(request: NextRequest) {
   try {
     // 验证管理员权限
     const user = await auth(request)
-    if (!user || user.role !== 'admin') {
+    if (!user || user.role !== 'ADMIN') {
       return ApiResponseHandler.forbidden('需要管理员权限')
     }
 

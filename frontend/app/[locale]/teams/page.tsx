@@ -457,31 +457,25 @@ export default function TeamsPage() {
         <div className="container py-8 relative">
           <div className="space-y-8">
             {/* 现代化页面头部 */}
-            <div className={`transition-all duration-1000 ${isVisible ? 'animate-slide-up opacity-100' : 'opacity-0 translate-y-10'}`}>
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                <div className="space-y-4">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-gradient-primary rounded-2xl">
-                      <Users className="w-8 h-8 text-primary-foreground" />
-                    </div>
-                    <div>
-                      <h1 className="text-responsive-lg font-bold text-gradient animate-shimmer">
-                        {t('pageTitle')}
-                      </h1>
-                      <p className="text-muted-foreground leading-relaxed">
-                        {t('pageDescription')}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Button variant="outline" className="glass hover-lift border-primary/30" asChild>
-                    <Link href="/teams/create">
-                      <Plus className="w-4 h-4 mr-2" />
-                      {t('createTeam')}
-                    </Link>
-                  </Button>
-                </div>
+            <div className={`text-center space-y-6 mb-12 transition-all duration-1000 ${isVisible ? 'animate-slide-up opacity-100' : 'opacity-0 translate-y-10'}`}>
+              <div className="space-y-4">
+                <h1 className="text-responsive-lg font-bold tracking-tight">
+                  <span className="text-gradient animate-shimmer">{t('pageTitle')}</span>
+                </h1>
+                <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+                  {t('pageDescription')}
+                </p>
+              </div>
+
+              {/* 顶部操作栏 */}
+              <div className="flex items-center justify-center">
+                <Button className="group hover-lift hover-glow bg-primary hover:bg-primary/90" asChild>
+                  <Link href="/teams/create">
+                    <Plus className="h-4 w-4 mr-2 transition-transform group-hover:scale-110" />
+                    {t('createTeam')}
+                    <Sparkles className="h-4 w-4 ml-2 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </Link>
+                </Button>
               </div>
             </div>
 
@@ -912,7 +906,7 @@ export default function TeamsPage() {
                                     </Badge>
                                   </div>
                                   <p className="text-sm text-muted-foreground">
-                                    {t('fromInviter')} <span className="font-medium text-foreground">{invitation.inviterName}</span> 的邀请
+                                    {t('invitations.fromInviter', { inviterName: invitation.inviterName })}
                                   </p>
                                 </div>
                                 

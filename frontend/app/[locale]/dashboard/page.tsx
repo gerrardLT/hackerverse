@@ -11,10 +11,15 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Progress } from '@/components/ui/progress'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Input } from '@/components/ui/input'
-import { Trophy, Calendar, Users, Star, Plus, Settings, Code, HelpCircle, Edit, Save, X, Upload, Bookmark, Heart, MessageSquare, TrendingUp, Activity, Target, Zap, Sparkles } from 'lucide-react'
+import { Trophy, Calendar, Users, Star, Plus, Settings, Code, HelpCircle, Edit, Save, X, Upload, Bookmark, Heart, MessageSquare, TrendingUp, Activity, Target, Zap, Sparkles, Award, Clock, BarChart3, Shield } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
 import { apiService } from '@/lib/api'
 import { useToast } from '@/hooks/use-toast'
+import { AchievementDisplay } from '@/components/dashboard/achievement-display'
+import { ActivityTimeline } from '@/components/dashboard/activity-timeline'
+import { ReputationChart } from '@/components/dashboard/reputation-chart'
+import { EnhancedStats } from '@/components/dashboard/enhanced-stats'
+import { CredentialsManagement } from '@/components/dashboard/credentials-management'
 
 interface DashboardStats {
   participatedHackathons: number
@@ -983,12 +988,14 @@ export default function DashboardPage() {
             }}>
               {/* 现代化标签导航 */}
               <div className="glass border border-primary/10 rounded-2xl p-2">
-                <TabsList className="grid w-full grid-cols-5 bg-transparent gap-1">
+                <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-7 bg-transparent gap-1">
                   {[
                     { value: 'overview', label: t('tabs.overview'), icon: Activity },
-                    { value: 'hackathons', label: t('tabs.hackathons'), icon: Calendar },
-                    { value: 'projects', label: t('tabs.projects'), icon: Code },
-                    { value: 'teams', label: t('tabs.teams'), icon: Users },
+                    { value: 'enhanced', label: t('tabs.enhanced'), icon: BarChart3 },
+                    { value: 'achievements', label: t('tabs.achievements'), icon: Award },
+                    { value: 'activity', label: t('tabs.activity'), icon: Clock },
+                    { value: 'reputation', label: t('tabs.reputation'), icon: Star },
+                    { value: 'credentials', label: t('tabs.credentials'), icon: Shield },
                     { value: 'community', label: t('tabs.community'), icon: MessageSquare }
                   ].map((tab) => (
                     <TabsTrigger 
@@ -1005,6 +1012,45 @@ export default function DashboardPage() {
 
               {/* 现代化概览标签页 */}
               <TabsContent value="overview" className="space-y-6 animate-fade-in">
+                {/* 快捷操作区域 */}
+                <div className="glass border border-primary/10 rounded-2xl p-6">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="p-2 bg-gradient-primary rounded-xl">
+                      <Zap className="w-5 h-5 text-primary-foreground" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-foreground">{t('quickActions.title')}</h3>
+                      <p className="text-sm text-muted-foreground">{t('quickActions.description')}</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <Button variant="outline" className="glass hover-lift h-auto p-4 flex-col gap-2" asChild>
+                      <Link href="/projects">
+                        <Code className="w-5 h-5 text-primary" />
+                        <span className="text-sm font-medium">{t('quickActions.projects')}</span>
+                      </Link>
+                    </Button>
+                    <Button variant="outline" className="glass hover-lift h-auto p-4 flex-col gap-2" asChild>
+                      <Link href="/hackathons">
+                        <Trophy className="w-5 h-5 text-primary" />
+                        <span className="text-sm font-medium">{t('quickActions.hackathons')}</span>
+                      </Link>
+                    </Button>
+                    <Button variant="outline" className="glass hover-lift h-auto p-4 flex-col gap-2" asChild>
+                      <Link href="/teams">
+                        <Users className="w-5 h-5 text-primary" />
+                        <span className="text-sm font-medium">{t('quickActions.teams')}</span>
+                      </Link>
+                    </Button>
+                    <Button variant="outline" className="glass hover-lift h-auto p-4 flex-col gap-2" asChild>
+                      <Link href="/community">
+                        <MessageSquare className="w-5 h-5 text-primary" />
+                        <span className="text-sm font-medium">{t('quickActions.community')}</span>
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* 现代化最近活动 */}
                   <div className="glass border border-primary/10 rounded-2xl p-6 relative overflow-hidden">
@@ -1051,7 +1097,7 @@ export default function DashboardPage() {
                               <p className="text-sm font-semibold text-foreground">{activity.title}</p>
                               <p className="text-xs text-muted-foreground leading-relaxed">{activity.description}</p>
                               <p className="text-xs text-muted-foreground">
-                                {new Date(activity.date).toLocaleDateString('zh-CN')}
+                                {new Date(activity.date).toLocaleDateString()}
                               </p>
                             </div>
                           </div>
@@ -1496,6 +1542,31 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* 增强统计标签页 */}
+          <TabsContent value="enhanced" className="space-y-6">
+            <EnhancedStats />
+          </TabsContent>
+
+          {/* 成就标签页 */}
+          <TabsContent value="achievements" className="space-y-6">
+            <AchievementDisplay />
+          </TabsContent>
+
+          {/* 活动记录标签页 */}
+          <TabsContent value="activity" className="space-y-6">
+            <ActivityTimeline />
+          </TabsContent>
+
+          {/* 声誉分析标签页 */}
+          <TabsContent value="reputation" className="space-y-6">
+            <ReputationChart />
+          </TabsContent>
+
+          {/* 凭证管理标签页 */}
+          <TabsContent value="credentials" className="space-y-6">
+            <CredentialsManagement />
           </TabsContent>
             </Tabs>
           </div>

@@ -15,8 +15,8 @@ export interface UserState {
   avatarUrl?: string
   bio?: string
   reputationScore: number
-  role: 'user' | 'admin' | 'moderator' | 'judge'
-  status: 'active' | 'suspended' | 'banned' | 'pending'
+  role: 'USER' | 'ADMIN' | 'MODERATOR' | 'JUDGE'
+  status: 'ACTIVE' | 'SUSPENDED' | 'BANNED' | 'PENDING'
   emailVerified: boolean
   createdAt: string
   updatedAt: string

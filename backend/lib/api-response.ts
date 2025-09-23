@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { prepareApiResponse } from './bigint-serializer'
 
 // 统一API响应接口
 export interface ApiResponse<T = any> {
@@ -52,6 +53,12 @@ export enum ErrorCode {
  */
 export class ApiResponseHandler {
   /**
+   * 私有方法：安全地序列化和返回JSON响应
+   */
+  private static jsonResponse(data: any, status: number = 200): NextResponse {
+    return NextResponse.json(prepareApiResponse(data), { status })
+  }
+  /**
    * 成功响应
    */
   static success<T>(data?: T, message?: string): NextResponse {
@@ -60,7 +67,7 @@ export class ApiResponseHandler {
       message,
       data
     }
-    return NextResponse.json(response, { status: 200 })
+    return this.jsonResponse(response, 200)
   }
 
   /**
@@ -72,7 +79,7 @@ export class ApiResponseHandler {
       message: message || '创建成功',
       data
     }
-    return NextResponse.json(response, { status: 201 })
+    return this.jsonResponse(response, 201)
   }
 
   /**
@@ -83,7 +90,7 @@ export class ApiResponseHandler {
       success: true,
       message: message || '操作成功'
     }
-    return NextResponse.json(response, { status: 204 })
+    return this.jsonResponse(response, 204)
   }
 
   /**
@@ -100,7 +107,7 @@ export class ApiResponseHandler {
       code: code || ErrorCode.INVALID_INPUT,
       details
     }
-    return NextResponse.json(response, { status: 400 })
+    return this.jsonResponse(response, 400)
   }
 
   /**
@@ -115,7 +122,7 @@ export class ApiResponseHandler {
       error,
       code: code || ErrorCode.UNAUTHORIZED
     }
-    return NextResponse.json(response, { status: 401 })
+    return this.jsonResponse(response, 401)
   }
 
   /**
@@ -130,7 +137,7 @@ export class ApiResponseHandler {
       error,
       code: code || ErrorCode.FORBIDDEN
     }
-    return NextResponse.json(response, { status: 403 })
+    return this.jsonResponse(response, 403)
   }
 
   /**
@@ -145,7 +152,7 @@ export class ApiResponseHandler {
       error,
       code: code || ErrorCode.NOT_FOUND
     }
-    return NextResponse.json(response, { status: 404 })
+    return this.jsonResponse(response, 404)
   }
 
   /**
@@ -162,7 +169,7 @@ export class ApiResponseHandler {
       code: code || ErrorCode.RESOURCE_CONFLICT,
       details
     }
-    return NextResponse.json(response, { status: 409 })
+    return this.jsonResponse(response, 409)
   }
 
   /**
@@ -178,7 +185,7 @@ export class ApiResponseHandler {
       code: ErrorCode.VALIDATION_ERROR,
       details
     }
-    return NextResponse.json(response, { status: 422 })
+    return this.jsonResponse(response, 422)
   }
 
   /**
@@ -195,7 +202,7 @@ export class ApiResponseHandler {
       code: code || ErrorCode.INTERNAL_SERVER_ERROR,
       details
     }
-    return NextResponse.json(response, { status: 500 })
+    return this.jsonResponse(response, 500)
   }
 
   /**
@@ -210,7 +217,7 @@ export class ApiResponseHandler {
       error,
       code: code || ErrorCode.EXTERNAL_SERVICE_ERROR
     }
-    return NextResponse.json(response, { status: 502 })
+    return this.jsonResponse(response, 502)
   }
 
   /**
@@ -237,7 +244,7 @@ export class ApiResponseHandler {
         pagination
       }
     }
-    return NextResponse.json(response, { status: 200 })
+    return this.jsonResponse(response, 200)
   }
 
   /**

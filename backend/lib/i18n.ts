@@ -28,7 +28,7 @@ const messages: Record<SupportedLocale, TranslationMessages> = {
       alreadyJoined: 'Already joined this hackathon',
       registrationClosed: 'Registration period has ended',
       invalidDateRange: 'End date must be after start date',
-      invalidRegistrationDeadline: 'Registration deadline must be before start date',
+      registrationTooLate: 'Registration deadline cannot be more than 24 hours after start time',
       getListError: 'Failed to get hackathon list',
       getDetailsError: 'Failed to get hackathon details',
       privateEvent: 'This hackathon is a private event',
@@ -40,7 +40,6 @@ const messages: Record<SupportedLocale, TranslationMessages> = {
       smartContractCallFailed: 'Smart contract call failed, hackathon creation failed',
       creatorCannotJoin: 'Creator cannot participate in their own hackathon',
       registrationNotStarted: 'Registration has not started yet',
-      registrationClosed: 'Registration has ended',
       participantLimitReached: 'Participant limit reached',
       alreadyRegistered: 'You have already registered for this hackathon',
       notRegistered: 'You have not registered for this hackathon',
@@ -81,7 +80,6 @@ const messages: Record<SupportedLocale, TranslationMessages> = {
       notPublicRecruiting: 'This team is not publicly recruiting',
       alreadyMember: 'You are already a member of this team',
       applicationPending: 'You have already submitted an application, please wait for review',
-      needRegistration: 'Please register for this hackathon first',
       applicationSubmitFailed: 'Failed to submit application',
       alreadyTeamMember: 'User is already a team member',
       userNotRegistered: 'Invited user has not registered for this hackathon',
@@ -246,6 +244,309 @@ const messages: Record<SupportedLocale, TranslationMessages> = {
       replyLikedMessage: 'A user liked your reply in "{postTitle}"',
       newFollower: 'New follower',
       newFollowerMessage: '{followerName} followed you'
+    },
+    dashboard: {
+      getUserStatsError: 'Failed to get user statistics',
+      getAchievementsError: 'Failed to get user achievements',
+      getActivityError: 'Failed to get user activity',
+      getReputationError: 'Failed to get reputation data',
+      createAchievementError: 'Failed to create achievement',
+      updateAchievementError: 'Failed to update achievement',
+      achievementCreatedSuccess: 'Achievement created successfully',
+      achievementUpdatedSuccess: 'Achievement updated successfully',
+      invalidAchievementData: 'Invalid achievement data',
+      userNotFound: 'User not found',
+      invalidRequest: 'Invalid request parameters'
+    },
+    admin: {
+      dashboard: {
+        loadError: 'Failed to load admin dashboard data'
+      },
+      content: {
+        loadError: 'Failed to get pending content reviews',
+        modelNotAvailable: 'Content review model not available',
+        notFound: 'Review content not found',
+        alreadyReviewed: 'Content has already been reviewed',
+        approveSuccess: 'Content approved successfully',
+        rejectSuccess: 'Content rejected successfully',
+        flagSuccess: 'Content flagged successfully',
+        reviewError: 'Content review operation failed'
+      },
+      analytics: {
+        loadError: 'Failed to get analytics data',
+        overview: {
+          title: 'Analytics Overview',
+          description: 'Comprehensive analytics dashboard for organizers',
+          participants: 'Participants',
+          projects: 'Projects', 
+          teams: 'Teams',
+          avgProjectsPerTeam: 'Avg Projects per Team',
+          completionRate: 'Completion Rate',
+          satisfactionScore: 'Satisfaction Score'
+        },
+        participation: {
+          title: 'Participation Analysis',
+          description: 'Detailed participation metrics and trends',
+          registrations: 'Registrations',
+          actualParticipants: 'Actual Participants',
+          dropoutRate: 'Dropout Rate',
+          dailyRegistrations: 'Daily Registrations',
+          peakRegistrationTime: 'Peak Registration Time',
+          averageTeamSize: 'Average Team Size'
+        },
+        projects: {
+          title: 'Project Quality Analysis',
+          description: 'Project submission and quality metrics',
+          totalSubmissions: 'Total Submissions',
+          submissionRate: 'Submission Rate',
+          averageScore: 'Average Score',
+          topProjects: 'Top Projects',
+          technologyDistribution: 'Technology Distribution',
+          categoryBreakdown: 'Category Breakdown'
+        },
+        teams: {
+          title: 'Team Collaboration Analysis',
+          description: 'Team formation and collaboration patterns',
+          averageFormationTime: 'Average Formation Time',
+          soloParticipants: 'Solo Participants',
+          teamSizeDistribution: 'Team Size Distribution',
+          collaborationScore: 'Collaboration Score',
+          communicationActivity: 'Communication Activity'
+        },
+        report: {
+          title: 'Custom Reports',
+          description: 'Create and manage custom analytics reports',
+          name: 'Report Name',
+          reportType: 'Report Type',
+          scope: 'Scope',
+          create: 'Create Report',
+          generate: 'Generate Report',
+          export: 'Export Report',
+          lastGenerated: 'Last Generated',
+          notFound: 'Report not found',
+          createSuccess: 'Report created successfully',
+          createError: 'Failed to create report',
+          generateSuccess: 'Report generated successfully',
+          generateError: 'Failed to generate report',
+          deleteSuccess: 'Report deleted successfully',
+          deleteError: 'Failed to delete report'
+        },
+        export: {
+          title: 'Export Data',
+          format: 'Export Format',
+          json: 'JSON',
+          csv: 'CSV',
+          excel: 'Excel',
+          pdf: 'PDF',
+          exportSuccess: 'Data exported successfully',
+          exportError: 'Failed to export data',
+          unsupportedFormat: 'Unsupported export format',
+          pdfNotSupported: 'PDF export is not supported yet'
+        },
+        errors: {
+          dataLoadFailed: 'Failed to load analytics data',
+          reportNotFound: 'Report not found',
+          insufficientPermissions: 'Insufficient permissions to access analytics',
+          invalidTimeRange: 'Invalid time range specified',
+          noDataAvailable: 'No data available for the selected period'
+        }
+      },
+      hackathons: {
+        loadError: 'Failed to load hackathons for review',
+        notFound: 'Hackathon not found',
+        cannotReview: 'Hackathon cannot be reviewed in current status',
+        submitSuccess: 'Hackathon submitted for review',
+        approveSuccess: 'Hackathon approved successfully',
+        rejectSuccess: 'Hackathon rejected successfully',
+        request_changesSuccess: 'Change request sent successfully',
+        reviewError: 'Hackathon review operation failed',
+        historyError: 'Failed to load review history'
+      }
+    },
+    credentials: {
+      generate: {
+        forbidden: 'You do not have permission to generate credentials for other users',
+        success: 'Credential generated successfully',
+        error: 'Failed to generate credential'
+      },
+      verify: {
+        invalidHash: 'Invalid IPFS hash format',
+        error: 'Failed to verify credential'
+      },
+      upload: {
+        forbidden: 'You do not have permission to upload this credential',
+        alreadyExists: 'Credential already exists',
+        success: 'Credential uploaded successfully',
+        error: 'Failed to upload credential',
+        getInfo: 'IPFS credential upload service',
+        infoError: 'Failed to get upload information'
+      },
+      templates: {
+        loadError: 'Failed to load credential templates',
+        createForbidden: 'You do not have permission to create templates',
+        nameExists: 'Template name already exists for this credential type',
+        invalidSchema: 'Invalid JSON schema format',
+        createSuccess: 'Template created successfully',
+        createError: 'Failed to create template'
+      },
+      subjectNotFound: 'Subject user not found',
+      issuerNotFound: 'Issuer user not found',
+      templateNotFound: 'Template not found',
+      insufficientRole: 'Insufficient role to use this template'
+    },
+    reputation: {
+      userNotFound: 'User not found',
+      userInactive: 'User is inactive',
+      fetchError: 'Failed to fetch user reputation information',
+      leaderboard: {
+        error: 'Failed to fetch leaderboard'
+      },
+      unauthorizedCalculate: 'Unauthorized to perform reputation calculation',
+      invalidCalculateParams: 'Invalid parameters',
+      calculateAllSuccess: 'All users reputation scores recalculated successfully',
+      calculateUserSuccess: 'User reputation score recalculated successfully',
+      calculateError: 'Failed to calculate reputation scores',
+      rules: {
+        fetchError: 'Failed to fetch reputation rules',
+        missingFields: 'Missing required fields',
+        actionExists: 'Action type already exists',
+        createSuccess: 'Reputation rule created successfully',
+        createError: 'Failed to create reputation rule',
+        missingId: 'Missing rule ID',
+        notFound: 'Rule not found',
+        updateSuccess: 'Reputation rule updated successfully',
+        updateError: 'Failed to update reputation rule',
+        deactivateSuccess: 'Rule deactivated (due to existing records)',
+        deleteSuccess: 'Reputation rule deleted successfully',
+        deleteError: 'Failed to delete reputation rule'
+      }
+    },
+    judging: {
+      assignments: {
+        fetchError: 'Failed to fetch judge assignments'
+      },
+      score: {
+        notAssigned: 'You are not assigned to judge this hackathon',
+        projectNotFound: 'Project not found',
+        hackathonNotActive: 'This hackathon is not currently accepting scores',
+        missingRequiredCriteria: 'Missing required criteria: {criterion}',
+        invalidData: 'Invalid score data',
+        draftSaved: 'Draft saved successfully',
+        submitted: 'Score submitted successfully',
+        submitError: 'Failed to submit score'
+      },
+      criteria: {
+        hackathonNotFound: 'Hackathon not found',
+        fetchError: 'Failed to fetch scoring criteria',
+        hackathonIdRequired: 'Hackathon ID is required',
+        criteriaIdRequired: 'Criteria ID is required',
+        notFound: 'Criteria not found',
+        invalidData: 'Invalid criteria data',
+        invalidScoreRange: 'Minimum score must be less than maximum score',
+        weightExceeds100: 'Total weight cannot exceed 100%',
+        weightWouldExceed100: 'Adding this criteria would exceed 100% total weight',
+        createSuccess: 'Scoring criteria created successfully',
+        createError: 'Failed to create scoring criteria',
+        updateSuccess: 'Scoring criteria updated successfully',
+        updateError: 'Failed to update scoring criteria',
+        deleteSuccess: 'Scoring criteria deleted successfully',
+        deleteError: 'Failed to delete scoring criteria',
+        deactivateSuccess: 'Scoring criteria deactivated successfully',
+        batchCreateSuccess: 'Scoring criteria batch created successfully'
+      },
+      results: {
+        hackathonNotFound: 'Hackathon not found',
+        fetchError: 'Failed to fetch judging results'
+      }
+    },
+    teamMatching: {
+      preferences: {
+        hackathonIdRequired: 'Hackathon ID is required',
+        idRequired: 'Team ID or User ID is required',
+        unauthorizedTeam: 'You are not authorized to access this team',
+        fetchError: 'Failed to fetch team preferences',
+        updateSuccess: 'Team preferences updated successfully',
+        updateError: 'Failed to update team preferences'
+      },
+      recommendations: {
+        missingParams: 'Missing required parameters',
+        unauthorizedTeam: 'You are not authorized to access this team',
+        invalidType: 'Invalid recommendation type',
+        fetchError: 'Failed to fetch team recommendations'
+      },
+      compatibility: {
+        hackathonIdRequired: 'Hackathon ID is required',
+        calculateError: 'Failed to calculate compatibility'
+      },
+      joinRequest: {
+        alreadyMember: 'You are already a member of this team',
+        alreadyApplied: 'You have already applied to this team',
+        teamNotFound: 'Team not found',
+        submitSuccess: 'Join request submitted successfully',
+        submitError: 'Failed to submit join request'
+      },
+      suitable: {
+        alreadyInTeam: 'You are already a member of a team in this hackathon',
+        fetchError: 'Failed to fetch suitable teams'
+      },
+      matching: {
+        pageTitle: 'Smart Team Matching',
+        pageDescription: 'Find the perfect team or teammates with AI-powered recommendations',
+        preferencesTitle: 'Matching Preferences',
+        preferencesDescription: 'Set your team matching preferences, the system will recommend the most suitable teams based on these conditions',
+        skillMatching: 'Skill Matching',
+        requiredSkills: 'Required Skills',
+        preferredSkills: 'Preferred Skills',
+        skillWeight: 'Skill Match Weight',
+        experienceRequirements: 'Experience Requirements',
+        minExperience: 'Minimum Experience',
+        maxExperience: 'Maximum Experience',
+        teamSize: 'Team Size',
+        preferredTeamSize: 'Preferred Team Size',
+        maxTeamSize: 'Maximum Team Size',
+        collaborationPreferences: 'Collaboration Preferences',
+        collaborationStyle: 'Collaboration Style',
+        diversityPreference: 'Diversity Preference',
+        advancedSettings: 'Advanced Settings',
+        locationFlexible: 'Location Flexible',
+        personalityMatch: 'Consider Personality Match',
+        enableNotifications: 'Enable Match Notifications',
+        autoAcceptThreshold: 'Auto Accept Threshold',
+        aiRecommendations: 'AI Recommendations',
+        suitableTeams: 'Suitable Teams',
+        noMatches: 'No Matching Teams',
+        noMatchesDescription: 'Try adjusting your matching preferences or check other suitable teams',
+        adjustPreferences: 'Adjust Preferences',
+        noSuitableTeams: 'No Suitable Teams',
+        noSuitableTeamsDescription: 'No teams found matching your criteria, please try again later',
+        matchingTeams: 'Finding the most suitable teams for you...',
+        refreshRecommendations: 'Refresh Recommendations',
+        matchingSettings: 'Matching Settings',
+        filterConditions: 'Filter Conditions',
+        selectHackathon: 'Select Hackathon',
+        allHackathons: 'All Hackathons',
+        compatibility: 'Compatibility',
+        matchingSkills: 'Matching Skills',
+        members: 'members',
+        slots: 'slots',
+        viewDetails: 'View Details',
+        applyToJoin: 'Apply to Join',
+        recruiting: 'Recruiting',
+        highMatch: 'High Match',
+        goodMatch: 'Good Match',
+        averageMatch: 'Average Match',
+        lowMatch: 'Low Match',
+        saveSettings: 'Save Settings',
+        cancel: 'Cancel',
+        applicationSubmitted: 'Application Submitted',
+        applicationSubmittedDesc: 'Your application has been sent to team',
+        settingsSaved: 'Settings Saved',
+        settingsSavedDesc: 'Your matching preferences have been updated, the system will recommend teams based on new settings',
+        loadingFailed: 'Loading Failed',
+        loadingFailedDesc: 'Unable to load team recommendations, please try again later',
+        loginRequired: 'Login Required',
+        loginRequiredDesc: 'You need to login before applying to join a team'
+      }
     }
   },
   zh: {
@@ -269,7 +570,7 @@ const messages: Record<SupportedLocale, TranslationMessages> = {
       alreadyJoined: '已经加入了此黑客松',
       registrationClosed: '报名时间已结束',
       invalidDateRange: '结束日期必须晚于开始日期',
-      invalidRegistrationDeadline: '注册截止日期必须早于开始日期',
+      registrationTooLate: '注册截止时间不能超过开始时间后24小时',
       getListError: '获取黑客松列表失败',
       getDetailsError: '获取黑客松详情失败',
       privateEvent: '该黑客松为私有活动',
@@ -281,7 +582,6 @@ const messages: Record<SupportedLocale, TranslationMessages> = {
       smartContractCallFailed: '智能合约调用失败，黑客松创建失败',
       creatorCannotJoin: '创建者不能参加自己创建的黑客松',
       registrationNotStarted: '报名尚未开始',
-      registrationClosed: '报名已截止',
       participantLimitReached: '参与人数已达上限',
       alreadyRegistered: '您已经报名参加该黑客松',
       notRegistered: '您未报名参加该黑客松',
@@ -322,7 +622,6 @@ const messages: Record<SupportedLocale, TranslationMessages> = {
       notPublicRecruiting: '该团队不公开招募',
       alreadyMember: '您已经是该团队成员',
       applicationPending: '您已提交申请，请等待审核',
-      needRegistration: '请先报名参加该黑客松',
       applicationSubmitFailed: '申请提交失败',
       alreadyTeamMember: '该用户已经是团队成员',
       userNotRegistered: '被邀请用户未参加该黑客松',
@@ -406,7 +705,17 @@ const messages: Record<SupportedLocale, TranslationMessages> = {
       passwordTooShort: '密码至少8个字符',
       invalidDate: '日期格式不正确',
       fileTooLarge: '文件大小超出限制',
-      invalidFileType: '文件类型不支持'
+      invalidFileType: '文件类型不支持',
+      projectTitleRequired: '项目标题不能为空',
+      projectDescriptionMinLength: '项目描述至少10个字符',
+      technologiesRequired: '至少选择一种技术',
+      githubUrlFormat: 'GitHub链接格式不正确',
+      demoUrlFormat: '演示链接格式不正确',
+      videoUrlFormat: '视频链接格式不正确',
+      presentationUrlFormat: '演示文稿链接格式不正确',
+      userIdRequired: '用户ID不能为空',
+      messageMaxLength: '消息不能超过{max}个字符',
+      inviteMessageMaxLength: '邀请消息不能超过500字符'
     },
     errors: {
       serverError: '服务器内部错误',
@@ -425,7 +734,12 @@ const messages: Record<SupportedLocale, TranslationMessages> = {
       unsupportedOperation: '不支持的操作',
       queryFailed: '查询失败',
       dataPreparationFailed: '数据准备失败',
-      getStatsError: '获取统计数据失败'
+      getStatsError: '获取统计数据失败',
+      operationFailed: '操作失败',
+      validationFailed: '验证失败',
+      requestDataValidationFailed: '请求数据验证失败',
+      insufficientPermissions: '权限不足',
+      adminRequired: '需要管理员权限'
     },
     stats: {
       users: {
@@ -488,48 +802,308 @@ const messages: Record<SupportedLocale, TranslationMessages> = {
       newFollower: '有新的粉丝关注了你',
       newFollowerMessage: '{followerName} 关注了你'
     },
-    validation: {
-      required: '此字段为必填项',
-      invalidEmail: '邮箱格式不正确',
-      emailFormatError: '邮箱格式不正确',
-      passwordRequired: '密码不能为空',
-      passwordMinLength: '密码至少6位',
-      usernameMinLength: '用户名至少2个字符',
-      usernameMaxLength: '用户名最多30个字符',
-      walletAddressFormat: '钱包地址格式不正确',
-      titleRequired: '标题不能为空',
-      descriptionMinLength: '描述至少10个字符',
-      startDateFormat: '开始日期格式不正确',
-      endDateFormat: '结束日期格式不正确',
-      registrationStartDateFormat: '报名开始日期格式不正确',
-      registrationDeadlineFormat: '注册截止日期格式不正确',
-      maxParticipantsMin: '最大参与人数至少1人',
-      prizePoolNonNegative: '奖金池不能为负数',
-      categoriesRequired: '至少选择一个类别',
-      teamNameMinLength: '团队名称至少2个字符',
-      teamDescriptionMinLength: '团队描述至少10个字符',
-      hackathonIdRequired: '黑客松ID不能为空',
-      maxMembersRange: '最大成员数至少1人且不能超过10人',
-      skillsRequired: '至少选择一种技能',
-      projectTitleRequired: '项目标题不能为空',
-      projectDescriptionMinLength: '项目描述至少10个字符',
-      technologiesRequired: '至少选择一种技术',
-      githubUrlFormat: 'GitHub链接格式不正确',
-      demoUrlFormat: '演示链接格式不正确',
-      videoUrlFormat: '视频链接格式不正确',
-      presentationUrlFormat: '演示文稿链接格式不正确',
-      userIdRequired: '用户ID不能为空',
-      messageMaxLength: '消息不能超过{max}个字符',
-      inviteMessageMaxLength: '邀请消息不能超过500字符'
+    dashboard: {
+      getUserStatsError: '获取用户统计数据失败',
+      getAchievementsError: '获取用户成就失败',
+      getActivityError: '获取用户活动失败',
+      getReputationError: '获取声誉数据失败',
+      createAchievementError: '创建成就失败',
+      updateAchievementError: '更新成就失败',
+      achievementCreatedSuccess: '成就创建成功',
+      achievementUpdatedSuccess: '成就更新成功',
+      invalidAchievementData: '成就数据无效',
+      userNotFound: '用户不存在',
+      invalidRequest: '请求参数无效'
     },
-    errors: {
-      unknownError: '发生未知错误',
-      operationFailed: '操作失败',
-      networkError: '网络错误',
-      validationFailed: '验证失败',
-      requestDataValidationFailed: '请求数据验证失败',
-      insufficientPermissions: '权限不足',
-      adminRequired: '需要管理员权限'
+    admin: {
+      dashboard: {
+        loadError: '加载管理员仪表板数据失败'
+      },
+      content: {
+        loadError: '获取待审核内容失败',
+        modelNotAvailable: '内容审核模型不可用',
+        notFound: '审核内容不存在',
+        alreadyReviewed: '内容已经审核过',
+        approveSuccess: '内容审核通过',
+        rejectSuccess: '内容已拒绝',
+        flagSuccess: '内容已标记',
+        reviewError: '内容审核操作失败'
+      },
+      analytics: {
+        loadError: '获取分析数据失败',
+        overview: {
+          title: '分析概览',
+          description: '为组织者提供的综合分析仪表板',
+          participants: '参与者',
+          projects: '项目',
+          teams: '团队',
+          avgProjectsPerTeam: '平均每团队项目数',
+          completionRate: '完成率',
+          satisfactionScore: '满意度评分'
+        },
+        participation: {
+          title: '参与度分析',
+          description: '详细的参与指标和趋势',
+          registrations: '报名人数',
+          actualParticipants: '实际参与者',
+          dropoutRate: '流失率',
+          dailyRegistrations: '每日报名',
+          peakRegistrationTime: '报名高峰时间',
+          averageTeamSize: '平均团队规模'
+        },
+        projects: {
+          title: '项目质量分析',
+          description: '项目提交和质量指标',
+          totalSubmissions: '总提交数',
+          submissionRate: '提交率',
+          averageScore: '平均分数',
+          topProjects: '顶级项目',
+          technologyDistribution: '技术分布',
+          categoryBreakdown: '分类明细'
+        },
+        teams: {
+          title: '团队协作分析',
+          description: '团队组建和协作模式',
+          averageFormationTime: '平均组队时间',
+          soloParticipants: '单人参与者',
+          teamSizeDistribution: '团队规模分布',
+          collaborationScore: '协作评分',
+          communicationActivity: '沟通活跃度'
+        },
+        report: {
+          title: '自定义报告',
+          description: '创建和管理自定义分析报告',
+          name: '报告名称',
+          reportType: '报告类型',
+          scope: '范围',
+          create: '创建报告',
+          generate: '生成报告',
+          export: '导出报告',
+          lastGenerated: '最后生成时间',
+          notFound: '报告未找到',
+          createSuccess: '报告创建成功',
+          createError: '报告创建失败',
+          generateSuccess: '报告生成成功',
+          generateError: '报告生成失败',
+          deleteSuccess: '报告删除成功',
+          deleteError: '报告删除失败'
+        },
+        export: {
+          title: '导出数据',
+          format: '导出格式',
+          json: 'JSON',
+          csv: 'CSV',
+          excel: 'Excel',
+          pdf: 'PDF',
+          exportSuccess: '数据导出成功',
+          exportError: '数据导出失败',
+          unsupportedFormat: '不支持的导出格式',
+          pdfNotSupported: 'PDF导出暂不支持'
+        },
+        errors: {
+          dataLoadFailed: '分析数据加载失败',
+          reportNotFound: '报告未找到',
+          insufficientPermissions: '权限不足，无法访问分析功能',
+          invalidTimeRange: '指定的时间范围无效',
+          noDataAvailable: '所选时期没有可用数据'
+        }
+      },
+      hackathons: {
+        loadError: '获取待审核黑客松失败',
+        notFound: '黑客松不存在',
+        cannotReview: '黑客松当前状态无法审核',
+        submitSuccess: '黑客松已提交审核',
+        approveSuccess: '黑客松审核通过',
+        rejectSuccess: '黑客松已拒绝',
+        request_changesSuccess: '修改请求已发送',
+        reviewError: '黑客松审核操作失败',
+        historyError: '获取审核历史失败'
+      }
+    },
+    credentials: {
+      generate: {
+        forbidden: '您没有权限为其他用户生成凭证',
+        success: '凭证生成成功',
+        error: '凭证生成失败'
+      },
+      verify: {
+        invalidHash: '无效的IPFS哈希格式',
+        error: '凭证验证失败'
+      },
+      upload: {
+        forbidden: '您没有权限上传此凭证',
+        alreadyExists: '凭证已存在',
+        success: '凭证上传成功',
+        error: '凭证上传失败',
+        getInfo: 'IPFS凭证上传服务',
+        infoError: '获取上传信息失败'
+      },
+      templates: {
+        loadError: '获取凭证模板失败',
+        createForbidden: '您没有权限创建模板',
+        nameExists: '该凭证类型的模板名称已存在',
+        invalidSchema: '无效的JSON模式格式',
+        createSuccess: '模板创建成功',
+        createError: '模板创建失败'
+      },
+      subjectNotFound: '凭证主体用户不存在',
+      issuerNotFound: '凭证颁发者不存在',
+      templateNotFound: '模板不存在',
+      insufficientRole: '角色权限不足，无法使用此模板'
+    },
+    reputation: {
+      userNotFound: '用户不存在',
+      userInactive: '用户已停用',
+      fetchError: '获取用户声誉信息失败',
+      leaderboard: {
+        error: '获取排行榜失败'
+      },
+      unauthorizedCalculate: '无权限执行声誉计算',
+      invalidCalculateParams: '参数无效',
+      calculateAllSuccess: '所有用户声誉积分重新计算完成',
+      calculateUserSuccess: '用户声誉积分重新计算完成',
+      calculateError: '声誉积分计算失败',
+      rules: {
+        fetchError: '获取声誉规则失败',
+        missingFields: '缺少必填字段',
+        actionExists: '该行为类型已存在',
+        createSuccess: '声誉规则创建成功',
+        createError: '创建声誉规则失败',
+        missingId: '缺少规则ID',
+        notFound: '规则不存在',
+        updateSuccess: '声誉规则更新成功',
+        updateError: '更新声誉规则失败',
+        deactivateSuccess: '规则已停用（因为存在相关记录）',
+        deleteSuccess: '声誉规则删除成功',
+        deleteError: '删除声誉规则失败'
+      }
+    },
+    judging: {
+      assignments: {
+        fetchError: '获取评委分配失败'
+      },
+      score: {
+        notAssigned: '您没有被分配评审此黑客松',
+        projectNotFound: '项目不存在',
+        hackathonNotActive: '此黑客松目前不接受评分',
+        missingRequiredCriteria: '缺少必填评分项：{criterion}',
+        invalidData: '评分数据无效',
+        draftSaved: '草稿保存成功',
+        submitted: '评分提交成功',
+        submitError: '提交评分失败'
+      },
+      criteria: {
+        hackathonNotFound: '黑客松不存在',
+        fetchError: '获取评分标准失败',
+        hackathonIdRequired: '需要黑客松ID',
+        criteriaIdRequired: '需要标准ID',
+        notFound: '评分标准不存在',
+        invalidData: '评分标准数据无效',
+        invalidScoreRange: '最小分数必须小于最大分数',
+        weightExceeds100: '总权重不能超过100%',
+        weightWouldExceed100: '添加此标准会导致总权重超过100%',
+        createSuccess: '评分标准创建成功',
+        createError: '创建评分标准失败',
+        updateSuccess: '评分标准更新成功',
+        updateError: '更新评分标准失败',
+        deleteSuccess: '评分标准删除成功',
+        deleteError: '删除评分标准失败',
+        deactivateSuccess: '评分标准停用成功',
+        batchCreateSuccess: '评分标准批量创建成功'
+      },
+      results: {
+        hackathonNotFound: '黑客松不存在',
+        fetchError: '获取评审结果失败'
+      }
+    },
+    teamMatching: {
+      preferences: {
+        hackathonIdRequired: '需要黑客松ID',
+        idRequired: '需要团队ID或用户ID',
+        unauthorizedTeam: '您无权访问此团队',
+        fetchError: '获取团队偏好失败',
+        updateSuccess: '团队偏好更新成功',
+        updateError: '更新团队偏好失败'
+      },
+      recommendations: {
+        missingParams: '缺少必要参数',
+        unauthorizedTeam: '您无权访问此团队',
+        invalidType: '无效的推荐类型',
+        fetchError: '获取团队推荐失败'
+      },
+      compatibility: {
+        hackathonIdRequired: '需要黑客松ID',
+        calculateError: '计算兼容性失败'
+      },
+      joinRequest: {
+        alreadyMember: '您已经是此团队的成员',
+        alreadyApplied: '您已经申请加入此团队',
+        teamNotFound: '团队不存在',
+        submitSuccess: '加入请求提交成功',
+        submitError: '提交加入请求失败'
+      },
+      suitable: {
+        alreadyInTeam: '您已经是此黑客松中某个团队的成员',
+        fetchError: '获取适合的团队失败'
+      },
+      matching: {
+        pageTitle: '智能团队匹配',
+        pageDescription: '基于AI算法为您推荐最合适的团队和队友',
+        preferencesTitle: '匹配偏好设置',
+        preferencesDescription: '设置您的团队匹配偏好，系统将根据这些条件为您推荐最合适的团队',
+        skillMatching: '技能匹配',
+        requiredSkills: '必需技能',
+        preferredSkills: '偏好技能',
+        skillWeight: '技能匹配权重',
+        experienceRequirements: '经验要求',
+        minExperience: '最低经验',
+        maxExperience: '最高经验',
+        teamSize: '团队规模',
+        preferredTeamSize: '偏好团队规模',
+        maxTeamSize: '最大团队规模',
+        collaborationPreferences: '协作偏好',
+        collaborationStyle: '协作风格',
+        diversityPreference: '多样性偏好',
+        advancedSettings: '高级设置',
+        locationFlexible: '地理位置灵活',
+        personalityMatch: '考虑性格匹配',
+        enableNotifications: '启用匹配通知',
+        autoAcceptThreshold: '自动接受阈值',
+        aiRecommendations: 'AI推荐',
+        suitableTeams: '适合团队',
+        noMatches: '暂无匹配的团队',
+        noMatchesDescription: '尝试调整您的匹配偏好或查看其他适合的团队',
+        adjustPreferences: '调整偏好',
+        noSuitableTeams: '暂无适合的团队',
+        noSuitableTeamsDescription: '当前没有找到符合条件的团队，请稍后再试',
+        matchingTeams: '正在为您匹配最合适的团队...',
+        refreshRecommendations: '刷新推荐',
+        matchingSettings: '匹配设置',
+        filterConditions: '筛选条件',
+        selectHackathon: '选择黑客松',
+        allHackathons: '所有黑客松',
+        compatibility: '匹配度',
+        matchingSkills: '匹配技能',
+        members: '成员',
+        slots: '空位',
+        viewDetails: '查看详情',
+        applyToJoin: '申请加入',
+        recruiting: '招募中',
+        highMatch: '高度匹配',
+        goodMatch: '良好匹配',
+        averageMatch: '一般匹配',
+        lowMatch: '匹配度低',
+        saveSettings: '保存设置',
+        cancel: '取消',
+        applicationSubmitted: '申请已提交',
+        applicationSubmittedDesc: '您的加入申请已发送给团队',
+        settingsSaved: '设置已保存',
+        settingsSavedDesc: '您的匹配偏好已更新，系统将根据新设置为您推荐团队',
+        loadingFailed: '加载失败',
+        loadingFailedDesc: '无法加载团队推荐，请稍后重试',
+        loginRequired: '请先登录',
+        loginRequiredDesc: '您需要登录后才能申请加入团队'
+      }
     }
   }
 };

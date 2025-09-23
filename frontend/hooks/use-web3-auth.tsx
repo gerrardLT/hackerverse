@@ -186,11 +186,11 @@ export function Web3AuthProvider({ children }: { children: React.ReactNode }) {
         // 使用统一的认证状态管理器
         const { useAuthStore } = await import('@/lib/auth-state-manager')
         const authStore = useAuthStore.getState()
-        // 转换User类型到UserState类型，添加缺失的字段
+        // 使用后端返回的用户信息，转换角色和状态为前端类型格式
         const userState = {
           ...response.data.user,
-          role: 'user' as const,  // 前端使用小写，后端会处理转换
-          status: 'active' as const  // 前端使用小写，后端会处理转换
+          role: (response.data.user.role?.toUpperCase() || 'USER') as 'USER' | 'ADMIN' | 'MODERATOR' | 'JUDGE',
+          status: (response.data.user.status?.toUpperCase() || 'ACTIVE') as 'ACTIVE' | 'SUSPENDED' | 'BANNED' | 'PENDING'
         }
         authStore.setAuthenticated(userState, response.data.token, 'web3')
         
@@ -213,11 +213,11 @@ export function Web3AuthProvider({ children }: { children: React.ReactNode }) {
           // 使用统一的认证状态管理器
           const { useAuthStore } = await import('@/lib/auth-state-manager')
           const authStore = useAuthStore.getState()
-          // 转换User类型到UserState类型，添加缺失的字段
+          // 使用后端返回的用户信息，转换角色和状态为前端类型格式
           const userState = {
             ...createResponse.data.user,
-            role: 'user' as const,  // 前端使用小写，后端会处理转换
-            status: 'active' as const  // 前端使用小写，后端会处理转换
+            role: (createResponse.data.user.role?.toUpperCase() || 'USER') as 'USER' | 'ADMIN' | 'MODERATOR' | 'JUDGE',
+            status: (createResponse.data.user.status?.toUpperCase() || 'ACTIVE') as 'ACTIVE' | 'SUSPENDED' | 'BANNED' | 'PENDING'
           }
           authStore.setAuthenticated(userState, createResponse.data.token, 'web3')
         } else {

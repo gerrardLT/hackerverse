@@ -30,6 +30,9 @@ enum UserStatus {
 
 enum HackathonStatus {
   DRAFT
+  PENDING_REVIEW    // 待审核
+  APPROVED         // 审核通过
+  REJECTED         // 审核拒绝
   ACTIVE
   COMPLETED
   CANCELLED
@@ -38,11 +41,12 @@ enum HackathonStatus {
 }
 
 enum ProjectStatus {
-  DRAFT
-  SUBMITTED
-  REVIEWED
-  WINNER
-  REJECTED
+  DRAFT           // 草稿状态 - 项目正在开发中
+  READY_TO_SUBMIT // 准备提交 - 项目完成，可以提交到黑客松
+  SUBMITTED       // 已提交 - 已提交到特定黑客松
+  REVIEWED        // 已审核 - 黑客松组织者已审核
+  WINNER          // 获奖项目
+  REJECTED        // 被拒绝的项目
 
   @@schema("hackathon_schema")
 }
@@ -233,6 +237,7 @@ model User {
   notifications        Notification[]
   participations       Participation[]
   projectLikes         ProjectLike[]
+  projectComments      ProjectComment[]
   projects             Project[]
   staking              Staking?
   stakingTransactions  StakingTransaction[]
@@ -240,6 +245,33 @@ model User {
   ledTeams             Team[]               @relation("TeamLeader")
   teamApplications     TeamApplication[]
   reviewedApplications TeamApplication[]    @relation("TeamApplicationReviewer")
+  achievements         UserAchievement[]    @relation("UserAchievements")
+  adminActions         AdminAction[]        @relation("AdminActions")
+  contentReviews       ContentReview[]      @relation("ContentReviews")
+  reviewedContent      ContentReview[]      @relation("ReviewedContent")
+  platformSettings     PlatformSetting[]    @relation("PlatformSettings")
+  auditLogs            AuditLog[]           @relation("AuditLogs")
+  reviewedHackathons   Hackathon[]          @relation("HackathonReviewer")
+  hackathonReviews     HackathonReview[]    @relation("HackathonReviews")
+  reviewComments       ReviewComment[]      @relation("ReviewComments")
+  ipfsCredentials      IPFSCredential[]     @relation("UserIPFSCredentials")
+  issuedCredentials    IPFSCredential[]     @relation("IssuedIPFSCredentials")
+  createdTemplates     CredentialTemplate[] @relation("CreatedTemplates")
+  approvedTemplates    CredentialTemplate[] @relation("ApprovedTemplates")
+  credentialVerifications CredentialVerification[] @relation("CredentialVerifications")
+  createdReputationRules ReputationRule[] @relation("CreatedReputationRules")
+  updatedReputationRules ReputationRule[] @relation("UpdatedReputationRules")
+  createdScoringCriteria ScoringCriteria[] @relation("CreatedScoringCriteria")
+  updatedScoringCriteria ScoringCriteria[] @relation("UpdatedScoringCriteria")
+  createdJudgingSessions JudgingSession[] @relation("CreatedJudgingSessions")
+  updatedJudgingSessions JudgingSession[] @relation("UpdatedJudgingSessions")
+  teamPreferences        TeamPreferences[] @relation("UserTeamPreferences")
+  sourceTeamRecommendations TeamRecommendation[] @relation("SourceUserRecommendations")
+  targetTeamRecommendations TeamRecommendation[] @relation("TargetUserRecommendations")
+  createdReports         CustomReport[] @relation("CreatedReports")
+  // 新增关联：专业评委仪表板与评审工作流程系统
+  lockedJudgingSessions  JudgingLock[] @relation("LockedJudgingSessions")
+  unlockedJudgingSessions JudgingLock[] @relation("UnlockedJudgingSessions")
 
   @@map("users")
   @@schema("hackathon_schema")
@@ -274,11 +306,29 @@ model Hackathon {
   gasUsed              BigInt?
   syncStatus           String          @default("PENDING")
   txHash               String?
+  // 审核流程相关字段
+  reviewStatus         String?         // 审核状态：pending, approved, rejected, under_review
+  reviewerId           String?         // 审核员ID
+  reviewNotes          String?         // 审核备注
+  reviewedAt           DateTime?       // 审核时间
+  rejectionReason      String?         // 拒绝原因
+  submittedForReviewAt DateTime?       // 提交审核时间
   organizer            User            @relation("Organizer", fields: [organizerId], references: [id])
+  reviewer             User?           @relation("HackathonReviewer", fields: [reviewerId], references: [id], onDelete: SetNull)
   judges               Judge[]
   participations       Participation[]
   projects             Project[]
   teams                Team[]
+  projectSubmissions   ProjectSubmission[]
+  hackathonReviews     HackathonReview[]
+  scoringCriteria      ScoringCriteria[]
+  judgingSessions      JudgingSession[]
+  teamPreferences      TeamPreferences[]
+  teamRecommendations  TeamRecommendation[]
+  // 新增关联：专业评委仪表板与评审工作流程系统
+  judgingLocks         JudgingLock[] // 评审锁定记录
+  judgeIpfsRecords     JudgingIpfsRecord[] // 评委IPFS记录
+  judgeDashboardPreferences JudgeDashboardPreferences[] // 评委仪表板偏好
 
   @@map("hackathons")
   @@schema("hackathon_schema")
@@ -288,7 +338,7 @@ model Project {
   id              String        @id @default(cuid())
   title           String
   description     String?
-  hackathonId     String
+  hackathonId     String?       // ✅ 改为可选字段，支持独立项目创建
   teamId          String?
   creatorId       String
   technologies    Json          @default("[]")
@@ -309,12 +359,48 @@ model Project {
   txHash          String?
   feedback        Feedback[]
   projectLikes    ProjectLike[]
+  projectComments ProjectComment[]
+  submissions     ProjectSubmission[]
   creator         User          @relation(fields: [creatorId], references: [id], onDelete: Cascade)
-  hackathon       Hackathon     @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  hackathon       Hackathon?    @relation(fields: [hackathonId], references: [id], onDelete: Cascade) // ✅ 改为可选关系
   team            Team?         @relation(fields: [teamId], references: [id])
   scores          Score[]
+  // 新增关联：专业评委仪表板与评审工作流程系统
+  judgeIpfsRecords JudgingIpfsRecord[] // 评委IPFS评分记录
 
   @@map("projects")
+  @@schema("hackathon_schema")
+}
+
+model ProjectSubmission {
+  id           String                 @id @default(cuid())
+  projectId    String
+  hackathonId  String
+  submittedAt  DateTime              @default(now())
+  status       ProjectSubmissionStatus @default(SUBMITTED)
+  notes        String?               // 提交备注
+  withdrawnAt  DateTime?             // 撤销提交时间
+  withdrawReason String?             // 撤销原因
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+  
+  project      Project               @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  hackathon    Hackathon             @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, hackathonId])
+  @@index([projectId])
+  @@index([hackathonId])
+  @@index([submittedAt])
+  @@map("project_submissions")
+  @@schema("hackathon_schema")
+}
+
+enum ProjectSubmissionStatus {
+  SUBMITTED   // 已提交
+  WITHDRAWN   // 已撤销
+  ACCEPTED    // 已接受（组织者确认）
+  REJECTED    // 已拒绝
+  
   @@schema("hackathon_schema")
 }
 
@@ -334,6 +420,9 @@ model Team {
   projects     Project[]
   members      TeamMember[]
   applications TeamApplication[]
+  preferences  TeamPreferences[]
+  sourceRecommendations TeamRecommendation[] @relation("SourceTeamRecommendations")
+  targetRecommendations TeamRecommendation[] @relation("TargetTeamRecommendations")
   hackathon    Hackathon    @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
   leader       User         @relation("TeamLeader", fields: [leaderId], references: [id])
 
@@ -401,6 +490,9 @@ model Judge {
   hackathon        Hackathon @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
   user             User      @relation(fields: [userId], references: [id])
   scores           Score[]
+  // 新增关联：专业评委仪表板与评审工作流程系统
+  ipfsRecords      JudgingIpfsRecord[] // IPFS评分记录
+  dashboardPreferences JudgeDashboardPreferences[] // 仪表板偏好设置
 
   @@map("judges")
   @@schema("hackathon_schema")
@@ -418,6 +510,11 @@ model Score {
   totalScore          Decimal? @db.Decimal(4, 1)
   comments            String?
   ipfsHash            String?
+  // 新增字段：钱包签名验证
+  walletSignature     String? // 评委钱包对评分数据的数字签名
+  signatureTimestamp  DateTime? // 签名时间戳
+  isFinalized         Boolean @default(false) // 评分是否已最终确认（不可再修改）
+  finalizedAt         DateTime? // 最终确认时间
   createdAt           DateTime @default(now())
   blockNumber         BigInt?
   gasUsed             BigInt?
@@ -425,7 +522,10 @@ model Score {
   txHash              String?
   judge               Judge    @relation(fields: [judgeId], references: [id], onDelete: Cascade)
   project             Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  ipfsRecords         JudgingIpfsRecord[] // 关联的IPFS记录
 
+  @@index([projectId, isFinalized])
+  @@index([judgeId, signatureTimestamp])
   @@map("scores")
   @@schema("hackathon_schema")
 }
@@ -460,6 +560,29 @@ model ProjectLike {
 
   @@unique([projectId, userId])
   @@map("project_likes")
+  @@schema("hackathon_schema")
+}
+
+model ProjectComment {
+  id        String   @id @default(cuid())
+  projectId String
+  userId    String
+  content   String
+  parentId  String?  // 父评论ID，用于嵌套回复
+  ipfsHash  String?  // IPFS存储的评论哈希
+  isEdited  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  editedAt  DateTime?
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent    ProjectComment? @relation("CommentReplies", fields: [parentId], references: [id])
+  replies   ProjectComment[] @relation("CommentReplies")
+
+  @@index([projectId, createdAt])
+  @@index([userId, createdAt])
+  @@index([parentId])
+  @@map("project_comments")
   @@schema("hackathon_schema")
 }
 
@@ -845,6 +968,7 @@ model DIDCredential {
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
   user                  User      @relation("UserDID", fields: [userId], references: [id], onDelete: Cascade)
+  ipfsCredentials       IPFSCredential[] @relation("IPFSDIDCredentials")
 
   @@index([userId, credentialType])
   @@index([issuer, isVerified])
@@ -894,5 +1018,765 @@ model CommunityIncentive {
   @@index([userId, distributed])
   @@index([actionType, season])
   @@map("community_incentives")
+  @@schema("hackathon_schema")
+}
+
+// 用户成就系统
+model UserAchievement {
+  id           String    @id @default(cuid())
+  userId       String
+  type         String    // 成就类型: first_hackathon, project_master, team_leader, reputation_milestone等
+  title        String    // 成就标题
+  description  String    // 成就描述
+  icon         String?   // 成就图标
+  badge        String?   // 徽章样式
+  level        Int       @default(1) // 成就等级 (1-5)
+  rarity       String    @default("common") // 稀有度: common, rare, epic, legendary
+  progress     Int       @default(0) // 当前进度
+  target       Int       @default(1) // 目标值
+  isCompleted  Boolean   @default(false) // 是否完成
+  completedAt  DateTime? // 完成时间
+  isVisible    Boolean   @default(true) // 是否可见
+  metadata     Json?     // 成就相关元数据
+  season       String?   // 成就季度
+  category     String    @default("general") // 成就分类: general, hackathon, project, team, community
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  user         User      @relation("UserAchievements", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isCompleted])
+  @@index([type, level])
+  @@index([category, rarity])
+  @@map("user_achievements")
+  @@schema("hackathon_schema")
+}
+
+// 管理员操作日志
+model AdminAction {
+  id          String   @id @default(cuid())
+  adminId     String   // 执行操作的管理员ID
+  action      String   // 操作类型: user_ban, content_delete, role_change, etc.
+  targetType  String   // 目标类型: user, post, hackathon, project, etc.
+  targetId    String   // 目标ID
+  targetTitle String?  // 目标标题（用于显示）
+  details     Json?    // 操作详细信息
+  ipAddress   String?  // IP地址
+  userAgent   String?  // 用户代理
+  reason      String?  // 操作原因
+  result      String   @default("success") // 操作结果: success, failed, partial
+  createdAt   DateTime @default(now())
+  admin       User     @relation("AdminActions", fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([adminId, createdAt])
+  @@index([action, createdAt])
+  @@index([targetType, targetId])
+  @@map("admin_actions")
+  @@schema("hackathon_schema")
+}
+
+// 内容审核记录
+model ContentReview {
+  id           String    @id @default(cuid())
+  contentType  String    // 内容类型: post, project, hackathon, comment, etc.
+  contentId    String    // 内容ID
+  contentTitle String?   // 内容标题
+  authorId     String    // 内容作者ID
+  reviewerId   String?   // 审核员ID
+  status       String    @default("pending") // 审核状态: pending, approved, rejected, flagged
+  priority     String    @default("normal") // 优先级: low, normal, high, urgent
+  category     String?   // 举报分类: spam, inappropriate, copyright, etc.
+  reason       String?   // 审核原因
+  reviewNotes  String?   // 审核备注
+  autoFlagged  Boolean   @default(false) // 是否自动标记
+  flagReason   String?   // 自动标记原因
+  reportCount  Int       @default(0) // 举报次数
+  reportedBy   Json?     // 举报人列表
+  reviewedAt   DateTime? // 审核时间
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  author       User      @relation("ContentReviews", fields: [authorId], references: [id], onDelete: Cascade)
+  reviewer     User?     @relation("ReviewedContent", fields: [reviewerId], references: [id], onDelete: SetNull)
+
+  @@index([status, priority, createdAt])
+  @@index([contentType, status])
+  @@index([reviewerId, reviewedAt])
+  @@index([authorId, status])
+  @@map("content_reviews")
+  @@schema("hackathon_schema")
+}
+
+// 平台配置设置
+model PlatformSetting {
+  id          String   @id @default(cuid())
+  key         String   @unique // 配置键名: max_upload_size, notification_enabled, etc.
+  value       String   // 配置值
+  valueType   String   @default("string") // 值类型: string, number, boolean, json
+  category    String   @default("general") // 配置分类: general, security, notification, etc.
+  description String?  // 配置描述
+  isPublic    Boolean  @default(false) // 是否公开（前端可访问）
+  isEditable  Boolean  @default(true) // 是否可编辑
+  validation  Json?    // 验证规则
+  defaultValue String? // 默认值
+  updatedBy   String?  // 最后修改人
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  updater     User?    @relation("PlatformSettings", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  @@index([category, key])
+  @@index([isPublic, category])
+  @@map("platform_settings")
+  @@schema("hackathon_schema")
+}
+
+// 系统审计日志
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?  // 用户ID（如果是用户操作）
+  action     String   // 操作类型: login, logout, api_call, data_export, etc.
+  resource   String?  // 资源类型: user, hackathon, project, admin_panel, etc.
+  resourceId String?  // 资源ID
+  method     String?  // HTTP方法
+  endpoint   String?  // API端点
+  ipAddress  String?  // IP地址
+  userAgent  String?  // 用户代理
+  sessionId  String?  // 会话ID
+  requestId  String?  // 请求ID
+  details    Json?    // 详细信息
+  metadata   Json?    // 元数据
+  severity   String   @default("info") // 严重程度: info, warning, error, critical
+  duration   Int?     // 操作耗时（毫秒）
+  success    Boolean  @default(true) // 操作是否成功
+  errorCode  String?  // 错误代码
+  errorMessage String? // 错误消息
+  createdAt  DateTime @default(now())
+  user       User?    @relation("AuditLogs", fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@index([action, createdAt])
+  @@index([resource, createdAt])
+  @@index([severity, createdAt])
+  @@index([success, createdAt])
+  @@map("audit_logs")
+  @@schema("hackathon_schema")
+}
+
+// 黑客松审核记录
+model HackathonReview {
+  id               String    @id @default(cuid())
+  hackathonId      String    // 黑客松ID
+  reviewerId       String    // 审核员ID
+  action           String    // 审核动作: submit, approve, reject, request_changes
+  status           String    // 审核状态: pending, approved, rejected, under_review
+  score            Int?      // 审核评分 (1-10)
+  priority         String    @default("normal") // 优先级: low, normal, high, urgent
+  category         String?   // 审核分类: content, legal, technical, business
+  feedback         String?   // 审核反馈
+  rejectionReason  String?   // 拒绝原因
+  recommendedChanges String? // 建议修改
+  isPublic         Boolean   @default(false) // 是否公开显示
+  metadata         Json?     // 审核元数据
+  estimatedTime    Int?      // 预计审核时间(分钟)
+  actualTime       Int?      // 实际审核时间(分钟)
+  ipAddress        String?   // IP地址
+  userAgent        String?   // 用户代理
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  hackathon        Hackathon @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  reviewer         User      @relation("HackathonReviews", fields: [reviewerId], references: [id], onDelete: Cascade)
+  comments         ReviewComment[]
+
+  @@index([hackathonId, status])
+  @@index([reviewerId, createdAt])
+  @@index([action, status])
+  @@index([priority, createdAt])
+  @@map("hackathon_reviews")
+  @@schema("hackathon_schema")
+}
+
+// 审核评论
+model ReviewComment {
+  id               String          @id @default(cuid())
+  reviewId         String          // 审核记录ID
+  commenterId      String          // 评论者ID
+  content          String          // 评论内容
+  type             String          @default("comment") // 评论类型: comment, suggestion, question, concern
+  isInternal       Boolean         @default(false) // 是否内部评论
+  isResolved       Boolean         @default(false) // 是否已解决
+  parentId         String?         // 父评论ID（用于回复）
+  attachments      Json?           // 附件信息
+  mentions         Json?           // @提及的用户
+  priority         String          @default("normal") // 优先级
+  tags             Json?           // 标签
+  ipAddress        String?         // IP地址
+  userAgent        String?         // 用户代理
+  editedAt         DateTime?       // 编辑时间
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  review           HackathonReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  commenter        User            @relation("ReviewComments", fields: [commenterId], references: [id], onDelete: Cascade)
+  parent           ReviewComment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies          ReviewComment[] @relation("CommentReplies")
+
+  @@index([reviewId, createdAt])
+  @@index([commenterId, createdAt])
+  @@index([type, isInternal])
+  @@index([isResolved, priority])
+  @@map("review_comments")
+  @@schema("hackathon_schema")
+}
+
+// IPFS凭证系统扩展
+model IPFSCredential {
+  id                    String    @id @default(cuid())
+  userId                String    // 凭证所有者
+  didCredentialId       String?   // 关联的DID凭证ID（可选）
+  credentialType        String    // 凭证类型：hackathon_completion, project_contribution, skill_verification, etc.
+  title                 String    // 凭证标题
+  description           String?   // 凭证描述
+  ipfsHash              String    @unique // IPFS存储哈希
+  metadata              Json?     // 凭证元数据（JSON格式）
+  templateId            String?   // 使用的模板ID
+  issuerUserId          String?   // 颁发者用户ID
+  issuerType            String    @default("platform") // 颁发者类型: platform, organization, peer
+  issuerMetadata        Json?     // 颁发者相关元数据
+  isVerified            Boolean   @default(false) // 是否已验证
+  verificationScore     Int       @default(0) // 验证分数 (0-100)
+  isRevoked             Boolean   @default(false) // 是否已撤销
+  revokedAt             DateTime? // 撤销时间
+  revokedReason         String?   // 撤销原因
+  expiryDate            DateTime? // 过期时间
+  isPublic              Boolean   @default(true) // 是否公开显示
+  displayOrder          Int       @default(0) // 显示顺序
+  category              String    @default("achievement") // 分类: achievement, certification, badge, etc.
+  tags                  Json      @default("[]") // 标签
+  skillsProven          Json      @default("[]") // 证明的技能
+  evidence              Json?     // 支持证据（项目链接、截图等）
+  endorsements          Json      @default("[]") // 背书记录
+  shareableLink         String?   // 可分享的链接
+  viewCount             Int       @default(0) // 查看次数
+  downloadCount         Int       @default(0) // 下载次数
+  lastAccessedAt        DateTime? // 最后访问时间
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  user                  User      @relation("UserIPFSCredentials", fields: [userId], references: [id], onDelete: Cascade)
+  issuer                User?     @relation("IssuedIPFSCredentials", fields: [issuerUserId], references: [id], onDelete: SetNull)
+  didCredential         DIDCredential? @relation("IPFSDIDCredentials", fields: [didCredentialId], references: [id], onDelete: SetNull)
+  template              CredentialTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  verifications         CredentialVerification[]
+
+  @@index([userId, credentialType])
+  @@index([credentialType, isVerified])
+  @@index([issuerUserId, isVerified])
+  @@index([category, isPublic])
+  @@index([isRevoked, expiryDate])
+  @@map("ipfs_credentials")
+  @@schema("hackathon_schema")
+}
+
+// 凭证模板管理
+model CredentialTemplate {
+  id                   String    @id @default(cuid())
+  name                 String    // 模板名称
+  description          String?   // 模板描述
+  credentialType       String    // 凭证类型
+  category             String    // 分类
+  version              String    @default("1.0.0") // 模板版本
+  schema               Json      // 凭证数据结构schema
+  designTemplate       Json?     // 视觉设计模板（样式、布局等）
+  requiredFields       Json      @default("[]") // 必填字段列表
+  optionalFields       Json      @default("[]") // 可选字段列表
+  validationRules      Json      @default("{}") // 验证规则
+  isActive             Boolean   @default(true) // 是否启用
+  isPublic             Boolean   @default(true) // 是否公开可用
+  organizationOnly     Boolean   @default(false) // 是否仅限组织使用
+  minimumRole          String    @default("USER") // 最低使用权限
+  autoIssueRules       Json?     // 自动颁发规则
+  expiryDuration       Int?      // 默认过期时长（天）
+  tags                 Json      @default("[]") // 模板标签
+  popularity           Int       @default(0) // 使用热度
+  createdBy            String?   // 创建者
+  approvedBy           String?   // 审核者
+  approvedAt           DateTime? // 审核时间
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  creator              User?     @relation("CreatedTemplates", fields: [createdBy], references: [id], onDelete: SetNull)
+  approver             User?     @relation("ApprovedTemplates", fields: [approvedBy], references: [id], onDelete: SetNull)
+  credentials          IPFSCredential[]
+
+  @@index([credentialType, isActive])
+  @@index([category, isPublic])
+  @@index([popularity, createdAt])
+  @@map("credential_templates")
+  @@schema("hackathon_schema")
+}
+
+// 凭证验证记录
+model CredentialVerification {
+  id                   String    @id @default(cuid())
+  credentialId         String    // 被验证的凭证ID
+  verifierUserId       String?   // 验证者用户ID（如果是用户验证）
+  verifierType         String    // 验证者类型: user, system, organization, blockchain
+  verificationMethod   String    // 验证方法: manual, auto, blockchain, api
+  status               String    // 验证状态: pending, verified, failed, disputed
+  score                Int?      // 验证分数 (0-100)
+  evidence             Json?     // 验证证据
+  comments             String?   // 验证评论
+  isAnonymous          Boolean   @default(false) // 是否匿名验证
+  trustScore           Int       @default(50) // 信任度评分
+  verificationLevel    String    @default("basic") // 验证级别: basic, standard, premium, enterprise
+  ipAddress            String?   // 验证者IP
+  userAgent            String?   // 用户代理
+  location             String?   // 验证地理位置
+  blockchainTxHash     String?   // 区块链交易哈希（如果是链上验证）
+  externalReference    String?   // 外部参考ID
+  metadata             Json?     // 验证相关元数据
+  isPublic             Boolean   @default(false) // 验证记录是否公开
+  expiryDate           DateTime? // 验证过期时间
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  credential           IPFSCredential @relation(fields: [credentialId], references: [id], onDelete: Cascade)
+  verifier             User?     @relation("CredentialVerifications", fields: [verifierUserId], references: [id], onDelete: SetNull)
+
+  @@index([credentialId, status])
+  @@index([verifierUserId, createdAt])
+  @@index([status, verificationLevel])
+  @@index([verifierType, trustScore])
+  @@map("credential_verifications")
+  @@schema("hackathon_schema")
+}
+
+// 声誉积分规则配置
+model ReputationRule {
+  id                String    @id @default(cuid())
+  action            String    @unique // 行为类型: submit_project, vote, judge, organize, participate, win_prize, etc.
+  actionName        String    // 行为名称（用于显示）
+  description       String?   // 规则描述
+  basePoints        Int       // 基础积分
+  maxPointsPerDay   Int?      // 每日最大积分（防止刷分）
+  maxPointsPerSeason Int?     // 每季度最大积分
+  category          String    @default("general") // 分类: general, hackathon, project, community, governance
+  difficulty        String    @default("normal") // 难度等级: easy, normal, hard, expert
+  multiplierRules   Json      @default("{}") // 倍数规则配置（如：质押倍数、连续参与奖励等）
+  cooldownHours     Int       @default(0) // 冷却时间（小时）
+  prerequisites     Json      @default("[]") // 前置条件（如：需要完成的其他行为）
+  seasonalBonus     Decimal   @default(1.0) @db.Decimal(3, 2) // 季节性奖励倍数
+  communityVote     Boolean   @default(false) // 是否需要社区投票决定
+  isActive          Boolean   @default(true) // 是否启用
+  validFrom         DateTime  @default(now()) // 生效时间
+  validUntil        DateTime? // 失效时间
+  createdBy         String?   // 创建者ID
+  updatedBy         String?   // 最后更新者ID
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  creator           User?     @relation("CreatedReputationRules", fields: [createdBy], references: [id], onDelete: SetNull)
+  updater           User?     @relation("UpdatedReputationRules", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  @@index([action, isActive])
+  @@index([category, isActive])
+  @@index([difficulty, isActive])
+  @@index([validFrom, validUntil])
+  @@map("reputation_rules")
+  @@schema("hackathon_schema")
+}
+
+// 评分标准配置
+model ScoringCriteria {
+  id             String    @id @default(cuid())
+  hackathonId    String    // 关联的黑客松
+  criteriaName   String    // 标准名称（如"创新性"、"技术复杂度"等）
+  description    String?   // 标准描述
+  weight         Decimal   @db.Decimal(5, 2) // 权重（百分比，0-100）
+  maxScore       Decimal   @db.Decimal(4, 1) // 最大分数
+  displayOrder   Int       @default(0) // 显示顺序
+  isRequired     Boolean   @default(true) // 是否必填
+  isActive       Boolean   @default(true) // 是否启用
+  criteriaType   String    @default("standard") // 标准类型: standard, custom, bonus
+  helpText       String?   // 评分帮助文本
+  minScore       Decimal   @default(0) @db.Decimal(4, 1) // 最小分数
+  createdBy      String?   // 创建者ID
+  updatedBy      String?   // 最后更新者ID
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  hackathon      Hackathon @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  creator        User?     @relation("CreatedScoringCriteria", fields: [createdBy], references: [id], onDelete: SetNull)
+  updater        User?     @relation("UpdatedScoringCriteria", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  @@index([hackathonId, isActive])
+  @@index([hackathonId, displayOrder])
+  @@map("scoring_criteria")
+  @@schema("hackathon_schema")
+}
+
+// 评分会话管理
+model JudgingSession {
+  id            String    @id @default(cuid())
+  hackathonId   String    // 关联的黑客松
+  name          String    // 会话名称
+  description   String?   // 会话描述
+  startTime     DateTime  // 开始时间
+  endTime       DateTime  // 结束时间
+  judgeIds      Json      @default("[]") // 参与的评委ID列表
+  projectIds    Json      @default("[]") // 需要评分的项目ID列表
+  status        String    @default("SCHEDULED") // 会话状态: SCHEDULED, ACTIVE, PAUSED, COMPLETED, CANCELLED
+  sessionType   String    @default("STANDARD") // 会话类型: STANDARD, PRELIMINARY, FINAL, SPECIAL
+  maxProjectsPerJudge Int @default(10) // 每个评委最多评审的项目数
+  minScoresRequired   Int @default(3) // 每个项目最少需要的评分数
+  allowLateSubmission Boolean @default(false) // 是否允许延迟提交
+  autoAssignProjects  Boolean @default(true) // 是否自动分配项目
+  notificationSent    Boolean @default(false) // 是否已发送通知
+  reminderSent        Boolean @default(false) // 是否已发送提醒
+  // 新增字段：时间锁定和IPFS支持
+  isLocked         Boolean @default(false) // 评审会话是否已锁定
+  lockTimestamp    DateTime? // 锁定时间戳
+  finalIpfsHash    String? // 最终评审结果的IPFS哈希
+  signatureRequired Boolean @default(false) // 是否需要钱包签名
+  autoLockEnabled  Boolean @default(true) // 是否启用自动锁定
+  lockGracePeriod  Int @default(0) // 锁定宽限期（分钟）
+  createdBy      String?   // 创建者ID
+  updatedBy      String?   // 最后更新者ID
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  hackathon      Hackathon @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  creator        User?     @relation("CreatedJudgingSessions", fields: [createdBy], references: [id], onDelete: SetNull)
+  updater        User?     @relation("UpdatedJudgingSessions", fields: [updatedBy], references: [id], onDelete: SetNull)
+  judgingLocks   JudgingLock[] // 关联的锁定记录
+
+  @@index([hackathonId, status])
+  @@index([hackathonId, startTime])
+  @@index([status, startTime])
+  @@index([hackathonId, isLocked])
+  @@index([autoLockEnabled, endTime])
+  @@map("judging_sessions")
+  @@schema("hackathon_schema")
+}
+
+// 智能团队匹配系统 - 团队偏好设置
+model TeamPreferences {
+  id                   String    @id @default(cuid())
+  teamId               String?   // 团队ID（如果是团队设置偏好）
+  userId               String?   // 用户ID（如果是用户设置偏好）
+  hackathonId          String    // 关联的黑客松
+  
+  // 技能匹配偏好
+  requiredSkills       Json      @default("[]") // 必需技能
+  preferredSkills      Json      @default("[]") // 偏好技能
+  skillMatchWeight     Decimal   @default(0.4) @db.Decimal(3, 2) // 技能匹配权重
+  
+  // 经验偏好
+  minExperience        String    @default("beginner") // 最低经验: beginner, intermediate, advanced, expert
+  maxExperience        String    @default("expert") // 最高经验
+  experienceWeight     Decimal   @default(0.2) @db.Decimal(3, 2) // 经验匹配权重
+  
+  // 地理位置偏好
+  preferredTimezones   Json      @default("[]") // 偏好时区
+  locationFlexible     Boolean   @default(true) // 地理位置是否灵活
+  locationWeight       Decimal   @default(0.1) @db.Decimal(3, 2) // 地理匹配权重
+  
+  // 工作模式偏好
+  communicationStyle   Json      @default("[]") // 沟通方式偏好: ["realtime", "async", "meetings", "text"]
+  workingHours         Json      @default("{}") // 工作时间偏好 {"start": "09:00", "end": "18:00", "timezone": "UTC+8"}
+  collaborationStyle   String    @default("balanced") // 协作风格: structured, flexible, balanced
+  
+  // 团队规模偏好
+  preferredTeamSize    Int       @default(4) // 偏好团队规模
+  maxTeamSize          Int       @default(6) // 最大团队规模
+  
+  // 项目偏好
+  projectTypes         Json      @default("[]") // 项目类型偏好
+  technologyStacks     Json      @default("[]") // 技术栈偏好
+  difficultyLevel      String    @default("medium") // 难度偏好: easy, medium, hard, expert
+  
+  // 其他偏好
+  personalityMatch     Boolean   @default(false) // 是否考虑性格匹配
+  diversityPreference  String    @default("balanced") // 多样性偏好: similar, diverse, balanced
+  leadershipStyle      String?   // 领导风格偏好: democratic, autocratic, laissez_faire
+  
+  // 匹配设置
+  isActive             Boolean   @default(true) // 是否启用匹配
+  autoAcceptThreshold  Decimal   @default(0.8) @db.Decimal(3, 2) // 自动接受匹配的阈值
+  notifyOnMatch        Boolean   @default(true) // 匹配时是否通知
+  
+  // 时间戳
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  
+  // 关联关系
+  team                 Team?     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user                 User?     @relation("UserTeamPreferences", fields: [userId], references: [id], onDelete: Cascade)
+  hackathon            Hackathon @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, hackathonId]) // 每个团队在每个黑客松只能有一个偏好设置
+  @@unique([userId, hackathonId]) // 每个用户在每个黑客松只能有一个偏好设置
+  @@index([hackathonId, isActive])
+  @@index([teamId, isActive])
+  @@index([userId, isActive])
+  @@map("team_preferences")
+  @@schema("hackathon_schema")
+}
+
+// 智能团队匹配系统 - 推荐记录
+model TeamRecommendation {
+  id                   String    @id @default(cuid())
+  recommendationType   String    // 推荐类型: team_to_user, user_to_team, team_to_team
+  
+  // 推荐对象
+  sourceTeamId         String?   // 源团队ID
+  sourceUserId         String?   // 源用户ID
+  targetTeamId         String?   // 目标团队ID
+  targetUserId         String?   // 目标用户ID
+  hackathonId          String    // 关联的黑客松
+  
+  // 匹配分数
+  overallScore         Decimal   @db.Decimal(4, 3) // 总体匹配分数 (0-1)
+  skillMatchScore      Decimal   @db.Decimal(4, 3) // 技能匹配分数
+  experienceMatchScore Decimal   @db.Decimal(4, 3) // 经验匹配分数
+  locationMatchScore   Decimal   @db.Decimal(4, 3) // 地理匹配分数
+  availabilityScore    Decimal   @db.Decimal(4, 3) // 可用性匹配分数
+  personalityScore     Decimal?  @db.Decimal(4, 3) // 性格匹配分数（可选）
+  
+  // 匹配详情
+  matchingSkills       Json      @default("[]") // 匹配的技能
+  missingSkills        Json      @default("[]") // 缺失的技能
+  complementarySkills  Json      @default("[]") // 互补的技能
+  strengthsAnalysis    Json?     // 优势分析
+  weaknessesAnalysis   Json?     // 劣势分析
+  synergyReasons       Json      @default("[]") // 协同理由
+  
+  // 推荐状态
+  status               String    @default("active") // active, viewed, applied, accepted, rejected, expired
+  viewedAt             DateTime? // 查看时间
+  respondedAt          DateTime? // 响应时间
+  response             String?   // 响应类型: interested, not_interested, applied, auto_matched
+  
+  // 算法信息
+  algorithmVersion     String    @default("1.0.0") // 算法版本
+  confidence           Decimal   @db.Decimal(4, 3) // 推荐置信度
+  explanation          String?   // 推荐解释
+  
+  // 有效期
+  expiresAt            DateTime? // 推荐过期时间
+  isActive             Boolean   @default(true) // 是否有效
+  
+  // 时间戳
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  
+  // 关联关系
+  sourceTeam           Team?     @relation("SourceTeamRecommendations", fields: [sourceTeamId], references: [id], onDelete: Cascade)
+  sourceUser           User?     @relation("SourceUserRecommendations", fields: [sourceUserId], references: [id], onDelete: Cascade)
+  targetTeam           Team?     @relation("TargetTeamRecommendations", fields: [targetTeamId], references: [id], onDelete: Cascade)
+  targetUser           User?     @relation("TargetUserRecommendations", fields: [targetUserId], references: [id], onDelete: Cascade)
+  hackathon            Hackathon @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+
+  @@index([hackathonId, isActive, overallScore])
+  @@index([sourceTeamId, status])
+  @@index([sourceUserId, status])
+  @@index([targetTeamId, status])
+  @@index([targetUserId, status])
+  @@index([createdAt, expiresAt])
+  @@map("team_recommendations")
+  @@schema("hackathon_schema")
+}
+
+// 组织者分析工具 - 分析缓存
+model AnalyticsCache {
+  id                String   @id @default(cuid())
+  cacheKey          String   @unique // 缓存键，格式如: "hackathon:stats:${hackathonId}:${type}"
+  
+  // 缓存内容
+  dataType          String   // 数据类型: overview, participation, projects, teams, engagement
+  hackathonId       String?  // 关联的黑客松（如果适用）
+  userId            String?  // 关联的用户（如果适用）
+  scope             String   @default("hackathon") // 范围: hackathon, global, user, team
+  
+  // 缓存数据
+  data              Json     // 缓存的分析数据
+  metadata          Json?    // 元数据（如生成参数、统计信息等）
+  
+  // 计算信息
+  computeTime       Int?     // 计算耗时（毫秒）
+  dataPoints        Int      @default(0) // 数据点数量
+  lastDataUpdate    DateTime? // 源数据最后更新时间
+  
+  // 缓存设置
+  ttl               Int      @default(3600) // 生存时间（秒）
+  priority          String   @default("normal") // 优先级: low, normal, high, critical
+  autoRefresh       Boolean  @default(true) // 是否自动刷新
+  
+  // 访问统计
+  accessCount       Int      @default(0) // 访问次数
+  lastAccessedAt    DateTime? // 最后访问时间
+  hitRate           Decimal  @default(0) @db.Decimal(5, 4) // 命中率
+  
+  // 状态
+  status            String   @default("valid") // valid, expired, computing, failed
+  errorMessage      String?  // 错误信息
+  version           String   @default("1.0.0") // 数据版本
+  
+  // 时间戳
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  expiresAt         DateTime // 过期时间
+
+  @@index([cacheKey, status])
+  @@index([hackathonId, dataType])
+  @@index([expiresAt, status])
+  @@index([dataType, scope, priority])
+  @@map("analytics_cache")
+  @@schema("hackathon_schema")
+}
+
+// 组织者分析工具 - 自定义报告配置
+model CustomReport {
+  id                String   @id @default(cuid())
+  name              String   // 报告名称
+  description       String?  // 报告描述
+  
+  // 报告设置
+  reportType        String   // 报告类型: overview, detailed, comparison, trend, custom
+  scope             String   // 报告范围: hackathon, global, period, comparison
+  hackathonIds      Json     @default("[]") // 关联的黑客松ID列表
+  
+  // 数据配置
+  metrics           Json     // 指标配置: ["participants", "projects", "engagement", "completion_rate"]
+  dimensions        Json     @default("[]") // 维度配置: ["time", "category", "location", "experience"]
+  filters           Json     @default("{}") // 过滤条件
+  groupBy           Json     @default("[]") // 分组配置
+  
+  // 时间范围
+  timeRange         Json     // 时间范围配置 {"start": "2024-01-01", "end": "2024-12-31", "interval": "month"}
+  relativePeriod    String?  // 相对时间: last_week, last_month, last_quarter, last_year
+  
+  // 可视化设置
+  chartTypes        Json     @default("[]") // 图表类型: ["line", "bar", "pie", "table"]
+  layout            Json?    // 布局配置
+  styling           Json     @default("{}") // 样式配置
+  
+  // 输出设置
+  format            Json     @default("[]") // 输出格式: ["pdf", "excel", "csv", "json"]
+  includeRawData    Boolean  @default(false) // 是否包含原始数据
+  includeTrends     Boolean  @default(true) // 是否包含趋势分析
+  includeInsights   Boolean  @default(true) // 是否包含洞察建议
+  
+  // 调度设置
+  isScheduled       Boolean  @default(false) // 是否定期生成
+  scheduleFrequency String?  // 调度频率: daily, weekly, monthly, quarterly
+  scheduleTime      String?  // 调度时间 "09:00"
+  recipients        Json     @default("[]") // 接收者邮箱列表
+  
+  // 权限设置
+  createdBy         String   // 创建者ID
+  isPublic          Boolean  @default(false) // 是否公开
+  sharedWith        Json     @default("[]") // 分享用户ID列表
+  accessLevel       String   @default("owner") // 访问级别: owner, editor, viewer
+  
+  // 执行统计
+  executionCount    Int      @default(0) // 执行次数
+  lastExecutedAt    DateTime? // 最后执行时间
+  lastExecutionTime Int?     // 最后执行耗时（毫秒）
+  averageExecTime   Int?     // 平均执行时间
+  
+  // 状态
+  status            String   @default("active") // active, archived, failed
+  errorMessage      String?  // 错误信息
+  isActive          Boolean  @default(true) // 是否启用
+  
+  // 时间戳
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // 关联关系
+  creator           User     @relation("CreatedReports", fields: [createdBy], references: [id], onDelete: Cascade)
+
+  @@index([createdBy, isActive])
+  @@index([reportType, scope])
+  @@index([isScheduled, status])
+  @@index([isPublic, isActive])
+  @@map("custom_reports")
+  @@schema("hackathon_schema")
+}
+
+// 专业评委仪表板与评审工作流程系统 - 新增模型定义
+
+// 评审锁定控制表
+model JudgingLock {
+  id               String    @id @default(cuid())
+  hackathonId      String    // 关联的黑客松
+  sessionId        String?   // 关联的评审会话
+  lockType         String    @default("time_based") // 锁定类型: time_based, manual, emergency
+  isActive         Boolean   @default(true)
+  lockedAt         DateTime  @default(now())
+  lockedBy         String?   // 锁定操作的管理员ID
+  unlockReason     String?   // 解锁原因
+  unlockedAt       DateTime? // 解锁时间
+  unlockedBy       String?   // 解锁操作的管理员ID
+  autoLockTime     DateTime? // 自动锁定时间
+  gracePeriodMinutes Int     @default(0)
+  affectedJudges   Json      @default("[]") // 受影响的评委列表
+  affectedProjects Json      @default("[]") // 受影响的项目列表
+  lockMetadata     Json      @default("{}")
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  // 关联关系
+  hackathon        Hackathon      @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  session          JudgingSession? @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  locker           User?          @relation("LockedJudgingSessions", fields: [lockedBy], references: [id], onDelete: SetNull)
+  unlocker         User?          @relation("UnlockedJudgingSessions", fields: [unlockedBy], references: [id], onDelete: SetNull)
+
+  @@index([hackathonId, isActive])
+  @@index([autoLockTime])
+  @@map("judging_locks")
+  @@schema("hackathon_schema")
+}
+
+// IPFS评分存储记录表
+model JudgingIpfsRecord {
+  id                String    @id @default(cuid())
+  scoreId           String    // 关联的评分记录
+  judgeId           String    // 评委ID
+  projectId         String    // 项目ID
+  hackathonId       String    // 黑客松ID
+  ipfsHash          String    @unique // IPFS存储哈希
+  walletAddress     String?   // 评委钱包地址
+  signature         String?   // 钱包签名
+  signatureMessage  String?   // 签名消息
+  verificationStatus String   @default("pending") // 验证状态: pending, verified, failed
+  verifiedAt        DateTime? // 验证时间
+  dataStructure     Json      // 存储在IPFS中的结构化数据
+  metadata          Json      @default("{}")
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  // 关联关系
+  score             Score      @relation(fields: [scoreId], references: [id], onDelete: Cascade)
+  judge             Judge      @relation(fields: [judgeId], references: [id], onDelete: Cascade)
+  project           Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  hackathon         Hackathon  @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+
+  @@index([verificationStatus, createdAt])
+  @@index([hackathonId, judgeId])
+  @@map("judging_ipfs_records")
+  @@schema("hackathon_schema")
+}
+
+// 评委仪表板个人偏好设置表
+model JudgeDashboardPreferences {
+  id                      String    @id @default(cuid())
+  judgeId                 String    // 评委ID
+  hackathonId             String?   // 黑客松ID（可选，全局设置时为null）
+  filterPreferences       Json      @default("{}") // 过滤器偏好设置
+  viewPreferences         Json      @default("{}") // 视图偏好设置
+  notificationPreferences Json      @default("{}") // 通知偏好设置
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  // 关联关系
+  judge                   Judge     @relation(fields: [judgeId], references: [id], onDelete: Cascade)
+  hackathon               Hackathon? @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+
+  @@unique([judgeId, hackathonId])
+  @@index([judgeId, hackathonId])
+  @@map("judge_dashboard_preferences")
   @@schema("hackathon_schema")
 }

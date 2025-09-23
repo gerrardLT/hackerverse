@@ -5,8 +5,8 @@ import { auth } from '@/lib/auth'
 
 // 更新角色验证模式
 const updateRoleSchema = z.object({
-  role: z.enum(['admin', 'moderator', 'user'], {
-    errorMap: () => ({ message: '角色必须是 admin、moderator 或 user' })
+  role: z.enum(['ADMIN', 'MODERATOR', 'JUDGE', 'USER'], {
+    errorMap: () => ({ message: '角色必须是 ADMIN、MODERATOR、JUDGE 或 USER' })
   })
 })
 
@@ -31,7 +31,7 @@ export async function PUT(
     }
 
     // 检查用户是否是管理员
-    if (user.role !== 'admin') {
+    if (user.role !== 'ADMIN') {
       return NextResponse.json(
         { success: false, error: '权限不足' },
         { status: 403 }

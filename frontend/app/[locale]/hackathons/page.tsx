@@ -86,6 +86,12 @@ export default function HackatonsPage() {
                 {t('myHackathons')}
               </Link>
             </Button>
+            <Button variant="outline" className="glass hover-lift" asChild>
+              <Link href="/projects">
+                <Grid3x3 className="h-4 w-4 mr-2" />
+                {t('myProjects')}
+              </Link>
+            </Button>
           </div>
         </div>
 

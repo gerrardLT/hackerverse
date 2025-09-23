@@ -1,0 +1,200 @@
+{
+  "dashboard": {
+    "title": "评委仪表板",
+    "subtitle": "审查和评分分配给您的项目",
+    "errors": {
+      "loadFailed": "加载仪表板数据失败",
+      "authRequired": "请登录以访问评委仪表板",
+      "judgeOnly": "此仪表板仅授权评委可以访问"
+    },
+    "stats": {
+      "totalAssigned": "分配项目",
+      "completed": "已完成",
+      "pending": "进行中",
+      "locked": "已锁定",
+      "completion": "完成"
+    },
+    "timeStatus": {
+      "gracePeriod": "宽限期生效中 - 仍可修改提交内容",
+      "until": "截至",
+      "nextDeadline": "下一个截止时间"
+    },
+    "status": {
+      "all": "所有项目",
+      "assigned": "新分配",
+      "pending": "进行中",
+      "completed": "已完成",
+      "locked": "已锁定"
+    },
+    "sort": {
+      "priority": "优先级",
+      "deadline": "截止时间",
+      "title": "标题",
+      "created": "创建时间",
+      "asc": "升序",
+      "desc": "降序"
+    },
+    "filters": {
+      "title": "过滤器和搜索"
+    },
+    "search": {
+      "placeholder": "搜索项目..."
+    },
+    "project": {
+      "finalized": "已最终确认",
+      "noDescription": "未提供描述",
+      "viewDetails": "查看详情",
+      "startScoring": "开始评分",
+      "updateScore": "更新评分",
+      "scoringProgress": "评分进度",
+      "criteriaScored": "个标准已评分",
+      "lastUpdated": "最后更新"
+    },
+    "empty": {
+      "noProjects": "未分配项目",
+      "noMatches": "没有匹配的项目",
+      "waitForAssignment": "您尚未被分配任何项目。请稍后查看或联系活动组织者。",
+      "tryDifferentFilters": "尝试调整过滤器或搜索条件来查找项目。"
+    }
+  },
+  "filter": {
+    "title": "高级项目过滤",
+    "hackathon": "黑客松",
+    "allHackathons": "所有黑客松",
+    "technologies": "技术栈",
+    "tags": "标签",
+    "tracks": "赛道",
+    "scoreStatus": {
+      "all": "所有评分状态",
+      "unscored": "未评分",
+      "partial": "部分评分",
+      "completed": "评分完成",
+      "finalized": "已最终确认"
+    },
+    "dateRange": "时间范围",
+    "scoreRange": "分数范围",
+    "apply": "应用过滤器",
+    "reset": "重置过滤器",
+    "results": "显示 {count} 个项目"
+  },
+  "scoreForm": {
+    "title": "项目评分",
+    "subtitle": "根据以下标准评估此项目",
+    "criteria": {
+      "innovation": "创新性",
+      "technicalComplexity": "技术复杂度",
+      "userExperience": "用户体验",
+      "businessPotential": "商业潜力",
+      "presentation": "项目展示"
+    },
+    "descriptions": {
+      "innovation": "解决方案的原创性和创造性",
+      "technicalComplexity": "技术难度和实现质量",
+      "userExperience": "可用性和用户界面设计",
+      "businessPotential": "市场可行性和商业模式",
+      "presentation": "项目展示和文档质量"
+    },
+    "comments": "评语和反馈",
+    "commentsPlaceholder": "请提供关于此项目的详细反馈...",
+    "privateNote": "私人备注（仅您可见）",
+    "saveDraft": "保存草稿",
+    "finalize": "最终确认评分",
+    "finalizeWarning": "一旦最终确认，此评分将无法修改。您确定吗？",
+    "walletRequired": "最终确认需要连接钱包",
+    "connectWallet": "连接钱包"
+  },
+  "timeControl": {
+    "title": "评审期控制",
+    "status": {
+      "active": "进行中",
+      "locked": "已锁定",
+      "gracePeriod": "宽限期",
+      "expired": "已过期"
+    },
+    "lockPeriod": "锁定评审期",
+    "unlockPeriod": "解锁评审期",
+    "extendPeriod": "延长截止时间",
+    "lockReason": "锁定原因",
+    "lockReasonPlaceholder": "请说明锁定评审期的原因...",
+    "extendMinutes": "延长时间（分钟）",
+    "gracePeriod": "宽限期（分钟）",
+    "forceFinalize": "强制最终确认所有未完成的评分",
+    "confirmLock": "确认锁定",
+    "confirmUnlock": "确认解锁"
+  },
+  "verification": {
+    "title": "评分验证",
+    "verifyAll": "验证所有评分",
+    "verifyProject": "验证项目评分",
+    "status": {
+      "all_verified": "所有评分已验证 ({verified}/{total})",
+      "partially_verified": "部分评分已验证 ({verified}/{total})",
+      "verification_failed": "所有评分验证失败",
+      "no_scores": "没有已最终确认的评分需要验证"
+    },
+    "ipfsAccessible": "IPFS 可访问",
+    "dataIntegrity": "数据完整性",
+    "signatureValid": "签名有效",
+    "timestampValid": "时间戳有效",
+    "overallValid": "整体有效",
+    "recommendations": {
+      "hasFailures": "{count} 个评分验证失败",
+      "ipfsIssues": "{count} 个评分存在 IPFS 可访问性问题",
+      "signatureIssues": "{count} 个评分存在无效签名",
+      "integrityIssues": "{count} 个评分存在数据完整性问题",
+      "allGood": "所有评分均已正确验证"
+    },
+    "dataIntegrityFailed": "数据完整性检查失败：{mismatches}",
+    "timestampMismatch": "时间戳不匹配（相差 {diff} 秒）",
+    "signatureInvalid": "钱包签名无效",
+    "signatureVerificationFailed": "签名验证失败：{error}",
+    "noSignatureToVerify": "没有可验证的签名",
+    "incompleteIPFSData": "IPFS 数据不完整",
+    "ipfsParseError": "解析 IPFS 数据失败：{error}",
+    "ipfsNotAccessible": "IPFS 哈希 {hash} 无法访问：{error}",
+    "noIPFSHash": "没有可验证的 IPFS 哈希",
+    "verificationError": "验证过程失败：{error}"
+  },
+  "notifications": {
+    "periodLocked": {
+      "title": "评审期已锁定",
+      "message": "{hackathonTitle} 的评审期已被锁定（{lockType}）。原因：{reason}",
+      "defaultReason": "评审期已结束"
+    },
+    "periodUnlocked": {
+      "title": "评审期已解锁",
+      "message": "{hackathonTitle} 的评审期已被解锁。原因：{reason}{extendedTime}",
+      "extended": "（延长 {minutes} 分钟）"
+    },
+    "scoreFinalized": {
+      "title": "评分已最终确认",
+      "message": "您对「{projectTitle}」的评分已由 {judgeName} 最终确认。总分：{score}/10"
+    },
+    "scoreFinalizedByAdmin": {
+      "title": "评分已由管理员最终确认",
+      "message": "您对「{projectTitle}」的评分已由管理员 {adminName} 最终确认"
+    }
+  },
+  "success": {
+    "scoreFinalized": "「{projectTitle}」的评分已最终确认（得分：{score}/10）",
+    "periodLocked": "{hackathonTitle} 的评审期已锁定。已通知 {judgeCount} 位评委。",
+    "periodUnlocked": "{hackathonTitle} 的评审期已解锁。{extendInfo}",
+    "timeExtended": "时间延长了 {minutes} 分钟。"
+  },
+  "errors": {
+    "hackathonNotFound": "未找到黑客松",
+    "projectNotFound": "未找到项目",
+    "scoreNotFound": "未找到评分记录",
+    "notAssignedJudge": "您未被指定为此黑客松的评委",
+    "periodLocked": "评审期已锁定 - 不允许更改",
+    "alreadyLocked": "评审期已经锁定",
+    "notLocked": "评审期当前未锁定",
+    "alreadyFinalized": "评分已最终确认",
+    "incompleteScore": "评分不完整 - 请在最终确认前提供总分",
+    "ipfsUploadFailed": "上传评分数据到 IPFS 失败",
+    "ipfsRetrievalFailed": "从 IPFS 检索数据失败",
+    "ipfsDataParseError": "解析 IPFS 数据失败",
+    "ipfsRecordNotFound": "在数据库中未找到 IPFS 记录",
+    "invalidIPFSHash": "无效的 IPFS 哈希格式"
+  }
+}

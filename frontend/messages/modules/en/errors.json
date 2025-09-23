@@ -1,0 +1,12 @@
+{
+  "notFound": "Page not found",
+  "serverError": "Server error",
+  "networkError": "Network error",
+  "unauthorized": "Unauthorized",
+  "forbidden": "Forbidden",
+  "validation": "Validation error",
+  "required": "This field is required",
+  "invalidEmail": "Invalid email address",
+  "passwordTooShort": "Password too short",
+  "passwordMismatch": "Passwords do not match"
+}

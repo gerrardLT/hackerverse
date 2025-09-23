@@ -23,7 +23,7 @@ export async function POST(
       where: {
         id: invitationId,
         userId: user.id,
-        type: 'team_invite',
+        type: 'TEAM_INVITE',
         read: false
       }
     })

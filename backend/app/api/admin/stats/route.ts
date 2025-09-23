@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
+import { prepareApiResponse } from '@/lib/bigint-serializer'
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,7 +15,7 @@ export async function GET(request: NextRequest) {
     }
 
     // 检查用户是否是管理员
-    if (user.role !== 'admin') {
+    if (user.role !== 'ADMIN') {
       return NextResponse.json(
         { success: false, error: '权限不足' },
         { status: 403 }
@@ -121,7 +122,7 @@ export async function GET(request: NextRequest) {
     const hackathonGrowthRate = lastMonthHackathons > 0 ? ((hackathonGrowth - lastMonthHackathons) / lastMonthHackathons * 100).toFixed(1) : '0'
     const projectGrowthRate = lastMonthProjects > 0 ? ((projectGrowth - lastMonthProjects) / lastMonthProjects * 100).toFixed(1) : '0'
 
-    return NextResponse.json({
+    const responseData = {
       success: true,
       data: {
         overview: {
@@ -151,7 +152,9 @@ export async function GET(request: NextRequest) {
           }
         }
       }
-    })
+    }
+
+    return NextResponse.json(prepareApiResponse(responseData))
 
   } catch (error) {
     console.error('获取统计数据错误:', error)

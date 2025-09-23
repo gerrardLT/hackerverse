@@ -1,0 +1,323 @@
+{
+  "title": "团队",
+  "createTeam": "创建团队",
+  "join": "加入团队",
+  "leave": "离开团队",
+  "apply": "申请加入",
+  "invite": "邀请成员",
+  "manage": "管理团队",
+  "members": "成员",
+  "leader": "队长",
+  "pageTitle": "团队管理",
+  "pageDescription": "发现团队、管理你的团队、处理邀请",
+  "loading": {
+    "teams": "加载团队中...",
+    "hackathons": "加载黑客松列表失败",
+    "invitations": "加载邀请失败",
+    "failed": "加载失败",
+    "retry": "重试",
+    "networkError": "网络错误，请检查网络连接",
+    "getTeamsFailed": "获取团队列表失败",
+    "submitting": "提交中...",
+    "submitApplication": "提交申请"
+  },
+  "searchTitle": "搜索团队",
+  "newInvitation": "新邀请",
+  "fromInviter": "来自",
+  "defaultInvitationMessage": "诚邀您加入我们的团队，一起创造精彩项目！",
+  "myTeam": "我的团队",
+  "showPassion": "展示你的热情和能力",
+  "noTeamsJoined": "还没有加入任何团队",
+  "exploreTeams": "探索精彩的团队，开始你的协作之旅",
+  "console": {
+    "loadingTeamsError": "加载团队列表错误:",
+    "acceptInvitationFailed": "接受邀请失败:",
+    "declineInvitationFailed": "拒绝邀请失败:",
+    "applicationSubmitFailed": "申请提交失败:"
+  },
+  "search": {
+    "placeholder": "搜索团队...",
+    "statusFilter": "状态筛选",
+    "allStatuses": "全部状态",
+    "hackathonFilter": "黑客松筛选",
+    "allHackathons": "全部黑客松"
+  },
+  "tabs": {
+    "allTeams": "全部团队",
+    "myTeams": "我的团队",
+    "invitations": "团队邀请"
+  },
+  "status": {
+    "recruiting": "招募中",
+    "full": "已满员",
+    "competing": "比赛中",
+    "completed": "已完成",
+    "disbanded": "已解散"
+  },
+  "actions": {
+    "viewDetails": "查看详情",
+    "applyToJoin": "申请加入",
+    "manageTeam": "管理团队",
+    "acceptInvitation": "接受邀请",
+    "decline": "拒绝",
+    "cancel": "取消",
+    "retry": "重试"
+  },
+  "memberCount": "{current}/{max} 成员",
+  "roleLeader": "队长",
+  "roleMember": "成员",
+  "roleRecruiting": "招募中",
+  "unknownHackathon": "未知黑客松",
+  "empty": {
+    "noTeamsFound": "没有找到团队",
+    "adjustSearchCriteria": "尝试调整搜索条件或创建新团队",
+    "noInvitations": "暂无邀请",
+    "noInvitationsDesc": "你目前没有收到任何团队邀请"
+  },
+  "invitations": {
+    "teamInvitation": "团队邀请",
+    "fromInviter": "来自 {inviterName} 的邀请",
+    "acceptInvitation": "接受邀请",
+    "decline": "拒绝"
+  },
+  "joinDialog": {
+    "title": "申请加入团队",
+    "description": "申请加入 \"{teamName}\" 团队",
+    "skillsLabel": "技能标签 (可选)",
+    "skillsPlaceholder": "请输入你的技能，用逗号分隔，如：React, Node.js, Python",
+    "skillsHelp": "展示你的技能，帮助团队了解你的能力",
+    "messageLabel": "申请理由 (可选)",
+    "messagePlaceholder": "请简述你想加入这个团队的理由，或者介绍一下自己...",
+    "characterCount": "{current}/500 字符"
+  },
+  "toasts": {
+    "loginRequired": "请先登录",
+    "loginRequiredDesc": "需要登录才能接受邀请",
+    "loginRequiredToDecline": "需要登录才能拒绝邀请",
+    "loginRequiredToApply": "请先登录",
+    "applicationSubmitted": "申请已提交",
+    "applicationSubmittedDesc": "申请已提交，请等待团队领导审核",
+    "applicationFailed": "申请失败",
+    "applicationFailedDesc": "申请提交失败，请重试",
+    "invitationAccepted": "成功",
+    "invitationAcceptedDesc": "已接受团队邀请",
+    "invitationDeclined": "成功",
+    "invitationDeclinedDesc": "已拒绝团队邀请",
+    "operationFailed": "操作失败",
+    "acceptInvitationFailed": "接受邀请失败",
+    "declineInvitationFailed": "拒绝邀请失败"
+  },
+  "applications": {
+    "title": "申请管理",
+    "pending": "待审核",
+    "approved": "已通过",
+    "rejected": "已拒绝",
+    "approve": "批准",
+    "reject": "拒绝",
+    "message": "申请消息",
+    "skills": "技能",
+    "experience": "经验"
+  },
+  "create": {
+    "title": "创建团队",
+    "subtitle": "创建您的黑客松团队",
+    "description": "创建您的黑客松团队",
+    "backToTeams": "返回团队",
+    "form": {
+      "teamName": "团队名称",
+      "teamNamePlaceholder": "输入团队名称",
+      "teamNameRequired": "团队名称不能为空",
+      "teamNameMinLength": "团队名称至少2个字符",
+      "description": "团队描述",
+      "descriptionPlaceholder": "描述您的团队、目标和正在寻找的成员...",
+      "descriptionRequired": "团队描述不能为空",
+      "descriptionMinLength": "团队描述至少10个字符",
+      "hackathon": "选择黑客松",
+      "hackathonPlaceholder": "选择要参加的黑客松",
+      "hackathonRequired": "请选择参赛的黑客松",
+      "maxMembers": "最大成员数",
+      "maxMembersDesc": "设置团队最大成员数量（包括您自己）",
+      "techStack": "技术栈",
+      "techStackDesc": "选择您的团队将使用的技术",
+      "selectTechStack": "选择技术栈",
+      "addTech": "添加",
+      "skillsRequired": "至少需要选择一项技能",
+      "skillsMaxLimit": "技能最多选择10项",
+      "roles": "团队角色",
+      "rolesDesc": "添加您的团队需要的角色",
+      "selectRole": "选择标签",
+      "addRole": "添加",
+      "teamVisibility": "团队可见性",
+      "publicTeam": "公开团队",
+      "publicTeamDesc": "其他用户可以发现并申请加入您的团队",
+      "privateTeam": "私人团队",
+      "privateTeamDesc": "只有受邀请的用户才能加入您的团队"
+    },
+    "validation": {
+      "nameMaxLength": "团队名称最多50个字符",
+      "descMaxLength": "团队描述最多500个字符",
+      "tagsMaxCount": "团队标签最多5个",
+      "minMembers": "团队规模至少2人",
+      "maxMembersLimit": "团队规模最多10人"
+    },
+    "success": {
+      "teamCreated": "团队创建成功！",
+      "teamCreatedDesc": "你的团队已成功创建，现在可以开始招募成员了"
+    },
+    "console": {
+      "createTeamError": "创建团队失败"
+    },
+    "preview": {
+      "title": "预览",
+      "teamOverview": "团队概览",
+      "noTechStack": "未选择技术栈",
+      "noRoles": "未添加角色",
+      "maxMembersLabel": "最大成员数: {count}",
+      "visibilityPublic": "公开团队",
+      "visibilityPrivate": "私人团队"
+    },
+    "actions": {
+      "createTeam": "创建团队",
+      "creating": "创建中...",
+      "cancel": "取消"
+    },
+    "loading": {
+      "hackathons": "获取黑客松列表失败",
+      "loadFailed": "加载失败",
+      "noHackathons": "无法获取黑客松列表，请刷新页面重试"
+    },
+    "auth": {
+      "loginRequired": "请先登录",
+      "loginDesc": "登录后才能创建团队"
+    },
+    "hackathon": {
+      "deadline": "截止时间",
+      "teamSize": "团队规模",
+      "members3": "3 人团队",
+      "members4": "4 人团队",
+      "members5": "5 人团队",
+      "members6": "6 人团队"
+    },
+    "sections": {
+      "basicInfo": "基本信息",
+      "techStack": "技术栈",
+      "techStackDesc": "选择团队将使用的技术栈",
+      "skillsSelected": "已选择 {count}/10 项技能",
+      "teamTags": "团队标签（可选）",
+      "teamTagsDesc": "添加标签来描述团队特色或招募需求",
+      "privacy": "隐私设置",
+      "privacyDesc": "控制团队的可见性",
+      "publicTeamLabel": "公开团队",
+      "publicTeamDesc": "允许其他用户搜索和查看你的团队",
+      "actions": "操作按钮"
+    }
+  },
+  "detail": {
+    "status": {
+      "recruiting": "招募中",
+      "full": "已满员",
+      "competing": "比赛中",
+      "completed": "已完成"
+    },
+    "tabs": {
+      "overview": "概览",
+      "members": "成员",
+      "project": "项目",
+      "activity": "动态",
+      "applications": "申请管理"
+    },
+    "loading": {
+      "teamDetails": "加载团队详情中...",
+      "retry": "重试",
+      "applications": "加载中..."
+    },
+    "errors": {
+      "teamNotFound": "团队信息未找到",
+      "loadFailed": "获取团队信息失败",
+      "networkError": "网络错误，请检查网络连接"
+    },
+    "memberCount": "{current}/{max} 成员",
+    "teamCreator": "团队创建者",
+    "actions": {
+      "inviteMember": "邀请成员",
+      "joined": "已加入团队",
+      "joining": "申请中...",
+      "applyJoin": "申请加入",
+      "contactLeader": "联系队长"
+    },
+    "invite": {
+      "dialogTitle": "邀请成员加入团队",
+      "dialogDesc": "输入用户ID邀请其加入您的团队",
+      "userIdLabel": "用户ID",
+      "userIdPlaceholder": "输入要邀请的用户ID",
+      "messageLabel": "邀请消息 (可选)",
+      "messagePlaceholder": "写一段邀请消息...",
+      "cancel": "取消",
+      "sending": "发送中...",
+      "send": "发送邀请"
+    },
+    "overview": {
+      "techStack": "技术栈",
+      "noTechStack": "暂未设置技术栈",
+      "recruitmentNeeds": "招募职位",
+      "projectIdea": "项目想法"
+    },
+    "stats": {
+      "title": "团队统计",
+      "createdAt": "创建时间",
+      "teamSize": "团队规模",
+      "recruitmentStatus": "招募状态",
+      "recruiting": "招募中",
+      "full": "已满员"
+    },
+    "social": {
+      "title": "社交链接",
+      "website": "官网"
+    },
+    "achievements": {
+      "title": "团队成就"
+    },
+    "members": {
+      "joinedAt": "加入时间",
+      "noMembers": "暂无团队成员",
+      "noMembersDesc": "团队还没有成员加入"
+    },
+    "project": {
+      "title": "项目信息",
+      "desc": "团队正在开发的项目详情",
+      "developing": "项目开发中",
+      "developingDesc": "团队正在努力开发项目，敬请期待！"
+    },
+    "activity": {
+      "title": "团队动态",
+      "desc": "团队的最新活动和更新",
+      "noActivity": "暂无团队动态",
+      "noActivityDesc": "团队还没有任何活动记录"
+    },
+    "applications": {
+      "title": "申请管理",
+      "desc": "管理用户的加入申请",
+      "noApplications": "暂无申请",
+      "noApplicationsDesc": "还没有用户申请加入团队",
+      "reputation": "声誉",
+      "appliedAt": "申请时间",
+      "approve": "批准",
+      "reject": "拒绝"
+    },
+    "toasts": {
+      "applicationSent": "申请已发送",
+      "applicationSentDesc": "你的加入申请已发送给团队队长，请等待审核",
+      "applicationFailed": "申请失败",
+      "applicationFailedDesc": "发送申请时出现错误，请重试",
+      "inviteSent": "邀请已发送",
+      "inviteSentDesc": "已成功向用户发送团队邀请",
+      "inviteFailed": "邀请失败",
+      "inviteFailedDesc": "发送邀请时出现错误",
+      "inviteError": "发送邀请时出现错误，请重试",
+      "applicationApproved": "申请已批准",
+      "applicationRejected": "申请已拒绝",
+      "operationFailed": "操作失败",
+      "operationFailedDesc": "操作失败，请重试"
+    }
+  }
+}
