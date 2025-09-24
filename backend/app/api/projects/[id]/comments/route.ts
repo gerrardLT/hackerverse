@@ -247,7 +247,7 @@ export async function POST(
       })
     }
     
-    return ApiResponseHandler.created('评论发表成功', { comment })
+    return ApiResponseHandler.created({ comment }, '评论发表成功')
     
   } catch (error) {
     console.error('创建项目评论错误:', error)

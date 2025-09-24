@@ -400,8 +400,7 @@ export async function GET(request: NextRequest) {
                 role: true
               }
             },
-            createdAt: true,
-            updatedAt: true
+            createdAt: true
           }
         },
         _count: {
@@ -484,8 +483,8 @@ export async function GET(request: NextRequest) {
       total: totalCount,
       returned: projects.length,
       filters: {
-        technologies: availableTechnologies?.length || 0,
-        tags: availableTags?.length || 0,
+        technologies: (availableTechnologies as any[])?.length || 0,
+        tags: (availableTags as any[])?.length || 0,
         hackathons: hackathons.length
       }
     })

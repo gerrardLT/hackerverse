@@ -106,8 +106,8 @@ export default function SubmitProjectPage() {
       } catch (error) {
         console.error('获取黑客松信息失败:', error)
         toast({
-          title: '加载失败',
-          description: '无法获取黑客松信息，请刷新页面重试',
+          title: t('messages.loadingFailed'),
+          description: t('messages.loadingFailedDesc'),
           variant: 'destructive',
         })
       }
@@ -196,8 +196,8 @@ export default function SubmitProjectPage() {
   const handleIPFSUpload = (results: IPFSUploadResult[]) => {
     setIpfsFiles(prev => [...prev, ...results])
     toast({
-      title: 'IPFS 上传成功',
-      description: `${results.length} 个文件已上传到 IPFS 网络`,
+      title: t('messages.ipfsUploadSuccess'),
+      description: t('messages.ipfsUploadSuccessDesc', { count: results.length }),
     })
   }
 
@@ -230,22 +230,22 @@ export default function SubmitProjectPage() {
       
       const result = await response.json()
       if (!result.success) {
-        throw new Error(result.error || '上传失败')
+        throw new Error(result.error || t('messages.uploadFailed'))
       }
       
       setProjectMetadataHash(result.hash)
       
       toast({
-        title: '元数据已上传',
-        description: '项目元数据已存储到 IPFS',
+        title: t('messages.metadataUploaded'),
+        description: t('messages.metadataUploadedDesc'),
       })
 
       return result.hash
     } catch (error) {
       console.error('Failed to create metadata:', error)
       toast({
-        title: '元数据上传失败',
-        description: '无法将项目元数据上传到 IPFS',
+        title: t('messages.metadataUploadFailed'),
+        description: t('messages.metadataUploadFailedDesc'),
         variant: 'destructive',
       })
       throw error
@@ -264,7 +264,7 @@ export default function SubmitProjectPage() {
   }
   
   const getSubmissionTimeStatus = () => {
-    if (!hackathon) return { canSubmit: false, message: '加载中...' }
+    if (!hackathon) return { canSubmit: false, message: t('status.loading') }
     
     const now = new Date()
     const startDate = new Date(hackathon.startDate)
@@ -273,17 +273,17 @@ export default function SubmitProjectPage() {
     if (now < startDate) {
       return {
         canSubmit: false,
-        message: `黑客松尚未开始，将于 ${startDate.toLocaleString('zh-CN')} 开始`
+        message: t('status.hackathonNotStarted', { startDate: startDate.toLocaleString() })
       }
     } else if (now > endDate) {
       return {
         canSubmit: false,
-        message: `黑客松已结束，已于 ${endDate.toLocaleString('zh-CN')} 结束`
+        message: t('status.hackathonEnded', { endDate: endDate.toLocaleString() })
       }
     } else {
       return {
         canSubmit: true,
-        message: `可以提交项目，截止时间：${endDate.toLocaleString('zh-CN')}`
+        message: t('status.canSubmit', { endDate: endDate.toLocaleString() })
       }
     }
   }
@@ -316,19 +316,19 @@ export default function SubmitProjectPage() {
       
       if (response.success) {
         toast({
-          title: '项目提交成功！',
-          description: `项目已成功提交到黑客松，IPFS哈希: ${metadataHash.substring(0, 12)}...`,
+          title: t('messages.projectSubmitSuccess'),
+          description: t('messages.projectSubmitSuccessDesc', { hash: metadataHash.substring(0, 12) }),
         })
         
         router.push(`/hackathons/${params.id}`)
       } else {
-        throw new Error(response.error || '提交失败')
+        throw new Error(response.error || t('messages.submitFailed'))
       }
     } catch (error) {
       console.error('项目提交失败:', error)
       toast({
-        title: '提交失败',
-        description: error instanceof Error ? error.message : '提交项目时出现错误，请重试',
+        title: t('messages.submitFailed'),
+        description: error instanceof Error ? error.message : t('messages.submitFailedDesc'),
         variant: 'destructive',
       })
     } finally {
@@ -337,11 +337,11 @@ export default function SubmitProjectPage() {
   }
 
   const steps = [
-    { id: 1, name: '项目信息', description: '基本项目信息' },
-    { id: 2, name: '团队组建', description: '团队成员信息' },
-    { id: 3, name: '项目详情', description: '详细项目描述' },
-    { id: 4, name: 'IPFS 存储', description: '去中心化文件存储' },
-    { id: 5, name: '提交确认', description: '最终确认提交' }
+    { id: 1, name: t('steps.1.name'), description: t('steps.1.description') },
+    { id: 2, name: t('steps.2.name'), description: t('steps.2.description') },
+    { id: 3, name: t('steps.3.name'), description: t('steps.3.description') },
+    { id: 4, name: t('steps.4.name'), description: t('steps.4.description') },
+    { id: 5, name: t('steps.5.name'), description: t('steps.5.description') }
   ]
 
   const getStepProgress = () => {
@@ -355,16 +355,16 @@ export default function SubmitProjectPage() {
           // 已提交项目的显示
           <div className="space-y-6">
             <div className="mb-8">
-              <h1 className="text-3xl font-bold">项目已提交</h1>
+              <h1 className="text-3xl font-bold">{t('status.projectSubmitted')}</h1>
               <p className="text-muted-foreground mt-2">
-                您已成功向 {hackathon?.title} 提交了项目
+                {t('status.projectSubmittedDesc', { hackathonTitle: hackathon?.title })}
               </p>
             </div>
             
             <Alert>
               <Check className="h-4 w-4" />
               <AlertDescription>
-                您已经为此黑客松提交了项目。每个用户在一个黑客松中只能提交一个项目。
+                {t('status.alreadySubmittedDesc')}
               </AlertDescription>
             </Alert>
 
@@ -375,7 +375,7 @@ export default function SubmitProjectPage() {
                   {userProject.title || userProject.name}
                 </CardTitle>
                 <CardDescription>
-                  提交时间: {new Date(userProject.createdAt).toLocaleString('zh-CN')}
+                  {t('status.submissionTime', { time: new Date(userProject.createdAt).toLocaleString() })}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -394,7 +394,7 @@ export default function SubmitProjectPage() {
                     <Button variant="outline" size="sm" asChild>
                       <Link href={userProject.githubUrl} target="_blank">
                         <Github className="w-4 h-4 mr-2" />
-                        代码仓库
+                        {t('buttons.codeRepo')}
                       </Link>
                     </Button>
                   )}
@@ -402,13 +402,13 @@ export default function SubmitProjectPage() {
                     <Button variant="outline" size="sm" asChild>
                       <Link href={userProject.demoUrl} target="_blank">
                         <Globe className="w-4 h-4 mr-2" />
-                        在线演示
+                        {t('buttons.onlineDemo')}
                       </Link>
                     </Button>
                   )}
                   <Button variant="outline" size="sm" asChild>
                     <Link href={`/hackathons/${params.id}`}>
-                      返回黑客松详情
+                      {t('buttons.backToHackathon')}
                     </Link>
                   </Button>
                 </div>
@@ -464,11 +464,11 @@ export default function SubmitProjectPage() {
             {currentStep === 1 && (
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-semibold mb-4">项目基本信息</h3>
+                  <h3 className="text-lg font-semibold mb-4">{t('steps.1.name')}</h3>
                   
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="projectName">项目名称 *</Label>
+                      <Label htmlFor="projectName">{t('labels.projectName')} *</Label>
                       <Input
                         id="projectName"
                         value={projectName}
@@ -479,18 +479,18 @@ export default function SubmitProjectPage() {
                     </div>
 
                     <div>
-                      <Label htmlFor="projectDescription">项目简介 *</Label>
+                      <Label htmlFor="projectDescription">{t('labels.projectDescription')} *</Label>
                       <Textarea
                         id="projectDescription"
                         value={projectDescription}
                         onChange={(e) => setProjectDescription(e.target.value)}
-                        placeholder="简要描述你的项目..."
+                        placeholder={t('placeholders.projectDescShort')}
                         className="mt-1 min-h-[100px]"
                       />
                     </div>
 
                     <div>
-                      <Label>选择赛道 *</Label>
+                      <Label>{t('labels.selectTrack')} *</Label>
                       <Select value={selectedTrack} onValueChange={setSelectedTrack}>
                         <SelectTrigger className="mt-1">
                           <SelectValue placeholder={t('form.selectTrackPlaceholder')} />
@@ -506,9 +506,9 @@ export default function SubmitProjectPage() {
                     </div>
 
                     <div>
-                      <Label>技术栈</Label>
+                      <Label>{t('labels.techStack')}</Label>
                       <p className="text-sm text-muted-foreground mb-3">
-                        选择你项目中使用的技术栈
+                        {t('labels.techStackDesc')}
                       </p>
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                         {hackathon?.technologies?.map((tech: string) => (
@@ -546,7 +546,7 @@ export default function SubmitProjectPage() {
             {currentStep === 2 && (
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-semibold mb-4">团队成员</h3>
+                  <h3 className="text-lg font-semibold mb-4">{t('labels.teamMembers')}</h3>
                   
                   <div className="space-y-4">
                     {teamMembers.map((member, index) => (
@@ -554,7 +554,7 @@ export default function SubmitProjectPage() {
                         <CardContent className="p-4">
                           <div className="flex items-center justify-between mb-3">
                             <h4 className="font-medium">
-                              成员 {index + 1} {index === 0 && '(团队领导)'}
+                              {t('labels.member')} {index + 1} {index === 0 && t('labels.teamLeader')}
                             </h4>
                             {index > 0 && (
                               <Button
@@ -569,7 +569,7 @@ export default function SubmitProjectPage() {
                           
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                              <Label>姓名 *</Label>
+                              <Label>{t('labels.memberName')} *</Label>
                               <Input
                                 value={member.name}
                                 onChange={(e) => updateTeamMember(member.id, 'name', e.target.value)}
@@ -578,7 +578,7 @@ export default function SubmitProjectPage() {
                               />
                             </div>
                             <div>
-                              <Label>邮箱 *</Label>
+                              <Label>{t('labels.memberEmail')} *</Label>
                               <Input
                                 value={member.email}
                                 onChange={(e) => updateTeamMember(member.id, 'email', e.target.value)}
@@ -589,7 +589,7 @@ export default function SubmitProjectPage() {
                           </div>
                           
                           <div className="mt-4">
-                            <Label>角色</Label>
+                            <Label>{t('labels.memberRole')}</Label>
                             <Select 
                               value={member.role} 
                               onValueChange={(value) => updateTeamMember(member.id, 'role', value)}
@@ -598,13 +598,13 @@ export default function SubmitProjectPage() {
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="Team Leader">团队领导</SelectItem>
-                                <SelectItem value="Frontend Developer">前端开发</SelectItem>
-                                <SelectItem value="Backend Developer">后端开发</SelectItem>
-                                <SelectItem value="Smart Contract Developer">智能合约开发</SelectItem>
-                                <SelectItem value="UI/UX Designer">UI/UX 设计师</SelectItem>
-                                <SelectItem value="Product Manager">产品经理</SelectItem>
-                                <SelectItem value="Other">其他</SelectItem>
+                                <SelectItem value="Team Leader">{t('roles.teamLeader')}</SelectItem>
+                                <SelectItem value="Frontend Developer">{t('roles.frontendDev')}</SelectItem>
+                                <SelectItem value="Backend Developer">{t('roles.backendDev')}</SelectItem>
+                                <SelectItem value="Smart Contract Developer">{t('roles.smartContractDev')}</SelectItem>
+                                <SelectItem value="UI/UX Designer">{t('roles.uiuxDesigner')}</SelectItem>
+                                <SelectItem value="Product Manager">{t('roles.productManager')}</SelectItem>
+                                <SelectItem value="Other">{t('roles.other')}</SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
@@ -614,7 +614,7 @@ export default function SubmitProjectPage() {
                     
                     <Button variant="outline" onClick={addTeamMember} className="w-full">
                       <Plus className="mr-2 h-4 w-4" />
-                      添加团队成员
+                      {t('buttons.addMember')}
                     </Button>
                   </div>
                 </div>
@@ -625,40 +625,40 @@ export default function SubmitProjectPage() {
             {currentStep === 3 && (
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-semibold mb-4">项目详细描述</h3>
+                  <h3 className="text-lg font-semibold mb-4">{t('labels.projectDetails')}</h3>
                   
                   <div className="space-y-6">
                     <div>
-                      <Label htmlFor="problemStatement">问题陈述 *</Label>
+                      <Label htmlFor="problemStatement">{t('labels.problemStatement')} *</Label>
                       <Textarea
                         id="problemStatement"
                         value={problemStatement}
                         onChange={(e) => setProblemStatement(e.target.value)}
-                        placeholder="描述你要解决的问题..."
+                        placeholder={t('placeholders.problemDescription')}
                         className="mt-1 min-h-[100px]"
                       />
                     </div>
 
                     <div>
-                      <Label htmlFor="solution">解决方案 *</Label>
+                      <Label htmlFor="solution">{t('labels.solution')} *</Label>
                       <Textarea
                         id="solution"
                         value={solution}
                         onChange={(e) => setSolution(e.target.value)}
-                        placeholder="详细描述你的解决方案..."
+                        placeholder={t('placeholders.solutionDescription')}
                         className="mt-1 min-h-[120px]"
                       />
                     </div>
 
                     <div>
-                      <Label>主要功能特性</Label>
+                      <Label>{t('labels.keyFeatures')}</Label>
                       <div className="space-y-3 mt-2">
                         {features.map((feature, index) => (
                           <div key={index} className="flex gap-2">
                             <Input
                               value={feature}
                               onChange={(e) => updateFeature(index, e.target.value)}
-                              placeholder="输入功能特性..."
+                              placeholder={t('placeholders.featurePlaceholder')}
                               className="flex-1"
                             />
                             {features.length > 1 && (
@@ -674,40 +674,40 @@ export default function SubmitProjectPage() {
                         ))}
                         <Button variant="outline" onClick={addFeature} size="sm">
                           <Plus className="mr-2 h-4 w-4" />
-                          添加功能
+                          {t('buttons.addFeature')}
                         </Button>
                       </div>
                     </div>
 
                     <div>
-                      <Label htmlFor="technicalArchitecture">技术架构</Label>
+                      <Label htmlFor="technicalArchitecture">{t('labels.technicalArchitecture')}</Label>
                       <Textarea
                         id="technicalArchitecture"
                         value={technicalArchitecture}
                         onChange={(e) => setTechnicalArchitecture(e.target.value)}
-                        placeholder="描述你的技术架构和实现方式..."
+                        placeholder={t('placeholders.technicalArchitecture')}
                         className="mt-1 min-h-[100px]"
                       />
                     </div>
 
                     <div>
-                      <Label htmlFor="challenges">遇到的挑战</Label>
+                      <Label htmlFor="challenges">{t('labels.challenges')}</Label>
                       <Textarea
                         id="challenges"
                         value={challenges}
                         onChange={(e) => setChallenges(e.target.value)}
-                        placeholder="描述开发过程中遇到的挑战和如何解决..."
+                        placeholder={t('placeholders.challengesDescription')}
                         className="mt-1 min-h-[100px]"
                       />
                     </div>
 
                     <div>
-                      <Label htmlFor="futureWork">未来规划</Label>
+                      <Label htmlFor="futureWork">{t('labels.futureWork')}</Label>
                       <Textarea
                         id="futureWork"
                         value={futureWork}
                         onChange={(e) => setFutureWork(e.target.value)}
-                        placeholder="描述项目的未来发展计划..."
+                        placeholder={t('placeholders.futureWorkDescription')}
                         className="mt-1 min-h-[100px]"
                       />
                     </div>
@@ -722,14 +722,13 @@ export default function SubmitProjectPage() {
                 <div>
                   <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                     <Database className="h-5 w-5" />
-                    去中心化文件存储
+                    {t('labels.decentralizedStorage')}
                   </h3>
                   
                   <Alert className="mb-6">
                     <AlertCircle className="h-4 w-4" />
                     <AlertDescription>
-                      所有文件将存储在 IPFS 网络中，确保数据的去中心化和永久性。
-                      请上传项目相关的图片、文档、演示视频等文件。
+                      {t('ipfs.description')}
                     </AlertDescription>
                   </Alert>
 
@@ -737,15 +736,15 @@ export default function SubmitProjectPage() {
                     {/* 项目链接 */}
                     <Card>
                       <CardHeader>
-                        <CardTitle className="text-base">项目链接</CardTitle>
+                        <CardTitle className="text-base">{t('labels.projectLinks')}</CardTitle>
                         <CardDescription>
-                          提供项目的相关链接信息
+                          {t('labels.projectLinksDesc')}
                         </CardDescription>
                       </CardHeader>
                       <CardContent className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <Label htmlFor="githubUrl">GitHub 仓库 *</Label>
+                            <Label htmlFor="githubUrl">{t('labels.githubRepo')} *</Label>
                             <div className="flex mt-1">
                               <div className="flex items-center px-3 border border-r-0 rounded-l-md bg-muted">
                                 <Github className="h-4 w-4" />
@@ -761,7 +760,7 @@ export default function SubmitProjectPage() {
                           </div>
 
                           <div>
-                            <Label htmlFor="demoUrl">演示链接</Label>
+                            <Label htmlFor="demoUrl">{t('labels.demoLink')}</Label>
                             <div className="flex mt-1">
                               <div className="flex items-center px-3 border border-r-0 rounded-l-md bg-muted">
                                 <Globe className="h-4 w-4" />
@@ -779,7 +778,7 @@ export default function SubmitProjectPage() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <Label htmlFor="videoUrl">演示视频</Label>
+                            <Label htmlFor="videoUrl">{t('labels.videoDemo')}</Label>
                             <div className="flex mt-1">
                               <div className="flex items-center px-3 border border-r-0 rounded-l-md bg-muted">
                                 <Video className="h-4 w-4" />
@@ -795,7 +794,7 @@ export default function SubmitProjectPage() {
                           </div>
 
                           <div>
-                            <Label htmlFor="presentationUrl">项目文档</Label>
+                            <Label htmlFor="presentationUrl">{t('labels.projectDocs')}</Label>
                             <div className="flex mt-1">
                               <div className="flex items-center px-3 border border-r-0 rounded-l-md bg-muted">
                                 <FileText className="h-4 w-4" />
@@ -826,31 +825,31 @@ export default function SubmitProjectPage() {
                     {ipfsFiles.length > 0 && (
                       <Card>
                         <CardHeader>
-                          <CardTitle className="text-base">IPFS 存储统计</CardTitle>
+                          <CardTitle className="text-base">{t('ipfs.storageStats')}</CardTitle>
                         </CardHeader>
                         <CardContent>
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                             <div>
                               <div className="text-2xl font-bold text-primary">{ipfsFiles.length}</div>
-                              <div className="text-sm text-muted-foreground">文件数量</div>
+                              <div className="text-sm text-muted-foreground">{t('ipfs.fileCount')}</div>
                             </div>
                             <div>
                               <div className="text-2xl font-bold text-primary">
                                 {(ipfsFiles.reduce((sum, file) => sum + file.size, 0) / 1024 / 1024).toFixed(1)}MB
                               </div>
-                              <div className="text-sm text-muted-foreground">总大小</div>
+                              <div className="text-sm text-muted-foreground">{t('ipfs.totalSize')}</div>
                             </div>
                             <div>
                               <div className="text-2xl font-bold text-primary">
                                 {ipfsFiles.filter(f => f.path.match(/\.(jpg|jpeg|png|gif)$/i)).length}
                               </div>
-                              <div className="text-sm text-muted-foreground">图片文件</div>
+                              <div className="text-sm text-muted-foreground">{t('ipfs.imageFiles')}</div>
                             </div>
                             <div>
                               <div className="text-2xl font-bold text-primary">
                                 {ipfsFiles.filter(f => f.path.match(/\.(mp4|avi|mov)$/i)).length}
                               </div>
-                              <div className="text-sm text-muted-foreground">视频文件</div>
+                              <div className="text-sm text-muted-foreground">{t('ipfs.videoFiles')}</div>
                             </div>
                           </div>
                         </CardContent>
@@ -1006,9 +1005,9 @@ export default function SubmitProjectPage() {
                     disabled={isSubmitting || !agreedToTerms || !canSubmitProject()}
                     className="w-full"
                   >
-                    {isSubmitting ? '提交中...' : 
-                     !canSubmitProject() ? '暂时无法提交' : 
-                     '提交项目到 IPFS'}
+                    {isSubmitting ? t('messages.submitting') : 
+                     !canSubmitProject() ? t('messages.cannotSubmit') : 
+                     t('messages.submitToIpfs')}
                   </Button>
                 </div>
               )}

@@ -63,7 +63,7 @@ async function recalculateUserReputation(userId: string) {
   // 验证用户是否存在
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { id: true, username: true }
+    select: { id: true, username: true, reputationScore: true }
   })
 
   if (!user) {
@@ -180,19 +180,19 @@ async function recalculateAllUsersReputation() {
     },
     
     topUsers: results
-      .filter(r => !r.error && r.newScore > 0)
-      .sort((a, b) => (b.newScore || 0) - (a.newScore || 0))
+      .filter(r => !('error' in r) && 'newScore' in r && r.newScore > 0)
+      .sort((a, b) => (('newScore' in b ? b.newScore : 0) || 0) - (('newScore' in a ? a.newScore : 0) || 0))
       .slice(0, 10)
       .map(r => ({
         userId: r.userId,
         username: r.username,
-        score: r.newScore
+        score: 'newScore' in r ? r.newScore : 0
       }))
   }
 
   // 计算积分分布
   results.forEach(result => {
-    if (!result.error && result.newScore !== undefined) {
+    if (!('error' in result) && 'newScore' in result && result.newScore !== undefined) {
       const score = result.newScore
       if (score < 100) summary.scoreDistribution['0-99']++
       else if (score < 500) summary.scoreDistribution['100-499']++

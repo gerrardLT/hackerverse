@@ -186,7 +186,7 @@ export class RecommendationService {
         // 用户发布的帖子
         prisma.communityPost.findMany({
           where: { authorId: userId, isDeleted: false },
-          select: { category: true, tags: true },
+          select: { id: true, category: true, tags: true },
           take: 20,
           orderBy: { createdAt: 'desc' }
         }),
@@ -480,5 +480,185 @@ export class RecommendationService {
       console.error('获取相关帖子错误:', error)
       return []
     }
+  }
+
+  // ============ 黑客松推荐功能 ============
+  
+  // 获取推荐的特色黑客松
+  static async getRecommendedHackathons(limit: number = 3, forceRefresh: boolean = false) {
+    const candidates = await this.getCandidateHackathons()
+    if (candidates.length === 0) return []
+
+    const scored = await this.calculateHackathonScores(candidates)
+    const recommended = scored.sort((a, b) => b.score - a.score).slice(0, limit)
+
+    if (forceRefresh) {
+      await this.updateFeaturedFlags(recommended.map(h => h.id))
+    }
+
+    const full = await this.getFullHackathonData(recommended.map(h => h.id))
+    return full.map((hackathon, idx) => ({
+      ...hackathon,
+      score: recommended[idx].score,
+      metrics: recommended[idx].metrics,
+      rawData: recommended[idx].rawData,
+    }))
+  }
+
+  // 获取完整的黑客松数据
+  private static async getFullHackathonData(hackathonIds: string[]) {
+    return await prisma.hackathon.findMany({
+      where: { id: { in: hackathonIds } },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        startDate: true,
+        endDate: true,
+        registrationDeadline: true,
+        maxParticipants: true,
+        prizePool: true,
+        categories: true,
+        tags: true,
+        requirements: true,
+        rules: true,
+        isPublic: true,
+        featured: true,
+        ipfsHash: true,
+        metadata: true,
+        createdAt: true,
+        organizer: { select: { id: true, username: true, avatarUrl: true } },
+        _count: { select: { participations: true, projects: true } },
+      },
+      orderBy: [{ featured: 'desc' }, { createdAt: 'desc' }],
+    })
+  }
+
+  // 获取候选黑客松
+  private static async getCandidateHackathons() {
+    const now = new Date()
+    return await prisma.hackathon.findMany({
+      where: {
+        isPublic: true,
+        status: 'ACTIVE',
+        OR: [
+          { endDate: { gt: now } },
+          { endDate: { gte: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) } },
+        ],
+      },
+      include: {
+        organizer: { select: { id: true, username: true, reputationScore: true } },
+        _count: { select: { participations: true, projects: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+    })
+  }
+
+  // 计算黑客松推荐分数
+  private static async calculateHackathonScores(hackathons: any[]) {
+    const maxValues = this.calculateMaxValues(hackathons)
+    return hackathons.map(h => {
+      const metrics = this.calculateMetrics(h, maxValues)
+      const score = this.calculateFinalScore(metrics)
+      return {
+        id: h.id,
+        title: h.title,
+        score,
+        metrics,
+        rawData: {
+          prizePool: h.prizePool || 0,
+          participationCount: h._count.participations,
+          daysSinceCreated: Math.floor((Date.now() - h.createdAt.getTime()) / (1000 * 60 * 60 * 24)),
+          categories: h.categories || [],
+          organizerHackathons: 1,
+        },
+      }
+    })
+  }
+
+  // 计算最大值用于归一化
+  private static calculateMaxValues(hackathons: any[]) {
+    return {
+      maxPrizePool: Math.max(...hackathons.map(h => h.prizePool || 0), 1),
+      maxParticipation: Math.max(...hackathons.map(h => h._count.participations), 1),
+      maxDaysOld: Math.max(...hackathons.map(h => Math.floor((Date.now() - h.createdAt.getTime()) / (1000 * 60 * 60 * 24))), 1),
+      maxCategories: Math.max(...hackathons.map(h => (h.categories || []).length), 1),
+    }
+  }
+
+  // 计算各项指标分数
+  private static calculateMetrics(h: any, max: any) {
+    const weights = {
+      prizePool: 0.3,
+      participation: 0.25,
+      recentness: 0.2,
+      diversity: 0.15,
+      reputation: 0.1,
+    }
+
+    const prizePool = h.prizePool || 0
+    const participationCount = h._count.participations
+    const daysSinceCreated = Math.floor((Date.now() - h.createdAt.getTime()) / (1000 * 60 * 60 * 24))
+    const categoriesCount = (h.categories || []).length
+    const organizerReputation = h.organizer?.reputationScore || 0
+
+    return {
+      prizePoolScore: Math.min((prizePool / max.maxPrizePool) * 100, 100),
+      participationScore: Math.min((participationCount / max.maxParticipation) * 100, 100),
+      recentnessScore: Math.max(100 - (daysSinceCreated / max.maxDaysOld) * 100, 0),
+      categoryDiversityScore: Math.min((categoriesCount / max.maxCategories) * 100, 100),
+      organizerReputationScore: Math.min(organizerReputation / 10, 100),
+      weights
+    }
+  }
+
+  // 计算最终推荐分数
+  private static calculateFinalScore(metrics: any) {
+    const { weights } = metrics
+    return (
+      metrics.prizePoolScore * weights.prizePool +
+      metrics.participationScore * weights.participation +
+      metrics.recentnessScore * weights.recentness +
+      metrics.categoryDiversityScore * weights.diversity +
+      metrics.organizerReputationScore * weights.reputation
+    )
+  }
+
+  // 更新特色标记
+  private static async updateFeaturedFlags(recommendedIds: string[]) {
+    await prisma.hackathon.updateMany({ where: { featured: true }, data: { featured: false } })
+    if (recommendedIds.length > 0) {
+      await prisma.hackathon.updateMany({ where: { id: { in: recommendedIds } }, data: { featured: true } })
+    }
+  }
+
+  // 获取推荐算法报告
+  static async getRecommendationReport() {
+    const candidates = await this.getCandidateHackathons()
+    const scored = await this.calculateHackathonScores(candidates)
+    const recommended = scored.sort((a, b) => b.score - a.score).slice(0, 5)
+    
+    return {
+      summary: {
+        totalCandidates: candidates.length,
+        averageScore: scored.length ? scored.reduce((s, h) => s + h.score, 0) / scored.length : 0,
+        topScore: recommended[0]?.score || 0,
+        lowestScore: scored.length ? scored[scored.length - 1]?.score || 0 : 0,
+      },
+      details: scored.sort((a, b) => b.score - a.score),
+      weights: {
+        prizePool: 0.3,
+        participation: 0.25,
+        recentness: 0.2,
+        diversity: 0.15,
+        reputation: 0.1,
+      }
+    }
+  }
+
+  // 更新推荐权重配置
+  static updateWeights(newWeights: any) {
+    // 这里可以实现权重更新逻辑
+    console.log('权重已更新:', newWeights)
   }
 }

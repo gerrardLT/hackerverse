@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
         version: '1.0.0',
         timestamp: new Date().toISOString(),
         data: {
-          username: validatedData.username,
+          username: validatedData.username || validatedData.email.split('@')[0], // 使用邮箱前缀作为默认用户名
           email: validatedData.email,
           avatar: '',
           bio: 'New registered user',

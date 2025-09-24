@@ -53,6 +53,7 @@ export async function POST(
         id: true,
         title: true,
         hackathonId: true,
+        contractId: true,
         hackathon: {
           select: {
             id: true,
@@ -67,6 +68,14 @@ export async function POST(
       return NextResponse.json(
         { error: '项目不存在' },
         { status: 404 }
+      )
+    }
+
+    // 检查项目是否关联到黑客松
+    if (!project.hackathon) {
+      return NextResponse.json(
+        { error: '独立项目无法进行评分' },
+        { status: 400 }
       )
     }
 
@@ -179,16 +188,16 @@ export async function POST(
       // 注意：需要使用智能合约中的项目ID，而不是数据库ID
       const projectContractId = project.contractId || 1 // 如果没有contractId，使用默认值
       
-      const tx = await smartContractService.submitScore(
+      const txHash = await smartContractService.submitScore(
         projectContractId,
-        Math.round(totalScore * 100) // 智能合约使用整数，乘以100保持精度
+        Math.round(totalScore * 100), // 智能合约使用整数，乘以100保持精度
+        '' // 暂时使用空字符串作为feedbackCID
       )
-      const receipt = await tx.wait()
       
       contractResult = {
-        txHash: tx.hash,
-        blockNumber: Number(receipt.blockNumber),
-        gasUsed: Number(receipt.gasUsed)
+        txHash: txHash,
+        blockNumber: null, // submitScore方法不返回receipt信息
+        gasUsed: null
       }
       
       console.log('⛓️ 智能合约评分提交成功:', contractResult)
@@ -254,7 +263,7 @@ export async function POST(
       message: '评分提交成功',
       score: {
         ...score,
-        ipfsUrl: ipfsHash ? `${process.env.IPFS_GATEWAY}/ipfs/${ipfsHash}` : null
+        ipfsUrl: score.ipfsHash ? `${process.env.IPFS_GATEWAY}/ipfs/${score.ipfsHash}` : null
       }
     }, { status: 201 })
 

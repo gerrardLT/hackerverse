@@ -157,7 +157,7 @@ export async function POST(
       })
 
       // 3. 如果选择强制最终确认，更新所有未确认的评分
-      let finalizedScores: any[] = []
+      let finalizedScores: any = { count: 0 }
       if (validatedData.forceFinalize) {
         const judgeIds = hackathon.judges.map(j => j.id)
         
@@ -181,7 +181,7 @@ export async function POST(
           tx.notification.create({
             data: {
               userId: judgeUserId,
-              type: 'JUDGING_PERIOD_LOCKED',
+              type: 'SYSTEM_ANNOUNCEMENT',
               title: t('judging.notifications.periodLocked.title'),
               message: t('judging.notifications.periodLocked.message', {
                 hackathonTitle: hackathon.title,
@@ -189,7 +189,7 @@ export async function POST(
                 reason: validatedData.reason || t('judging.notifications.periodLocked.defaultReason')
               }),
               priority: 'HIGH',
-              category: 'JUDGING',
+              category: 'SYSTEM',
               data: {
                 hackathonId,
                 lockId: lockRecord.id,
@@ -241,7 +241,7 @@ export async function POST(
         },
         message: t('judging.success.periodLocked', {
           hackathonTitle: hackathon.title,
-          judgeCount: affectedJudges.length
+          judgeCount: affectedJudges.length.toString()
         })
       }
     })
@@ -377,7 +377,7 @@ export async function DELETE(
           unlockedBy: user.id,
           unlockReason: validatedData.reason,
           lockMetadata: {
-            ...activeLock.lockMetadata,
+            ...(activeLock.lockMetadata as object || {}),
             unlockReason: validatedData.reason,
             extendedMinutes: validatedData.extendMinutes,
             unlockedBy: user.id,
@@ -396,17 +396,17 @@ export async function DELETE(
             tx.notification.create({
               data: {
                 userId: judgeUserId,
-                type: 'JUDGING_PERIOD_UNLOCKED',
+                type: 'SYSTEM_ANNOUNCEMENT',
                 title: t('judging.notifications.periodUnlocked.title'),
                 message: t('judging.notifications.periodUnlocked.message', {
                   hackathonTitle: activeLock.hackathon.title,
                   reason: validatedData.reason,
                   extendedTime: validatedData.extendMinutes > 0 
-                    ? t('judging.notifications.periodUnlocked.extended', { minutes: validatedData.extendMinutes })
+                    ? t('judging.notifications.periodUnlocked.extended', { minutes: validatedData.extendMinutes.toString() })
                     : ''
                 }),
                 priority: 'MEDIUM',
-                category: 'JUDGING',
+                category: 'SYSTEM',
                 data: {
                   hackathonId,
                   lockId: activeLock.id,
@@ -461,7 +461,7 @@ export async function DELETE(
         message: t('judging.success.periodUnlocked', {
           hackathonTitle: activeLock.hackathon.title,
           extendInfo: validatedData.extendMinutes > 0 
-            ? t('judging.success.timeExtended', { minutes: validatedData.extendMinutes })
+            ? t('judging.success.timeExtended', { minutes: validatedData.extendMinutes.toString() })
             : ''
         })
       }

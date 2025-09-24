@@ -37,8 +37,8 @@ export class UnifiedNotificationService {
       type: 'TEAM_INVITE',
       title: '团队邀请',
       message: `${inviterName} 邀请你加入 "${teamName}" 团队`,
-      priority: NotificationPriority.HIGH,
-      category: NotificationCategory.TEAM,
+      priority: 'HIGH',
+      category: 'TEAM',
       actionUrl: `/teams/${teamId}`,
       actionLabel: '查看详情',
       data: {
@@ -61,13 +61,13 @@ export class UnifiedNotificationService {
   ) {
     return this.createNotification({
       userId,
-      type: approved ? NotificationType.TEAM_APPLICATION_APPROVED : NotificationType.TEAM_APPLICATION_REJECTED,
+      type: approved ? 'TEAM_APPLICATION_APPROVED' : 'TEAM_APPLICATION_REJECTED',
       title: approved ? '申请已批准' : '申请被拒绝',
       message: approved 
         ? `恭喜！你的加入 "${teamName}" 团队的申请已被批准`
         : `很遗憾，你的加入 "${teamName}" 团队的申请被拒绝`,
-      priority: NotificationPriority.HIGH,
-      category: NotificationCategory.TEAM,
+      priority: 'HIGH',
+      category: 'TEAM',
       actionUrl: `/teams/${teamId}`,
       actionLabel: '查看团队',
       data: {
@@ -89,11 +89,11 @@ export class UnifiedNotificationService {
   ) {
     return this.createNotification({
       userId,
-      type: NotificationType.TEAM_MEMBER_JOINED,
+      type: 'TEAM_MEMBER_JOINED',
       title: '新成员加入',
       message: `${newMemberName} 已加入你的团队 "${teamName}"`,
-      priority: NotificationPriority.MEDIUM,
-      category: NotificationCategory.TEAM,
+      priority: 'MEDIUM',
+      category: 'TEAM',
       actionUrl: `/teams/${teamId}`,
       actionLabel: '查看团队',
       data: {
@@ -117,10 +117,10 @@ export class UnifiedNotificationService {
     timeRemaining: string
   ) {
     const typeMap = {
-      starting: NotificationType.HACKATHON_STARTING,
-      ending: NotificationType.HACKATHON_ENDING,
-      registration_ending: NotificationType.HACKATHON_REGISTRATION_REMINDER,
-      submission_ending: NotificationType.HACKATHON_SUBMISSION_REMINDER
+      starting: 'HACKATHON_STARTING',
+      ending: 'HACKATHON_ENDING',
+      registration_ending: 'HACKATHON_REGISTRATION_REMINDER',
+      submission_ending: 'HACKATHON_SUBMISSION_REMINDER'
     }
 
     const messageMap = {
@@ -135,8 +135,8 @@ export class UnifiedNotificationService {
       type: typeMap[reminderType],
       title: '黑客松提醒',
       message: messageMap[reminderType],
-      priority: NotificationPriority.URGENT,
-      category: NotificationCategory.HACKATHON,
+      priority: 'URGENT',
+      category: 'HACKATHON',
       actionUrl: `/hackathons/${hackathonId}`,
       actionLabel: '查看详情',
       data: {
@@ -160,11 +160,11 @@ export class UnifiedNotificationService {
   ) {
     return this.createNotification({
       userId,
-      type: NotificationType.PRIZE_AWARDED,
+      type: 'PRIZE_AWARDED',
       title: '🏆 恭喜获奖！',
       message: `恭喜！你在 "${hackathonTitle}" 中获得了 ${prize}`,
-      priority: NotificationPriority.URGENT,
-      category: NotificationCategory.HACKATHON,
+      priority: 'URGENT',
+      category: 'HACKATHON',
       actionUrl: projectId ? `/projects/${projectId}` : `/hackathons/${hackathonId}`,
       actionLabel: '查看详情',
       data: {
@@ -188,7 +188,7 @@ export class UnifiedNotificationService {
     actorName: string,
     projectId: string
   ) {
-    const type = interactionType === 'liked' ? NotificationType.PROJECT_LIKED : NotificationType.PROJECT_COMMENTED
+    const type = interactionType === 'liked' ? 'PROJECT_LIKED' : 'PROJECT_COMMENTED'
     const message = interactionType === 'liked' 
       ? `${actorName} 点赞了你的项目 "${projectTitle}"`
       : `${actorName} 评论了你的项目 "${projectTitle}"`
@@ -198,8 +198,8 @@ export class UnifiedNotificationService {
       type,
       title: '项目互动',
       message,
-      priority: NotificationPriority.LOW,
-      category: NotificationCategory.PROJECT,
+      priority: 'LOW',
+      category: 'PROJECT',
       actionUrl: `/projects/${projectId}`,
       actionLabel: '查看项目',
       data: {
@@ -223,11 +223,11 @@ export class UnifiedNotificationService {
   ) {
     return this.createNotification({
       userId,
-      type: NotificationType.PROJECT_REVIEWED,
+      type: 'PROJECT_REVIEWED',
       title: '项目评审完成',
       message: `评审员 ${judgeName} 已完成对你的项目 "${projectTitle}" 的评审，得分：${score}`,
-      priority: NotificationPriority.MEDIUM,
-      category: NotificationCategory.PROJECT,
+      priority: 'MEDIUM',
+      category: 'PROJECT',
       actionUrl: `/projects/${projectId}`,
       actionLabel: '查看详情',
       data: {
@@ -252,10 +252,10 @@ export class UnifiedNotificationService {
     entityId?: string
   ) {
     const typeMap = {
-      post_replied: NotificationType.COMMUNITY_POST_REPLIED,
-      post_liked: NotificationType.COMMUNITY_POST_LIKED,
-      reply_liked: NotificationType.COMMUNITY_REPLY_LIKED,
-      new_follower: NotificationType.COMMUNITY_NEW_FOLLOWER
+      post_replied: 'COMMUNITY_POST_REPLIED',
+      post_liked: 'COMMUNITY_POST_LIKED',
+      reply_liked: 'COMMUNITY_REPLY_LIKED',
+      new_follower: 'COMMUNITY_NEW_FOLLOWER'
     }
 
     const messageMap = {
@@ -270,8 +270,8 @@ export class UnifiedNotificationService {
       type: typeMap[interactionType],
       title: '社区互动',
       message: messageMap[interactionType],
-      priority: NotificationPriority.LOW,
-      category: NotificationCategory.COMMUNITY,
+      priority: 'LOW',
+      category: 'COMMUNITY',
       actionUrl: entityId ? `/community/posts/${entityId}` : '/community',
       actionLabel: '查看详情',
       data: {
@@ -296,11 +296,11 @@ export class UnifiedNotificationService {
   ) {
     return this.createNotification({
       userId,
-      type: NotificationType.SYSTEM_ANNOUNCEMENT,
+      type: 'SYSTEM_ANNOUNCEMENT',
       title: `📢 ${title}`,
       message,
-      priority: NotificationPriority.MEDIUM,
-      category: NotificationCategory.SYSTEM,
+      priority: 'MEDIUM',
+      category: 'SYSTEM',
       actionUrl,
       actionLabel: actionUrl ? '查看详情' : undefined,
       data: {
@@ -315,11 +315,11 @@ export class UnifiedNotificationService {
   static async createWelcomeNotification(userId: string, username: string) {
     return this.createNotification({
       userId,
-      type: NotificationType.WELCOME_MESSAGE,
+      type: 'WELCOME_MESSAGE',
       title: '欢迎加入 HackX！',
       message: `欢迎 ${username}！开始你的黑客松之旅，探索无限可能！`,
-      priority: NotificationPriority.MEDIUM,
-      category: NotificationCategory.SYSTEM,
+      priority: 'MEDIUM',
+      category: 'SYSTEM',
       actionUrl: '/dashboard',
       actionLabel: '开始探索',
       data: {
@@ -340,11 +340,11 @@ export class UnifiedNotificationService {
       const notification = await prisma.notification.create({
         data: {
           userId: data.userId,
-          type: data.type,
+          type: data.type as any,
           title: data.title,
           message: data.message,
-          priority: data.priority || NotificationPriority.MEDIUM,
-          category: data.category || NotificationCategory.SYSTEM,
+          priority: data.priority || 'MEDIUM',
+          category: data.category || 'SYSTEM',
           actionUrl: data.actionUrl,
           actionLabel: data.actionLabel,
           data: data.data,
@@ -368,11 +368,11 @@ export class UnifiedNotificationService {
       const result = await prisma.notification.createMany({
         data: notifications.map(data => ({
           userId: data.userId,
-          type: data.type,
+          type: data.type as any,
           title: data.title,
           message: data.message,
-          priority: data.priority || NotificationPriority.MEDIUM,
-          category: data.category || NotificationCategory.SYSTEM,
+          priority: data.priority || 'MEDIUM',
+          category: data.category || 'SYSTEM',
           actionUrl: data.actionUrl,
           actionLabel: data.actionLabel,
           data: data.data,

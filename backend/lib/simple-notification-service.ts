@@ -1,5 +1,6 @@
 import { prisma } from './prisma'
 import { t } from './i18n'
+import { NotificationType } from '@prisma/client'
 
 interface SimpleNotificationData {
   userId: string
@@ -267,7 +268,7 @@ export class SimpleNotificationService {
       const notification = await prisma.notification.create({
         data: {
           userId: data.userId,
-          type: data.type,
+          type: data.type as NotificationType,
           title: data.title,
           message: data.message,
           data: data.data,

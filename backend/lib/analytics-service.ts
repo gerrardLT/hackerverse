@@ -121,10 +121,10 @@ export class AnalyticsService {
       
       // 注册趋势
       prisma.participation.groupBy({
-        by: ['createdAt'],
+        by: ['joinedAt'],
         where: { hackathonId },
         _count: { id: true },
-        orderBy: { createdAt: 'asc' }
+        orderBy: { joinedAt: 'asc' }
       })
     ])
 
@@ -150,7 +150,7 @@ export class AnalyticsService {
     // 处理注册趋势数据（按天聚合）
     const trendMap = new Map<string, number>()
     registrationTrend.forEach(item => {
-      const date = item.createdAt.toISOString().split('T')[0]
+      const date = item.joinedAt.toISOString().split('T')[0]
       trendMap.set(date, (trendMap.get(date) || 0) + item._count.id)
     })
 
@@ -169,7 +169,7 @@ export class AnalyticsService {
       totalProjects,
       totalTeams: teamStats._count.id,
       completionRate: Math.round(completionRate * 100) / 100,
-      averageScore: scoreStats._avg.totalScore || 0,
+      averageScore: Number(scoreStats._avg.totalScore) || 0,
       topSkills,
       registrationTrend: registrationTrendData,
       engagementRate: Math.round(engagementRate * 100) / 100
@@ -194,17 +194,17 @@ export class AnalyticsService {
         where: { hackathonId },
         include: {
           user: {
-            select: { skills: true, location: true }
+            select: { skills: true }
           }
         }
       }),
       
       // 注册趋势
       prisma.participation.groupBy({
-        by: ['createdAt'],
+        by: ['joinedAt'],
         where: { hackathonId },
         _count: { id: true },
-        orderBy: { createdAt: 'asc' }
+        orderBy: { joinedAt: 'asc' }
       }),
       
       // 用户人口统计学数据
@@ -214,10 +214,8 @@ export class AnalyticsService {
             some: { hackathonId }
           }
         },
-        select: { 
-          skills: true, 
-          location: true,
-          experience: true 
+        select: {
+          skills: true
         }
       }),
       
@@ -225,7 +223,7 @@ export class AnalyticsService {
       prisma.participation.count({
         where: { 
           hackathonId,
-          status: 'checked_in'
+          status: 'CONFIRMED'
         }
       }),
       
@@ -240,7 +238,7 @@ export class AnalyticsService {
     // 处理注册趋势
     const trendMap = new Map<string, number>()
     registrationTrend.forEach(item => {
-      const date = item.createdAt.toISOString().split('T')[0]
+      const date = item.joinedAt.toISOString().split('T')[0]
       trendMap.set(date, (trendMap.get(date) || 0) + item._count.id)
     })
 
@@ -258,9 +256,9 @@ export class AnalyticsService {
       const experience = (user as any).experience || 'unknown'
       experienceMap.set(experience, (experienceMap.get(experience) || 0) + 1)
       
-      // 地理位置分析
-      const location = user.location || 'unknown'
-      locationMap.set(location, (locationMap.get(location) || 0) + 1)
+      // 地理位置分析 (暂时禁用，因为User模型中没有location字段)
+      // const location = user.location || 'unknown'
+      // locationMap.set(location, (locationMap.get(location) || 0) + 1)
       
       // 技能分析
       if (user.skills && Array.isArray(user.skills)) {
@@ -286,10 +284,7 @@ export class AnalyticsService {
         byExperience: Array.from(experienceMap.entries())
           .map(([level, count]) => ({ level, count }))
           .sort((a, b) => b.count - a.count),
-        byLocation: Array.from(locationMap.entries())
-          .map(([location, count]) => ({ location, count }))
-          .sort((a, b) => b.count - a.count)
-          .slice(0, 10),
+        byLocation: [], // 暂时禁用地理位置统计
         bySkills: Array.from(skillMap.entries())
           .map(([skill, count]) => ({ skill, count }))
           .sort((a, b) => b.count - a.count)
@@ -360,21 +355,21 @@ export class AnalyticsService {
 
     scores.forEach(score => {
       if (score.totalScore) {
-        totalScore += score.totalScore
+        totalScore += Number(score.totalScore)
         scoreCount++
         
         // 分数分布
-        const range = Math.floor(score.totalScore / 2) * 2
+        const range = Math.floor(Number(score.totalScore) / 2) * 2
         const rangeKey = `${range}-${range + 1.9}`
         scoreRanges.set(rangeKey, (scoreRanges.get(rangeKey) || 0) + 1)
       }
       
       // 各维度质量指标
-      if (score.innovation) qualityMetrics.innovation.push(score.innovation)
-      if (score.technicalComplexity) qualityMetrics.technicalComplexity.push(score.technicalComplexity)
-      if (score.userExperience) qualityMetrics.userExperience.push(score.userExperience)
-      if (score.businessPotential) qualityMetrics.businessPotential.push(score.businessPotential)
-      if (score.presentation) qualityMetrics.presentation.push(score.presentation)
+      if (score.innovation) qualityMetrics.innovation.push(Number(score.innovation))
+      if (score.technicalComplexity) qualityMetrics.technicalComplexity.push(Number(score.technicalComplexity))
+      if (score.userExperience) qualityMetrics.userExperience.push(Number(score.userExperience))
+      if (score.businessPotential) qualityMetrics.businessPotential.push(Number(score.businessPotential))
+      if (score.presentation) qualityMetrics.presentation.push(Number(score.presentation))
     })
 
     const averageScore = scoreCount > 0 ? totalScore / scoreCount : 0
@@ -394,10 +389,10 @@ export class AnalyticsService {
         })
       }
       
-      // 分类分析
-      const category = project.category || 'other'
+      // 分类分析 (使用项目状态代替category字段，因为Project模型中没有category字段)
+      const category = project.status || 'other'
       const projectAvgScore = project.scores.length > 0 
-        ? project.scores.reduce((sum, s) => sum + (s.totalScore || 0), 0) / project.scores.length 
+        ? project.scores.reduce((sum, s) => sum + (Number(s.totalScore) || 0), 0) / project.scores.length 
         : 0
       
       const existing = categoryMap.get(category) || { count: 0, totalScore: 0 }
@@ -535,7 +530,7 @@ export class AnalyticsService {
       team.projects.forEach(project => {
         project.scores.forEach(score => {
           if (score.totalScore) {
-            totalScore += score.totalScore
+            totalScore += Number(score.totalScore)
             scoreCount++
           }
         })
@@ -566,7 +561,7 @@ export class AnalyticsService {
     const teamCompletionRate = totalTeams > 0 ? (teamsWithProjects / totalTeams) * 100 : 0
     
     const teamsWithLeaderProjects = teams.filter(team => 
-      team.projects.some(project => project.createdBy === team.leaderId)
+      team.projects.some(project => project.creatorId === team.leaderId)
     ).length
     const leaderParticipationRate = totalTeams > 0 ? (teamsWithLeaderProjects / totalTeams) * 100 : 0
 

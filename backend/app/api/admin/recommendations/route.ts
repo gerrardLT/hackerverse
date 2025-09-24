@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
       case 'preview':
         // 预览推荐结果
         const limit = parseInt(searchParams.get('limit') || '5')
-        const preview = await recommendationService.getRecommendedHackathons(limit, false)
+        const preview = await RecommendationService.getRecommendedHackathons(limit, false)
         return NextResponse.json({
           success: true,
           data: {
@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
 
       default:
         // 默认返回当前配置
-        const currentReport = await recommendationService.getRecommendationReport()
+        const currentReport = await RecommendationService.getRecommendationReport()
         return NextResponse.json({
           success: true,
           data: {
@@ -101,7 +101,7 @@ export async function PUT(request: NextRequest) {
           }, { status: 400 })
         }
 
-        recommendationService.updateWeights(validatedWeights)
+        RecommendationService.updateWeights(validatedWeights)
         
         return NextResponse.json({
           success: true,
@@ -115,7 +115,7 @@ export async function PUT(request: NextRequest) {
       case 'refresh_featured':
         // 刷新特色黑客松标记
         const limit = data.limit || 3
-        const refreshed = await recommendationService.getRecommendedHackathons(limit, true)
+        const refreshed = await RecommendationService.getRecommendedHackathons(limit, true)
         
         return NextResponse.json({
           success: true,
@@ -173,7 +173,7 @@ export async function POST(request: NextRequest) {
       case 'recalculate':
         // 重新计算并更新特色黑客松
         console.log('🔄 开始重新计算推荐...')
-        const recommendations = await recommendationService.getRecommendedHackathons(limit, true)
+        const recommendations = await RecommendationService.getRecommendedHackathons(limit, true)
         
         return NextResponse.json({
           success: true,

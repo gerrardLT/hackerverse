@@ -219,7 +219,6 @@ export async function POST(
         ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip'),
         locale,
         scoreCreatedAt: existingScore.createdAt,
-        scoreUpdatedAt: existingScore.updatedAt,
         ...validatedData.additionalMetadata
       }
     }
@@ -275,15 +274,15 @@ export async function POST(
       const notification = await tx.notification.create({
         data: {
           userId: project.creatorId,
-          type: 'SCORE_FINALIZED',
+          type: 'PROJECT_REVIEWED',
           title: t('judging.notifications.scoreFinalized.title'),
           message: t('judging.notifications.scoreFinalized.message', {
             projectTitle: project.title,
             judgeName: user.username || user.email,
-            score: Number(existingScore.totalScore)
+            score: Number(existingScore.totalScore).toString()
           }),
           priority: 'MEDIUM',
-          category: 'JUDGING',
+          category: 'PROJECT',
           data: {
             projectId: project.id,
             scoreId: existingScore.id,
@@ -300,14 +299,14 @@ export async function POST(
         judgeNotification = await tx.notification.create({
           data: {
             userId: judge.userId,
-            type: 'SCORE_FINALIZED_BY_ADMIN',
+            type: 'SYSTEM_ANNOUNCEMENT',
             title: t('judging.notifications.scoreFinalizedByAdmin.title'),
             message: t('judging.notifications.scoreFinalizedByAdmin.message', {
               projectTitle: project.title,
               adminName: user.username || user.email
             }),
             priority: 'LOW',
-            category: 'JUDGING',
+            category: 'SYSTEM',
             data: {
               projectId: project.id,
               scoreId: existingScore.id,
@@ -362,7 +361,7 @@ export async function POST(
         },
         message: t('judging.success.scoreFinalized', {
           projectTitle: project.title,
-          score: Number(result.updatedScore.totalScore)
+          score: Number(result.updatedScore.totalScore).toString()
         })
       }
     })

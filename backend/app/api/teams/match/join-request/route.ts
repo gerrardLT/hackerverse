@@ -227,10 +227,10 @@ export async function POST(request: NextRequest) {
       await prisma.notification.create({
         data: {
           userId: team.leaderId,
-          type: 'TEAM_APPLICATION_RECEIVED',
+          type: 'TEAM_INVITE',
           title: t('teams.notifications.applicationReceived.title'),
           message: t('teams.notifications.applicationReceived.message', {
-            username: user.username,
+            username: user.username || 'Unknown User',
             teamName: team.name
           }),
           data: {

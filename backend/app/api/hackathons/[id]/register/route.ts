@@ -115,7 +115,7 @@ export async function POST(
       data: {
         hackathonId,
         userId: payload.userId,
-        status: 'registered',
+        status: 'REGISTERED',
         joinedAt: new Date(),
       },
       select: {

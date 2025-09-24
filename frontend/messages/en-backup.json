@@ -607,6 +607,14 @@
     "noHackathons": "No Hackathons",
     "noHackathonsDesc": "No hackathons match your criteria, please try adjusting filters",
     "noHackathonsEmpty": "No hackathons have been organized yet, be the first creator!",
+    "actions": {
+      "refresh": "Refresh",
+      "retry": "Retry"
+    },
+    "auth": {
+      "loginRequired": "Login Required",
+      "login": "Login"
+    },
     "errors": {
       "fetchDataFailed": "Failed to fetch data",
       "dataLoadFailed": "Data Load Failed",
@@ -617,7 +625,8 @@
       "networkError": "Network error, please check connection",
       "networkErrorDesc": "Please check network connection and retry",
       "fetchTeamsFailed": "Failed to fetch teams",
-      "fetchTeamsFailedDesc": "Unable to fetch teams list"
+      "fetchTeamsFailedDesc": "Unable to fetch teams list",
+      "accessDenied": "Access Denied"
     },
     "notFound": "Page Not Found",
     "notFoundDesc": "The page you are looking for does not exist.",
@@ -1782,7 +1791,195 @@
         "imageUploadFailedContinue": "Cover image upload failed, but will continue creating hackathon"
       }
     },
-    "submit": "Submit Project",
+    "submit": {
+      "title": "Submit Project",
+      "description": "Submit your amazing project to this hackathon",
+      "form": {
+        "projectNamePlaceholder": "Enter your project name...",
+        "selectTrackPlaceholder": "Select a track...",
+        "descriptionPlaceholder": "Describe your project...",
+        "repositoryUrlPlaceholder": "https://github.com/...",
+        "demoUrlPlaceholder": "https://...",
+        "videoUrlPlaceholder": "https://youtube.com/...",
+        "projectName": "Project Name",
+        "track": "Track",
+        "description": "Description",
+        "repositoryUrl": "Repository URL",
+        "demoUrl": "Demo URL",
+        "videoUrl": "Video URL (Optional)",
+        "technologies": "Technologies Used",
+        "teamMembers": "Team Members",
+        "addMember": "Add Member",
+        "removeMember": "Remove",
+        "memberName": "Name",
+        "memberRole": "Role",
+        "memberEmail": "Email (Optional)",
+        "memberNamePlaceholder": "Enter member name...",
+        "memberEmailPlaceholder": "Enter member email...",
+        "submit": "Submit Project",
+        "cancel": "Cancel",
+        "submitting": "Submitting...",
+        "success": "Project submitted successfully!",
+        "error": "Failed to submit project"
+      },
+      "validation": {
+        "projectNameRequired": "Project name is required",
+        "trackRequired": "Please select a track",
+        "descriptionRequired": "Project description is required",
+        "repositoryUrlRequired": "Repository URL is required",
+        "invalidUrl": "Please enter a valid URL",
+        "memberNameRequired": "Member name is required",
+        "memberRoleRequired": "Member role is required"
+      },
+      "tracks": {
+        "web": "Web Development",
+        "mobile": "Mobile Development",
+        "ai": "AI/ML",
+        "blockchain": "Blockchain",
+        "iot": "IoT",
+        "game": "Game Development",
+        "fintech": "FinTech",
+        "healthcare": "Healthcare",
+        "education": "Education",
+        "other": "Other"
+      },
+      "auth": {
+        "loginRequired": "Login Required",
+        "login": "Login"
+      },
+      "messages": {
+        "loadingFailed": "Loading Failed",
+        "loadingFailedDesc": "Unable to load hackathon information, please refresh and try again",
+        "ipfsUploadSuccess": "IPFS Upload Successful",
+        "ipfsUploadSuccessDesc": "{count} files uploaded to IPFS network",
+        "metadataUploaded": "Metadata Uploaded",
+        "metadataUploadedDesc": "Project metadata stored to IPFS",
+        "metadataUploadFailed": "Metadata Upload Failed",
+        "metadataUploadFailedDesc": "Unable to upload project metadata to IPFS",
+        "projectSubmitSuccess": "Project Submitted Successfully!",
+        "projectSubmitSuccessDesc": "Project successfully submitted to hackathon, IPFS hash: {hash}...",
+        "submitFailed": "Submission Failed",
+        "submitFailedDesc": "Error occurred while submitting project, please try again",
+        "uploadFailed": "Upload Failed",
+        "submitting": "Submitting...",
+        "cannotSubmit": "Cannot Submit Yet",
+        "submitToIpfs": "Submit Project to IPFS"
+      },
+      "steps": {
+        "1": {
+          "name": "Project Info",
+          "description": "Basic project information"
+        },
+        "2": {
+          "name": "Team Setup",
+          "description": "Team member information"
+        },
+        "3": {
+          "name": "Project Details",
+          "description": "Detailed project description"
+        },
+        "4": {
+          "name": "IPFS Storage",
+          "description": "Decentralized file storage"
+        },
+        "5": {
+          "name": "Submit Confirmation",
+          "description": "Final submission confirmation"
+        }
+      },
+      "labels": {
+        "projectName": "Project Name",
+        "projectDescription": "Project Description",
+        "selectTrack": "Select Track",
+        "techStack": "Tech Stack",
+        "techStackDesc": "Select the technologies used in your project",
+        "teamMembers": "Team Members",
+        "member": "Member",
+        "teamLeader": "(Team Leader)",
+        "memberName": "Name",
+        "memberEmail": "Email",
+        "memberRole": "Role",
+        "projectDetails": "Project Details",
+        "problemStatement": "Problem Statement",
+        "solution": "Solution",
+        "keyFeatures": "Key Features",
+        "technicalArchitecture": "Technical Architecture",
+        "challenges": "Challenges Faced",
+        "futureWork": "Future Plans",
+        "decentralizedStorage": "Decentralized File Storage",
+        "projectLinks": "Project Links",
+        "projectLinksDesc": "Provide relevant links for your project",
+        "githubRepo": "GitHub Repository",
+        "demoLink": "Demo Link",
+        "videoDemo": "Demo Video",
+        "projectDocs": "Project Documentation"
+      },
+      "roles": {
+        "teamLeader": "Team Leader",
+        "frontendDev": "Frontend Developer",
+        "backendDev": "Backend Developer",
+        "smartContractDev": "Smart Contract Developer",
+        "uiuxDesigner": "UI/UX Designer",
+        "productManager": "Product Manager",
+        "other": "Other"
+      },
+      "buttons": {
+        "addMember": "Add Team Member",
+        "addFeature": "Add Feature",
+        "backToHackathon": "Back to Hackathon Details"
+      },
+      "status": {
+        "loading": "Loading...",
+        "projectSubmitted": "Project Submitted",
+        "projectSubmittedDesc": "You have successfully submitted a project to {hackathonTitle}",
+        "alreadySubmittedDesc": "You have already submitted a project for this hackathon. Each user can only submit one project per hackathon.",
+        "submissionTime": "Submission time: {time}",
+        "hackathonNotStarted": "Hackathon has not started yet, will start on {startDate}",
+        "hackathonEnded": "Hackathon has ended on {endDate}",
+        "canSubmit": "You can submit your project, deadline: {endDate}"
+      },
+      "placeholders": {
+        "projectDescShort": "Briefly describe your project...",
+        "problemDescription": "Describe the problem you want to solve...",
+        "solutionDescription": "Describe your solution approach...",
+        "technicalArchitecture": "Describe your technical architecture and implementation...",
+        "challengesDescription": "Describe the challenges you faced and how you solved them...",
+        "futureWorkDescription": "Describe your future development plans...",
+        "featurePlaceholder": "Enter feature description...",
+        "githubUrl": "https://github.com/...",
+        "demoUrl": "https://...",
+        "videoUrl": "https://youtube.com/...",
+        "docsUrl": "https://docs.google.com/..."
+      },
+      "ipfs": {
+        "title": "Decentralized File Storage",
+        "description": "All files will be stored on the IPFS network, ensuring decentralized and permanent data storage. Please upload project-related images, documents, demo videos, and other files.",
+        "uploadArea": "Upload Files",
+        "uploadAreaDesc": "Drag and drop files here, or click to browse. Supports images, documents, and video files.",
+        "storageStats": "IPFS Storage Statistics",
+        "fileCount": "File Count",
+        "totalSize": "Total Size",
+        "imageFiles": "Image Files",
+        "videoFiles": "Video Files",
+        "upload": {
+          "title": "IPFS File Upload",
+          "description": "Upload files to the IPFS network for decentralized storage. Supports up to {maxFiles} files, maximum {maxFileSize}MB per file.",
+          "dragDropText": "Click or drag files here",
+          "maxFilesReached": "Maximum file count reached ({maxFiles})",
+          "supportedTypes": "Supported",
+          "fileList": "File List ({current}/{max})",
+          "clearCompleted": "Clear Completed",
+          "uploading": "Uploading...",
+          "uploadFiles": "Upload {count} files",
+          "fileSizeError": "File size cannot exceed {maxSize}MB",
+          "unsupportedType": "Unsupported file type",
+          "uploadFailed": "Upload failed",
+          "uploadSuccess": "{count} files uploaded successfully",
+          "uploadError": "{count} files failed to upload",
+          "ipfsUploadError": "IPFS upload failed"
+        }
+      }
+    },
     "detail": {
       "notFound": "Hackathon not found",
       "backToList": "Back to Hackathons",

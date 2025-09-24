@@ -70,8 +70,7 @@ export async function GET(
                 projectId: true,
                 isFinalized: true,
                 totalScore: true,
-                createdAt: true,
-                updatedAt: true
+                createdAt: true
               }
             }
           }

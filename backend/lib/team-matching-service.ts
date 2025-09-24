@@ -321,7 +321,9 @@ export class TeamMatchingService {
             hackathonId
           }
         })
-        teamPreferences = leaderPreferences
+        if (leaderPreferences) {
+          teamPreferences = leaderPreferences
+        }
       }
       
       // 如果没有偏好设置，使用默认值
@@ -372,9 +374,9 @@ export class TeamMatchingService {
       
       // 计算综合分数（根据权重）
       const weights = {
-        skill: preferences.skillMatchWeight,
-        experience: preferences.experienceWeight,
-        location: preferences.locationWeight,
+        skill: Number(preferences.skillMatchWeight) || 0.4,
+        experience: Number(preferences.experienceWeight) || 0.2,
+        location: Number(preferences.locationWeight) || 0.2,
         availability: 0.2,
         teamSize: 0.1
       }

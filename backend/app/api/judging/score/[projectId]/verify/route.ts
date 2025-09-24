@@ -235,7 +235,7 @@ export async function GET(
                     } else {
                       verificationResult.verification.warnings.push(
                         t('judging.verification.timestampMismatch', {
-                          diff: Math.round(timeDiff / 1000)
+                          diff: Math.round(timeDiff / 1000).toString()
                         })
                       )
                     }
@@ -262,7 +262,7 @@ export async function GET(
                     } catch (signError) {
                       verificationResult.verification.errors.push(
                         t('judging.verification.signatureVerificationFailed', {
-                          error: signError
+                          error: signError instanceof Error ? signError.message : String(signError)
                         })
                       )
                     }
@@ -282,14 +282,14 @@ export async function GET(
 
               } catch (parseError) {
                 verificationResult.verification.errors.push(
-                  t('judging.verification.ipfsParseError', { error: parseError })
+                  t('judging.verification.ipfsParseError', { error: parseError instanceof Error ? parseError.message : String(parseError) })
                 )
               }
             } else {
               verificationResult.verification.errors.push(
                 t('judging.verification.ipfsNotAccessible', { 
                   hash: score.ipfsHash,
-                  error: ipfsResult.error
+                  error: ipfsResult.error || 'Unknown error'
                 })
               )
             }
@@ -310,7 +310,7 @@ export async function GET(
         } catch (verifyError) {
           console.error('❌ 验证过程出错:', verifyError)
           verificationResult.verification.errors.push(
-            t('judging.verification.verificationError', { error: verifyError })
+            t('judging.verification.verificationError', { error: verifyError instanceof Error ? verifyError.message : String(verifyError) })
           )
         }
 
@@ -353,8 +353,8 @@ export async function GET(
           overallStatus,
           verificationTimestamp: new Date().toISOString(),
           message: t(`judging.verification.status.${overallStatus.toLowerCase()}`, {
-            verified: verifiedCount,
-            total: verificationResults.length
+            verified: verifiedCount.toString(),
+            total: verificationResults.length.toString()
           })
         },
         recommendations: generateVerificationRecommendations(verificationResults, t)

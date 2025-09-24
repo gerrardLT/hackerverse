@@ -6,7 +6,7 @@ import { z } from 'zod';
 const proposalSchema = z.object({
   title: z.string().min(1),
   description: z.string().min(1),
-  proposalType: z.enum(['governance', 'funding', 'technical', 'community']),
+  proposalType: z.enum(['TREASURY', 'GOVERNANCE', 'PROTOCOL', 'EMERGENCY']),
   targetAmount: z.number().optional(),
   executionTime: z.string().datetime()
 });
@@ -121,6 +121,7 @@ export async function POST(request: NextRequest) {
         proposalType,
         targetAmount: targetAmount || null,
         executionTime: new Date(executionTime),
+        votingDeadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 默认7天后到期
         creatorId: user.id
       }
     });

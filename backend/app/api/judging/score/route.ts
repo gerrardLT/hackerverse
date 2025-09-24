@@ -79,6 +79,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // 检查项目是否关联到黑客松
+    if (!project.hackathon) {
+      return NextResponse.json(
+        { success: false, error: t('judging.score.projectNotInHackathon') },
+        { status: 400 }
+      )
+    }
+
     // 验证黑客松状态
     if (!['ACTIVE', 'COMPLETED'].includes(project.hackathon.status)) {
       return NextResponse.json(
@@ -162,11 +170,10 @@ export async function POST(request: NextRequest) {
       })
 
       if (allScores.length > 0) {
-        const avgScore = allScores.reduce((sum, score) => sum + (score.totalScore || 0), 0) / allScores.length
+        const avgScore = allScores.reduce((sum, score) => sum + (Number(score.totalScore) || 0), 0) / allScores.length
         await prisma.project.update({
           where: { id: validatedData.projectId },
           data: { 
-            averageScore: Number(avgScore.toFixed(1)),
             status: 'REVIEWED'
           }
         })

@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    let recommendations = []
+    let recommendations: any[] = []
     let cacheKey = ''
 
     if (type === 'teams') {

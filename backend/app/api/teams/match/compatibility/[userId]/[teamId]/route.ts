@@ -200,7 +200,7 @@ export async function GET(
             experienceMatchScore: compatibilityResult.experienceMatchScore,
             locationMatchScore: compatibilityResult.locationMatchScore,
             availabilityScore: compatibilityResult.availabilityScore,
-            personalityScore: compatibilityResult.personalityScore || null,
+            // personalityScore: 功能暂未实现
             matchingSkills: compatibilityResult.matchingSkills,
             missingSkills: compatibilityResult.missingSkills,
             complementarySkills: compatibilityResult.complementarySkills,
@@ -253,7 +253,7 @@ export async function GET(
           needsImprovement: compatibilityResult.overallScore < 0.6,
           highCompatibility: compatibilityResult.overallScore > 0.8,
           recommendations: compatibilityResult.overallScore < 0.8 ? [
-            ...(compatibilityResult.missingSkills.length > 0 ? 
+            ...(compatibilityResult.missingSkills && Array.isArray(compatibilityResult.missingSkills) && compatibilityResult.missingSkills.length > 0 ? 
               [`考虑学习以下技能：${compatibilityResult.missingSkills.slice(0, 3).join(', ')}`] : []),
             ...(compatibilityResult.locationMatchScore < 0.5 ? 
               ['考虑调整工作时间或时区偏好'] : []),

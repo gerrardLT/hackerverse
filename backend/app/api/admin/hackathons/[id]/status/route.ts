@@ -38,7 +38,40 @@ export async function PUT(
     // 检查黑客松是否存在
     const hackathon = await prisma.hackathon.findUnique({
       where: { id: params.id },
-      include: {
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        startDate: true,
+        endDate: true,
+        registrationStartDate: true,
+        registrationDeadline: true,
+        maxParticipants: true,
+        prizePool: true,
+        categories: true,
+        tags: true,
+        requirements: true,
+        rules: true,
+        isPublic: true,
+        featured: true,
+        status: true,
+        organizerId: true,
+        ipfsHash: true,
+        metadata: true,
+        prizes: true,
+        tracks: true,
+        createdAt: true,
+        updatedAt: true,
+        contractId: true,
+        syncStatus: true,
+        txHash: true,
+        // 排除 BigInt 字段: blockNumber, gasUsed
+        reviewStatus: true,
+        reviewerId: true,
+        reviewNotes: true,
+        reviewedAt: true,
+        rejectionReason: true,
+        submittedForReviewAt: true,
         organizer: {
           select: {
             id: true,

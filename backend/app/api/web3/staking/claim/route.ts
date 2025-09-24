@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
       data: {
         stakingId: staking.id,
         userId: user.id,
-        type: 'claim_rewards',
+        type: 'CLAIM_REWARD',
         amount: currentRewards,
         status: 'CONFIRMED'
       }

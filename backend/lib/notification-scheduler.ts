@@ -13,21 +13,21 @@ export class NotificationScheduler {
       // 检查即将开始的黑客松 (1小时内)
       const startingSoon = await prisma.hackathon.findMany({
         where: {
-          startTime: {
+          startDate: {
             gte: now,
             lte: new Date(now.getTime() + 60 * 60 * 1000) // 1小时后
           },
-          status: 'UPCOMING'
+          status: 'APPROVED'
         },
         include: {
-          participants: {
+          participations: {
             select: { userId: true }
           }
         }
       })
 
       for (const hackathon of startingSoon) {
-        for (const participant of hackathon.participants) {
+        for (const participant of hackathon.participations) {
           await SimpleNotificationService.createHackathonReminderNotification(
             participant.userId,
             hackathon.title,
@@ -41,21 +41,21 @@ export class NotificationScheduler {
       // 检查即将结束的黑客松 (24小时内)
       const endingSoon = await prisma.hackathon.findMany({
         where: {
-          endTime: {
+          endDate: {
             gte: now,
             lte: new Date(now.getTime() + 24 * 60 * 60 * 1000) // 24小时后
           },
           status: 'ACTIVE'
         },
         include: {
-          participants: {
+          participations: {
             select: { userId: true }
           }
         }
       })
 
       for (const hackathon of endingSoon) {
-        for (const participant of hackathon.participants) {
+        for (const participant of hackathon.participations) {
           await SimpleNotificationService.createHackathonReminderNotification(
             participant.userId,
             hackathon.title,
@@ -69,15 +69,15 @@ export class NotificationScheduler {
       // 检查报名即将截止的黑客松 (3天内)
       const registrationEnding = await prisma.hackathon.findMany({
         where: {
-          registrationEndDate: {
+          registrationDeadline: {
             gte: now,
             lte: new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000) // 3天后
           },
-          status: 'UPCOMING'
+          status: 'APPROVED'
         },
         include: {
           _count: {
-            select: { participants: true }
+            select: { participations: true }
           }
         }
       })

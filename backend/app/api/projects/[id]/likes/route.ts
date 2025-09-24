@@ -96,7 +96,7 @@ export async function POST(
         projectId: project.id,
         projectTitle: project.title,
         hackathonId: project.hackathonId,
-        hackathonTitle: project.hackathon.title,
+        hackathonTitle: project.hackathon?.title || 'Independent Project',
         user: {
           id: user.id,
           username: user.username,

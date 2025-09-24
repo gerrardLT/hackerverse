@@ -90,7 +90,9 @@ export async function GET(
       case 'excel':
         // 这里可以集成 xlsx 库来生成 Excel 文件
         const excelData = await convertToExcel(reportData, report.name)
-        return new NextResponse(excelData, {
+        // 将 Buffer 转换为 Uint8Array 以兼容 NextResponse
+        const uint8Array = new Uint8Array(excelData)
+        return new NextResponse(uint8Array, {
           status: 200,
           headers: {
             'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -179,8 +181,8 @@ async function generateReportData(report: any): Promise<any> {
 
 // 转换为CSV格式
 function convertToCSV(data: any): string {
-  const headers = ['Metric', 'Value']
-  const rows = []
+  const headers: string[] = ['Metric', 'Value']
+  const rows: string[][] = []
 
   // 添加汇总数据
   if (data.summary) {
@@ -201,7 +203,7 @@ function convertToCSV(data: any): string {
 
   const csvContent = [
     headers.join(','),
-    ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ...rows.map((row: string[]) => row.map((cell: string) => `"${cell}"`).join(','))
   ].join('\n')
 
   return csvContent

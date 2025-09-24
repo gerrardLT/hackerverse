@@ -148,7 +148,7 @@ export default function CreateTeamPage() {
       try {
         const response = await apiService.getHackathons({ 
           limit: 100,
-          status: 'upcoming,ongoing' // 只获取即将开始和进行中的黑客松
+          // 移除状态筛选，获取所有已审核的黑客松
         })
         
         if (response.success && response.data) {
@@ -261,7 +261,7 @@ export default function CreateTeamPage() {
         throw new Error(response.error || t('validation.createFailed'))
       }
     } catch (error) {
-      console.error(t('validation.createTeamError'), error)
+      console.error(t('console.createTeamError'), error)
       toast({
         title: t('validation.createFailed'),
         description: error instanceof Error ? error.message : t('validation.createError'),
@@ -301,6 +301,13 @@ export default function CreateTeamPage() {
               {t('description')}
             </p>
           </div>
+        </div>
+
+        {/* 表单提示 */}
+        <div className="p-4 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
+          <p className="text-sm text-blue-800 dark:text-blue-200">
+            <strong>{tCommon('note')}:</strong> {t('form.requiredFieldsNote')}
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -397,15 +404,15 @@ export default function CreateTeamPage() {
           {/* 技术栈 */}
           <Card>
             <CardHeader>
-              <CardTitle>{t('sections.techStack')}</CardTitle>
+              <CardTitle>{t('sections.techStack')} *</CardTitle>
               <CardDescription>
-                {t('sections.techStackDesc')}
+                {t('sections.techStackDesc')} ({t('form.skillsRequired')})
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex gap-2">
                 <Select value={newTech} onValueChange={setNewTech}>
-                  <SelectTrigger className="flex-1">
+                  <SelectTrigger className={`flex-1 ${validationErrors.skills ? 'border-red-500' : ''}`}>
                     <SelectValue placeholder={t('form.selectTechStack')} />
                   </SelectTrigger>
                   <SelectContent>

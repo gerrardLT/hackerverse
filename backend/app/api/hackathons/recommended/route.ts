@@ -101,7 +101,34 @@ async function getPersonalizedRecommendations(userId: string, limit: number) {
   
   const recommendations = await prisma.hackathon.findMany({
     where: whereConditions,
-    include: {
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      startDate: true,
+      endDate: true,
+      registrationStartDate: true,
+      registrationDeadline: true,
+      maxParticipants: true,
+      prizePool: true,
+      categories: true,
+      tags: true,
+      requirements: true,
+      rules: true,
+      isPublic: true,
+      featured: true,
+      status: true,
+      organizerId: true,
+      ipfsHash: true,
+      metadata: true,
+      prizes: true,
+      tracks: true,
+      createdAt: true,
+      updatedAt: true,
+      contractId: true,
+      syncStatus: true,
+      txHash: true,
+      // 排除 BigInt 字段: blockNumber, gasUsed
       organizer: {
         select: {
           username: true,

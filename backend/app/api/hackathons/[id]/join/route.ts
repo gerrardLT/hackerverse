@@ -63,7 +63,7 @@ export async function POST(
     // 检查黑客松是否公开
     if (!hackathon.isPublic) {
       return NextResponse.json(
-        { success: false, error: t('hackathons.privateEvent', { fallback: 'This hackathon is a private event' }) },
+        { success: false, error: t('hackathons.privateEvent') || 'This hackathon is a private event' },
         { status: 403 }
       )
     }

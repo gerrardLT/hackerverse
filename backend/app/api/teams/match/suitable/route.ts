@@ -120,10 +120,9 @@ export async function GET(request: NextRequest) {
         leader: {
           select: {
             id: true,
-            name: true,
+            username: true,
             email: true,
             skills: true,
-            experience: true,
           },
         },
         members: {
@@ -131,9 +130,8 @@ export async function GET(request: NextRequest) {
             user: {
               select: {
                 id: true,
-                name: true,
+                username: true,
                 skills: true,
-                experience: true,
               },
             },
             role: true,
@@ -181,16 +179,16 @@ export async function GET(request: NextRequest) {
         matchScore += skillMatchRatio * 0.3
       }
 
-      // 经验匹配计算
-      if (experienceLevel && team.leader.experience) {
-        const experienceLevels = ['beginner', 'intermediate', 'advanced', 'expert']
-        const userLevel = experienceLevels.indexOf(experienceLevel)
-        const teamLevel = experienceLevels.indexOf(team.leader.experience as string)
-        if (userLevel !== -1 && teamLevel !== -1) {
-          const experienceMatch = 1 - Math.abs(userLevel - teamLevel) / (experienceLevels.length - 1)
-          matchScore += experienceMatch * 0.2
-        }
-      }
+      // 经验匹配计算 (暂时禁用，因为User模型中没有experience字段)
+      // if (experienceLevel && team.leader.experience) {
+      //   const experienceLevels = ['beginner', 'intermediate', 'advanced', 'expert']
+      //   const userLevel = experienceLevels.indexOf(experienceLevel)
+      //   const teamLevel = experienceLevels.indexOf(team.leader.experience as string)
+      //   if (userLevel !== -1 && teamLevel !== -1) {
+      //     const experienceMatch = 1 - Math.abs(userLevel - teamLevel) / (experienceLevels.length - 1)
+      //     matchScore += experienceMatch * 0.2
+      //   }
+      // }
 
       // 确保分数在0-1之间
       matchScore = Math.min(Math.max(matchScore, 0), 1)

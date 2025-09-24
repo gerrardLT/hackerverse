@@ -192,7 +192,7 @@ export async function PATCH(
           await SimpleNotificationService.createMemberJoinedNotification(
             member.userId,
             team.name,
-            application.user.username,
+            application.user.username || 'Unknown User',
             teamId
           )
         }

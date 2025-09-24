@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
       data: {
         stakingId: staking.id,
         userId: user.id,
-        type: 'stake',
+        type: 'STAKE',
         amount,
         status: 'CONFIRMED'
       }

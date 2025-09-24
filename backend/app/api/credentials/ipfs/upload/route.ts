@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { credential, options = {} } = validatedData
+    const { credential, options = { createDatabaseRecord: true, isPublic: true, category: 'external', tags: [], skillsProven: [], autoVerify: false } } = validatedData
 
     // 验证用户是否有权限上传此凭证
     const isSubject = credential.subject.id === user.id

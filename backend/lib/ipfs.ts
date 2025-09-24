@@ -546,7 +546,7 @@ export class IPFSService {
           const pinata = await this.initPinata()
           
           // 创建 File 对象
-          const fileObject = new File([file], filename, { 
+          const fileObject = new File([new Uint8Array(file)], filename, { 
             type: this.getMimeType(filename) 
           })
           
@@ -982,7 +982,7 @@ export class IPFSService {
       // 检查关键字段是否一致
       const keyFields = ['id', 'type', 'title', 'issuer', 'subject', 'issuanceDate']
       for (const field of keyFields) {
-        if (expectedData[field] && actualData[field] !== expectedData[field]) {
+        if ((expectedData as any)[field] && (actualData as any)[field] !== (expectedData as any)[field]) {
           return false
         }
       }

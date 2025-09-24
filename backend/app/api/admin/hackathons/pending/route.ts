@@ -74,8 +74,9 @@ export async function GET(request: NextRequest) {
     const orderBy: any = {}
     orderBy[validatedQuery.sortBy] = validatedQuery.sortOrder
 
+
     // 查询待审核黑客松
-    const [hackathons, total] = await Promise.all([
+    const [hackathonsRaw, total] = await Promise.all([
       prisma.hackathon.findMany({
         where,
         skip,
@@ -123,6 +124,13 @@ export async function GET(request: NextRequest) {
       }),
       prisma.hackathon.count({ where })
     ])
+
+    // 手动排除 BigInt 字段以避免序列化错误
+    const hackathons = hackathonsRaw.map(hackathon => {
+      const { blockNumber, gasUsed, ...hackathonWithoutBigInt } = hackathon
+      return hackathonWithoutBigInt
+    })
+
 
     // 获取每个黑客松的详细审核统计
     const enrichedHackathons = await Promise.all(

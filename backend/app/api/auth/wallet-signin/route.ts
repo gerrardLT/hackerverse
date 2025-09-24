@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
               where: { id: user.id },
               data: {
                 profileSyncStatus: 'SYNCED',
-                lastTxHash: contractResult
+                lastTxHash: contractResult.hash // 提取交易哈希
               }
             })
           }

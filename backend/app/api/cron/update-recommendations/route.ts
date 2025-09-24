@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     
     // 获取推荐的黑客松并更新featured标记
     const startTime = Date.now()
-    const recommendations = await recommendationService.getRecommendedHackathons(3, true)
+    const recommendations = await RecommendationService.getRecommendedHackathons(3, true)
     const duration = Date.now() - startTime
 
     // 记录执行结果
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     // 简单的状态检查
-    const report = await recommendationService.getRecommendationReport()
+    const report = await RecommendationService.getRecommendationReport()
     
     return NextResponse.json({
       success: true,

@@ -45,7 +45,7 @@ export async function POST(
     }
 
     // 检查提案状态
-    if (proposal.status !== 'passed') {
+    if (proposal.status !== 'PASSED') {
       return NextResponse.json(
         { success: false, error: '提案未通过，无法执行' },
         { status: 400 }
@@ -64,7 +64,7 @@ export async function POST(
     const updatedProposal = await prisma.dAOProposal.update({
       where: { id: params.id },
       data: {
-        status: 'executed'
+        status: 'EXECUTED'
       }
     });
 
@@ -73,7 +73,7 @@ export async function POST(
       message: '提案执行成功',
       data: {
         proposalId: params.id,
-        status: 'executed',
+        status: 'EXECUTED',
         executedAt: new Date().toISOString()
       }
     });

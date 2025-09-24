@@ -82,7 +82,13 @@ export async function GET(request: NextRequest) {
             title: true,
             description: true,
             status: true,
-            submittedAt: true,
+            createdAt: true,
+            submissions: {
+              select: {
+                submittedAt: true,
+                status: true
+              }
+            },
             team: {
               select: {
                 name: true,

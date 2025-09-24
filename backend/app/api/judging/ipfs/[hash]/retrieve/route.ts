@@ -160,7 +160,7 @@ export async function GET(
           data: {
             verificationStatus: 'failed',
             metadata: {
-              ...ipfsRecord.metadata,
+              ...(ipfsRecord.metadata as object || {}),
               lastAccessAttempt: new Date().toISOString(),
               lastAccessError: ipfsResult.error,
               accessAttemptBy: user.id
@@ -218,7 +218,7 @@ export async function GET(
           verificationStatus: parsedData ? 'verified' : 'pending',
           verifiedAt: parsedData ? new Date() : null,
           metadata: {
-            ...ipfsRecord.metadata,
+            ...(ipfsRecord.metadata as object || {}),
             lastAccessedAt: new Date().toISOString(),
             lastAccessedBy: user.id,
             accessCount: (ipfsRecord.metadata as any)?.accessCount ? 

@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
       data: {
         stakingId: staking.id,
         userId: user.id,
-        type: 'unstake',
+        type: 'UNSTAKE',
         amount,
         status: 'CONFIRMED'
       }

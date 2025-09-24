@@ -108,7 +108,7 @@ export async function GET(
     if (!hackathon.isPublic) {
       console.log('❌ 黑客松为私有:', hackathonId)
       return NextResponse.json(
-        { success: false, error: t('hackathons.privateEvent', { fallback: 'This hackathon is a private event' }) },
+        { success: false, error: t('hackathons.privateEvent') || 'This hackathon is a private event' },
         { status: 403 }
       )
     }
@@ -157,7 +157,7 @@ export async function GET(
     const t = createTFunction(locale)
     
     return NextResponse.json(
-      { success: false, error: t('hackathons.getDetailsError', { fallback: 'Failed to get hackathon details' }) },
+      { success: false, error: t('hackathons.getDetailsError') || 'Failed to get hackathon details' },
       { status: 500 }
     )
   }

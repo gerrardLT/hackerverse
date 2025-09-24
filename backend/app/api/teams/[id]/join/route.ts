@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
+import { createTFunction, getLocaleFromRequest } from '@/lib/i18n'
 
 const joinTeamSchema = z.object({
   message: z.string().max(500, '申请理由不能超过500字符').optional(),
@@ -12,6 +13,10 @@ export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  // 创建翻译函数
+  const locale = getLocaleFromRequest(request)
+  const t = createTFunction(locale)
+  
   try {
     const teamId = params.id
     
@@ -19,7 +24,7 @@ export async function POST(
     const user = await auth(request)
     if (!user) {
       return NextResponse.json(
-        { success: false, error: t('auth.unauthorized', getLocaleFromRequest(request)) },
+        { success: false, error: t('auth.unauthorized') || 'Unauthorized' },
         { status: 401 }
       )
     }
@@ -46,14 +51,14 @@ export async function POST(
 
     if (!team) {
       return NextResponse.json(
-        { success: false, error: t('teams.notFound', getLocaleFromRequest(request)) },
+        { success: false, error: t('teams.notFound') || 'Team not found' },
         { status: 404 }
       )
     }
 
     if (!team.isPublic) {
       return NextResponse.json(
-        { success: false, error: t('teams.notPublicRecruiting', getLocaleFromRequest(request)) },
+        { success: false, error: t('teams.notPublicRecruiting') || 'Team is not publicly recruiting' },
         { status: 403 }
       )
     }
@@ -61,7 +66,7 @@ export async function POST(
     // 检查团队是否已满员
     if (team._count.members >= team.maxMembers) {
       return NextResponse.json(
-        { success: false, error: t('teams.teamFull', getLocaleFromRequest(request)) },
+        { success: false, error: t('teams.teamFull') || 'Team is full' },
         { status: 400 }
       )
     }
@@ -76,7 +81,7 @@ export async function POST(
 
     if (existingMember) {
       return NextResponse.json(
-        { success: false, error: t('teams.alreadyMember', getLocaleFromRequest(request)) },
+        { success: false, error: t('teams.alreadyMember') || 'Already a member' },
         { status: 400 }
       )
     }
@@ -94,7 +99,7 @@ export async function POST(
     if (existingApplication) {
       if (existingApplication.status === 'PENDING') {
         return NextResponse.json(
-          { success: false, error: t('teams.applicationPending', getLocaleFromRequest(request)) },
+          { success: false, error: t('teams.applicationPending') || 'Application already pending' },
           { status: 400 }
         )
       } else if (existingApplication.status === 'REJECTED') {
@@ -129,7 +134,7 @@ export async function POST(
 
     if (!participation) {
       return NextResponse.json(
-        { success: false, error: t('teams.needRegistration', getLocaleFromRequest(request)) },
+        { success: false, error: t('teams.needRegistration') || 'Must register for hackathon first' },
         { status: 400 }
       )
     }
@@ -146,7 +151,7 @@ export async function POST(
 
     if (otherTeamMember) {
       return NextResponse.json(
-        { success: false, error: t('teams.alreadyInOtherTeam', getLocaleFromRequest(request)) },
+        { success: false, error: t('teams.alreadyInOtherTeam') || 'Already in another team' },
         { status: 400 }
       )
     }
@@ -196,7 +201,7 @@ export async function POST(
   } catch (error) {
     console.error('申请加入团队错误:', error)
     return NextResponse.json(
-      { success: false, error: t('teams.applicationSubmitFailed', getLocaleFromRequest(request)) },
+      { success: false, error: t('teams.applicationSubmitFailed') || 'Failed to submit application' },
       { status: 500 }
     )
   }

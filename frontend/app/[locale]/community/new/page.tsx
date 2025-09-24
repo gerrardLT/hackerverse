@@ -137,8 +137,8 @@ export default function NewPostPage() {
 
   const renderPreview = () => {
     return (
-      <div className="prose max-w-none">
-        <h1 className="text-2xl font-bold mb-4">{title || t('preview.titlePreview')}</h1>
+      <div className="prose prose-gray dark:prose-invert max-w-none">
+        <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">{title || t('preview.titlePreview')}</h1>
         {category && (
           <div className="mb-4">
             <Badge className="mb-2">
@@ -155,7 +155,7 @@ export default function NewPostPage() {
             ))}
           </div>
         )}
-        <div className="whitespace-pre-wrap">
+        <div className="whitespace-pre-wrap text-gray-800 dark:text-gray-200">
           {content || t('preview.contentPreview')}
         </div>
       </div>
@@ -163,7 +163,7 @@ export default function NewPostPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
@@ -173,7 +173,7 @@ export default function NewPostPage() {
               {t('backToCommunity')}
             </Button>
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('title')}</h1>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -199,7 +199,7 @@ export default function NewPostPage() {
                       {errors.title && (
                         <span className="text-red-500">{errors.title}</span>
                       )}
-                      <span className={`ml-auto ${title.length > 200 ? 'text-red-500' : 'text-gray-500'}`}>
+                      <span className={`ml-auto ${title.length > 200 ? 'text-red-500' : 'text-gray-500 dark:text-gray-400'}`}>
                         {title.length}/200
                       </span>
                     </div>
@@ -260,7 +260,7 @@ export default function NewPostPage() {
                         ))}
                       </div>
                     )}
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
                       {t('form.tagsCount', { current: tags.length })}
                     </span>
                   </div>
@@ -290,7 +290,7 @@ export default function NewPostPage() {
                         />
                       </TabsContent>
                       <TabsContent value="preview" className="mt-4">
-                        <div className="min-h-[300px] p-4 border rounded-md bg-white">
+                        <div className="min-h-[300px] p-4 border rounded-md bg-white dark:bg-gray-800 dark:border-gray-600">
                           {renderPreview()}
                         </div>
                       </TabsContent>
@@ -299,7 +299,7 @@ export default function NewPostPage() {
                       {errors.content && (
                         <span className="text-red-500">{errors.content}</span>
                       )}
-                      <span className={`ml-auto ${content.length < 50 ? 'text-red-500' : 'text-gray-500'}`}>
+                      <span className={`ml-auto ${content.length < 50 ? 'text-red-500' : 'text-gray-500 dark:text-gray-400'}`}>
                         {t('form.contentCharCount', { count: content.length })}
                       </span>
                     </div>
@@ -331,25 +331,25 @@ export default function NewPostPage() {
                   {t('sidebar.writingTips')}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 text-sm text-gray-600">
+              <CardContent className="space-y-3 text-sm text-gray-600 dark:text-gray-300">
                 <div className="flex items-start gap-2">
-                  <span className="text-blue-600 font-semibold">1.</span>
+                  <span className="text-blue-600 dark:text-blue-400 font-semibold">1.</span>
                   <span>{t('sidebar.tip1')}</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <span className="text-blue-600 font-semibold">2.</span>
+                  <span className="text-blue-600 dark:text-blue-400 font-semibold">2.</span>
                   <span>{t('sidebar.tip2')}</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <span className="text-blue-600 font-semibold">3.</span>
+                  <span className="text-blue-600 dark:text-blue-400 font-semibold">3.</span>
                   <span>{t('sidebar.tip3')}</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <span className="text-blue-600 font-semibold">4.</span>
+                  <span className="text-blue-600 dark:text-blue-400 font-semibold">4.</span>
                   <span>{t('sidebar.tip4')}</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <span className="text-blue-600 font-semibold">5.</span>
+                  <span className="text-blue-600 dark:text-blue-400 font-semibold">5.</span>
                   <span>{t('sidebar.tip5')}</span>
                 </div>
               </CardContent>
@@ -363,20 +363,20 @@ export default function NewPostPage() {
                   {t('sidebar.formatHelp')}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2 text-sm">
-                <div className="font-mono bg-gray-100 p-2 rounded">
+              <CardContent className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                <div className="font-mono bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 p-2 rounded">
                   {t('sidebar.boldText')}
                 </div>
-                <div className="font-mono bg-gray-100 p-2 rounded">
+                <div className="font-mono bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 p-2 rounded">
                   {t('sidebar.italicText')}
                 </div>
-                <div className="font-mono bg-gray-100 p-2 rounded">
+                <div className="font-mono bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 p-2 rounded">
                   {t('sidebar.code')}
                 </div>
-                <div className="font-mono bg-gray-100 p-2 rounded">
+                <div className="font-mono bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 p-2 rounded">
                   {t('sidebar.link')}
                 </div>
-                <div className="font-mono bg-gray-100 p-2 rounded">
+                <div className="font-mono bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 p-2 rounded">
                   {t('sidebar.heading')}
                 </div>
               </CardContent>
@@ -387,7 +387,7 @@ export default function NewPostPage() {
               <CardHeader>
                 <CardTitle>{t('sidebar.guidelines')}</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2 text-sm text-gray-600">
+              <CardContent className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
                 <Alert>
                   <AlertDescription>
                     {t('sidebar.guidelinesDesc')}

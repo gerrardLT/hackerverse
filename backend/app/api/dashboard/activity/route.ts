@@ -151,12 +151,14 @@ export async function GET(request: NextRequest) {
         id: `project_${project.id}`,
         type: 'project_submitted',
         title: '提交了项目',
-        description: `在 ${project.hackathon.title} 提交了项目 "${project.title}"`,
+        description: project.hackathon 
+          ? `在 ${project.hackathon.title} 提交了项目 "${project.title}"`
+          : `提交了独立项目 "${project.title}"`,
         date: project.createdAt,
         metadata: {
           projectId: project.id,
           projectTitle: project.title,
-          hackathonTitle: project.hackathon.title,
+          hackathonTitle: project.hackathon?.title,
           teamName: project.team?.name,
           status: project.status
         }
@@ -191,7 +193,7 @@ export async function GET(request: NextRequest) {
         metadata: {
           projectId: score.project.id,
           projectTitle: score.project.title,
-          hackathonTitle: score.project.hackathon.title,
+          hackathonTitle: score.project.hackathon?.title,
           totalScore: score.totalScore
         }
       })

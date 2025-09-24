@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useRef } from 'react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
@@ -35,6 +36,7 @@ export function IPFSUpload({
   className,
   disabled = false
 }: IPFSUploadProps) {
+  const t = useTranslations('hackathons.submit.ipfs.upload')
   const [files, setFiles] = useState<FileWithProgress[]>([])
   const [isUploading, setIsUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -58,7 +60,7 @@ export function IPFSUpload({
   const validateFile = (file: File): string | null => {
     // 检查文件大小
     if (file.size > maxFileSize * 1024 * 1024) {
-      return `文件大小不能超过 ${maxFileSize}MB`
+      return t('fileSizeError', { maxSize: maxFileSize })
     }
 
     // 检查文件类型
@@ -74,7 +76,7 @@ export function IPFSUpload({
     })
 
     if (!isAccepted) {
-      return '不支持的文件类型'
+      return t('unsupportedType')
     }
 
     return null
@@ -149,7 +151,7 @@ export function IPFSUpload({
         ))
 
       } catch (error) {
-        console.error('IPFS上传失败:', error)
+        console.error(t('ipfsUploadError'), error)
         
         setFiles(prev => prev.map(f => 
           f.id === fileItem.id 
@@ -157,7 +159,7 @@ export function IPFSUpload({
                 ...f, 
                 status: 'error', 
                 progress: 0,
-                error: error instanceof Error ? error.message : '上传失败'
+                error: error instanceof Error ? error.message : t('uploadFailed')
               } 
             : f
         ))
@@ -189,10 +191,10 @@ export function IPFSUpload({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Upload className="h-5 w-5" />
-          IPFS 文件上传
+          {t('title')}
         </CardTitle>
         <CardDescription>
-          将文件上传到 IPFS 网络进行去中心化存储。支持最多 {maxFiles} 个文件，单个文件最大 {maxFileSize}MB。
+          {t('description', { maxFiles, maxFileSize })}
         </CardDescription>
       </CardHeader>
       
@@ -226,12 +228,12 @@ export function IPFSUpload({
           <Upload className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
           <p className="text-sm font-medium">
             {files.length >= maxFiles 
-              ? `已达到最大文件数量 (${maxFiles})` 
-              : '点击或拖拽文件到这里'
+              ? t('maxFilesReached', { maxFiles })
+              : t('dragDropText')
             }
           </p>
           <p className="text-xs text-muted-foreground">
-            支持: {acceptedTypes.join(', ')}
+            {t('supportedTypes')}: {acceptedTypes.join(', ')}
           </p>
         </div>
 
@@ -250,7 +252,7 @@ export function IPFSUpload({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <h4 className="text-sm font-medium">
-                文件列表 ({files.length}/{maxFiles})
+                {t('fileList', { current: files.length, max: maxFiles })}
               </h4>
               {completedCount > 0 && (
                 <Button 
@@ -259,7 +261,7 @@ export function IPFSUpload({
                   onClick={clearCompleted}
                   disabled={isUploading}
                 >
-                  清除已完成
+                  {t('clearCompleted')}
                 </Button>
               )}
             </div>
@@ -318,9 +320,9 @@ export function IPFSUpload({
           <Alert>
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              {completedCount > 0 && `${completedCount} 个文件上传成功`}
+              {completedCount > 0 && t('uploadSuccess', { count: completedCount })}
               {completedCount > 0 && errorCount > 0 && '，'}
-              {errorCount > 0 && `${errorCount} 个文件上传失败`}
+              {errorCount > 0 && t('uploadError', { count: errorCount })}
             </AlertDescription>
           </Alert>
         )}
@@ -333,7 +335,7 @@ export function IPFSUpload({
               disabled={isUploading || disabled}
               className="flex-1"
             >
-              {isUploading ? '上传中...' : `上传 ${pendingCount} 个文件`}
+              {isUploading ? t('uploading') : t('uploadFiles', { count: pendingCount })}
             </Button>
           </div>
         )}

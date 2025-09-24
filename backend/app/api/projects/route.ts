@@ -376,8 +376,8 @@ export async function POST(request: NextRequest) {
       console.error('IPFS upload failed:', ipfsError)
       return NextResponse.json({
         success: false,
-        error: t('ipfs.uploadFailedHackathon', locale),
-        details: ipfsError instanceof Error ? ipfsError.message : t('errors.unknownError', locale)
+        error: t('ipfs.uploadFailedHackathon') || 'IPFS upload failed',
+        details: ipfsError instanceof Error ? ipfsError.message : (t('errors.unknownError') || 'Unknown error')
       }, { status: 500 })
     }
 

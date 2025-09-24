@@ -2,7 +2,7 @@
 
 import fs from 'fs/promises'
 import path from 'path'
-import glob from 'glob'
+import { glob } from 'glob'
 
 // 自动修复API中的中文硬编码
 
@@ -58,12 +58,7 @@ const CHINESE_TO_I18N: Record<string, string> = {
 
 // 查找所有API文件
 async function findApiFiles(): Promise<string[]> {
-  return new Promise((resolve, reject) => {
-    glob(`${API_DIR}/**/*.ts`, (err, files) => {
-      if (err) reject(err)
-      else resolve(files)
-    })
-  })
+  return await glob(`${API_DIR}/**/*.ts`)
 }
 
 // 修复单个文件

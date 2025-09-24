@@ -7,8 +7,8 @@ import { getLocaleFromRequest, createTFunction } from '@/lib/i18n'
 // 查询参数验证schema
 const querySchema = z.object({
   status: z.enum(['DRAFT', 'READY_TO_SUBMIT', 'SUBMITTED', 'REVIEWED', 'WINNER', 'REJECTED', 'ALL']).optional().default('ALL'),
-  page: z.string().transform(Number).pipe(z.number().min(1)).optional().default(1),
-  limit: z.string().transform(Number).pipe(z.number().min(1).max(100)).optional().default(20),
+  page: z.string().transform(Number).pipe(z.number().min(1)).optional().default('1'),
+  limit: z.string().transform(Number).pipe(z.number().min(1).max(100)).optional().default('20'),
   sortBy: z.enum(['title', 'status', 'createdAt', 'updatedAt', 'submissions']).optional().default('updatedAt'),
   sortOrder: z.enum(['asc', 'desc']).optional().default('desc'),
   search: z.string().optional()

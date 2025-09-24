@@ -13,7 +13,14 @@ const submitProjectSchema = z.object({
 })
 
 export async function OPTIONS() {
-  return ApiResponseHandler.cors()
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  })
 }
 
 export async function POST(
@@ -123,7 +130,7 @@ export async function POST(
     // 检查黑客松状态和时间
     const now = new Date()
     
-    if (hackathon.status !== 'ACTIVE' && hackathon.status !== 'UPCOMING') {
+    if (hackathon.status !== 'APPROVED') {
       return ApiResponseHandler.badRequest(
         t('hackathons.notAcceptingSubmissions', { status: hackathon.status })
       )
@@ -203,7 +210,7 @@ export async function POST(
         const notifications = teamMemberIds
           .filter(userId => userId !== payload.userId) // 排除提交者自己
           .map(userId => ({
-            type: 'PROJECT_SUBMITTED' as const,
+            type: 'PROJECT_STATUS_CHANGED' as const,
             title: t('notifications.projectSubmitted.title'),
             message: t('notifications.projectSubmitted.message', {
               projectTitle: project.title,
@@ -241,7 +248,7 @@ export async function POST(
     console.error('提交项目到黑客松失败:', error)
     
     if (error instanceof z.ZodError) {
-      return ApiResponseHandler.validationError(error.errors)
+      return ApiResponseHandler.validationError(error.errors.map(e => e.message).join(', '))
     }
     
     return ApiResponseHandler.internalError('Failed to submit project to hackathon')

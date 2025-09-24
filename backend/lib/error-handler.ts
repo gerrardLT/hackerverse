@@ -379,9 +379,11 @@ export function withErrorHandling(
       ErrorHandler.logInfo(`API request started: ${method} ${endpoint}`, {
         requestId,
         endpoint,
-        method,
-        userAgent: req.headers.get('user-agent') || undefined,
-        ip: req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || undefined
+        details: {
+          method,
+          userAgent: req.headers.get('user-agent') || undefined,
+          ip: req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || undefined
+        }
       })
 
       // 执行处理器

@@ -142,7 +142,7 @@ export async function GET(request: NextRequest) {
     // 构建查询条件
     const where: any = {
       isPublic: true,
-      status: 'ACTIVE', // 只显示已审核通过的黑客松
+      status: 'APPROVED', // 只显示已审核通过的黑客松
     }
     
     // 搜索条件
@@ -360,7 +360,7 @@ export async function GET(request: NextRequest) {
     }
     
     return NextResponse.json(
-      { success: false, error: t('hackathons.getListError', { fallback: 'Failed to get hackathon list' }) },
+      { success: false, error: t('hackathons.getListError') || 'Failed to get hackathon list' },
       { status: 500 }
     )
   }
@@ -427,7 +427,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { 
           success: false,
-          error: t('hackathons.invalidRegistrationStart', { fallback: 'Registration start time must be before registration deadline' }),
+          error: t('hackathons.invalidRegistrationStart') || 'Registration start time must be before registration deadline',
           code: 'INVALID_REGISTRATION_START_DATE'
         },
         { status: 400 }
@@ -444,7 +444,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { 
           success: false,
-          error: t('hackathons.organizerNotFound', { fallback: 'Organizer information not found' }),
+          error: t('hackathons.organizerNotFound') || 'Organizer information not found',
           code: 'ORGANIZER_NOT_FOUND'
         },
         { status: 404 }

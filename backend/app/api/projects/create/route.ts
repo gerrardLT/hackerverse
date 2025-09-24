@@ -22,7 +22,14 @@ const createProjectSchema = z.object({
 })
 
 export async function OPTIONS() {
-  return ApiResponseHandler.cors()
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  })
 }
 
 export async function POST(request: NextRequest) {
@@ -130,7 +137,7 @@ export async function POST(request: NextRequest) {
     console.error('创建项目失败:', error)
     
     if (error instanceof z.ZodError) {
-      return ApiResponseHandler.validationError(error.errors)
+      return ApiResponseHandler.validationError(error.errors.map(e => e.message).join(', '))
     }
     
     return ApiResponseHandler.internalError('Failed to create project')

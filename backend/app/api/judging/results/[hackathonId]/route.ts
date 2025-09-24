@@ -120,7 +120,7 @@ export async function GET(
             title: project.title,
             description: project.description,
             status: project.status,
-            submittedAt: project.submittedAt,
+            createdAt: project.createdAt,
             team: project.team,
             creator: project.creator,
             githubUrl: project.githubUrl,
@@ -141,7 +141,7 @@ export async function GET(
       }
 
       // 计算各项统计
-      const totalScores = scores.map(s => s.totalScore || 0)
+      const totalScores = scores.map(s => Number(s.totalScore) || 0)
       const averageScore = totalScores.reduce((sum, score) => sum + score, 0) / scoreCount
       const maxScore = Math.max(...totalScores)
       const minScore = Math.min(...totalScores)
@@ -152,11 +152,11 @@ export async function GET(
 
       // 分类评分统计
       const categoryScores = {
-        innovation: scores.map(s => s.innovation || 0).filter(s => s > 0),
-        technicalComplexity: scores.map(s => s.technicalComplexity || 0).filter(s => s > 0),
-        userExperience: scores.map(s => s.userExperience || 0).filter(s => s > 0),
-        businessPotential: scores.map(s => s.businessPotential || 0).filter(s => s > 0),
-        presentation: scores.map(s => s.presentation || 0).filter(s => s > 0)
+        innovation: scores.map(s => Number(s.innovation) || 0).filter(s => s > 0),
+        technicalComplexity: scores.map(s => Number(s.technicalComplexity) || 0).filter(s => s > 0),
+        userExperience: scores.map(s => Number(s.userExperience) || 0).filter(s => s > 0),
+        businessPotential: scores.map(s => Number(s.businessPotential) || 0).filter(s => s > 0),
+        presentation: scores.map(s => Number(s.presentation) || 0).filter(s => s > 0)
       }
 
       const categoryAverages = Object.entries(categoryScores).reduce((acc, [key, values]) => {
@@ -170,7 +170,7 @@ export async function GET(
           title: project.title,
           description: project.description,
           status: project.status,
-          submittedAt: project.submittedAt,
+          createdAt: project.createdAt,
           team: project.team,
           creator: project.creator,
           githubUrl: project.githubUrl,
@@ -188,12 +188,12 @@ export async function GET(
           scores: scores.map(score => ({
             id: score.id,
             judge: score.judge?.user,
-            innovation: score.innovation,
-            technicalComplexity: score.technicalComplexity,
-            userExperience: score.userExperience,
-            businessPotential: score.businessPotential,
-            presentation: score.presentation,
-            totalScore: score.totalScore,
+            innovation: Number(score.innovation),
+            technicalComplexity: Number(score.technicalComplexity),
+            userExperience: Number(score.userExperience),
+            businessPotential: Number(score.businessPotential),
+            presentation: Number(score.presentation),
+            totalScore: Number(score.totalScore),
             comments: score.comments,
             createdAt: score.createdAt,
             isDraft: score.syncStatus === 'DRAFT'
@@ -215,14 +215,14 @@ export async function GET(
           aValue = a.scoring.scoreCount
           bValue = b.scoring.scoreCount
           break
-        case 'submittedAt':
-          aValue = new Date(a.project.submittedAt || 0).getTime()
-          bValue = new Date(b.project.submittedAt || 0).getTime()
+        case 'createdAt':
+          aValue = new Date(a.project.createdAt || 0).getTime()
+          bValue = new Date(b.project.createdAt || 0).getTime()
           break
         case 'totalScore':
         default:
-          aValue = a.scoring.totalScore
-          bValue = b.scoring.totalScore
+          aValue = Number(a.scoring.totalScore)
+          bValue = Number(b.scoring.totalScore)
           break
       }
 
@@ -235,7 +235,7 @@ export async function GET(
 
     // 添加排名
     projectResults.forEach((result, index) => {
-      result.scoring.rank = index + 1
+      (result.scoring as any).rank = index + 1
     })
 
     // 获取评委信息
