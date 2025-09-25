@@ -13,7 +13,7 @@
 [![Ethereum](https://img.shields.io/badge/Ethereum-3C3C3D?logo=ethereum&logoColor=white)](https://ethereum.org/)
 [![i18n](https://img.shields.io/badge/i18n-Ready-green)](https://next-intl.dev/)
 
-[🚀 Live Demo](#) | [📖 中文 README](./README.md) | [🐛 Issues](../../issues) | [💬 Discussions](../../discussions)
+[🚀 Live Demo](http://47.99.101.42:3000/en) | [📖 中文 README](./README.md) | [🐛 Issues](../../issues) | [💬 Discussions](../../discussions)
 
 </div>
 
@@ -187,8 +187,9 @@ npm run deploy:sepolia  # or other networks
 
 ### 🌐 Access Application
 
-- **Frontend Application**: http://localhost:3000
-- **Backend API**: http://localhost:3002
+- **🚀 Live Demo**: [http://47.99.101.42:3000/en](http://47.99.101.42:3000/en) - Production deployment
+- **Frontend Application**: http://localhost:3000 - Local development
+- **Backend API**: http://localhost:3002 - Local development
 - **Database Management**: npx prisma studio (run in backend directory)
 
 ## 📱 Feature Modules
@@ -387,7 +388,7 @@ This project is licensed under the [MIT License](./LICENSE).
 
 ## 📞 Contact Us
 
-- **Project Homepage**: [Hackerverse Platform](#)
+- **Project Homepage**: [Hackerverse Platform](http://47.99.101.42:3000/en)
 - **Issue Reports**: [GitHub Issues](../../issues)
 - **Feature Suggestions**: [GitHub Discussions](../../discussions)
 - **Email**: traderluotao@gmail.com
