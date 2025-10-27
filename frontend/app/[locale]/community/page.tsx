@@ -238,196 +238,153 @@ export default function CommunityPage() {
         <div className="absolute top-20 left-10 w-2 h-2 bg-primary/30 rounded-full animate-pulse-slow" />
         <div className="absolute top-32 right-20 w-1 h-1 bg-secondary/40 rounded-full animate-pulse-slow" style={{ animationDelay: '1s' }} />
 
-        <div className="container py-8 relative">
-          {/* 现代化页面标题区域 */}
-          <div className={`text-center space-y-6 mb-12 transition-all duration-1000 ${isVisible ? 'animate-slide-up opacity-100' : 'opacity-0 translate-y-10'}`}>
-            <div className="space-y-4">
-              <h1 className="text-responsive-lg font-bold tracking-tight">
-                <span className="text-gradient animate-shimmer">{t('title')}</span>
-              </h1>
-              <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                {t('description')}
+        {/* 主内容区 - max-width 1280px */}
+        <div className="container max-w-[1280px] mx-auto px-4 md:px-6">
+          {/* 紧凑头部工具栏 - 80px高度 - Flat Design 2.0 */}
+          <div className="h-[80px] flex items-center justify-between border-b border-border/50">
+            {/* 左侧：标题+统计 */}
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">{t('title')}</h1>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {stats ? `${stats.totalPosts} ${t('posts')} · ${stats.totalUsers} ${t('members')}` : t('loading.stats')}
               </p>
             </div>
 
-            {/* 顶部操作栏 */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button className="group hover-lift hover-glow bg-primary hover:bg-primary/90" asChild>
+            {/* 右侧：搜索+分类+排序+发帖 */}
+            <div className="flex items-center gap-2">
+              <div className="relative w-[200px] hidden md:block">
+                <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder={t('search.placeholder')}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="h-9 pl-8 text-sm"
+                />
+              </div>
+
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger className="w-[120px] h-9 text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t('search.allCategories')}</SelectItem>
+                  {categories.map((category) => (
+                    <SelectItem key={category} value={category}>
+                      {getCategoryLabel(category)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger className="w-[100px] h-9 text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="latest">{t('search.latest')}</SelectItem>
+                  <SelectItem value="popular">{t('search.popular')}</SelectItem>
+                  <SelectItem value="replies">{t('search.mostReplies')}</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Button size="sm" asChild className="bg-gradient-to-r from-primary to-accent hover:opacity-90">
                 <Link href="/community/new">
-                  <Plus className="h-4 w-4 mr-2 transition-transform group-hover:scale-110" />
-                  {t('post.publishPost')}
-                  <Sparkles className="h-4 w-4 ml-2 opacity-0 group-hover:opacity-100 transition-opacity" />
-                </Link>
-              </Button>
-              <Button variant="outline" className="glass hover-lift" asChild>
-                <Link href="/community/search">
-                  <Search className="h-4 w-4 mr-2" />
-                  {t('search.advancedSearch')}
+                  <Plus className="h-4 w-4 mr-1" />
+                  {t('post.publish')}
                 </Link>
               </Button>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* 主要内容区域 */}
-            <div className="lg:col-span-3 space-y-6">
-              {/* 现代化搜索和筛选栏 */}
-              <div className={`transition-all duration-1000 delay-300 ${isVisible ? 'animate-slide-up opacity-100' : 'opacity-0 translate-y-10'}`}>
-                <div className="glass border border-primary/10 rounded-2xl p-6 space-y-4">
-                  <div className="flex flex-col lg:flex-row gap-4">
-                    {/* 增强型搜索框 */}
-                    <div className="flex-1 relative">
-                      <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
-                      <Input
-                        placeholder={t('search.placeholder')}
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-12 h-12 text-base glass border-primary/20 transition-all duration-300 focus:border-primary/40 focus:shadow-glow"
-                      />
-                    </div>
-
-                    {/* 分类筛选 */}
-                    <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                      <SelectTrigger className="w-full lg:w-48 h-12 glass border-primary/20">
-                        <SelectValue placeholder={t('search.category')} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">{t('search.allCategories')}</SelectItem>
-                        {categories.map((category) => (
-                          <SelectItem key={category} value={category}>
-                            {categoryIcons[category]} {getCategoryLabel(category)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-
-                    {/* 排序方式 */}
-                    <Select value={sortBy} onValueChange={setSortBy}>
-                      <SelectTrigger className="w-full lg:w-40 h-12 glass border-primary/20">
-                        <SelectValue placeholder={t('search.sort')} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="latest">
-                          <Clock className="w-4 h-4 mr-2 inline" />
-                          {t('search.latest')}
-                        </SelectItem>
-                        <SelectItem value="popular">
-                          <Flame className="w-4 h-4 mr-2 inline" />
-                          {t('search.popular')}
-                        </SelectItem>
-                        <SelectItem value="replies">
-                          <MessageSquare className="w-4 h-4 mr-2 inline" />
-                          {t('search.mostReplies')}
-                        </SelectItem>
-                        <SelectItem value="views">
-                          <Eye className="w-4 h-4 mr-2 inline" />
-                          {t('search.mostViews')}
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
+          {/* 社区规则 - 可折叠隐藏式 */}
+          <details className="mt-4 group">
+            <summary className="cursor-pointer list-none">
+              <div className="glass-light border border-border/50 rounded-xl p-3 hover:border-primary/30 transition-all">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-primary" />
+                    <span className="text-sm font-semibold">{t('rules.title')}</span>
+                    <Badge variant="outline" className="text-xs">5 {t('rules.count')}</Badge>
                   </div>
-
-                  {/* 筛选结果统计 */}
-                  <div className="flex items-center justify-between text-sm text-muted-foreground">
-                    <span>{t('search.resultsCount', { count: filteredPosts.length })}</span>
-                    {(searchQuery || selectedCategory !== 'all') && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setSearchQuery('')
-                          setSelectedCategory('all')
-                        }}
-                        className="text-xs"
-                      >
-                        {t('clearFilters')}
-                      </Button>
-                    )}
+                  <div className="text-xs text-muted-foreground group-open:rotate-180 transition-transform">
+                    ▼
                   </div>
                 </div>
               </div>
+            </summary>
+            <div className="mt-2 glass-light border border-border/50 rounded-xl p-4 animate-fade-in">
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+                {[
+                  { key: 'rule1', icon: '🤝' },
+                  { key: 'rule2', icon: '💬' },
+                  { key: 'rule3', icon: '🔒' },
+                  { key: 'rule4', icon: '📚' },
+                  { key: 'rule5', icon: '⚡' }
+                ].map((rule) => (
+                  <div key={rule.key} className="flex items-start gap-2 p-2 rounded-lg hover:bg-primary/5 transition-colors">
+                    <span className="text-lg shrink-0">{rule.icon}</span>
+                    <span className="text-xs text-muted-foreground leading-tight">
+                      {t(`rules.${rule.key}`)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </details>
 
-              {/* 现代化帖子列表 */}
-              <div className={`space-y-6 transition-all duration-1000 delay-500 ${isVisible ? 'animate-fade-in opacity-100' : 'opacity-0'}`}>
+          {/* 双栏布局：主内容 + 侧边栏(280px) */}
+          <div className="py-4 flex flex-col lg:flex-row gap-4">
+            {/* 主要内容区域 */}
+            <div className="flex-1 min-w-0">
+
+              {/* 紧凑帖子列表 - 80-100px高度 - Flat Design 2.0 */}
+              <div className="space-y-2">
                 {filteredPosts.map((post, index) => (
-                  <div
-                    key={post.id}
-                    className="animate-slide-up"
-                    style={{ animationDelay: `${600 + index * 100}ms` }}
-                  >
-                    <div className="group relative glass border border-primary/10 hover:border-primary/30 rounded-2xl p-6 hover-lift hover-glow transition-all duration-500">
-                      {/* 背景渐变效果 */}
-                      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 rounded-2xl" />
-                      
-                      <div className="flex items-start gap-6">
-                        {/* 用户头像 */}
-                        <div className="relative">
-                          <Avatar className="w-14 h-14 ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all">
-                            <AvatarImage src={post.author.avatar || "/placeholder.svg"} alt={post.author.name} />
-                            <AvatarFallback className="bg-gradient-primary text-primary-foreground text-lg">
-                              {post.author.name.charAt(0)}
-                            </AvatarFallback>
-                          </Avatar>
-                          {/* 用户声望指示器 */}
-                          <div className="absolute -bottom-1 -right-1 bg-gradient-primary text-white text-xs px-1.5 py-0.5 rounded-full">
-                            {post.author.reputation}
-                          </div>
-                        </div>
-                        
-                        <div className="flex-1 min-w-0 space-y-4">
-                          {/* 帖子分类和状态 */}
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <Badge className={`${categoryColors[post.category]} animate-slide-in shadow-sm`}>
-                              {categoryIcons[post.category]} {getCategoryLabel(post.category)}
-                            </Badge>
-                            {post.isPinned && (
-                              <Badge variant="outline" className="text-blue-600 dark:text-blue-400 border-blue-200 animate-slide-in" style={{ animationDelay: '0.1s' }}>
-                                📌 {t('post.pinned')}
-                              </Badge>
-                            )}
-                            {post.isLocked && (
-                              <Badge variant="outline" className="text-muted-foreground border-muted animate-slide-in" style={{ animationDelay: '0.2s' }}>
-                                🔒 {t('post.locked')}
-                              </Badge>
-                            )}
-                            {/* 热门帖子指示器 */}
-                            {post.likes > 10 && (
-                              <Badge variant="outline" className="text-orange-600 border-orange-200 animate-slide-in" style={{ animationDelay: '0.3s' }}>
-                                🔥 {t('hotPost')}
-                              </Badge>
-                            )}
+                  <Link key={post.id} href={`/community/posts/${post.id}`}>
+                    <Card className="border-border/50 hover:border-primary/50 hover:shadow-md transition-all duration-300 hover-lift group cursor-pointer">
+                      <CardContent className="p-3">
+                        <div className="flex items-start gap-3">
+                          {/* 用户头像 - 紧凑 */}
+                          <div className="relative shrink-0">
+                            <Avatar className="w-10 h-10 ring-2 ring-border group-hover:ring-primary/40 transition-all">
+                              <AvatarImage src={post.author.avatar || "/placeholder.svg"} alt={post.author.name} />
+                              <AvatarFallback className="bg-gradient-primary text-primary-foreground text-sm">
+                                {post.author.name.charAt(0)}
+                              </AvatarFallback>
+                            </Avatar>
                           </div>
                           
-                          {/* 帖子标题和内容 */}
-                          <div className="space-y-3">
-                            <Link 
-                              href={`/community/posts/${post.id}`}
-                              className="block group-hover:text-primary transition-colors duration-300"
-                            >
-                              <h3 className="text-xl font-bold line-clamp-2 leading-tight hover:underline">
+                          <div className="flex-1 min-w-0 space-y-1.5">
+                            {/* 第一行：分类+标题 */}
+                            <div className="flex items-start gap-2">
+                              <Badge className={`${categoryColors[post.category]} text-xs h-5 px-1.5 shrink-0`}>
+                                {getCategoryLabel(post.category)}
+                              </Badge>
+                              {post.isPinned && (
+                                <Badge variant="outline" className="text-xs h-5 px-1.5 shrink-0">📌</Badge>
+                              )}
+                              <h3 className="text-sm font-semibold line-clamp-1 leading-tight group-hover:text-primary transition-colors flex-1 min-w-0">
                                 {post.title}
                               </h3>
-                            </Link>
+                            </div>
                             
-                            <p className="text-muted-foreground line-clamp-3 leading-relaxed">
+                            {/* 第二行：摘要 */}
+                            <p className="text-xs text-muted-foreground line-clamp-1 leading-tight">
                               {post.excerpt}
                             </p>
-                          </div>
-                          
-                          {/* 帖子元信息和操作 */}
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-6 text-sm text-muted-foreground">
+                            
+                            {/* 第三行：作者+时间+统计 */}
+                            <div className="flex items-center justify-between text-xs text-muted-foreground">
                               <div className="flex items-center gap-2">
-                                <span className="font-medium text-foreground group-hover:text-primary transition-colors">
+                                <span className="font-medium group-hover:text-primary transition-colors">
                                   {post.author.name}
                                 </span>
                                 <span>·</span>
                                 <span>{formatTimeAgo(post.createdAt, locale)}</span>
                               </div>
-                            </div>
-                            
-                            {/* 交互操作栏 */}
-                            <div className="flex items-center gap-4">
+                              
+                              {/* 统计信息 */}
+                              <div className="flex items-center gap-4">
                               {/* 浏览数 */}
                               <div className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
                                 <Eye className="w-4 h-4" />
@@ -486,15 +443,13 @@ export default function CommunityPage() {
                               >
                                 <Share2 className="w-4 h-4" />
                               </button>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-
-                      {/* 装饰性边框光效 */}
-                      <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/20 via-secondary/20 to-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 animate-pulse-slow" />
-                    </div>
-                  </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
                 ))}
               </div>
 
@@ -530,10 +485,10 @@ export default function CommunityPage() {
                   </div>
                 </div>
               )}
-        </div>
+            </div>
 
             {/* 现代化侧边栏 */}
-            <div className="space-y-6">
+            <div className="w-full lg:w-[280px] shrink-0 space-y-4">
               {/* 现代化社区统计 */}
               <div className={`transition-all duration-1000 delay-400 ${isVisible ? 'animate-slide-left opacity-100' : 'opacity-0 translate-x-10'}`}>
                 <div className="glass border border-primary/10 rounded-2xl p-6 relative overflow-hidden">
@@ -611,10 +566,10 @@ export default function CommunityPage() {
 
                     <div className="space-y-4">
                       {topContributors.map((contributor, index) => (
-                        <div key={contributor.id} className="group flex items-center gap-4 p-3 glass rounded-xl border border-primary/10 hover:border-primary/30 transition-all duration-300 hover:shadow-lg">
+                        <div key={contributor.id} className="group flex items-center gap-3 p-2.5 glass rounded-xl border border-primary/10 hover:border-primary/30 transition-all duration-300 hover:shadow-lg">
                           {/* 排名徽章 */}
-                          <div className="relative">
-                            <div className={`flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold text-white ${
+                          <div className="relative shrink-0">
+                            <div className={`flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold text-white ${
                               index === 0 ? 'bg-gradient-to-r from-yellow-400 to-yellow-600' :
                               index === 1 ? 'bg-gradient-to-r from-gray-300 to-gray-500' :
                               index === 2 ? 'bg-gradient-to-r from-orange-400 to-orange-600' :
@@ -623,31 +578,31 @@ export default function CommunityPage() {
                               {index + 1}
                             </div>
                             {index < 3 && (
-                              <Star className="absolute -top-1 -right-1 w-3 h-3 text-yellow-400 fill-current" />
+                              <Star className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 text-yellow-400 fill-current" />
                             )}
                           </div>
 
                           {/* 用户头像 */}
-                          <Avatar className="w-10 h-10 ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all">
+                          <Avatar className="w-9 h-9 ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all shrink-0">
                             <AvatarImage src={contributor.avatar || "/placeholder.svg"} alt={contributor.name} />
-                            <AvatarFallback className="bg-gradient-primary text-primary-foreground">
+                            <AvatarFallback className="bg-gradient-primary text-primary-foreground text-xs">
                               {contributor.name.charAt(0)}
                             </AvatarFallback>
                           </Avatar>
 
                           {/* 用户信息 */}
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold truncate group-hover:text-primary transition-colors">
+                            <p className="text-sm font-semibold truncate group-hover:text-primary transition-colors leading-tight">
                               {contributor.name}
                             </p>
-                            <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                              <span className="flex items-center gap-1">
-                                <TrendingUp className="w-3 h-3" />
-                                {contributor.reputation} {t('reputation')}
+                            <div className="flex items-center gap-2 text-[10px] text-muted-foreground mt-0.5">
+                              <span className="flex items-center gap-0.5 truncate">
+                                <TrendingUp className="w-2.5 h-2.5 shrink-0" />
+                                {contributor.reputation}
                               </span>
-                              <span className="flex items-center gap-1">
-                                <MessageSquare className="w-3 h-3" />
-                                {contributor.postsCount} {t('postsCount')}
+                              <span className="flex items-center gap-0.5 truncate">
+                                <MessageSquare className="w-2.5 h-2.5 shrink-0" />
+                                {contributor.postsCount}
                               </span>
                             </div>
                           </div>
@@ -658,60 +613,6 @@ export default function CommunityPage() {
                 </div>
               </div>
 
-              {/* 现代化社区规则 */}
-              <div className={`transition-all duration-1000 delay-800 ${isVisible ? 'animate-slide-left opacity-100' : 'opacity-0 translate-x-10'}`}>
-                <div className="glass border border-primary/10 rounded-2xl p-6 relative overflow-hidden">
-                  {/* 背景装饰 */}
-                  <div className="absolute top-0 left-0 w-16 h-16 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full -translate-y-4 -translate-x-4" />
-                  
-                  <div className="relative">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="p-2 bg-gradient-primary rounded-xl">
-                        <Sparkles className="w-5 h-5 text-primary-foreground" />
-                      </div>
-                      <h3 className="text-xl font-bold text-foreground">{t('rules.title')}</h3>
-                    </div>
-
-                    <div className="space-y-4 text-sm">
-                      {[
-                        { key: 'rule1', icon: '🤝' },
-                        { key: 'rule2', icon: '💬' },
-                        { key: 'rule3', icon: '🔒' },
-                        { key: 'rule4', icon: '📚' },
-                        { key: 'rule5', icon: '⚡' }
-                      ].map((rule, index) => (
-                        <div 
-                          key={rule.key}
-                          className="flex items-start gap-3 p-3 glass rounded-xl border border-primary/10 transition-all duration-300 hover:border-primary/30"
-                        >
-                          <div className="flex items-center justify-center w-8 h-8 bg-gradient-primary rounded-full text-white text-xs font-bold">
-                            {rule.icon}
-                          </div>
-                          <div className="flex-1">
-                            <span className="text-foreground leading-relaxed">
-                              {t(`rules.${rule.key}`)}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* 底部行动号召 */}
-                    <div className="mt-6 pt-4 border-t border-primary/20">
-                      <div className="text-center">
-                        <p className="text-xs text-muted-foreground mb-3">
-                          {t('followRules')}
-                        </p>
-                        <Button size="sm" variant="outline" className="glass hover-lift" asChild>
-                          <Link href="/community/guidelines">
-                            {t('viewCompleteRules')}
-                          </Link>
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
 

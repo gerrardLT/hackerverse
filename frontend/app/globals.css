@@ -1,3 +1,6 @@
+@import '../styles/design-tokens.css';
+@import '../styles/animations.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -64,7 +67,7 @@
     --accent-foreground: oklch(0.08 0 0); /* #020617 */
     --destructive: oklch(0.6 0.25 25); /* #ef4444 */
     --destructive-foreground: oklch(1 0 0); /* #ffffff */
-    --border: oklch(0.2 0 0); /* #334155 */
+    --border: oklch(0.3 0.01 260); /* #475569 更亮的边框，带微妙紫色调 */
     --input: oklch(0.15 0 0); /* #1e293b */
     --ring: oklch(0.6 0.25 280 / 0.4); /* rgba(139, 92, 246, 0.4) */
     --chart-1: oklch(0.6 0.25 280); /* #8b5cf6 */
@@ -279,8 +282,16 @@
 }
 
 
-/* Glassmorphism Effects */
+  /* Glassmorphism Effects */
 @layer components {
+  /* Background Grid Pattern */
+  .bg-grid-pattern {
+    background-image: 
+      linear-gradient(to right, currentColor 1px, transparent 1px),
+      linear-gradient(to bottom, currentColor 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
   .glass {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
@@ -308,6 +319,15 @@
     backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.15);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Enhanced border visibility for dark mode */
+  .border-visible {
+    border-color: oklch(0.35 0.02 260);
+  }
+
+  .dark .border-visible {
+    border-color: oklch(0.35 0.02 260);
   }
 
   /* Modern Gradient Backgrounds */

@@ -160,8 +160,8 @@ export function ConnectWalletDialog({ open, onOpenChange, onConnect, onWalletCon
 
       const result = await wallet.connect()
       
-      // 检查网络是否正确 (BSC Testnet)
-      const expectedChainId = 97 // BSC Testnet
+      // 检查网络是否正确 - 使用环境变量配置的chainId
+      const expectedChainId = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || '97')
       if (result.chainId !== expectedChainId) {
         try {
           await switchToBSCTestnet()
@@ -234,16 +234,6 @@ export function ConnectWalletDialog({ open, onOpenChange, onConnect, onWalletCon
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* 网络提示 */}
-          <Alert>
-            <AlertTriangle className="h-4 w-4" />
-            <AlertDescription>
-              {t.rich('wallet.ensureBSCTestnet', {
-                strong: (chunks) => <strong className="font-semibold">{chunks}</strong>
-              })}
-            </AlertDescription>
-          </Alert>
-
           {/* 钱包选项 */}
           <div className="space-y-2">
             {walletOptions.map((wallet) => {

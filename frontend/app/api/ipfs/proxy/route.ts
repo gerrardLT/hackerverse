@@ -16,7 +16,8 @@ export async function GET(request: NextRequest) {
     }
 
     // 构建后端代理URL
-    const backendUrl = `http://localhost:3002/api/ipfs/proxy?hash=${hash}`
+    const apiBase = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002/api').replace(/\/api$/, '')
+    const backendUrl = `${apiBase}/api/ipfs/proxy?hash=${hash}`
     
     console.log('🔄 代理IPFS文件请求到后端:', backendUrl)
 

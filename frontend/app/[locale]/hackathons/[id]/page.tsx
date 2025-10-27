@@ -134,7 +134,7 @@ export default function HackathonDetailPage() {
     sortBy: 'created',
     sortOrder: 'desc'
   })
-  const [filteredProjects, setFilteredProjects] = useState<typeof hackathon.projects>([])
+  const [filteredProjects, setFilteredProjects] = useState<Hackathon['projects']>([])
   const [isLoadingProjects, setIsLoadingProjects] = useState(false)
 
   // 加载项目数据
@@ -154,10 +154,10 @@ export default function HackathonDetailPage() {
       const url = `/hackathons/${hackathonId}/projects${params.toString() ? `?${params.toString()}` : ''}`
       const response = await apiService.get(url)
       
-      if (response.success) {
-        const { projects, filters: filterOptions } = response.data
-        setFilteredProjects(projects || [])
-        setProjectFilters(filterOptions || { tracks: [], tags: [], technologies: [] })
+      if (response.success && response.data) {
+        const data = response.data as { projects?: any[], filters?: FilterOptions }
+        setFilteredProjects(data.projects || [])
+        setProjectFilters(data.filters || { tracks: [], tags: [], technologies: [] })
       } else {
         throw new Error(response.error || '加载项目失败')
       }
@@ -209,13 +209,19 @@ export default function HackathonDetailPage() {
         const projects = response.data.projects.map((project: any) => ({
           id: project.id,
           name: project.title,
+          title: project.title,
           team: project.team?.name || project.creator?.username || t('project.individual'),
           members: project.team?._count?.members || 1,
-          track: project.category || t('project.uncategorized')
+          track: project.category || t('project.uncategorized'),
+          likes: project._count?.likes || 0,
+          comments: project._count?.comments || 0,
+          feedbacks: project._count?.feedbacks || 0,
+          createdAt: project.createdAt,
+          updatedAt: project.updatedAt
         }))
         
         // Update projects in hackathon
-        setHackathon(prev => prev ? { ...prev, projects } : null)
+        setHackathon(prev => prev ? { ...prev, projects } as Hackathon : null)
       }
     } catch (error) {
       console.error('[HACKATHON] Failed to get project list:', error)
@@ -545,87 +551,162 @@ export default function HackathonDetailPage() {
     : 0
 
   return (
-    <div className="container py-8">
-      <div className="space-y-8">
-        {/* 头部横幅 */}
-        <div className="relative">
-          <div className="h-64 md:h-80 rounded-lg overflow-hidden">
-            <img
-              src={hackathon.coverImage || "/placeholder.svg"}
-              alt={hackathon.title}
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-black/40" />
-          </div>
-          
-          <div className="absolute bottom-6 left-6 right-6 text-white">
-            <div className="flex items-center gap-2 mb-2">
-              <Badge className={`${getStatusColor(hackathon.status)} text-white`}>
-                {getStatusText(hackathon.status)}
-              </Badge>
-              {hackathon.status === 'upcoming' && (
-                <Badge variant="secondary" className="bg-white/20 text-white">
-                  <Timer className="h-3 w-3 mr-1" />
-                  {t('timing.startsIn', { days: getDaysUntil(hackathon.startDate) })}
-                </Badge>
-              )}
+    <div className="min-h-screen bg-background">
+      {/* 顶部横幅 - 140px 紧凑高度 - Flat Design 2.0 */}
+      <div className="relative h-[140px] border-b border-border/50 overflow-hidden">
+        {/* 背景图片层 */}
+        <div className="absolute inset-0">
+          <img
+            src={hackathon.coverImage || "/placeholder.svg"}
+            alt={hackathon.title}
+            className="w-full h-full object-cover opacity-20"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/95 via-background/90 to-background/95" />
+        </div>
+        
+        {/* 内容层 */}
+        <div className="container max-w-[1280px] mx-auto h-full relative px-4 md:px-6">
+          <div className="h-full flex items-center justify-between gap-4">
+            {/* 左侧：信息 */}
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              {/* 小封面图 - 仅桌面显示 */}
+              <div className="h-[90px] w-[120px] rounded-lg overflow-hidden border border-border/50 shrink-0 hidden lg:block">
+                <img
+                  src={hackathon.coverImage || "/placeholder.svg"}
+                  alt={hackathon.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              
+              {/* 标题和元数据 */}
+              <div className="flex-1 min-w-0 space-y-2">
+                {/* 状态徽章行 */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Badge className={`${getStatusColor(hackathon.status)} text-xs h-6`}>
+                    {getStatusText(hackathon.status)}
+                  </Badge>
+                  {hackathon.status === 'upcoming' && (
+                    <Badge variant="secondary" className="text-xs h-6">
+                      <Timer className="h-3 w-3 mr-1" />
+                      {getDaysUntil(hackathon.startDate)}d left
+                    </Badge>
+                  )}
+                  {hackathon.tags.slice(0, 2).map((tag) => (
+                    <Badge key={tag} variant="outline" className="text-xs h-6 hidden md:inline-flex">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+                
+                {/* 标题 */}
+                <h1 className="text-xl md:text-2xl font-bold text-foreground line-clamp-1">
+                  {hackathon.title}
+                </h1>
+                
+                {/* 快速统计信息 */}
+                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <Calendar className="h-3 w-3" />
+                    <span className="hidden sm:inline">{formatDate(hackathon.startDate)}</span>
+                    <span className="sm:hidden">{new Date(hackathon.startDate).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Users className="h-3 w-3" />
+                    <span>{hackathon.participants}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Trophy className="h-3 w-3 text-amber-500" />
+                    <span className="font-semibold">{hackathon.totalPrize}</span>
+                  </div>
+                  {hackathon.location && (
+                    <div className="flex items-center gap-1 hidden md:flex">
+                      <MapPin className="h-3 w-3" />
+                      <span className="truncate max-w-[100px]">{hackathon.location}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold mb-2">{hackathon.title}</h1>
-            <p className="text-lg opacity-90 max-w-2xl">{hackathon.description}</p>
+            
+            {/* 右侧：操作区 */}
+            <div className="flex items-center gap-2 shrink-0">
+              {/* 评委头像组 - 仅大屏显示 */}
+              {hackathon.judges.length > 0 && (
+                <div className="hidden xl:flex items-center -space-x-2">
+                  {hackathon.judges.slice(0, 3).map((judge, index) => (
+                    <Avatar key={index} className="h-7 w-7 border-2 border-background">
+                      <AvatarImage src={judge.avatar} />
+                      <AvatarFallback className="text-xs">{judge.name[0]}</AvatarFallback>
+                    </Avatar>
+                  ))}
+                  {hackathon.judges.length > 3 && (
+                    <div className="h-7 w-7 rounded-full border-2 border-background bg-muted flex items-center justify-center text-[10px] font-medium">
+                      +{hackathon.judges.length - 3}
+                    </div>
+                  )}
+                </div>
+              )}
+              
+              {/* 分享按钮 */}
+              <Button variant="outline" size="sm" onClick={handleShare} className="h-8 w-8 p-0">
+                <Share2 className="h-3 w-3" />
+              </Button>
+              
+              {/* 加入/已加入按钮 */}
+              {user && user.id !== hackathon.organizerId && (() => {
+                const registrationStatus = canRegister(hackathon)
+                return registrationStatus.canRegister || isJoined ? (
+                  <Button 
+                    size="sm"
+                    onClick={handleJoinHackathon}
+                    disabled={isJoined || !registrationStatus.canRegister}
+                    className="h-8 px-4 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary"
+                  >
+                    {isJoined ? (
+                      <>
+                        <CheckCircle className="h-3 w-3 mr-1" />
+                        {t('status.joined')}
+                      </>
+                    ) : (
+                      t('actions.joinNow')
+                    )}
+                  </Button>
+                ) : null
+              })()}
+            </div>
           </div>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* 主要内容 */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* 快速信息 */}
-            <Card>
-              <CardContent className="p-6">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="text-center">
-                    <div className="flex items-center justify-center mb-2">
-                      <Calendar className="h-5 w-5 text-primary" />
-                    </div>
-                    <p className="text-sm text-muted-foreground">{t('startTime')}</p>
-                    <p className="font-semibold">{formatDate(hackathon.startDate)}</p>
-                  </div>
-                  
-                  <div className="text-center">
-                    <div className="flex items-center justify-center mb-2">
-                      <Clock className="h-5 w-5 text-primary" />
-                    </div>
-                    <p className="text-sm text-muted-foreground">{t('duration')}</p>
-                    <p className="font-semibold">{t('days', { count: 14 })}</p>
-                  </div>
-                  
-                  <div className="text-center">
-                    <div className="flex items-center justify-center mb-2">
-                      <Trophy className="h-5 w-5 text-primary" />
-                    </div>
-                    <p className="text-sm text-muted-foreground">{t('totalPrize')}</p>
-                    <p className="font-semibold">{hackathon.totalPrize}</p>
-                  </div>
-                  
-                  <div className="text-center">
-                    <div className="flex items-center justify-center mb-2">
-                      <MapPin className="h-5 w-5 text-primary" />
-                    </div>
-                    <p className="text-sm text-muted-foreground">{t('locationLabel')}</p>
-                    <p className="font-semibold">{hackathon.location}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+      {/* 主内容区 - max-width 1280px */}
+      <div className="container max-w-[1280px] mx-auto px-4 md:px-6 py-6">
+        <div className="space-y-6">
 
-            {/* 详细信息标签页 */}
+        {/* 双栏布局：主内容 + 侧边栏(320px) */}
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* 主内容区 - 自适应宽度 */}
+          <div className="flex-1 min-w-0">
+            {/* 紧凑Tab系统 - 48px高度 */}
             <Tabs defaultValue="overview" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-5">
-                <TabsTrigger value="overview">{t('tabs.overview')}</TabsTrigger>
-                <TabsTrigger value="prizes">{t('tabs.prizes')}</TabsTrigger>
-                <TabsTrigger value="rules">{t('tabs.rules')}</TabsTrigger>
-                <TabsTrigger value="timeline">{t('tabs.timeline')}</TabsTrigger>
-                <TabsTrigger value="projects">{t('tabs.projects')}</TabsTrigger>
-              </TabsList>
+              <div className="bg-muted/30 rounded-lg p-1">
+                <TabsList className="h-[48px] w-full grid grid-cols-5 bg-transparent border-0">
+                  <TabsTrigger value="overview" className="text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                    {t('tabs.overview')}
+                  </TabsTrigger>
+                  <TabsTrigger value="prizes" className="text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                    {t('tabs.prizes')}
+                  </TabsTrigger>
+                  <TabsTrigger value="rules" className="text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                    {t('tabs.rules')}
+                  </TabsTrigger>
+                  <TabsTrigger value="timeline" className="text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                    {t('tabs.timeline')}
+                  </TabsTrigger>
+                  <TabsTrigger value="projects" className="text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                    {t('tabs.projects')}
+                  </TabsTrigger>
+                </TabsList>
+              </div>
 
               <TabsContent value="overview" className="space-y-6">
                 {/* 时间安排信息 */}
@@ -941,7 +1022,7 @@ export default function HackathonDetailPage() {
                                       <LikeButtonWithCount
                                         projectId={project.id}
                                         initialCount={project.likes || 0}
-                                        size="sm"
+                                        className="text-sm"
                                       />
                                       <Button variant="outline" size="sm" asChild>
                                         <Link href={`/hackathons/${hackathon.id}/projects/${project.id}`}>
@@ -985,12 +1066,13 @@ export default function HackathonDetailPage() {
             </Tabs>
           </div>
 
-          {/* 侧边栏 */}
-          <div className="space-y-6">
-            {/* 参与按钮 */}
+          {/* 侧边栏 - 320px固定宽度 */}
+          <aside className="lg:w-[320px] shrink-0">
+            <div className="lg:sticky lg:top-20 space-y-4">
+            {/* 快速操作卡片 - 紧凑设计 */}
             <Card>
-              <CardContent className="p-6">
-                <div className="space-y-4">
+              <CardContent className="p-4">
+                <div className="space-y-3">
                   {/* 创建者身份提示 */}
                   {user && user.id === hackathon.organizerId && (
                     <div className="text-center p-4 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg">
@@ -1003,21 +1085,7 @@ export default function HackathonDetailPage() {
                     </div>
                   )}
                   
-                  {user && user.id !== hackathon.organizerId && (() => {
-                    const registrationStatus = canRegister(hackathon)
-                    // 只要在注册期内就显示按钮，不管黑客松是否已经开始
-                    return registrationStatus.canRegister || isJoined ? (
-                      <Button 
-                        className="w-full" 
-                        size="lg"
-                        onClick={handleJoinHackathon}
-                        disabled={isJoined || !registrationStatus.canRegister}
-                      >
-                        {isJoined ? t('status.joined') : (registrationStatus.canRegister ? t('actions.joinNow') : registrationStatus.reason)}
-                      </Button>
-                    ) : null
-                  })()}
-                  
+                  {/* 提交项目按钮 - 仅已加入的用户在提交期内可见 */}
                   {user && user.id !== hackathon.organizerId && isJoined && (() => {
                     const submitStatus = canSubmitProject(hackathon)
                     return submitStatus.canSubmit ? (
@@ -1042,74 +1110,62 @@ export default function HackathonDetailPage() {
                       </Link>
                     </Button>
                   )}
-
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={handleShare} className="w-full">
-                      <Share2 className="h-4 w-4 mr-2" />
-                      {t('actions.share')}
-                    </Button>
-                  </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* 参与统计 */}
+            {/* 关键数据卡片 - 紧凑设计 */}
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5" />
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Users className="h-4 w-4" />
                   {t('stats.participation')}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span>{t('stats.participants')}</span>
-                    <span>{hackathon.participants.toLocaleString()}</span>
+              <CardContent className="space-y-3 pt-0">
+                {/* 参与进度 */}
+                {hackathon.maxParticipants && (
+                  <div>
+                    <div className="flex justify-between text-xs mb-1.5">
+                      <span className="text-muted-foreground">{t('stats.participants')}</span>
+                      <span className="font-semibold">{hackathon.participants} / {hackathon.maxParticipants}</span>
+                    </div>
+                    <Progress value={participationProgress} className="h-1.5" />
                   </div>
-                  {hackathon.maxParticipants && (
-                    <>
-                      <Progress value={participationProgress} className="h-2" />
-                      <p className="text-xs text-muted-foreground">
-                        {t('stats.remainingSlots', { count: hackathon.maxParticipants - hackathon.participants })}
-                      </p>
-                    </>
-                  )}
-                </div>
+                )}
                 
-                <Separator />
-                
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span>{t('stats.submittedProjects')}</span>
-                    <span>{hackathon.projects.length}</span>
+                {/* 快速统计 */}
+                <div className="grid grid-cols-3 gap-2 pt-2 border-t border-border/50">
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-foreground">{hackathon.projects.length}</div>
+                    <div className="text-xs text-muted-foreground">{t('stats.projects')}</div>
                   </div>
-                  <div className="flex justify-between">
-                    <span>{t('stats.tracks')}</span>
-                    <span>{hackathon.tracks.length}</span>
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-foreground">{hackathon.tracks.length}</div>
+                    <div className="text-xs text-muted-foreground">{t('stats.tracks')}</div>
                   </div>
-                  <div className="flex justify-between">
-                    <span>{t('stats.prizes')}</span>
-                    <span>{hackathon.prizes.length}</span>
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-foreground">{hackathon.prizes.length}</div>
+                    <div className="text-xs text-muted-foreground">{t('stats.prizes')}</div>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* 组织者信息 */}
+            {/* 组织者信息 - 紧凑设计 */}
             <Card>
-              <CardHeader>
-                <CardTitle>{t('organizer.title')}</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">{t('organizer.title')}</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="flex items-start gap-3">
-                  <Avatar className="h-12 w-12">
+              <CardContent className="pt-0">
+                <div className="flex items-start gap-2.5">
+                  <Avatar className="h-10 w-10">
                     <AvatarImage src={hackathon.organizer.avatar || "/placeholder.svg"} />
                     <AvatarFallback>{hackathon.organizer.name[0]}</AvatarFallback>
                   </Avatar>
-                  <div className="flex-1">
-                    <h4 className="font-semibold">{hackathon.organizer.name}</h4>
-                    <p className="text-sm text-muted-foreground mt-1">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold text-sm">{hackathon.organizer.name}</h4>
+                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
                       {hackathon.organizer.description}
                     </p>
                     
@@ -1186,68 +1242,77 @@ export default function HackathonDetailPage() {
               </CardContent>
             </Card>
 
-            {/* 评委团 */}
-            <Card>
-              <CardHeader>
-                <CardTitle>{t('judges.title')}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {hackathon.judges.map((judge, index) => (
-                    <div key={index} className="flex items-center gap-3">
-                      <Avatar className="h-10 w-10">
-                        <AvatarImage src={judge.avatar || "/placeholder.svg"} />
-                        <AvatarFallback>{judge.name[0]}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="font-medium text-sm">{judge.name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {judge.title} @ {judge.company}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* 赞助商 */}
-            <Card>
-              <CardHeader>
-                <CardTitle>{t('sponsors.title')}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-3">
-                  {hackathon.sponsors.map((sponsor, index) => (
-                    <div key={index} className="text-center p-3 border rounded-lg">
-                      <img
-                        src={sponsor.logo || "/placeholder.svg"}
-                        alt={sponsor.name}
-                        className="h-8 w-auto mx-auto mb-2"
-                      />
-                      <p className="text-xs font-medium">{sponsor.name}</p>
-                      <Badge variant="outline" className="text-xs mt-1">
-                        {sponsor.tier}
-                      </Badge>
-                      {sponsor.websiteUrl && (
-                        <div className="mt-2">
-                          <a
-                            href={sponsor.websiteUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800"
-                          >
-                            <ExternalLink className="w-3 h-3" />
-                            {t('sponsors.visitWebsite')}
-                          </a>
+            {/* 评委团 - 紧凑设计 */}
+            {hackathon.judges.length > 0 && (
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center justify-between">
+                    <span>{t('judges.title')}</span>
+                    <Badge variant="secondary" className="text-xs">{hackathon.judges.length}</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="space-y-2.5">
+                    {hackathon.judges.slice(0, 5).map((judge, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={judge.avatar || "/placeholder.svg"} />
+                          <AvatarFallback>{judge.name[0]}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-xs truncate">{judge.name}</p>
+                          <p className="text-xs text-muted-foreground truncate">
+                            {judge.title}
+                          </p>
                         </div>
-                      )}
+                      </div>
+                    ))}
+                    {hackathon.judges.length > 5 && (
+                      <div className="text-xs text-muted-foreground text-center pt-1">
+                        +{hackathon.judges.length - 5} more
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* 赞助商 - 紧凑设计 */}
+            {hackathon.sponsors.length > 0 && (
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center justify-between">
+                    <span>{t('sponsors.title')}</span>
+                    <Badge variant="secondary" className="text-xs">{hackathon.sponsors.length}</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="grid grid-cols-2 gap-2">
+                    {hackathon.sponsors.slice(0, 6).map((sponsor, index) => (
+                      <div key={index} className="text-center p-2 border border-border/50 rounded-lg hover:bg-muted/50 transition-colors">
+                        <img
+                          src={sponsor.logo || "/placeholder.svg"}
+                          alt={sponsor.name}
+                          className="h-6 w-auto mx-auto mb-1"
+                        />
+                        <p className="text-xs font-medium truncate">{sponsor.name}</p>
+                        <Badge variant="outline" className="text-xs mt-0.5 h-4 px-1">
+                          {sponsor.tier}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                  {hackathon.sponsors.length > 6 && (
+                    <div className="text-xs text-muted-foreground text-center pt-2">
+                      +{hackathon.sponsors.length - 6} more sponsors
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+            </div>
+          </aside>
+        </div>
         </div>
       </div>
     </div>

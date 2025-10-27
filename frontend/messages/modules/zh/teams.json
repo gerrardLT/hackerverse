@@ -1,5 +1,6 @@
 {
   "title": "团队",
+  "teams": "个团队",
   "createTeam": "创建团队",
   "join": "加入团队",
   "leave": "离开团队",
@@ -10,6 +11,7 @@
   "leader": "队长",
   "pageTitle": "团队管理",
   "pageDescription": "发现团队、管理你的团队、处理邀请",
+  "pendingInvitations": "个待处理邀请",
   "loading": {
     "teams": "加载团队中...",
     "hackathons": "加载黑客松列表失败",

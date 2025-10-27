@@ -779,7 +779,7 @@ export default function TeamMatchPage() {
             <div className={`transition-all duration-1000 delay-400 ${isVisible ? 'animate-fade-in opacity-100' : 'opacity-0'}`}>
               <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
                 <div className="glass border border-primary/10 rounded-2xl p-2">
-                  <TabsList className="grid w-full grid-cols-2 bg-transparent gap-1">
+                  <TabsList className="grid w-full grid-cols-2 bg-transparent gap-1 border-0">
                     <TabsTrigger 
                       value="recommendations"
                       className="glass hover-lift transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-white"

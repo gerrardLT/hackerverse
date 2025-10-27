@@ -147,44 +147,59 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="container py-8">
-      <div className="space-y-6">
-        {/* 页面标题 */}
-        <div>
-          <h1 className="text-3xl font-bold">设置</h1>
-          <p className="text-muted-foreground">管理你的账户设置和偏好</p>
-        </div>
+    <div className="relative min-h-screen">
+      {/* 动态背景 */}
+      <div className="absolute inset-0 gradient-mesh opacity-15 -z-10" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/80 to-background -z-10" />
+      
+      <div className="container py-8 max-w-[1280px] mx-auto">
+        <div className="space-y-6">
+          {/* 紧凑页面标题 - 80px高度 */}
+          <div className="glass-light border border-border/50 rounded-2xl p-5">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl font-bold flex items-center gap-2">
+                  <Settings className="h-6 w-6" />
+                  设置
+                </h1>
+                <p className="text-sm text-muted-foreground mt-1">管理你的账户设置和偏好</p>
+              </div>
+            </div>
+          </div>
 
-        <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="profile" className="flex items-center gap-2">
-              <User className="h-4 w-4" />
-              个人信息
-            </TabsTrigger>
-            <TabsTrigger value="notifications" className="flex items-center gap-2">
-              <Bell className="h-4 w-4" />
-              通知设置
-            </TabsTrigger>
-            <TabsTrigger value="privacy" className="flex items-center gap-2">
-              <Shield className="h-4 w-4" />
-              隐私设置
-            </TabsTrigger>
-            <TabsTrigger value="appearance" className="flex items-center gap-2">
-              <Palette className="h-4 w-4" />
-              外观设置
-            </TabsTrigger>
-          </TabsList>
+          <Tabs defaultValue="profile" className="space-y-6">
+            {/* 紧凑Tab导航 - 48px高度 */}
+            <div className="bg-muted/30 rounded-xl p-1">
+              <TabsList className="h-[48px] w-full grid grid-cols-2 md:grid-cols-4 bg-transparent gap-1 border-0">
+                <TabsTrigger value="profile" className="text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                  <User className="h-4 w-4 mr-1.5" />
+                  <span className="hidden sm:inline">个人信息</span>
+                </TabsTrigger>
+                <TabsTrigger value="notifications" className="text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                  <Bell className="h-4 w-4 mr-1.5" />
+                  <span className="hidden sm:inline">通知设置</span>
+                </TabsTrigger>
+                <TabsTrigger value="privacy" className="text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                  <Shield className="h-4 w-4 mr-1.5" />
+                  <span className="hidden sm:inline">隐私设置</span>
+                </TabsTrigger>
+                <TabsTrigger value="appearance" className="text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                  <Palette className="h-4 w-4 mr-1.5" />
+                  <span className="hidden sm:inline">外观设置</span>
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
-          {/* 个人信息设置 */}
-          <TabsContent value="profile" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>个人信息</CardTitle>
-                <CardDescription>
+            {/* 个人信息设置 */}
+            <TabsContent value="profile" className="space-y-6 animate-fade-in">
+            <Card className="glass-light border-border/50">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg">个人信息</CardTitle>
+                <CardDescription className="text-sm">
                   更新你的个人资料信息，这些信息将显示在你的个人资料页面上
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-5">
                 {/* 头像 */}
                 <div className="flex items-center gap-4">
                   <Avatar className="h-20 w-20">
@@ -251,14 +266,14 @@ export default function SettingsPage() {
                 </Button>
               </CardContent>
             </Card>
-          </TabsContent>
+            </TabsContent>
 
-          {/* 通知设置 */}
-          <TabsContent value="notifications" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>通知设置</CardTitle>
-                <CardDescription>
+            {/* 通知设置 */}
+            <TabsContent value="notifications" className="space-y-6 animate-fade-in">
+            <Card className="glass-light border-border/50">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg">通知设置</CardTitle>
+                <CardDescription className="text-sm">
                   管理你接收通知的方式和类型
                 </CardDescription>
               </CardHeader>
@@ -352,14 +367,14 @@ export default function SettingsPage() {
                 </Button>
               </CardContent>
             </Card>
-          </TabsContent>
+            </TabsContent>
 
-          {/* 隐私设置 */}
-          <TabsContent value="privacy" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>隐私设置</CardTitle>
-                <CardDescription>
+            {/* 隐私设置 */}
+            <TabsContent value="privacy" className="space-y-6 animate-fade-in">
+            <Card className="glass-light border-border/50">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg">隐私设置</CardTitle>
+                <CardDescription className="text-sm">
                   控制你的个人信息对其他用户的可见性
                 </CardDescription>
               </CardHeader>
@@ -420,14 +435,14 @@ export default function SettingsPage() {
                 </Button>
               </CardContent>
             </Card>
-          </TabsContent>
+            </TabsContent>
 
-          {/* 外观设置 */}
-          <TabsContent value="appearance" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>外观设置</CardTitle>
-                <CardDescription>
+            {/* 外观设置 */}
+            <TabsContent value="appearance" className="space-y-6 animate-fade-in">
+            <Card className="glass-light border-border/50">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg">外观设置</CardTitle>
+                <CardDescription className="text-sm">
                   自定义你的界面外观
                 </CardDescription>
               </CardHeader>
@@ -472,8 +487,9 @@ export default function SettingsPage() {
                 </Button>
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
     </div>
   )

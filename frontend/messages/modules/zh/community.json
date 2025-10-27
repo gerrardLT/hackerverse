@@ -2,6 +2,7 @@
   "title": "社区",
   "description": "分享想法、提问交流、展示作品",
   "posts": "帖子",
+  "members": "成员",
   "createPost": "发布帖子",
   "reply": "回复",
   "like": "点赞",
@@ -16,7 +17,8 @@
     "networkError": "网络错误，请稍后重试",
     "loadingFailed": "加载社区数据失败",
     "toggleLikeFailed": "切换点赞状态失败",
-    "toggleBookmarkFailed": "切换收藏状态失败"
+    "toggleBookmarkFailed": "切换收藏状态失败",
+    "stats": "加载统计数据中..."
   },
   "clearFilters": "清除筛选",
   "hotPost": "热门",
@@ -73,6 +75,7 @@
   "post": {
     "backToCommunity": "返回社区",
     "createPost": "发布帖子",
+    "publish": "发布帖子",
     "publishPost": "发布帖子",
     "publishFirst": "发布第一个帖子",
     "pinned": "置顶",
@@ -160,6 +163,7 @@
   },
   "rules": {
     "title": "社区规则",
+    "count": "条规则",
     "rule1": "保持友善和尊重，营造良好的讨论氛围",
     "rule2": "发布有价值的内容，避免灌水和重复",
     "rule3": "使用合适的分类和标签，便于他人查找",

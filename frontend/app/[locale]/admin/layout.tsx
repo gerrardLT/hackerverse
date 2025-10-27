@@ -128,25 +128,30 @@ export default function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Admin Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center">
-          <div className="flex items-center gap-4">
-            <Shield className="h-6 w-6 text-primary" />
-            <h1 className="text-xl font-bold">{t('title')}</h1>
+    <div className="min-h-screen bg-background relative">
+      {/* 动态背景 */}
+      <div className="absolute inset-0 gradient-mesh opacity-10 -z-10" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/90 to-background -z-10" />
+      
+      {/* Admin Header - 80px高度 Flat Design 2.0 */}
+      <header className="sticky top-0 z-50 w-full glass-light border-b border-border/50 backdrop-blur-xl">
+        <div className="container flex h-20 items-center max-w-[1400px] mx-auto px-6">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-gradient-primary rounded-xl">
+              <Shield className="h-5 w-5 text-primary-foreground" />
+            </div>
+            <div>
+              <h1 className="text-lg font-bold">{t('title')}</h1>
+              <p className="text-xs text-muted-foreground">{t('role.' + user.role.toLowerCase())}</p>
+            </div>
           </div>
           
-          <div className="ml-auto flex items-center gap-4">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Database className="h-4 w-4" />
-              <span>{t('role.' + user.role.toLowerCase())}</span>
-            </div>
-            
+          <div className="ml-auto flex items-center gap-3">
             <Button 
               variant="outline" 
               size="sm"
               onClick={() => router.push('/dashboard')}
+              className="glass hover-lift"
             >
               {t('backToSite')}
             </Button>
@@ -154,26 +159,30 @@ export default function AdminLayout({
         </div>
       </header>
 
-      {/* Admin Navigation */}
-      <div className="container py-6">
+      {/* Admin Navigation - 48px Tab高度 */}
+      <div className="container max-w-[1400px] mx-auto px-6 py-6">
         <Tabs value={getCurrentTab()} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
-            {adminNavItems.map((item) => {
-              const Icon = item.icon
-              return (
-                <TabsTrigger 
-                  key={item.key} 
-                  value={item.key}
-                  asChild
-                >
-                  <Link href={item.href} className="flex items-center gap-2">
-                    <Icon className="h-4 w-4" />
-                    <span className="hidden sm:inline">{item.label}</span>
-                  </Link>
-                </TabsTrigger>
-              )
-            })}
-          </TabsList>
+          {/* 紧凑Tab导航 */}
+          <div className="bg-muted/30 rounded-xl p-1">
+            <TabsList className="h-[48px] w-full grid grid-cols-3 md:grid-cols-6 bg-transparent gap-1 border-0">
+              {adminNavItems.map((item) => {
+                const Icon = item.icon
+                return (
+                  <TabsTrigger 
+                    key={item.key} 
+                    value={item.key}
+                    asChild
+                    className="text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+                  >
+                    <Link href={item.href} className="flex items-center gap-1.5">
+                      <Icon className="h-4 w-4" />
+                      <span className="hidden sm:inline">{item.label}</span>
+                    </Link>
+                  </TabsTrigger>
+                )
+              })}
+            </TabsList>
+          </div>
           
           {/* Content Area */}
           <div className="space-y-6">

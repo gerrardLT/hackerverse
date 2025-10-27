@@ -526,7 +526,7 @@ export default function PostDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-12 w-12 text-primary animate-spin mx-auto mb-4" />
           <p className="text-muted-foreground">{t('loading')}</p>
@@ -537,9 +537,9 @@ export default function PostDetailPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
           <h3 className="text-lg font-medium mb-2">{t('loadFailed')}</h3>
           <p className="text-muted-foreground mb-4">{error}</p>
           <Button onClick={loadPost}>
@@ -552,10 +552,10 @@ export default function PostDetailPage() {
 
   if (!post) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('notFound')}</h1>
-          <p className="text-gray-600 mb-4">{t('notFoundDesc')}</p>
+          <h1 className="text-2xl font-bold text-foreground mb-2">{t('notFound')}</h1>
+          <p className="text-muted-foreground mb-4">{t('notFoundDesc')}</p>
           <Link href="/community">
             <Button>{t('backToCommunity')}</Button>
           </Link>
@@ -565,7 +565,7 @@ export default function PostDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
@@ -599,10 +599,10 @@ export default function PostDetailPage() {
                       <div className="flex items-center gap-2">
                         <span className="font-semibold">{post.author.name}</span>
                         {post.author.reputation > 0 && (
-                          <Badge variant="outline" className="text-xs text-gray-600">{t('reputation')}: {post.author.reputation}</Badge>
+                          <Badge variant="outline" className="text-xs text-muted-foreground">{t('reputation')}: {post.author.reputation}</Badge>
                         )}
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-500">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <span>{formatTimeAgo(post.createdAt, locale)}</span>
                         <span>•</span>
                         <span>{t('posted')}</span>
@@ -656,9 +656,9 @@ export default function PostDetailPage() {
                 ) : (
                   <div className="mb-4">
                     <div className="flex items-center gap-2 mb-2">
-                      {post.isPinned && <Flag className="w-4 h-4 text-blue-600" />}
-                      {post.isLocked && <AlertCircle className="w-4 h-4 text-gray-500" />}
-                      <h1 className="text-2xl font-bold text-gray-900">{post.title}</h1>
+                      {post.isPinned && <Flag className="w-4 h-4 text-primary" />}
+                      {post.isLocked && <AlertCircle className="w-4 h-4 text-muted-foreground" />}
+                      <h1 className="text-2xl font-bold text-foreground">{post.title}</h1>
                     </div>
                     
                     <div className="flex flex-wrap items-center gap-2">
@@ -688,7 +688,7 @@ export default function PostDetailPage() {
                   </div>
                 ) : (
                   <div className="prose max-w-none mb-6">
-                    <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
+                    <div className="whitespace-pre-wrap text-foreground leading-relaxed">
                       {post.content}
                     </div>
                   </div>
@@ -720,7 +720,7 @@ export default function PostDetailPage() {
                     </Button>
                   </div>
                   
-                  <div className="flex items-center gap-4 text-sm text-gray-500">
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <Eye className="w-4 h-4" />
                       {post.views} {t('views')}
@@ -795,11 +795,11 @@ export default function PostDetailPage() {
                           <div className="flex items-center gap-2 mb-2">
                             <span className="font-semibold text-sm">{reply.author.name}</span>
                             {reply.author.reputation > 0 && (
-                              <Badge variant="outline" className="text-xs text-gray-600">{t('reputation')}: {reply.author.reputation}</Badge>
+                              <Badge variant="outline" className="text-xs text-muted-foreground">{t('reputation')}: {reply.author.reputation}</Badge>
                             )}
-                            <span className="text-xs text-gray-500">{formatTimeAgo(reply.createdAt, locale)}</span>
+                            <span className="text-xs text-muted-foreground">{formatTimeAgo(reply.createdAt, locale)}</span>
                           </div>
-                          <p className="text-gray-700 mb-2 leading-relaxed">{reply.content}</p>
+                          <p className="text-foreground mb-2 leading-relaxed">{reply.content}</p>
                           <div className="flex items-center gap-2">
                             <Button 
                               variant="ghost" 
@@ -824,7 +824,7 @@ export default function PostDetailPage() {
 
                       {/* 回复输入框 */}
                       {replyingTo === reply.id && (
-                        <div className="ml-11 mt-4 p-4 bg-gray-50 rounded-lg">
+                        <div className="ml-11 mt-4 p-4 glass-light border border-border/50 rounded-lg">
                           <div className="flex gap-3">
                             <Avatar className="w-6 h-6">
                               <AvatarImage src="/placeholder.svg" alt={user?.username || 'User'} />
@@ -878,9 +878,9 @@ export default function PostDetailPage() {
                                   {subReply.author.reputation > 0 && (
                                     <Badge variant="outline" className="text-xs">{t('reputation')}: {subReply.author.reputation}</Badge>
                                   )}
-                                  <span className="text-xs text-gray-500">{formatTimeAgo(subReply.createdAt, locale)}</span>
+                                  <span className="text-xs text-muted-foreground">{formatTimeAgo(subReply.createdAt, locale)}</span>
                                 </div>
-                                <p className="text-sm text-gray-700 leading-relaxed">{subReply.content}</p>
+                                <p className="text-sm text-foreground leading-relaxed">{subReply.content}</p>
                               </div>
                             </div>
                           ))}
@@ -893,7 +893,7 @@ export default function PostDetailPage() {
                 </div>
 
                 {replies.length === 0 && (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 text-muted-foreground">
                     <MessageSquare className="w-12 h-12 mx-auto mb-4 opacity-50" />
                     <p>{t('noReplies')}</p>
                   </div>
@@ -917,24 +917,24 @@ export default function PostDetailPage() {
                   </Avatar>
                   <div>
                     <p className="font-semibold">{post.author.name}</p>
-                    <p className="text-sm text-gray-500">{t('reputation')}: {post.author.reputation}</p>
+                    <p className="text-sm text-muted-foreground">{t('reputation')}: {post.author.reputation}</p>
                   </div>
                 </div>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">{t('postsCount')}</span>
+                    <span className="text-muted-foreground">{t('postsCount')}</span>
                     <span className="font-semibold">
                       {authorStats ? authorStats.postsCount : '-'}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">{t('repliesCount2')}</span>
+                    <span className="text-muted-foreground">{t('repliesCount2')}</span>
                     <span className="font-semibold">
                       {authorStats ? authorStats.repliesCount : '-'}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">{t('joinTime')}</span>
+                    <span className="text-muted-foreground">{t('joinTime')}</span>
                     <span className="font-semibold">
                       {authorStats ? new Date(authorStats.joinedAt).toLocaleDateString('zh-CN', {
                         year: 'numeric',
@@ -964,19 +964,19 @@ export default function PostDetailPage() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">{t('publishTime')}</span>
+                  <span className="text-muted-foreground">{t('publishTime')}</span>
                   <span className="font-semibold">{formatTimeAgo(post.createdAt, locale)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">{t('viewCount')}</span>
+                  <span className="text-muted-foreground">{t('viewCount')}</span>
                   <span className="font-semibold">{post.views}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">{t('likeCount')}</span>
+                  <span className="text-muted-foreground">{t('likeCount')}</span>
                   <span className="font-semibold">{likeCount}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">{t('replyCount')}</span>
+                  <span className="text-muted-foreground">{t('replyCount')}</span>
                   <span className="font-semibold">{replies.length}</span>
                 </div>
               </CardContent>

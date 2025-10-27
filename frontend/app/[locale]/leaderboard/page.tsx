@@ -240,168 +240,232 @@ export default function LeaderboardPage() {
   }
 
   return (
-    <div className="container max-w-6xl mx-auto p-6 space-y-6">
-      {/* 页面标题 */}
-      <div className="text-center space-y-2">
-        <h1 className="text-4xl font-bold text-gradient animate-shimmer">
-          {t('title')}
-        </h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          {t('description')}
-        </p>
-      </div>
+    <div className="relative min-h-screen">
+      {/* 动态背景 */}
+      <div className="absolute inset-0 gradient-mesh opacity-15 -z-10" />
+      <div className="absolute inset-0 bg-gradient-to-br from-transparent via-background/90 to-background -z-10" />
 
-      {/* 统计卡片 */}
-      {data && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="glass border border-primary/10">
-            <CardContent className="p-4 text-center">
-              <Users className="w-8 h-8 text-blue-500 mx-auto mb-2" />
-              <div className="text-2xl font-bold">{data.meta.totalUsers}</div>
-              <p className="text-sm text-muted-foreground">{t('stats.totalUsers')}</p>
-            </CardContent>
-          </Card>
-          <Card className="glass border border-primary/10">
-            <CardContent className="p-4 text-center">
-              <BarChart3 className="w-8 h-8 text-green-500 mx-auto mb-2" />
-              <div className="text-2xl font-bold">{formatPoints(data.meta.averageScore)}</div>
-              <p className="text-sm text-muted-foreground">{t('stats.averageScore')}</p>
-            </CardContent>
-          </Card>
-          <Card className="glass border border-primary/10">
-            <CardContent className="p-4 text-center">
-              <Calendar className="w-8 h-8 text-purple-500 mx-auto mb-2" />
-              <div className="text-2xl font-bold">
-                {TIME_RANGES.find(r => r.value === timeRange)?.label || 'All Time'}
-              </div>
-              <p className="text-sm text-muted-foreground">{t('stats.timeRange')}</p>
-            </CardContent>
-          </Card>
-          <Card className="glass border border-primary/10">
-            <CardContent className="p-4 text-center">
-              <Filter className="w-8 h-8 text-orange-500 mx-auto mb-2" />
-              <div className="text-2xl font-bold">
-                {CATEGORIES.find(c => c.value === category)?.label || 'All'}
-              </div>
-              <p className="text-sm text-muted-foreground">{t('stats.category')}</p>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {/* 筛选和刷新 */}
-      <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-        <div className="flex gap-3">
-          <Select value={timeRange} onValueChange={setTimeRange}>
-            <SelectTrigger className="w-[180px] glass border border-primary/10">
-              <Calendar className="w-4 h-4 mr-2" />
-              <SelectValue placeholder={t('filters.timeRange')} />
-            </SelectTrigger>
-            <SelectContent className="glass border border-primary/10">
-              {TIME_RANGES.map((range) => (
-                <SelectItem key={range.value} value={range.value}>
-                  {t(`timeRanges.${range.value}`) || range.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select value={category} onValueChange={setCategory}>
-            <SelectTrigger className="w-[180px] glass border border-primary/10">
-              <Filter className="w-4 h-4 mr-2" />
-              <SelectValue placeholder={t('filters.category')} />
-            </SelectTrigger>
-            <SelectContent className="glass border border-primary/10">
-              {CATEGORIES.map((cat) => (
-                <SelectItem key={cat.value} value={cat.value}>
-                  {t(`categories.${cat.value}`) || cat.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <Button 
-          onClick={handleRefresh} 
-          variant="outline" 
-          className="glass border border-primary/10"
-          disabled={loading}
-        >
-          <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-          {t('refresh')}
-        </Button>
-      </div>
-
-      {/* 排行榜内容 */}
-      {loading ? (
-        <div className="space-y-4">
-          {Array.from({ length: 10 }).map((_, i) => (
-            <Card key={i} className="glass border border-primary/10">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <Skeleton className="w-12 h-12 rounded-full" />
-                  <div className="flex-1 space-y-2">
-                    <Skeleton className="h-4 w-[200px]" />
-                    <Skeleton className="h-3 w-[150px]" />
-                  </div>
-                  <Skeleton className="h-6 w-[80px]" />
+      {/* 主内容区 - max-width 1280px */}
+      <div className="container max-w-[1280px] mx-auto px-4 md:px-6">
+        {/* 紧凑头部工具栏 - 80px高度 - Flat Design 2.0 */}
+        <div className="h-[80px] flex items-center justify-between border-b border-border/50">
+          {/* 左侧：标题 + 快速统计 */}
+          <div className="flex items-center gap-6">
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">{t('title')}</h1>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {data ? `${data.meta.totalUsers} ${t('stats.totalUsers')}` : t('description')}
+              </p>
+            </div>
+            {/* 内联统计 */}
+            {data && (
+              <div className="hidden lg:flex items-center gap-4 text-sm">
+                <div className="flex items-center gap-1.5">
+                  <BarChart3 className="h-4 w-4 text-primary" />
+                  <span className="text-muted-foreground">Avg:</span>
+                  <span className="font-semibold">{formatPoints(data.meta.averageScore)}</span>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
+                <div className="h-4 w-px bg-border" />
+                <div className="flex items-center gap-1.5">
+                  <TrendingUp className="h-4 w-4 text-primary" />
+                  <span className="font-semibold">
+                    {TIME_RANGES.find(r => r.value === timeRange)?.label || 'All Time'}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 右侧：筛选器 + 刷新 */}
+          <div className="flex items-center gap-2">
+            <Select value={timeRange} onValueChange={setTimeRange}>
+              <SelectTrigger className="h-9 w-[130px] text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {TIME_RANGES.map((range) => (
+                  <SelectItem key={range.value} value={range.value}>
+                    {t(`timeRanges.${range.value}`) || range.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={category} onValueChange={setCategory}>
+              <SelectTrigger className="h-9 w-[120px] text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {CATEGORIES.map((cat) => (
+                  <SelectItem key={cat.value} value={cat.value}>
+                    {t(`categories.${cat.value}`) || cat.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Button 
+              onClick={handleRefresh} 
+              size="sm"
+              variant="ghost"
+              className="h-9 w-9 p-0"
+              disabled={loading}
+            >
+              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            </Button>
+          </div>
         </div>
-      ) : data?.leaderboard.length ? (
-        <>
-          {/* 前三名特殊显示 */}
-          {data.leaderboard.slice(0, 3).length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              {data.leaderboard.slice(0, 3).map((user) => (
-                <UserCard key={user.userId} user={user} showRankIcon={true} />
+
+        {/* 排行榜内容 */}
+        <div className="py-6">
+          {loading ? (
+            <div className="space-y-2">
+              {Array.from({ length: 10 }).map((_, i) => (
+                <div key={i} className="h-[48px] bg-muted/20 rounded-lg animate-pulse" />
               ))}
             </div>
-          )}
+          ) : data?.leaderboard.length ? (
+            <>
+              {/* 前三名紧凑横幅 - 120px高度 - Flat Design 2.0 */}
+              {data.leaderboard.slice(0, 3).length > 0 && (
+                <div className="h-[120px] grid grid-cols-3 gap-3 mb-4">
+                  {data.leaderboard.slice(0, 3).map((user, idx) => {
+                    const rankConfig = getRankIcon(user.rank);
+                    const RankIcon = rankConfig.icon;
+                    const bgColors = [
+                      'bg-gradient-to-br from-yellow-500/20 to-orange-500/20',
+                      'bg-gradient-to-br from-gray-400/20 to-gray-500/20',
+                      'bg-gradient-to-br from-amber-600/20 to-amber-700/20'
+                    ];
+                    return (
+                      <Link
+                        key={user.userId}
+                        href={`/users/${user.userId}`}
+                        className="block group"
+                      >
+                        <div className={`h-full ${bgColors[idx]} rounded-xl border border-border/50 p-3 hover:border-primary/50 transition-all hover-lift`}>
+                          <div className="flex flex-col h-full">
+                            {/* 排名图标 */}
+                            <div className="flex items-center justify-between mb-2">
+                              <RankIcon className={`h-6 w-6 ${rankConfig.color}`} />
+                              <Badge variant="outline" className="text-xs">
+                                #{user.rank}
+                              </Badge>
+                            </div>
+                            {/* 用户信息 */}
+                            <div className="flex items-center gap-2 mb-2">
+                              <Avatar className="h-8 w-8">
+                                <AvatarImage src={user.avatarUrl} />
+                                <AvatarFallback className="text-xs">
+                                  {user.username?.slice(0, 2).toUpperCase() || 'U'}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-semibold truncate group-hover:text-primary transition-colors">
+                                  {user.username}
+                                </p>
+                              </div>
+                            </div>
+                            {/* 积分 */}
+                            <div className="mt-auto">
+                              <div className="text-xl font-bold text-primary">
+                                {formatPoints(user.totalPoints)}
+                              </div>
+                              <p className="text-xs text-muted-foreground">{t('points')}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
 
-          {/* 其余排名 */}
-          {data.leaderboard.slice(3).length > 0 && (
-            <div className="space-y-3">
-              <h3 className="text-xl font-semibold">{t('otherRanks')}</h3>
-              {data.leaderboard.slice(3).map((user) => (
-                <UserCard key={user.userId} user={user} />
-              ))}
+              {/* 排名列表 - 表格化 48px/行 - Flat Design 2.0 */}
+              {data.leaderboard.slice(3).length > 0 && (
+                <div className="space-y-1">
+                  {data.leaderboard.slice(3).map((user) => (
+                    <Link
+                      key={user.userId}
+                      href={`/users/${user.userId}`}
+                      className="block group"
+                    >
+                      <div className="h-[48px] flex items-center gap-3 px-3 rounded-lg hover:bg-muted/50 border border-transparent hover:border-primary/30 transition-all">
+                        {/* 排名 */}
+                        <div className="w-[50px] text-center">
+                          <span className="text-sm font-semibold text-muted-foreground">
+                            #{user.rank}
+                          </span>
+                        </div>
+                        {/* 用户 */}
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src={user.avatarUrl} />
+                            <AvatarFallback className="text-xs">
+                              {user.username?.slice(0, 2).toUpperCase() || 'U'}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate group-hover:text-primary transition-colors">
+                              {user.username}
+                            </p>
+                          </div>
+                        </div>
+                        {/* 技能标签（隐藏在小屏幕） */}
+                        {user.skills && user.skills.length > 0 && (
+                          <div className="hidden md:flex gap-1">
+                            {user.skills.slice(0, 2).map((skill) => (
+                              <Badge key={skill} variant="outline" className="text-xs h-5">
+                                {skill}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+                        {/* 积分 */}
+                        <div className="w-[100px] text-right">
+                          <span className="text-sm font-bold text-primary">
+                            {formatPoints(user.totalPoints)}
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+
+              {/* 分页 */}
+              {data.pagination.hasMore && (
+                <div className="flex justify-center gap-2 mt-6">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                  >
+                    <ChevronLeft className="h-4 w-4 mr-1" />
+                    {tCommon('previous')}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={!data.pagination.hasMore}
+                  >
+                    {tCommon('next')}
+                    <ChevronRight className="h-4 w-4 ml-1" />
+                  </Button>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="text-center py-12">
+              <Trophy className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+              <h3 className="text-lg font-semibold mb-2">{t('noData.title')}</h3>
+              <p className="text-sm text-muted-foreground">{t('noData.description')}</p>
             </div>
           )}
-
-          {/* 分页 */}
-          {data.pagination.hasMore && (
-            <div className="flex justify-center gap-2">
-              <Button
-                variant="outline"
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="glass"
-              >
-                <ChevronLeft className="w-4 h-4 mr-2" />
-                {tCommon('previous')}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={!data.pagination.hasMore}
-                className="glass"
-              >
-                {tCommon('next')}
-                <ChevronRight className="w-4 h-4 ml-2" />
-              </Button>
-            </div>
-          )}
-        </>
-      ) : (
-        <Card className="glass border border-primary/10 p-8 text-center">
-          <Trophy className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-          <CardTitle className="text-xl">{t('noData.title')}</CardTitle>
-          <CardDescription className="mt-2">{t('noData.description')}</CardDescription>
-        </Card>
-      )}
+        </div>
+      </div>
     </div>
   )
 }

@@ -169,217 +169,163 @@ export default function NotificationsPage() {
   const stats = getStatistics()
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="max-w-6xl mx-auto space-y-8">
-        {/* 页面头部 */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center">
-              <Bell className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold">通知中心</h1>
-              <p className="text-muted-foreground">
-                管理你的所有通知和消息
-              </p>
-            </div>
+    <div className="min-h-screen bg-background">
+      {/* 主内容区 - max-width 1280px */}
+      <div className="container max-w-[1280px] mx-auto px-4 md:px-6">
+        {/* 紧凑头部工具栏 - 80px高度 - Flat Design 2.0 */}
+        <div className="h-[80px] flex items-center justify-between border-b border-border/50">
+          {/* 左侧：标题+统计 */}
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">通知中心</h1>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {stats.total} 条通知 · {stats.unread} 条未读
+            </p>
           </div>
 
+          {/* 右侧：搜索+筛选+操作 */}
           <div className="flex items-center gap-2">
-            <Button variant="outline" asChild>
-              <Link href="/notifications/settings">
-                <Settings className="h-4 w-4 mr-2" />
-                通知设置
-              </Link>
-            </Button>
+            <div className="relative w-[200px] hidden md:block">
+              <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="搜索通知..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="h-9 pl-8 text-sm"
+              />
+            </div>
+
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <SelectTrigger className="w-[100px] h-9 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">全部</SelectItem>
+                <SelectItem value="team">团队</SelectItem>
+                <SelectItem value="hackathon">黑客松</SelectItem>
+                <SelectItem value="project">项目</SelectItem>
+                <SelectItem value="system">系统</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-[100px] h-9 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="newest">最新</SelectItem>
+                <SelectItem value="oldest">最旧</SelectItem>
+                <SelectItem value="priority">优先级</SelectItem>
+              </SelectContent>
+            </Select>
+
             {stats.unread > 0 && (
-              <Button onClick={handleMarkAllAsRead}>
-                <Check className="h-4 w-4 mr-2" />
+              <Button size="sm" onClick={handleMarkAllAsRead} className="bg-gradient-to-r from-primary to-accent hover:opacity-90">
+                <Check className="h-4 w-4 mr-1" />
                 全部已读
               </Button>
             )}
+
+            <Button size="sm" variant="outline" asChild>
+              <Link href="/notifications/settings">
+                <Settings className="h-4 w-4" />
+              </Link>
+            </Button>
           </div>
         </div>
 
-        {/* 统计卡片 */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                  <Bell className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">{stats.total}</p>
-                  <p className="text-sm text-muted-foreground">总通知</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-lg bg-orange-100 dark:bg-orange-900 flex items-center justify-center">
-                  <MessageSquare className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">{stats.unread}</p>
-                  <p className="text-sm text-muted-foreground">未读消息</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-lg bg-red-100 dark:bg-red-900 flex items-center justify-center">
-                  <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">{stats.highPriority}</p>
-                  <p className="text-sm text-muted-foreground">高优先级</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-lg bg-green-100 dark:bg-green-900 flex items-center justify-center">
-                  <Users className="h-5 w-5 text-green-600 dark:text-green-400" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">{stats.teamInvites}</p>
-                  <p className="text-sm text-muted-foreground">团队邀请</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        {/* 快速统计 - 内联显示 */}
+        <div className="py-3 flex items-center gap-4 border-b border-border/30">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-950/20">
+            <Bell className="h-3 w-3 text-blue-500" />
+            <span className="text-xs font-medium">{stats.total} 总通知</span>
+          </div>
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-orange-50 dark:bg-orange-950/20">
+            <MessageSquare className="h-3 w-3 text-orange-500" />
+            <span className="text-xs font-medium">{stats.unread} 未读</span>
+          </div>
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-50 dark:bg-red-950/20">
+            <AlertCircle className="h-3 w-3 text-red-500" />
+            <span className="text-xs font-medium">{stats.highPriority} 高优先级</span>
+          </div>
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-green-50 dark:bg-green-950/20">
+            <Users className="h-3 w-3 text-green-500" />
+            <span className="text-xs font-medium">{stats.teamInvites} 团队邀请</span>
+          </div>
+          
+          {filteredNotifications.length > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleDeleteAll}
+              className="ml-auto text-destructive hover:text-destructive h-7 text-xs"
+            >
+              <Trash2 className="h-3 w-3 mr-1" />
+              批量删除
+            </Button>
+          )}
         </div>
 
-        {/* 搜索和筛选 */}
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="搜索通知..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-
-              <div className="flex gap-2">
-                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <SelectTrigger className="w-32">
-                    <SelectValue placeholder="Category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">全部分类</SelectItem>
-                    <SelectItem value="team">团队</SelectItem>
-                    <SelectItem value="hackathon">黑客松</SelectItem>
-                    <SelectItem value="project">项目</SelectItem>
-                    <SelectItem value="system">系统</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="w-32">
-                    <SelectValue placeholder="Sort" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="newest">最新优先</SelectItem>
-                    <SelectItem value="oldest">最旧优先</SelectItem>
-                    <SelectItem value="priority">优先级</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                {filteredNotifications.length > 0 && (
-                  <Button
-                    variant="outline"
-                    onClick={handleDeleteAll}
-                    className="text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    批量删除
-                  </Button>
-                )}
-              </div>
+        {/* 紧凑Tab系统 - 48px高度 - Flat Design 2.0 */}
+        <div className="py-4">
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <div className="bg-muted/30 rounded-xl p-1">
+              <TabsList className="h-[48px] w-full grid grid-cols-3 md:grid-cols-6 bg-transparent gap-1 border-0">
+                <TabsTrigger value="all" className="text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                  全部 <Badge variant="secondary" className="ml-1.5 text-xs">{getTabCount('all')}</Badge>
+                </TabsTrigger>
+                <TabsTrigger value="unread" className="text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                  未读 
+                  {getTabCount('unread') > 0 && (
+                    <Badge variant="destructive" className="ml-1.5 text-xs">{getTabCount('unread')}</Badge>
+                  )}
+                </TabsTrigger>
+                <TabsTrigger value="invites" className="text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                  邀请
+                  {getTabCount('invites') > 0 && (
+                    <Badge variant="default" className="ml-1.5 text-xs bg-blue-100">{getTabCount('invites')}</Badge>
+                  )}
+                </TabsTrigger>
+                <TabsTrigger value="team" className="text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm hidden md:flex">
+                  <Users className="h-3 w-3 mr-1" />
+                  团队
+                </TabsTrigger>
+                <TabsTrigger value="hackathon" className="text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm hidden md:flex">
+                  <Trophy className="h-3 w-3 mr-1" />
+                  黑客松
+                </TabsTrigger>
+                <TabsTrigger value="system" className="text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm hidden md:flex">
+                  <Settings className="h-3 w-3 mr-1" />
+                  系统
+                </TabsTrigger>
+              </TabsList>
             </div>
-          </CardContent>
-        </Card>
 
-        {/* 通知标签页 */}
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-6">
-            <TabsTrigger value="all" className="flex items-center gap-2">
-              全部
-              <Badge variant="secondary" className="text-xs">
-                {getTabCount('all')}
-              </Badge>
-            </TabsTrigger>
-            <TabsTrigger value="unread" className="flex items-center gap-2">
-              未读
-              {getTabCount('unread') > 0 && (
-                <Badge variant="destructive" className="text-xs">
-                  {getTabCount('unread')}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="invites" className="flex items-center gap-2">
-              邀请
-              {getTabCount('invites') > 0 && (
-                <Badge variant="default" className="text-xs">
-                  {getTabCount('invites')}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="team" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              团队
-            </TabsTrigger>
-            <TabsTrigger value="hackathon" className="flex items-center gap-2">
-              <Trophy className="h-4 w-4" />
-              黑客松
-            </TabsTrigger>
-            <TabsTrigger value="system" className="flex items-center gap-2">
-              <Settings className="h-4 w-4" />
-              系统
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value={activeTab} className="mt-6">
-            {filteredNotifications.length === 0 ? (
-              <Card>
-                <CardContent className="p-12">
-                  <div className="text-center">
+            <TabsContent value={activeTab} className="mt-4">
+              {filteredNotifications.length === 0 ? (
+                <Card>
+                  <CardContent className="p-12 text-center">
                     <Bell className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-medium mb-2">暂无通知</h3>
-                    <p className="text-muted-foreground">
+                    <h3 className="text-base font-medium mb-2">暂无通知</h3>
+                    <p className="text-sm text-muted-foreground">
                       {searchQuery ? '没有找到匹配的通知' : '你目前没有任何通知'}
                     </p>
-                  </div>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="space-y-4">
-                {filteredNotifications.map((notification) => (
-                  <NotificationItem
-                    key={notification.id}
-                    notification={notification}
-                    onMarkAsRead={handleMarkAsRead}
-                    onDelete={handleDelete}
-                  />
-                ))}
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-2">
+                  {filteredNotifications.map((notification) => (
+                    <NotificationItem
+                      key={notification.id}
+                      notification={notification}
+                      onMarkAsRead={handleMarkAsRead}
+                      onDelete={handleDelete}
+                    />
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
     </div>
   )

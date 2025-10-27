@@ -113,16 +113,16 @@ export function HackathonCard({ hackathon }: HackathonCardProps) {
 
   return (
     <Card 
-      className="group relative overflow-hidden hover-lift hover-glow glass border border-primary/10 hover:border-primary/30 transition-all duration-500 flex flex-col h-full"
+      className="group relative overflow-hidden hover-lift hover-glow glass border border-primary/10 hover:border-primary/30 transition-all duration-500 flex flex-row h-[140px]"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* 背景渐变效果 */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
       
-      {/* 图片区域 */}
-      <div className="relative overflow-hidden">
-        <div className="relative h-48 overflow-hidden">
+      {/* 图片区域 - 左侧固定宽度 */}
+      <div className="relative overflow-hidden w-[200px] shrink-0">
+        <div className="relative h-full overflow-hidden">
           <img
             src={hackathon.coverImage || "/placeholder.jpg"}
             alt={hackathon.title}
@@ -132,157 +132,120 @@ export function HackathonCard({ hackathon }: HackathonCardProps) {
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         </div>
         
-        {/* 顶部状态徽章 */}
-        <div className="absolute top-4 left-4 flex flex-col gap-2">
-          <Badge className={`${getStatusColor(hackathon.status)} shadow-lg animate-slide-in`}>
+        {/* 状态徽章 - 左上角 */}
+        <div className="absolute top-2 left-2">
+          <Badge className={`${getStatusColor(hackathon.status)} text-xs shadow-lg`}>
             {getStatusIcon(hackathon.status)}
             {getStatusText(hackathon.status)}
           </Badge>
-          {(() => {
-            const participationStatus = getParticipationStatus(hackathon.userParticipation)
-            return participationStatus ? (
-              <Badge className={`${participationStatus.color} ${participationStatus.textColor} shadow-lg animate-slide-in`} style={{ animationDelay: '0.1s' }}>
-                <Star className="h-3 w-3 mr-1" />
-                {participationStatus.text}
-              </Badge>
-            ) : null
-          })()}
         </div>
-
-        {/* 右上角操作按钮 */}
-        <div className="absolute top-4 right-4 flex gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            className={`h-8 w-8 p-0 glass hover:bg-white/20 transition-all duration-300 ${isHovered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}
-            onClick={toggleBookmark}
-          >
-            <Bookmark className={`h-4 w-4 transition-colors ${isBookmarked ? 'fill-current text-yellow-500' : 'text-white'}`} />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className={`h-8 w-8 p-0 glass hover:bg-white/20 transition-all duration-300 ${isHovered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}
-            style={{ transitionDelay: '0.1s' }}
-            onClick={handleShare}
-          >
-            <Share2 className="h-4 w-4 text-white" />
-          </Button>
-        </div>
-
-        {/* 倒计时信息 */}
-        {hackathon.status === 'upcoming' && (
-          <div className="absolute bottom-4 right-4 glass rounded-lg px-3 py-1 text-white text-sm animate-pulse-slow">
-            <Clock className="inline h-3 w-3 mr-1" />
-            {t('countdown.startsIn', { days: getDaysUntil(hackathon.startDate) })}
-          </div>
-        )}
-
-        {/* 热度指示器 */}
-        {hackathon.participants > 100 && (
-          <div className="absolute bottom-4 left-4 flex items-center gap-1 glass rounded-lg px-2 py-1 text-white text-xs">
-            <TrendingUp className="h-3 w-3 text-orange-400" />
-            <span>{t('trending')}</span>
-          </div>
-        )}
       </div>
       
-      {/* 卡片头部 */}
-      <CardHeader className="space-y-3 pb-4">
-        {/* 组织者信息 */}
-        <div className="flex items-center gap-3">
-          <Avatar className="h-8 w-8 ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all">
-            <AvatarImage src={hackathon.organizer.avatar || "/placeholder.svg"} />
-            <AvatarFallback className="bg-gradient-primary text-primary-foreground text-xs">
-              {hackathon.organizer.name[0]}
-            </AvatarFallback>
-          </Avatar>
+      {/* 右侧内容区域 - 紧凑布局 */}
+      <div className="flex-1 flex flex-col p-4 min-w-0">
+        {/* 顶部：标题 + 组织者 + 操作按钮 */}
+        <div className="flex items-start justify-between gap-3 mb-2">
           <div className="flex-1 min-w-0">
-            <span className="text-sm font-medium text-muted-foreground group-hover:text-primary transition-colors">
-              {hackathon.organizer.name}
-            </span>
-          </div>
-        </div>
-        
-        {/* 标题和描述 */}
-        <div className="space-y-2">
-          <h3 className="text-xl font-bold line-clamp-2 group-hover:text-primary transition-colors duration-300">
-            <Link href={`/hackathons/${hackathon.id}`} className="hover:underline">
-              {hackathon.title}
-            </Link>
-          </h3>
-          <p className="text-muted-foreground text-sm line-clamp-2 leading-relaxed">
-            {hackathon.description}
-          </p>
-        </div>
-      </CardHeader>
-
-      {/* 卡片内容 */}
-      <CardContent className="space-y-4 flex-1">
-        {/* 技术栈标签 */}
-        <div className="flex flex-wrap gap-2">
-          {(() => {
-            const allTags = Array.isArray(hackathon.tags) ? hackathon.tags : []
-            const categories = (hackathon as any).categories || []
-            const combinedTags = [...new Set([...allTags, ...categories])]
-            const displayTags = combinedTags.slice(0, 3)
-            
-            return (
-              <>
-                {displayTags.map((tag, index) => (
-                  <Badge 
-                    key={tag} 
-                    variant="secondary" 
-                    className="text-xs hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer"
-                    style={{ animationDelay: `${index * 0.1}s` }}
-                  >
-                    {tag}
-                  </Badge>
-                ))}
-                {combinedTags.length > 3 && (
-                  <Badge variant="outline" className="text-xs border-dashed hover:border-primary transition-colors">
-                    +{combinedTags.length - 3}
-                  </Badge>
-                )}
-              </>
-            )
-          })()}
-        </div>
-
-        {/* 统计信息 */}
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div className="flex items-center gap-2 text-muted-foreground group-hover:text-foreground transition-colors">
-            <Users className="h-4 w-4 text-blue-500" />
-            <span className="font-medium">{hackathon.participants.toLocaleString()}</span>
-            <span>{t('participants')}</span>
-          </div>
-          <div className="flex items-center gap-2 text-muted-foreground group-hover:text-foreground transition-colors">
-            <Trophy className="h-4 w-4 text-yellow-500" />
-            <span className="font-medium">{hackathon.totalPrize}</span>
-          </div>
-        </div>
-
-        {/* 日期信息 */}
-        <div className="flex items-center gap-2 text-sm text-muted-foreground group-hover:text-foreground transition-colors">
-          <Calendar className="h-4 w-4 text-green-500" />
-          <span className="text-xs">
-            {new Date(hackathon.startDate).toLocaleDateString('zh-CN')} - {new Date(hackathon.endDate).toLocaleDateString('zh-CN')}
-          </span>
-        </div>
-      </CardContent>
-
-      {/* 卡片底部 */}
-      <CardFooter className="mt-auto pt-6">
-        <Button asChild className="w-full group/btn bg-primary hover:bg-primary/90 hover:shadow-glow transition-all duration-300">
-          <Link href={`/hackathons/${hackathon.id}`}>
-            <span>{t('viewDetails')}</span>
-            <div className="flex items-center ml-2 transition-transform group-hover/btn:translate-x-1">
-              <ArrowRight className="h-4 w-4" />
-              <ExternalLink className="h-3 w-3 ml-1 opacity-0 group-hover/btn:opacity-100 transition-opacity" />
+            <h3 className="text-lg font-bold line-clamp-1 group-hover:text-primary transition-colors">
+              <Link href={`/hackathons/${hackathon.id}`} className="hover:underline">
+                {hackathon.title}
+              </Link>
+            </h3>
+            <div className="flex items-center gap-2 mt-1">
+              <Avatar className="h-5 w-5 ring-1 ring-primary/20">
+                <AvatarImage src={hackathon.organizer.avatar || "/placeholder.svg"} />
+                <AvatarFallback className="bg-gradient-primary text-primary-foreground text-[10px]">
+                  {hackathon.organizer.name[0]}
+                </AvatarFallback>
+              </Avatar>
+              <span className="text-xs text-muted-foreground">{hackathon.organizer.name}</span>
             </div>
-          </Link>
-        </Button>
-      </CardFooter>
+          </div>
+          
+          {/* 操作按钮 */}
+          <div className="flex gap-1 shrink-0">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 w-7 p-0 hover:bg-primary/10"
+              onClick={toggleBookmark}
+            >
+              <Bookmark className={`h-3 w-3 ${isBookmarked ? 'fill-current text-yellow-500' : ''}`} />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 w-7 p-0 hover:bg-primary/10"
+              onClick={handleShare}
+            >
+              <Share2 className="h-3 w-3" />
+            </Button>
+          </div>
+        </div>
+
+        {/* 描述 */}
+        <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
+          {hackathon.description}
+        </p>
+
+        {/* 底部：标签 + 统计信息 + 按钮 */}
+        <div className="flex items-center justify-between gap-3 mt-auto">
+          {/* 标签 */}
+          <div className="flex flex-wrap gap-1 flex-1 min-w-0">
+            {(() => {
+              const allTags = Array.isArray(hackathon.tags) ? hackathon.tags : []
+              const categories = (hackathon as any).categories || []
+              const combinedTags = [...new Set([...allTags, ...categories])]
+              const displayTags = combinedTags.slice(0, 2)
+              
+              return (
+                <>
+                  {displayTags.map((tag) => (
+                    <Badge 
+                      key={tag} 
+                      variant="secondary" 
+                      className="text-[10px] px-1.5 py-0 h-5"
+                    >
+                      {tag}
+                    </Badge>
+                  ))}
+                  {combinedTags.length > 2 && (
+                    <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-5">
+                      +{combinedTags.length - 2}
+                    </Badge>
+                  )}
+                </>
+              )
+            })()}
+          </div>
+
+          {/* 统计信息 */}
+          <div className="flex items-center gap-3 text-xs text-muted-foreground shrink-0">
+            <div className="flex items-center gap-1">
+              <Users className="h-3 w-3 text-blue-500" />
+              <span>{hackathon.participants}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Trophy className="h-3 w-3 text-yellow-500" />
+              <span className="font-medium">{hackathon.totalPrize}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Calendar className="h-3 w-3 text-green-500" />
+              <span className="text-[10px]">
+                {new Date(hackathon.startDate).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })}
+              </span>
+            </div>
+          </div>
+
+          {/* 查看详情按钮 */}
+          <Button asChild size="sm" className="h-7 px-3 shrink-0 bg-primary hover:bg-primary/90">
+            <Link href={`/hackathons/${hackathon.id}`} className="flex items-center gap-1">
+              <span className="text-xs">{t('viewDetails')}</span>
+              <ArrowRight className="h-3 w-3" />
+            </Link>
+          </Button>
+        </div>
+      </div>
 
       {/* 装饰性边框光效 */}
       <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-primary/20 via-secondary/20 to-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 animate-pulse-slow" />

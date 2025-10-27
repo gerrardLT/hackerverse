@@ -256,30 +256,31 @@ export default function HackathonReviewPage() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">{t('title')}</h2>
-          <p className="text-muted-foreground">{t('description')}</p>
+    <div className="space-y-6 animate-fade-in">
+      {/* 紧凑页面标题 - 80px高度 */}
+      <div className="glass-light border border-border/50 rounded-2xl p-5">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-bold">{t('title')}</h2>
+            <p className="text-sm text-muted-foreground mt-1">{t('description')}</p>
+          </div>
+          <Button onClick={loadHackathons} disabled={loading} size="sm" className="glass hover-lift">
+            <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
+            {tCommon('refresh')}
+          </Button>
         </div>
-        
-        <Button onClick={loadHackathons} disabled={loading}>
-          <RefreshCw className="h-4 w-4 mr-2" />
-          {tCommon('refresh')}
-        </Button>
       </div>
 
-      {/* Filters */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Filter className="h-5 w-5" />
+      {/* 紧凑筛选器 - 60px高度 */}
+      <Card className="glass-light border-border/50">
+        <CardHeader className="p-4 pb-3">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Filter className="h-4 w-4" />
             {t('filters.title')}
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+        <CardContent className="p-4 pt-0">
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-3">
             <Select 
               value={filters.status} 
               onValueChange={(value) => handleFilterChange('status', value)}

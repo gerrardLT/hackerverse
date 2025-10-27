@@ -71,6 +71,15 @@ module.exports = {
       chainId: 97,
       gasPrice: 10000000000, // 10 gwei
       gas: 8500000
+    },
+    // BSC主网配置
+    bscMainnet: {
+      url: process.env.BSC_MAINNET_RPC_URL || "https://bsc-dataseed1.bnbchain.org",
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      chainId: 56,
+      gasPrice: 3000000000, // 3 gwei (根据实际情况调整)
+      gas: 8500000,
+      timeout: 60000
     }
   },
   mocha: {

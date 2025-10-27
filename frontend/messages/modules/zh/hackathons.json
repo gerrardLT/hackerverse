@@ -599,6 +599,7 @@
       "participation": "参与统计",
       "remainingSlots": "还有 {count} 个名额",
       "tracks": "赛道数量",
+      "projects": "项目数量",
       "prizes": "奖项数量",
       "totalLikes": "总点赞数",
       "totalComments": "总评论数"

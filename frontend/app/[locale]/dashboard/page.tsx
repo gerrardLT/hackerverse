@@ -538,41 +538,39 @@ export default function DashboardPage() {
       <div className="absolute top-32 left-10 w-2 h-2 bg-primary/30 rounded-full animate-pulse-slow" />
       <div className="absolute top-48 right-20 w-1 h-1 bg-secondary/40 rounded-full animate-pulse-slow" style={{ animationDelay: '1s' }} />
 
-      <div className="container py-8 relative">
+      <div className="container py-8 relative max-w-[1280px] mx-auto">
         {/* 开发调试信息 */}
         
-        <div className="space-y-8">
-          {/* 现代化用户信息头部 */}
-          <div className={`transition-all duration-1000 ${isVisible ? 'animate-slide-up opacity-100' : 'opacity-0 translate-y-10'}`}>
-            <div className="glass border border-primary/10 rounded-3xl p-8 mb-8">
+        <div className="space-y-6">
+          {/* 紧凑用户信息头部 - 120px高度 - Flat Design 2.0 */}
+          <div className={`mb-6 transition-all duration-700 ${isVisible ? 'animate-slide-up opacity-100' : 'opacity-0 translate-y-10'}`}>
+            <div className="glass-light border border-border/50 rounded-2xl p-5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-6">
                   {isEditing ? (
-                    // 编辑模式的头像
+                    // 编辑模式的头像 - 紧凑版
                     <div className="relative">
-                      <Avatar className="h-20 w-20 ring-2 ring-primary/30 hover:ring-primary/50 transition-all">
+                      <Avatar className="h-16 w-16 ring-2 ring-primary/30 hover:ring-primary/50 transition-all">
                         <AvatarImage 
                           src={editForm.avatarUrl} 
                           alt={t('profile.userAvatar')}
                           className="object-cover"
-                          onLoad={() => {}}
-                          onError={(e) => {}}
                         />
-                        <AvatarFallback className="text-xl bg-gradient-primary text-primary-foreground">
+                        <AvatarFallback className="text-lg bg-gradient-primary text-primary-foreground">
                           {editForm.username?.[0]?.toUpperCase() || 'U'}
                         </AvatarFallback>
                       </Avatar>
                       <Button
                         size="sm"
                         variant="outline"
-                        className="absolute -bottom-2 -right-2 h-10 w-10 rounded-full p-0 glass hover-lift border-primary/30"
+                        className="absolute -bottom-1 -right-1 h-7 w-7 rounded-full p-0 glass-light hover-lift border-primary/30"
                         onClick={handleFileSelect}
                         disabled={uploading}
                       >
                         {uploading ? (
-                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent" />
+                          <div className="animate-spin rounded-full h-3 w-3 border-2 border-primary border-t-transparent" />
                         ) : (
-                          <Upload className="h-4 w-4" />
+                          <Upload className="h-3 w-3" />
                         )}
                       </Button>
                       <input
@@ -582,21 +580,19 @@ export default function DashboardPage() {
                         className="hidden"
                         onChange={handleFileChange}
                       />
-                      {/* 编辑模式装饰光环 */}
-                      <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary/20 to-secondary/20 animate-pulse-slow -z-10" />
                     </div>
                   ) : (
-                    // 正常显示模式的头像
+                    // 正常显示模式的头像 - 紧凑版
                     <div className="relative">
-                      <Avatar className="h-20 w-20 ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all">
+                      <Avatar className="h-16 w-16 ring-2 ring-border hover:ring-primary/40 transition-all">
                         <AvatarImage src={user.avatarUrl} />
-                        <AvatarFallback className="text-xl bg-gradient-primary text-primary-foreground">
+                        <AvatarFallback className="text-lg bg-gradient-primary text-primary-foreground">
                           {user.username?.[0]?.toUpperCase() || 'U'}
                         </AvatarFallback>
                       </Avatar>
-                      {/* 声望等级指示器 */}
-                      <div className="absolute -bottom-1 -right-1 bg-gradient-primary text-white text-xs px-2 py-1 rounded-full">
-                        {Math.floor(stats.reputationScore / 100)}{t('level')}
+                      {/* 声望等级指示器 - 紧凑版 */}
+                      <div className="absolute -bottom-1 -right-1 bg-gradient-primary text-white text-xs px-1.5 py-0.5 rounded-full">
+                        Lv.{Math.floor(stats.reputationScore / 100)}
                       </div>
                     </div>
                   )}
@@ -823,10 +819,10 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* 现代化统计卡片 */}
-          <div className={`transition-all duration-1000 delay-300 ${isVisible ? 'animate-slide-up opacity-100' : 'opacity-0 translate-y-10'}`}>
+          {/* 紧凑统计卡片 - 100px高度 - Flat Design 2.0 */}
+          <div className={`transition-all duration-700 delay-200 ${isVisible ? 'animate-slide-up opacity-100' : 'opacity-0 translate-y-10'}`}>
             <TooltipProvider>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
                   {
                     title: t('statistics.participatedHackathons'),
@@ -890,23 +886,32 @@ export default function DashboardPage() {
                     className="animate-scale-in"
                     style={{ animationDelay: stat.delay }}
                   >
-                    <div className="group relative glass border border-primary/10 hover:border-primary/30 rounded-2xl p-6 hover-lift hover-glow transition-all duration-500">
-                      {/* 背景渐变效果 */}
-                      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 rounded-2xl" />
-                      
-                      <div className="flex items-center justify-between mb-4">
+                    <div className="group relative glass-light border border-border/50 hover:border-primary/30 rounded-xl p-3 hover-lift transition-all duration-300 h-[100px] flex flex-col">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className={`p-1.5 rounded-lg bg-gradient-to-br ${stat.gradient}`}>
+                          <stat.icon className="h-4 w-4 text-white" />
+                        </div>
+                        
                         <div className="flex items-center gap-2">
-                          <h3 className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
-                            {stat.title}
-                          </h3>
+                          {stat.progress !== undefined && (
+                            <div className="flex items-center gap-1.5">
+                              <Progress 
+                                value={stat.progress} 
+                                className="h-1.5 w-16 bg-muted/50"
+                              />
+                              <p className="text-[10px] text-muted-foreground leading-tight whitespace-nowrap">
+                                {Math.round(stat.progress)}%
+                              </p>
+                            </div>
+                          )}
                           {stat.tooltip && (
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <HelpCircle className="h-3 w-3 text-muted-foreground cursor-help hover:text-primary transition-colors" />
                               </TooltipTrigger>
-                              <TooltipContent className="max-w-xs glass border border-primary/20">
+                              <TooltipContent className="max-w-xs glass-light border border-border">
                                 <div className="space-y-2">
-                                  <p className="font-medium">{stat.tooltip.title}</p>
+                                  <p className="font-medium text-xs">{stat.tooltip.title}</p>
                                   <ul className="text-xs space-y-1">
                                     {stat.tooltip.rules.map((rule, i) => (
                                       <li key={i}>{rule}</li>
@@ -922,33 +927,16 @@ export default function DashboardPage() {
                             </Tooltip>
                           )}
                         </div>
-                        <div className={`p-2 rounded-xl bg-gradient-to-br ${stat.gradient} group-hover:scale-110 transition-transform duration-300`}>
-                          <stat.icon className="h-5 w-5 text-white" />
-                        </div>
                       </div>
 
-                      <div className="space-y-2">
-                        <div className="text-3xl font-bold text-gradient animate-shimmer">
+                      <div className="space-y-0.5">
+                        <h3 className="text-xs font-medium text-muted-foreground leading-tight">
+                          {stat.title}
+                        </h3>
+                        <div className="text-xl font-bold text-foreground leading-tight">
                           {stat.value.toLocaleString()}
                         </div>
-                        <p className="text-sm text-muted-foreground leading-relaxed">
-                          {stat.desc}
-                        </p>
-                        {stat.progress !== undefined && (
-                          <div className="space-y-1">
-                            <Progress 
-                              value={stat.progress} 
-                              className="mt-3 h-2 bg-muted/50"
-                            />
-                            <p className="text-xs text-muted-foreground text-right">
-                              {Math.round(stat.progress)}% {t('toNextLevel')}
-                            </p>
-                          </div>
-                        )}
                       </div>
-
-                      {/* 装饰性边框光效 */}
-                      <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/20 via-secondary/20 to-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 animate-pulse-slow" />
                     </div>
                   </div>
                 ))}
@@ -956,9 +944,9 @@ export default function DashboardPage() {
             </TooltipProvider>
           </div>
 
-          {/* 现代化主要内容区域 */}
-          <div className={`transition-all duration-1000 delay-500 ${isVisible ? 'animate-fade-in opacity-100' : 'opacity-0'}`}>
-            <Tabs defaultValue="overview" className="space-y-6" onValueChange={async (value) => {
+          {/* 紧凑主要内容区域 - Flat Design 2.0 */}
+          <div className={`transition-all duration-700 delay-300 ${isVisible ? 'animate-fade-in opacity-100' : 'opacity-0'}`}>
+            <Tabs defaultValue="overview" className="space-y-4" onValueChange={async (value) => {
               // 当切换到对应tab时才加载数据，优化性能
               if (value === 'hackathons' && userHackathons.length === 0) {
                 fetchUserHackathons()
@@ -986,25 +974,23 @@ export default function DashboardPage() {
                 }
               }
             }}>
-              {/* 现代化标签导航 */}
-              <div className="glass border border-primary/10 rounded-2xl p-2">
-                <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-7 bg-transparent gap-1">
+              {/* 紧凑标签导航 - 5个Tab - 48px高度 */}
+              <div className="bg-muted/30 rounded-xl p-1">
+                <TabsList className="h-[48px] w-full grid grid-cols-2 md:grid-cols-5 bg-transparent gap-1 border-0">
                   {[
                     { value: 'overview', label: t('tabs.overview'), icon: Activity },
-                    { value: 'enhanced', label: t('tabs.enhanced'), icon: BarChart3 },
-                    { value: 'achievements', label: t('tabs.achievements'), icon: Award },
-                    { value: 'activity', label: t('tabs.activity'), icon: Clock },
-                    { value: 'reputation', label: t('tabs.reputation'), icon: Star },
-                    { value: 'credentials', label: t('tabs.credentials'), icon: Shield },
+                    { value: 'hackathons', label: t('tabs.hackathons'), icon: Trophy },
+                    { value: 'projects', label: t('tabs.projects'), icon: Code },
+                    { value: 'teams', label: t('tabs.teams'), icon: Users },
                     { value: 'community', label: t('tabs.community'), icon: MessageSquare }
                   ].map((tab) => (
                     <TabsTrigger 
                       key={tab.value} 
                       value={tab.value}
-                      className="glass hover-lift transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-white"
+                      className="text-sm bg-background/50 hover:bg-background/80 data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-primary/30 data-[state=active]:text-primary data-[state=active]:font-semibold transition-all duration-200"
                     >
-                      <tab.icon className="w-4 h-4 mr-2" />
-                      {tab.label}
+                      <tab.icon className="w-4 h-4 mr-1.5" />
+                      <span className="hidden sm:inline">{tab.label}</span>
                     </TabsTrigger>
                   ))}
                 </TabsList>
@@ -1544,30 +1530,6 @@ export default function DashboardPage() {
             </div>
           </TabsContent>
 
-          {/* 增强统计标签页 */}
-          <TabsContent value="enhanced" className="space-y-6">
-            <EnhancedStats />
-          </TabsContent>
-
-          {/* 成就标签页 */}
-          <TabsContent value="achievements" className="space-y-6">
-            <AchievementDisplay />
-          </TabsContent>
-
-          {/* 活动记录标签页 */}
-          <TabsContent value="activity" className="space-y-6">
-            <ActivityTimeline />
-          </TabsContent>
-
-          {/* 声誉分析标签页 */}
-          <TabsContent value="reputation" className="space-y-6">
-            <ReputationChart />
-          </TabsContent>
-
-          {/* 凭证管理标签页 */}
-          <TabsContent value="credentials" className="space-y-6">
-            <CredentialsManagement />
-          </TabsContent>
             </Tabs>
           </div>
         </div>

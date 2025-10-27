@@ -202,30 +202,31 @@ export default function ContentModerationPage() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">{t('title')}</h2>
-          <p className="text-muted-foreground">{t('description')}</p>
+    <div className="space-y-6 animate-fade-in">
+      {/* 紧凑页面标题 - 80px高度 */}
+      <div className="glass-light border border-border/50 rounded-2xl p-5">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-bold">{t('title')}</h2>
+            <p className="text-sm text-muted-foreground mt-1">{t('description')}</p>
+          </div>
+          <Button onClick={loadContentReviews} disabled={loading} size="sm" className="glass hover-lift">
+            <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
+            {tCommon('refresh')}
+          </Button>
         </div>
-        
-        <Button onClick={loadContentReviews} disabled={loading}>
-          <RefreshCw className="h-4 w-4 mr-2" />
-          {tCommon('refresh')}
-        </Button>
       </div>
 
-      {/* Filters */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Filter className="h-5 w-5" />
+      {/* 紧凑筛选器 - 60px高度 */}
+      <Card className="glass-light border-border/50">
+        <CardHeader className="p-4 pb-3">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Filter className="h-4 w-4" />
             {t('filters.title')}
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <CardContent className="p-4 pt-0">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
             <Select 
               value={filters.contentType} 
               onValueChange={(value) => handleFilterChange('contentType', value)}
@@ -334,95 +335,102 @@ export default function ContentModerationPage() {
           </Card>
         ) : (
           items.map((item) => (
-            <Card key={item.id}>
-              <CardContent className="p-6">
-                <div className="space-y-4">
-                  {/* Header */}
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-semibold">
+            <Card key={item.id} className="glass-light border-border/50 hover:border-primary/20 transition-all">
+              <CardContent className="p-4">
+                <div className="space-y-3">
+                  {/* 紧凑Header - 单行显示 */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <h3 className="text-sm font-semibold truncate max-w-[300px]">
                           {item.contentDetails?.title || item.contentTitle || `${item.contentType}_${item.contentId}`}
                         </h3>
                         {getStatusBadge(item.status)}
                         {getPriorityBadge(item.priority)}
                         {item.autoFlagged && (
-                          <Badge variant="destructive">
-                            <AlertCircle className="h-3 w-3 mr-1" />
+                          <Badge variant="destructive" className="text-xs px-1.5 py-0">
+                            <AlertCircle className="h-2.5 w-2.5 mr-0.5" />
                             {t('autoFlagged')}
                           </Badge>
                         )}
                       </div>
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <User className="h-3 w-3" />
-                          {item.author.username} ({item.author.role})
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                        <span className="flex items-center gap-0.5">
+                          <User className="h-2.5 w-2.5" />
+                          {item.author.username}
                         </span>
-                        <span className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
+                        <span>•</span>
+                        <span className="flex items-center gap-0.5">
+                          <Calendar className="h-2.5 w-2.5" />
                           {new Date(item.createdAt).toLocaleDateString()}
                         </span>
-                        <span className="flex items-center gap-1">
-                          <FileText className="h-3 w-3" />
-                          {item.contentType}
-                        </span>
+                        <span>•</span>
+                        <Badge variant="outline" className="text-xs px-1 py-0">{item.contentType}</Badge>
                         {item.reportCount > 0 && (
-                          <Badge variant="destructive">
-                            {item.reportCount} {t('reports')}
-                          </Badge>
+                          <>
+                            <span>•</span>
+                            <Badge variant="destructive" className="text-xs px-1.5 py-0">
+                              {item.reportCount}
+                            </Badge>
+                          </>
                         )}
                       </div>
                     </div>
 
-                    {/* Actions */}
+                    {/* 紧凑Actions按钮 */}
                     {item.status === 'pending' && (
-                      <div className="flex gap-2">
+                      <div className="flex gap-1.5">
                         <Button 
                           size="sm" 
                           variant="default"
                           onClick={() => openReviewDialog(item, 'approve')}
+                          className="h-7 text-xs px-2"
                         >
-                          <CheckCircle className="h-4 w-4 mr-1" />
+                          <CheckCircle className="h-3 w-3 mr-1" />
                           {t('actions.approve')}
                         </Button>
                         <Button 
                           size="sm" 
                           variant="destructive"
                           onClick={() => openReviewDialog(item, 'reject')}
+                          className="h-7 text-xs px-2"
                         >
-                          <XCircle className="h-4 w-4 mr-1" />
+                          <XCircle className="h-3 w-3 mr-1" />
                           {t('actions.reject')}
                         </Button>
                         <Button 
                           size="sm" 
                           variant="outline"
                           onClick={() => openReviewDialog(item, 'flag')}
+                          className="h-7 text-xs px-2"
                         >
-                          <Flag className="h-4 w-4 mr-1" />
+                          <Flag className="h-3 w-3 mr-1" />
                           {t('actions.flag')}
                         </Button>
                       </div>
                     )}
                   </div>
 
-                  {/* Content Preview */}
+                  {/* 紧凑Content Preview */}
                   {item.contentDetails && (
-                    <div className="bg-muted/50 p-4 rounded-lg">
-                      <p className="text-sm">
+                    <div className="bg-muted/30 p-2.5 rounded-lg">
+                      <p className="text-xs line-clamp-2">
                         {item.contentDetails.content || item.contentDetails.description || t('noPreview')}
                       </p>
                     </div>
                   )}
 
-                  {/* Additional Info */}
-                  <div className="text-sm text-muted-foreground">
-                    {item.category && (
-                      <span>{t('category')}: {item.category}</span>
-                    )}
-                    {item.reviewer && (
-                      <span className="ml-4">{t('reviewedBy')}: {item.reviewer.username}</span>
-                    )}
-                  </div>
+                  {/* 紧凑Additional Info */}
+                  {(item.category || item.reviewer) && (
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      {item.category && (
+                        <Badge variant="outline" className="text-xs px-1.5 py-0">{item.category}</Badge>
+                      )}
+                      {item.reviewer && (
+                        <span>{t('reviewedBy')}: {item.reviewer.username}</span>
+                      )}
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

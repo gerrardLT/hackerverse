@@ -2,9 +2,9 @@
 
 import { ethers } from 'ethers'
 
-// 合约地址 (BSC 测试网)
+// 合约地址 - 从环境变量读取，支持测试网和主网
 export const CONTRACT_ADDRESSES = {
-  HACKX_CORE: '0x4BcFE52B6f38881d888b595E201E56B2cde93699',
+  HACKX_CORE: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '0x4BcFE52B6f38881d888b595E201E56B2cde93699', // 默认测试网地址
   // 注意：目前只部署了 HackXCore 核心合约
   // 其他合约地址将在后续部署时更新
   DAO: '0x2345678901234567890123456789012345678901', // 待部署
@@ -12,24 +12,34 @@ export const CONTRACT_ADDRESSES = {
   NFT: '0x4567890123456789012345678901234567890123' // 待部署
 }
 
-// 网络配置
+// 网络配置 - 根据环境变量动态配置
+const chainId = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || '97')
+const isMainnet = chainId === 56
+
 export const NETWORK_CONFIG = {
-  chainId: 97, // BSC Testnet
-  name: 'BSC Testnet',
-  rpcUrls: [
-    'https://data-seed-prebsc-1-s1.bnbchain.org:8545',
-    'https://data-seed-prebsc-2-s1.bnbchain.org:8545',
-    'https://data-seed-prebsc-1-s2.bnbchain.org:8545',
-    'https://data-seed-prebsc-2-s2.bnbchain.org:8545',
-    'https://data-seed-prebsc-1-s3.bnbchain.org:8545',
-    'https://bsc-testnet.public.blastapi.io',
-    'https://bsc-testnet-rpc.publicnode.com'
-  ],
-  rpcUrl: 'https://data-seed-prebsc-1-s1.bnbchain.org:8545', // 保持向后兼容
-  blockExplorer: 'https://testnet.bscscan.com',
+  chainId: chainId,
+  name: isMainnet ? 'BSC Mainnet' : 'BSC Testnet',
+  rpcUrls: isMainnet 
+    ? [
+        'https://bsc-dataseed1.bnbchain.org',
+        'https://bsc-dataseed2.bnbchain.org',
+        'https://bsc-dataseed3.bnbchain.org',
+        'https://bsc-dataseed4.bnbchain.org',
+        'https://bsc-dataseed1.defibit.io',
+        'https://bsc-dataseed2.defibit.io',
+        'https://rpc.ankr.com/bsc'
+      ]
+    : [
+        'https://data-seed-prebsc-1-s1.bnbchain.org:8545',
+        'https://data-seed-prebsc-2-s1.bnbchain.org:8545',
+        'https://bsc-testnet.public.blastapi.io',
+        'https://bsc-testnet-rpc.publicnode.com'
+      ],
+  rpcUrl: process.env.NEXT_PUBLIC_BSC_RPC_URL || (isMainnet ? 'https://bsc-dataseed1.bnbchain.org' : 'https://data-seed-prebsc-1-s1.bnbchain.org:8545'),
+  blockExplorer: isMainnet ? 'https://bscscan.com' : 'https://testnet.bscscan.com',
   nativeCurrency: {
-    name: 'tBNB',
-    symbol: 'tBNB',
+    name: isMainnet ? 'BNB' : 'tBNB',
+    symbol: isMainnet ? 'BNB' : 'tBNB',
     decimals: 18
   }
 }
@@ -490,5 +500,6 @@ export const smartContractService = new SmartContractService()
 
 
 export const HACKX_CORE_ADDRESS: { [key: number]: string } = {
-  [97]: '0x4BcFE52B6f38881d888b595E201E56B2cde93699'  // BSC Testnet
+  [97]: '0x4BcFE52B6f38881d888b595E201E56B2cde93699',  // BSC Testnet
+  [56]: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '0x4BcFE52B6f38881d888b595E201E56B2cde93699'  // BSC Mainnet - 从环境变量读取
 };

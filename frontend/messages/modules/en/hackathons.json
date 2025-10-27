@@ -597,6 +597,7 @@
       "participation": "Participation Stats",
       "remainingSlots": "{count} {count, plural, =1 {slot} other {slots}} remaining",
       "tracks": "Tracks",
+      "projects": "Projects",
       "prizes": "Prizes",
       "totalLikes": "Total Likes",
       "totalComments": "Total Comments"

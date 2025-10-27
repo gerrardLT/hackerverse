@@ -2055,7 +2055,7 @@ class ApiService {
 }
 
 // 创建单例实例
-export const apiService = new ApiService()
+export const apiService = new ApiService(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002/api')
 
 // 导出类型
 export type { User, Hackathon, Project, Team, Notification, CommunityUser, CommunityPost, CommunityReply, ApiResponse } 

@@ -46,153 +46,157 @@ export default function HackatonsPage() {
     (filters.dateRange !== 'all' ? 1 : 0)
 
   return (
-    <div ref={pageRef} className="relative min-h-screen">
-      {/* 动态背景 */}
-      <div className="absolute inset-0 gradient-mesh opacity-20 -z-10" />
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/80 to-background -z-10" />
-      
-      {/* 顶部装饰性浮动元素 */}
-      <div className="absolute top-20 left-10 w-2 h-2 bg-primary/30 rounded-full animate-pulse-slow" />
-      <div className="absolute top-32 right-20 w-1 h-1 bg-secondary/40 rounded-full animate-pulse-slow" style={{ animationDelay: '1s' }} />
-
-      <div className="container py-8 relative">
-        {/* 现代化页面标题区域 */}
-        <div className={`text-center space-y-6 mb-12 transition-all duration-1000 ${isVisible ? 'animate-slide-up opacity-100' : 'opacity-0 translate-y-10'}`}>
-          <div className="space-y-4">
-            <h1 className="text-responsive-lg font-bold tracking-tight">
-              <span className="text-gradient animate-shimmer">{t('title')}</span>
-              {searchQuery && (
-                <div className="text-responsive-md font-normal text-muted-foreground mt-2">
-                  {t('searchResults', { query: searchQuery })}
-                </div>
-              )}
+    <div ref={pageRef} className="relative min-h-screen bg-background">
+      {/* 主内容容器 - max-width 1280px */}
+      <div className="container max-w-[1280px] mx-auto px-4 md:px-6">
+        {/* 紧凑头部工具栏 - 80px高度 */}
+        <div className={`h-[80px] flex items-center justify-between border-b border-border/50 transition-all duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+          {/* 左侧：标题 */}
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-foreground">
+              {t('title')}
             </h1>
-            <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              {t('subtitle')}
-            </p>
+            {searchQuery && (
+              <Badge variant="secondary" className="text-xs">
+                Search: {searchQuery}
+              </Badge>
+            )}
           </div>
 
-          {/* 顶部操作栏 */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button className="group hover-lift hover-glow bg-primary hover:bg-primary/90" asChild>
+          {/* 右侧：操作按钮组 */}
+          <div className="flex items-center gap-2">
+            <HackathonSearch 
+              searchQuery={searchQuery} 
+              onSearchChange={setSearchQuery} 
+            />
+            
+            {/* 筛选器按钮 */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowMobileFilters(!showMobileFilters)}
+              className={showMobileFilters ? 'bg-primary/10 border-primary' : ''}
+            >
+              <Filter className="h-4 w-4 mr-1" />
+              Filter
+              {activeFiltersCount > 0 && (
+                <Badge className="ml-1 h-5 w-5 p-0 flex items-center justify-center text-xs">
+                  {activeFiltersCount}
+                </Badge>
+              )}
+            </Button>
+
+            {/* 视图切换 */}
+            <div className="flex items-center gap-1 border border-border rounded-lg p-1">
+              <Button
+                variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('grid')}
+                className="h-7 w-7 p-0"
+              >
+                <Grid3x3 className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={viewMode === 'list' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('list')}
+                className="h-7 w-7 p-0"
+              >
+                <List className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {/* 创建按钮 */}
+            <Button size="sm" asChild className="bg-gradient-to-r from-primary to-accent hover:opacity-90">
               <Link href="/hackathons/create">
-                <Plus className="h-4 w-4 mr-2 transition-transform group-hover:scale-110" />
-                {t('create.title')}
-                <Sparkles className="h-4 w-4 ml-2 opacity-0 group-hover:opacity-100 transition-opacity" />
-              </Link>
-            </Button>
-            <Button variant="outline" className="glass hover-lift" asChild>
-              <Link href="/dashboard?tab=hackathons">
-                {t('myHackathons')}
-              </Link>
-            </Button>
-            <Button variant="outline" className="glass hover-lift" asChild>
-              <Link href="/projects">
-                <Grid3x3 className="h-4 w-4 mr-2" />
-                {t('myProjects')}
+                <Plus className="h-4 w-4 mr-1" />
+                Create
               </Link>
             </Button>
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* 现代化侧边栏筛选器 */}
-          <div className="lg:w-80 flex-shrink-0">
-            <div className={`transition-all duration-1000 delay-300 ${isVisible ? 'animate-slide-right opacity-100' : 'opacity-0 -translate-x-10'}`}>
-              {/* 桌面端筛选器 */}
-              <div className="hidden lg:block sticky top-32">
-                <div className="glass border border-primary/10 rounded-2xl p-6 space-y-6">
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-semibold flex items-center gap-2">
-                      <Filter className="h-5 w-5 text-primary" />
-                      {t('filters.title')}
-                    </h2>
-                    {activeFiltersCount > 0 && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded-full">
-                          {activeFiltersCount}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                  <HackathonFilters filters={filters} onFiltersChange={setFilters} />
-                </div>
-              </div>
+        {/* 筛选器面板 - 可折叠 */}
+        {showMobileFilters && (
+          <div className="my-4 p-4 border border-border/50 rounded-xl bg-muted/30 animate-slide-down">
+            <HackathonFilters filters={filters} onFiltersChange={setFilters} />
+          </div>
+        )}
 
-              {/* 移动端筛选器按钮 */}
-              <div className="lg:hidden">
-                <Button
-                  variant="outline"
-                  className={`w-full glass hover-lift transition-all ${showMobileFilters ? 'bg-primary/10 border-primary/30' : ''}`}
-                  onClick={() => setShowMobileFilters(!showMobileFilters)}
+        {/* 筛选标签栏 - 显示已选筛选项 */}
+        {activeFiltersCount > 0 && (
+          <div className="h-[40px] flex items-center gap-2 my-2">
+            <span className="text-sm text-muted-foreground">Active filters:</span>
+            {filters.status !== 'all' && (
+              <Badge variant="secondary" className="text-xs">
+                Status: {filters.status}
+                <button
+                  onClick={() => setFilters({ ...filters, status: 'all' })}
+                  className="ml-1 hover:text-destructive"
                 >
-                  <Filter className="h-4 w-4 mr-2" />
-                  {t('filters.title')}
-                  {activeFiltersCount > 0 && (
-                    <span className="ml-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full">
-                      {activeFiltersCount}
-                    </span>
-                  )}
-                </Button>
-                
-                {/* 移动端筛选器面板 */}
-                {showMobileFilters && (
-                  <div className="mt-4 glass border border-primary/10 rounded-2xl p-6 animate-slide-down">
-                    <HackathonFilters filters={filters} onFiltersChange={setFilters} />
-                  </div>
-                )}
-              </div>
-            </div>
+                  ×
+                </button>
+              </Badge>
+            )}
+            {filters.technologies.map(tech => (
+              <Badge key={tech} variant="secondary" className="text-xs">
+                {tech}
+                <button
+                  onClick={() => setFilters({
+                    ...filters,
+                    technologies: filters.technologies.filter(t => t !== tech)
+                  })}
+                  className="ml-1 hover:text-destructive"
+                >
+                  ×
+                </button>
+              </Badge>
+            ))}
+            {filters.prizeRange !== 'all' && (
+              <Badge variant="secondary" className="text-xs">
+                Prize: {filters.prizeRange}
+                <button
+                  onClick={() => setFilters({ ...filters, prizeRange: 'all' })}
+                  className="ml-1 hover:text-destructive"
+                >
+                  ×
+                </button>
+              </Badge>
+            )}
+            {filters.dateRange !== 'all' && (
+              <Badge variant="secondary" className="text-xs">
+                Date: {filters.dateRange}
+                <button
+                  onClick={() => setFilters({ ...filters, dateRange: 'all' })}
+                  className="ml-1 hover:text-destructive"
+                >
+                  ×
+                </button>
+              </Badge>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setFilters({
+                status: 'all',
+                technologies: [],
+                prizeRange: 'all',
+                dateRange: 'all'
+              })}
+              className="text-xs h-6 ml-auto"
+            >
+              Clear All
+            </Button>
           </div>
+        )}
 
-          {/* 主要内容区域 */}
-          <div className="flex-1 space-y-6 overflow-visible">
-            <div className={`transition-all duration-1000 delay-500 overflow-visible ${isVisible ? 'animate-slide-up opacity-100' : 'opacity-0 translate-y-10'}`}>
-              {/* 搜索和视图控制栏 */}
-              <div className="glass border border-primary/10 rounded-2xl p-6 space-y-4 overflow-visible">
-                <div className="flex flex-col md:flex-row gap-4">
-                  {/* 增强型搜索框 - 添加相对定位确保下拉框正确显示 */}
-                  <div className="flex-1 relative" style={{ zIndex: 1001 }}>
-                    <HackathonSearch 
-                      searchQuery={searchQuery} 
-                      onSearchChange={setSearchQuery} 
-                    />
-                  </div>
-
-                  {/* 视图模式切换 */}
-                  <div className="flex items-center gap-2">
-                    <div className="glass rounded-xl p-1 flex">
-                      <Button
-                        variant={viewMode === 'grid' ? 'default' : 'ghost'}
-                        size="sm"
-                        onClick={() => setViewMode('grid')}
-                        className={`transition-all ${viewMode === 'grid' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}
-                      >
-                        <Grid3x3 className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant={viewMode === 'list' ? 'default' : 'ghost'}
-                        size="sm"
-                        onClick={() => setViewMode('list')}
-                        className={`transition-all ${viewMode === 'list' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}
-                      >
-                        <List className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* 黑客松网格/列表 */}
-            <div className={`transition-all duration-1000 delay-700 ${isVisible ? 'animate-fade-in opacity-100' : 'opacity-0'}`}>
-              <HackathonGrid 
-                searchQuery={searchQuery} 
-                filters={filters} 
-                viewMode={viewMode}
-              />
-            </div>
-          </div>
+        {/* 黑客松网格 - 4列紧凑布局 */}
+        <div className={`py-6 transition-all duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+          <HackathonGrid 
+            searchQuery={searchQuery} 
+            filters={filters} 
+            viewMode={viewMode}
+          />
         </div>
       </div>
     </div>

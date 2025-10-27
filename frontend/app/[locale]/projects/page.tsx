@@ -328,123 +328,103 @@ export default function ProjectsPage() {
   }
 
   return (
-    <div className="container mx-auto py-6 px-4">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
-          <p className="text-muted-foreground mt-2">
-            {t('description', { total: stats.total })}
-          </p>
-        </div>
-        <Button asChild>
-          <Link href="/projects/create">
-            <Plus className="w-4 h-4 mr-2" />
-            {t('actions.create')}
-          </Link>
-        </Button>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-6">
-        <Card className="text-center">
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-primary">{stats.total}</div>
-            <div className="text-xs text-muted-foreground">{t('stats.total')}</div>
-          </CardContent>
-        </Card>
-        <Card className="text-center">
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-gray-600">{stats.draft}</div>
-            <div className="text-xs text-muted-foreground">{t('stats.draft')}</div>
-          </CardContent>
-        </Card>
-        <Card className="text-center">
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-blue-600">{stats.readyToSubmit}</div>
-            <div className="text-xs text-muted-foreground">{t('stats.readyToSubmit')}</div>
-          </CardContent>
-        </Card>
-        <Card className="text-center">
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-green-600">{stats.submitted}</div>
-            <div className="text-xs text-muted-foreground">{t('stats.submitted')}</div>
-          </CardContent>
-        </Card>
-        <Card className="text-center">
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-purple-600">{stats.reviewed}</div>
-            <div className="text-xs text-muted-foreground">{t('stats.reviewed')}</div>
-          </CardContent>
-        </Card>
-        <Card className="text-center">
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-yellow-600">{stats.winner}</div>
-            <div className="text-xs text-muted-foreground">{t('stats.winner')}</div>
-          </CardContent>
-        </Card>
-        <Card className="text-center">
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-red-600">{stats.rejected}</div>
-            <div className="text-xs text-muted-foreground">{t('stats.rejected')}</div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Filters and Search */}
-      <Card className="mb-6">
-        <CardContent className="p-6">
-          <div className="flex flex-col lg:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder={t('search.placeholder')}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
+    <div className="min-h-screen bg-background">
+      {/* 主内容区 - max-width 1280px */}
+      <div className="container max-w-[1280px] mx-auto px-4 md:px-6">
+        {/* 紧凑头部工具栏 - 80px高度 - Flat Design 2.0 */}
+        <div className="h-[80px] flex items-center justify-between border-b border-border/50">
+          {/* 左侧：标题+统计 */}
+          <div className="flex items-center gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">{t('title')}</h1>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {stats.total} {t('stats.projectsTotal')}
+              </p>
+            </div>
+            
+            {/* 快速统计 */}
+            <div className="hidden lg:flex items-center gap-3 ml-4">
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-950/20">
+                <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+                <span className="text-xs font-medium">{stats.readyToSubmit} {t('stats.ready')}</span>
+              </div>
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-green-50 dark:bg-green-950/20">
+                <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                <span className="text-xs font-medium">{stats.submitted} {t('stats.submitted')}</span>
+              </div>
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-yellow-50 dark:bg-yellow-950/20">
+                <div className="h-2 w-2 rounded-full bg-yellow-500"></div>
+                <span className="text-xs font-medium">{stats.winner} {t('stats.winner')}</span>
               </div>
             </div>
-            <div className="flex gap-2">
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-[140px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="updatedAt">{t('sort.updated')}</SelectItem>
-                  <SelectItem value="createdAt">{t('sort.created')}</SelectItem>
-                  <SelectItem value="title">{t('sort.title')}</SelectItem>
-                  <SelectItem value="status">{t('sort.status')}</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={sortOrder} onValueChange={setSortOrder}>
-                <SelectTrigger className="w-[120px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="desc">{t('sort.desc')}</SelectItem>
-                  <SelectItem value="asc">{t('sort.asc')}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-        <TabsList className="grid grid-cols-7 w-full">
-          <TabsTrigger value="ALL">{t('tabs.all')}</TabsTrigger>
-          <TabsTrigger value="DRAFT">{t('tabs.draft')}</TabsTrigger>
-          <TabsTrigger value="READY_TO_SUBMIT">{t('tabs.ready')}</TabsTrigger>
-          <TabsTrigger value="SUBMITTED">{t('tabs.submitted')}</TabsTrigger>
-          <TabsTrigger value="REVIEWED">{t('tabs.reviewed')}</TabsTrigger>
-          <TabsTrigger value="WINNER">{t('tabs.winner')}</TabsTrigger>
-          <TabsTrigger value="REJECTED">{t('tabs.rejected')}</TabsTrigger>
-        </TabsList>
+          {/* 右侧：搜索+筛选+创建 */}
+          <div className="flex items-center gap-2">
+            <div className="relative w-[200px] hidden md:block">
+              <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder={t('search.placeholder')}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="h-9 pl-8 text-sm"
+              />
+            </div>
 
-        <TabsContent value={activeTab} className="mt-6">
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-[110px] h-9 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="updatedAt">{t('sort.updated')}</SelectItem>
+                <SelectItem value="createdAt">{t('sort.created')}</SelectItem>
+                <SelectItem value="title">{t('sort.title')}</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Button size="sm" asChild className="bg-gradient-to-r from-primary to-accent hover:opacity-90">
+              <Link href="/projects/create">
+                <Plus className="h-4 w-4 mr-1" />
+                {t('actions.create')}
+              </Link>
+            </Button>
+          </div>
+        </div>
+
+        {/* 紧凑Tab系统 - 48px高度 - Flat Design 2.0 */}
+        <div className="py-4">
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <div className="bg-muted/30 rounded-xl p-1">
+              <TabsList className="h-[48px] w-full grid grid-cols-4 md:grid-cols-7 bg-transparent gap-1 border-0">
+                <TabsTrigger value="ALL" className="text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                  {t('tabs.all')} <Badge variant="secondary" className="ml-1.5 text-xs">{stats.total}</Badge>
+                </TabsTrigger>
+                <TabsTrigger value="DRAFT" className="text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                  {t('tabs.draft')} <Badge variant="outline" className="ml-1.5 text-xs">{stats.draft}</Badge>
+                </TabsTrigger>
+                <TabsTrigger value="READY_TO_SUBMIT" className="text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                  <span className="hidden md:inline">{t('tabs.ready')}</span>
+                  <span className="md:hidden">Ready</span>
+                  <Badge variant="secondary" className="ml-1.5 text-xs bg-blue-100">{stats.readyToSubmit}</Badge>
+                </TabsTrigger>
+                <TabsTrigger value="SUBMITTED" className="text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                  <span className="hidden md:inline">{t('tabs.submitted')}</span>
+                  <span className="md:hidden">Submit</span>
+                  <Badge variant="secondary" className="ml-1.5 text-xs bg-green-100">{stats.submitted}</Badge>
+                </TabsTrigger>
+                <TabsTrigger value="REVIEWED" className="text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm hidden md:flex">
+                  {t('tabs.reviewed')} <Badge variant="secondary" className="ml-1.5 text-xs bg-purple-100">{stats.reviewed}</Badge>
+                </TabsTrigger>
+                <TabsTrigger value="WINNER" className="text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm hidden md:flex">
+                  {t('tabs.winner')} <Badge variant="secondary" className="ml-1.5 text-xs bg-yellow-100">{stats.winner}</Badge>
+                </TabsTrigger>
+                <TabsTrigger value="REJECTED" className="text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm hidden md:flex">
+                  {t('tabs.rejected')} <Badge variant="secondary" className="ml-1.5 text-xs bg-red-100">{stats.rejected}</Badge>
+                </TabsTrigger>
+              </TabsList>
+            </div>
+
+            <TabsContent value={activeTab} className="mt-4">
           {error && (
             <Card className="mb-6 border-red-200 bg-red-50">
               <CardContent className="p-4">
@@ -472,34 +452,42 @@ export default function ProjectsPage() {
             </Card>
           ) : (
             <>
-              {/* Projects Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* 紧凑项目网格 - 4列布局 - Flat Design 2.0 */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {projects.map((project) => (
-                  <Card key={project.id} className="hover:shadow-md transition-shadow">
-                    <CardHeader className="pb-3">
+                  <Card key={project.id} className="h-[200px] border-border/50 hover:border-primary/50 hover:shadow-lg transition-all duration-300 hover-lift group cursor-pointer"
+                        onClick={() => router.push(`/projects/${project.id}`)}>
+                    <CardHeader className="pb-2 pt-3 px-3">
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1 min-w-0">
-                          <CardTitle className="text-lg line-clamp-2">{project.title}</CardTitle>
-                          <div className="flex items-center gap-2 mt-1">
+                          <CardTitle className="text-sm font-semibold line-clamp-2 leading-tight group-hover:text-primary transition-colors">
+                            {project.title}
+                          </CardTitle>
+                          <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
                             {getStatusBadge(project.status, project.statusDisplay)}
+                            {project.hackathon && (
+                              <Badge variant="outline" className="text-xs truncate max-w-[100px] h-5 px-1.5">
+                                {project.hackathon.title}
+                              </Badge>
+                            )}
                           </div>
                         </div>
                         <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                              <MoreVertical className="h-4 w-4" />
+                          <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                            <Button variant="ghost" size="sm" className="h-6 w-6 p-0 shrink-0">
+                              <MoreVertical className="h-3 w-3" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem asChild>
                               <Link href={`/projects/${project.id}`}>
-                                <Eye className="h-4 w-4 mr-2" />
+                                <Eye className="h-3 w-3 mr-2" />
                                 {tCommon('view')}
                               </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
                               <Link href={`/projects/${project.id}/edit`}>
-                                <Edit className="h-4 w-4 mr-2" />
+                                <Edit className="h-3 w-3 mr-2" />
                                 {tCommon('edit')}
                               </Link>
                             </DropdownMenuItem>
@@ -508,12 +496,13 @@ export default function ProjectsPage() {
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem 
                                   className="text-red-600"
-                                  onClick={() => {
+                                  onClick={(e) => {
+                                    e.stopPropagation()
                                     setProjectToDelete(project)
                                     setDeleteDialogOpen(true)
                                   }}
                                 >
-                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  <Trash2 className="h-3 w-3 mr-2" />
                                   {tCommon('delete')}
                                 </DropdownMenuItem>
                               </>
@@ -522,7 +511,7 @@ export default function ProjectsPage() {
                         </DropdownMenu>
                       </div>
                     </CardHeader>
-                    <CardContent className="space-y-4">
+                    <CardContent className="px-3 pb-3 pt-2 space-y-2">
                       {project.description && (
                         <p className="text-sm text-muted-foreground line-clamp-2">
                           {project.description}
@@ -607,11 +596,12 @@ export default function ProjectsPage() {
               {/* Add pagination component here if totalPages > 1 */}
             </>
           )}
-        </TabsContent>
-      </Tabs>
+            </TabsContent>
+          </Tabs>
+        </div>
 
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        {/* Delete Confirmation Dialog */}
+        <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{t('actions.confirmDelete')}</DialogTitle>
@@ -636,7 +626,8 @@ export default function ProjectsPage() {
             </Button>
           </DialogFooter>
         </DialogContent>
-      </Dialog>
+        </Dialog>
+      </div>
     </div>
   )
 }

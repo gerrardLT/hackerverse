@@ -241,40 +241,36 @@ export default function AdminUsersPage() {
   }, [filters])
 
   return (
-    <div className="space-y-6">
-      {/* 页面标题和统计 */}
-      <div className="flex justify-between items-start">
-        <div>
-          <h1 className="text-3xl font-bold">{t('title')}</h1>
-          <p className="text-muted-foreground mt-2">
-            {t('description')}
-          </p>
-        </div>
-        <div className="flex items-center gap-4">
-          <Card className="p-4">
-            <div className="flex items-center gap-2">
-              <div className="p-2 bg-primary/10 rounded-full">
-                <UserPlus className="h-4 w-4 text-primary" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold">{total}</div>
-                <div className="text-sm text-muted-foreground">{t('totalUsers')}</div>
-              </div>
+    <div className="space-y-6 animate-fade-in">
+      {/* 紧凑页面标题 - 80px高度 */}
+      <div className="glass-light border border-border/50 rounded-2xl p-5">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-bold">{t('title')}</h1>
+            <p className="text-sm text-muted-foreground mt-1">{t('description')}</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-gradient-primary rounded-lg">
+              <UserPlus className="h-4 w-4 text-primary-foreground" />
             </div>
-          </Card>
+            <div>
+              <div className="text-2xl font-bold">{total}</div>
+              <div className="text-xs text-muted-foreground">{t('totalUsers')}</div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* 搜索和筛选 */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Filter className="h-5 w-5" />
+      {/* 紧凑搜索和筛选 - 60px高度 */}
+      <Card className="glass-light border-border/50">
+        <CardHeader className="p-4 pb-3">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Filter className="h-4 w-4" />
             {t('filters')}
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <CardContent className="p-4 pt-0">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
             {/* 搜索 */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -344,28 +340,28 @@ export default function AdminUsersPage() {
         </CardContent>
       </Card>
 
-      {/* 用户列表 */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('usersList')}</CardTitle>
+      {/* 紧凑用户列表 - 表格化 48px/行 */}
+      <Card className="glass-light border-border/50">
+        <CardHeader className="p-4 pb-3">
+          <CardTitle className="text-base">{t('usersList')}</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4 pt-0">
           {loading ? (
             <div className="flex justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <div className="animate-spin rounded-full h-6 w-6 border-2 border-primary border-t-transparent"></div>
             </div>
           ) : (
             <>
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead>{t('table.user')}</TableHead>
-                    <TableHead>{t('table.role')}</TableHead>
-                    <TableHead>{t('table.status')}</TableHead>
-                    <TableHead>{t('table.reputation')}</TableHead>
-                    <TableHead>{t('table.activity')}</TableHead>
-                    <TableHead>{t('table.lastLogin')}</TableHead>
-                    <TableHead>{t('table.actions')}</TableHead>
+                  <TableRow className="border-border/50 hover:bg-transparent">
+                    <TableHead className="text-xs">{t('table.user')}</TableHead>
+                    <TableHead className="text-xs">{t('table.role')}</TableHead>
+                    <TableHead className="text-xs">{t('table.status')}</TableHead>
+                    <TableHead className="text-xs">{t('table.reputation')}</TableHead>
+                    <TableHead className="text-xs">{t('table.activity')}</TableHead>
+                    <TableHead className="text-xs">{t('table.lastLogin')}</TableHead>
+                    <TableHead className="text-xs text-right">{t('table.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -374,72 +370,77 @@ export default function AdminUsersPage() {
                       // 使用包含角色和状态的复合key强制重新渲染
                       const forceRenderKey = `${user.id}-${user.role}-${user.status}-v${Math.floor(Date.now()/1000)}`
                       return (
-                       <TableRow key={forceRenderKey}>
-                        <TableCell>
-                          <div className="flex items-center gap-3">
-                            <Avatar>
+                       <TableRow key={forceRenderKey} className="h-12 border-border/50 hover:bg-muted/30 transition-colors">
+                        <TableCell className="py-2">
+                          <div className="flex items-center gap-2">
+                            <Avatar className="h-8 w-8">
                               <AvatarImage src={user.avatarUrl} />
-                              <AvatarFallback>
+                              <AvatarFallback className="text-xs">
                                 {user.username?.charAt(0)?.toUpperCase() || user.email.charAt(0).toUpperCase()}
                               </AvatarFallback>
                             </Avatar>
                             <div>
-                              <div className="font-medium">{user.username || 'N/A'}</div>
-                              <div className="text-sm text-muted-foreground flex items-center gap-1">
+                              <div className="text-sm font-medium">{user.username || 'N/A'}</div>
+                              <div className="text-xs text-muted-foreground flex items-center gap-1">
                                 {user.emailVerified ? (
-                                  <Mail className="h-3 w-3 text-green-500" />
+                                  <Mail className="h-2.5 w-2.5 text-green-500" />
                                 ) : (
-                                  <Mail className="h-3 w-3 text-gray-400" />
+                                  <Mail className="h-2.5 w-2.5 text-gray-400" />
                                 )}
-                                {user.email}
+                                <span className="truncate max-w-[150px]">{user.email}</span>
                               </div>
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell>
-                          <Badge className={getRoleColor(user.role)}>
+                        <TableCell className="py-2">
+                          <Badge className={`${getRoleColor(user.role)} text-xs px-1.5 py-0`}>
                             {getRoleText(user.role)}
                           </Badge>
                         </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <div className={`w-2 h-2 rounded-full ${statusConfig.color}`} />
-                            <Badge variant={statusConfig.variant}>
+                        <TableCell className="py-2">
+                          <div className="flex items-center gap-1.5">
+                            <div className={`w-1.5 h-1.5 rounded-full ${statusConfig.color}`} />
+                            <Badge variant={statusConfig.variant} className="text-xs px-1.5 py-0">
                               {statusConfig.text}
                             </Badge>
                           </div>
                         </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Shield className="h-4 w-4 text-muted-foreground" />
+                        <TableCell className="py-2">
+                          <div className="flex items-center gap-1.5 text-sm">
+                            <Shield className="h-3 w-3 text-muted-foreground" />
                             {user.reputationScore}
                           </div>
                         </TableCell>
-                        <TableCell>
-                          <div className="text-sm">
-                            <div>{t('activity.hackathons')}: {user._count.participations}</div>
-                            <div>{t('activity.projects')}: {user._count.projects}</div>
-                            <div>{t('activity.organized')}: {user._count.organizedHackathons}</div>
+                        <TableCell className="py-2">
+                          <div className="text-xs text-muted-foreground">
+                            <span>{user._count.participations}H</span>
+                            <span className="mx-1">•</span>
+                            <span>{user._count.projects}P</span>
+                            <span className="mx-1">•</span>
+                            <span>{user._count.organizedHackathons}O</span>
                           </div>
                         </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Clock className="h-4 w-4" />
-                            {user.lastLoginAt 
-                              ? formatDate(user.lastLoginAt)
-                              : t('table.neverLoggedIn')
-                            }
+                        <TableCell className="py-2">
+                          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                            <Clock className="h-3 w-3" />
+                            <span className="truncate max-w-[100px]">
+                              {user.lastLoginAt 
+                                ? new Date(user.lastLoginAt).toLocaleDateString()
+                                : t('table.neverLoggedIn')
+                              }
+                            </span>
                           </div>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="py-2 text-right">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button 
                                 variant="ghost" 
                                 size="sm"
+                                className="h-7 w-7 p-0"
                                 onClick={() => console.log('🎯 DropdownMenuTrigger被点击:', user.id, user.username)}
                               >
-                                <MoreHorizontal className="h-4 w-4" />
+                                <MoreHorizontal className="h-3.5 w-3.5" />
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">

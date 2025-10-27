@@ -2,6 +2,7 @@
   "title": "Community",
   "description": "Share ideas, ask questions, showcase your work",
   "posts": "Posts",
+  "members": "Members",
   "createPost": "Create Post",
   "reply": "Reply",
   "like": "Like",
@@ -16,7 +17,8 @@
     "networkError": "Network error, please try again later",
     "loadingFailed": "Failed to load community data",
     "toggleLikeFailed": "Failed to toggle like status",
-    "toggleBookmarkFailed": "Failed to toggle bookmark status"
+    "toggleBookmarkFailed": "Failed to toggle bookmark status",
+    "stats": "Loading statistics..."
   },
   "clearFilters": "Clear Filters",
   "hotPost": "Hot",
@@ -73,6 +75,7 @@
   "post": {
     "backToCommunity": "Back to Community",
     "createPost": "Create Post",
+    "publish": "Publish Post",
     "publishPost": "Publish Post",
     "publishFirst": "Publish First Post",
     "pinned": "Pinned",
@@ -160,6 +163,7 @@
   },
   "rules": {
     "title": "Community Rules",
+    "count": "rules",
     "rule1": "Be friendly and respectful, create a positive discussion environment",
     "rule2": "Post valuable content, avoid spam and duplicates",
     "rule3": "Use appropriate categories and tags for easy discovery",

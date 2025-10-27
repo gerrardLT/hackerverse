@@ -1,5 +1,6 @@
 {
   "title": "Teams",
+  "teams": "teams",
   "createTeam": "Create Team",
   "join": "Join Team",
   "leave": "Leave Team",
@@ -10,6 +11,7 @@
   "leader": "Leader",
   "pageTitle": "Team Management",
   "pageDescription": "Discover teams, manage your teams, handle invitations",
+  "pendingInvitations": "pending invitations",
   "loading": {
     "teams": "Loading teams...",
     "hackathons": "Loading hackathons failed",

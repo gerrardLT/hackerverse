@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
                   request.cookies.get('hackx-token')?.value
 
     // 构建后端请求
-    const backendUrl = 'http://localhost:3002/api/ipfs/upload'
+    const backendUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002/api'}/ipfs/upload`.replace('/api/api/', '/api/')
     const headers: Record<string, string> = {}
     
     if (token) {
@@ -95,7 +95,7 @@ export async function PUT(request: NextRequest) {
                   request.cookies.get('hackx-token')?.value
 
     // 构建后端请求
-    const backendUrl = 'http://localhost:3002/api/ipfs/upload'
+    const backendUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002/api'}/ipfs/upload`.replace('/api/api/', '/api/')
     const headers: Record<string, string> = {
       'Content-Type': 'application/json'
     }

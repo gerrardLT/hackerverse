@@ -572,7 +572,8 @@ export default function AdminAnalyticsPage() {
       })
       
       // 直接通过window.open下载文件
-      const exportUrl = `http://localhost:3002/api/analytics/export/overview?${params.toString()}`
+      const apiBase = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002/api').replace(/\/api$/, '')
+      const exportUrl = `${apiBase}/api/analytics/export/overview?${params.toString()}`
       window.open(exportUrl, '_blank')
       
       toast({

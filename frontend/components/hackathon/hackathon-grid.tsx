@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { HackathonCard } from './hackathon-card'
+import { HackathonCardCompact } from './hackathon-card-compact'
 import { Button } from '@/components/ui/button'
 import { Loader2, AlertCircle } from 'lucide-react'
 import { dataService } from '@/lib/data-service'
@@ -286,9 +287,10 @@ export function HackathonGrid({ searchQuery, filters, viewMode = 'grid' }: Hacka
 
   const getGridClasses = () => {
     if (viewMode === 'list') {
-      return 'space-y-4'
+      return 'space-y-4 max-w-[900px] mx-auto'
     }
-    return 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6'
+    // 4列紧凑网格 - Flat Design 2.0
+    return 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'
   }
 
   return (
@@ -317,9 +319,15 @@ export function HackathonGrid({ searchQuery, filters, viewMode = 'grid' }: Hacka
               className="animate-slide-up"
               style={{ animationDelay: `${index * 50}ms` }}
             >
-              <HackathonCard
-                hackathon={formatHackathonForCard(hackathon)}
-              />
+              {viewMode === 'grid' ? (
+                <HackathonCardCompact
+                  hackathon={formatHackathonForCard(hackathon)}
+                />
+              ) : (
+                <HackathonCard
+                  hackathon={formatHackathonForCard(hackathon)}
+                />
+              )}
             </div>
           ))}
         </div>
@@ -406,16 +414,10 @@ export function HackathonGrid({ searchQuery, filters, viewMode = 'grid' }: Hacka
       )}
 
       {/* 页面底部状态栏 */}
-      {hackathons.length > 0 && !loading && (
-        <div className="glass border-t border-primary/10 rounded-t-2xl p-4 text-center">
+      {hackathons.length > 0 && !loading && !hasMore && total > 0 && (
+        <div className="mt-6 py-4 text-center">
           <div className="text-sm text-muted-foreground">
-            {t('displayedCount')} <span className="font-medium text-primary">{hackathons.length}</span> 个黑客松
-            {total > hackathons.length && (
-              <> / {t('totalCount')} <span className="font-medium text-primary">{total}</span> 个</>
-            )}
-            {!hasMore && total > 0 && (
-              <span className="ml-2 text-xs">🎉 {t('allLoaded')}</span>
-            )}
+            🎉 {t('allLoaded')}
           </div>
         </div>
       )}

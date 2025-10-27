@@ -10,7 +10,10 @@
     "deploy:polygon": "npx hardhat run scripts/deploy-production.js --network polygon",
     "deploy:mainnet": "npx hardhat run scripts/deploy-production.js --network mainnet",
     "deploy:sepolia": "npx hardhat run scripts/deploy-production.js --network sepolia",
+    "deploy:bsc-testnet": "npx hardhat run scripts/deploy-production.js --network bscTestnet",
+    "deploy:bsc-mainnet": "npx hardhat run scripts/deploy-bsc-mainnet.js --network bscMainnet",
     "verify": "node scripts/verify-contract.js",
+    "verify:bsc-mainnet": "npx hardhat run scripts/verify-bsc-mainnet.js --network bscMainnet",
     "update-config": "node scripts/update-config.js"
   },
   "keywords": [],

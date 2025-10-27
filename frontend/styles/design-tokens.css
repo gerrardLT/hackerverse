@@ -1,0 +1,86 @@
+/**
+ * HackerVerse Design Tokens
+ * Flat Design 2.0 风格
+ * 创建日期: 2025-10-08
+ */
+
+:root {
+  /* ===== 颜色系统 ===== */
+  
+  /* 主色调 */
+  --color-primary: hsl(262.1 83.3% 57.8%);
+  --color-primary-hover: hsl(262.1 83.3% 62%);
+  --color-primary-foreground: hsl(0 0% 100%);
+  
+  /* 辅助色 */
+  --color-secondary: hsl(220 14.3% 95.9%);
+  --color-secondary-hover: hsl(220 14.3% 90%);
+  --color-secondary-foreground: hsl(220.9 39.3% 11%);
+  
+  /* 强调色 */
+  --color-accent: hsl(220 70% 50%);
+  --color-accent-hover: hsl(220 70% 55%);
+  --color-accent-foreground: hsl(0 0% 100%);
+  
+  /* 语义色 */
+  --color-success: hsl(142 76% 36%);
+  --color-warning: hsl(38 92% 50%);
+  --color-error: hsl(0 84.2% 60.2%);
+  --color-info: hsl(199 89% 48%);
+  
+  /* ===== 间距系统 ===== */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+  --spacing-3xl: 64px;
+  
+  /* ===== 圆角系统 ===== */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+  
+  /* ===== 阴影系统 (Flat Design 2.0) ===== */
+  --shadow-level-1: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-level-2: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-level-3: 0 8px 24px rgba(0, 0, 0, 0.16);
+  --shadow-glow: 0 0 20px rgba(var(--color-primary-rgb), 0.3);
+  
+  /* ===== 过渡时长 ===== */
+  --transition-fast: 200ms;
+  --transition-normal: 300ms;
+  --transition-slow: 500ms;
+  
+  /* ===== 缓动函数 ===== */
+  --ease-out: cubic-bezier(0.33, 1, 0.68, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  
+  /* ===== 容器尺寸 ===== */
+  --container-max-width: 1280px;
+  --sidebar-width: 240px;
+  --sidebar-width-compact: 180px;
+  
+  /* ===== 组件高度 ===== */
+  --header-height: 64px;
+  --hero-height: 200px;
+  --toolbar-height: 80px;
+  --card-height-compact: 180px;
+  --card-height-standard: 240px;
+  
+  /* ===== 渐变 ===== */
+  --gradient-primary: linear-gradient(135deg, hsl(262.1 83.3% 57.8%) 0%, hsl(220 70% 50%) 100%);
+  --gradient-secondary: linear-gradient(135deg, hsl(220 70% 50%) 0%, hsl(262.1 83.3% 57.8%) 100%);
+  --gradient-success: linear-gradient(135deg, hsl(142 76% 36%) 0%, hsl(142 76% 46%) 100%);
+  --gradient-overlay: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.6) 100%);
+}
+
+/* 暗色主题调整 */
+.dark {
+  --shadow-level-1: 0 2px 8px rgba(0, 0, 0, 0.24);
+  --shadow-level-2: 0 4px 16px rgba(0, 0, 0, 0.32);
+  --shadow-level-3: 0 8px 24px rgba(0, 0, 0, 0.48);
+}
+

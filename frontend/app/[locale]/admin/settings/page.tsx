@@ -153,9 +153,9 @@ export default function AdminSettingsPage() {
         pinataApiKey: '',
         pinataSecretKey: '',
         
-        defaultChainId: 97,
-        rpcEndpoint: 'https://data-seed-prebsc-1-s1.binance.org:8545',
-        contractAddress: '0x...',
+        defaultChainId: parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || '97'),
+        rpcEndpoint: process.env.NEXT_PUBLIC_BSC_RPC_URL || 'https://data-seed-prebsc-1-s1.binance.org:8545',
+        contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '0x...',
         
         cacheTTL: 3600,
         maxFileSize: 10485760,

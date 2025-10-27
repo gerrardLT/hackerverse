@@ -454,294 +454,201 @@ export default function TeamsPage() {
         <div className="absolute top-20 left-10 w-2 h-2 bg-primary/30 rounded-full animate-pulse-slow" />
         <div className="absolute top-40 right-20 w-1 h-1 bg-secondary/40 rounded-full animate-pulse-slow" style={{ animationDelay: '1s' }} />
 
-        <div className="container py-8 relative">
-          <div className="space-y-8">
-            {/* 现代化页面头部 */}
-            <div className={`text-center space-y-6 mb-12 transition-all duration-1000 ${isVisible ? 'animate-slide-up opacity-100' : 'opacity-0 translate-y-10'}`}>
-              <div className="space-y-4">
-                <h1 className="text-responsive-lg font-bold tracking-tight">
-                  <span className="text-gradient animate-shimmer">{t('pageTitle')}</span>
-                </h1>
-                <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                  {t('pageDescription')}
-                </p>
-              </div>
-
-              {/* 顶部操作栏 */}
-              <div className="flex items-center justify-center">
-                <Button className="group hover-lift hover-glow bg-primary hover:bg-primary/90" asChild>
-                  <Link href="/teams/create">
-                    <Plus className="h-4 w-4 mr-2 transition-transform group-hover:scale-110" />
-                    {t('createTeam')}
-                    <Sparkles className="h-4 w-4 ml-2 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </Link>
-                </Button>
-              </div>
+        {/* 主内容区 - max-width 1280px */}
+        <div className="container max-w-[1280px] mx-auto px-4 md:px-6">
+          {/* 紧凑头部工具栏 - 80px高度 - Flat Design 2.0 */}
+          <div className="h-[80px] flex items-center justify-between border-b border-border/50">
+            {/* 左侧：标题 */}
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">{t('pageTitle')}</h1>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {teams.length} {t('teams')} {invitations.length > 0 && `· ${invitations.length} ${t('pendingInvitations')}`}
+              </p>
             </div>
 
-            {/* 现代化搜索和筛选 */}
-            <div className={`transition-all duration-1000 delay-200 ${isVisible ? 'animate-slide-up opacity-100' : 'opacity-0 translate-y-10'}`}>
-              <div className="glass border border-primary/10 rounded-2xl p-6 relative overflow-hidden">
-                {/* 背景装饰 */}
-                <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-full -translate-y-6 translate-x-6" />
-                
-                <div className="relative">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="p-2 bg-gradient-primary rounded-xl">
-                      <Search className="w-5 h-5 text-primary-foreground" />
-                    </div>
-                    <h3 className="text-lg font-bold text-foreground">{t('searchTitle')}</h3>
-                  </div>
-
-                  <div className="flex flex-col md:flex-row gap-4">
-                    <div className="relative flex-1">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                      <Input
-                        placeholder={t('search.placeholder')}
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-10 glass border-primary/20 focus:border-primary/40 focus:shadow-glow"
-                      />
-                    </div>
-                    <Select value={statusFilter} onValueChange={setStatusFilter}>
-                      <SelectTrigger className="w-full md:w-48 glass border-primary/20">
-                        <Filter className="w-4 h-4 mr-2" />
-                        <SelectValue placeholder={t('search.statusFilter')} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">
-                          <div className="flex items-center gap-2">
-                            <TrendingUp className="w-3 h-3" />
-                            {t('search.allStatuses')}
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="recruiting">
-                          <div className="flex items-center gap-2">
-                            <Target className="w-3 h-3" />
-                            {t('status.recruiting')}
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="full">
-                          <div className="flex items-center gap-2">
-                            <Shield className="w-3 h-3" />
-                            {t('status.full')}
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="competing">
-                          <div className="flex items-center gap-2">
-                            <Zap className="w-3 h-3" />
-                            {t('status.competing')}
-                          </div>
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Select value={hackathonFilter} onValueChange={setHackathonFilter}>
-                      <SelectTrigger className="w-full md:w-48 glass border-primary/20">
-                        <Calendar className="w-4 h-4 mr-2" />
-                        <SelectValue placeholder={t('search.hackathonFilter')} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">
-                          <div className="flex items-center gap-2">
-                            <Calendar className="w-3 h-3" />
-                            {t('search.allHackathons')}
-                          </div>
-                        </SelectItem>
-                        {hackathons.map(hackathon => (
-                          <SelectItem key={hackathon.id} value={hackathon.id}>
-                            {hackathon.title}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
+            {/* 右侧：搜索+筛选+创建 */}
+            <div className="flex items-center gap-2">
+              <div className="relative w-[200px] hidden md:block">
+                <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder={t('search.placeholder')}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="h-9 pl-8 text-sm"
+                />
               </div>
+
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-[120px] h-9 text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t('search.allStatuses')}</SelectItem>
+                  <SelectItem value="recruiting">{t('status.recruiting')}</SelectItem>
+                  <SelectItem value="full">{t('status.full')}</SelectItem>
+                  <SelectItem value="competing">{t('status.competing')}</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Button size="sm" asChild className="bg-gradient-to-r from-primary to-accent hover:opacity-90">
+                <Link href="/teams/create">
+                  <Plus className="h-4 w-4 mr-1" />
+                  {t('createTeam')}
+                </Link>
+              </Button>
             </div>
+          </div>
 
-            {/* 现代化标签页 */}
-            <div className={`transition-all duration-1000 delay-400 ${isVisible ? 'animate-fade-in opacity-100' : 'opacity-0'}`}>
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-                {/* 现代化标签导航 */}
-                <div className="glass border border-primary/10 rounded-2xl p-2">
-                  <TabsList className="grid w-full grid-cols-3 bg-transparent gap-1">
-                    {[
-                      { value: 'all', label: t('tabs.allTeams'), icon: Users },
-                      { value: 'my-teams', label: t('tabs.myTeams'), icon: Crown },
-                      { value: 'invitations', label: t('tabs.invitations'), icon: Bell, count: invitations.length }
-                    ].map((tab) => (
-                      <TabsTrigger 
-                        key={tab.value} 
-                        value={tab.value}
-                        className="glass hover-lift transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-white relative"
-                      >
-                        <tab.icon className="w-4 h-4 mr-2" />
-                        {tab.label}
-                        {tab.count && tab.count > 0 && (
-                          <Badge variant="destructive" className="ml-2 animate-bounce-gentle">
-                            {tab.count}
-                          </Badge>
-                        )}
-                      </TabsTrigger>
-                    ))}
-                  </TabsList>
-                </div>
+          {/* 紧凑Tab系统 - 48px高度 - Flat Design 2.0 */}
+          <div className="py-4">
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <div className="bg-muted/30 rounded-xl p-1">
+                <TabsList className="h-[48px] w-full grid grid-cols-3 bg-transparent gap-1 border-0">
+                  {[
+                    { value: 'all', label: t('tabs.allTeams'), icon: Users },
+                    { value: 'my-teams', label: t('tabs.myTeams'), icon: Crown },
+                    { value: 'invitations', label: t('tabs.invitations'), icon: Bell, count: invitations.length }
+                  ].map((tab) => (
+                    <TabsTrigger 
+                      key={tab.value} 
+                      value={tab.value}
+                      className="text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-200"
+                    >
+                      <tab.icon className="w-4 h-4 mr-1.5" />
+                      {tab.label}
+                      {tab.count && tab.count > 0 && (
+                        <Badge variant="destructive" className="ml-1.5 text-xs">
+                          {tab.count}
+                        </Badge>
+                      )}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </div>
 
-                {/* 所有团队标签页 */}
-                <TabsContent value="all" className="space-y-6 animate-fade-in">
-                  {loading ? (
-                    <div className="glass border border-primary/10 rounded-2xl p-12 text-center">
-                      <div className="space-y-4">
-                        <div className="p-4 bg-gradient-primary rounded-2xl w-fit mx-auto">
-                          <Loader2 className="h-8 w-8 animate-spin text-primary-foreground" />
-                        </div>
-                        <p className="text-muted-foreground">{t('loading.teams')}</p>
-                      </div>
-                    </div>
-                  ) : error ? (
-                    <div className="glass border border-destructive/20 rounded-2xl p-12 text-center">
-                      <div className="space-y-4">
-                        <div className="p-4 bg-gradient-to-br from-red-500 to-pink-500 rounded-2xl w-fit mx-auto">
-                          <Users className="h-8 w-8 text-white" />
-                        </div>
-                        <p className="text-destructive mb-4">{error}</p>
-                        <Button onClick={loadTeams} className="bg-primary hover:bg-primary/90 hover-lift hover-glow">
-                          <Sparkles className="w-4 h-4 mr-2" />
-                          {t('actions.retry')}
-                        </Button>
-                      </div>
-                    </div>
-                  ) : filteredTeams.length === 0 ? (
-                    <div className="glass border border-primary/10 rounded-2xl p-12 text-center">
-                      <div className="space-y-6">
-                        <div className="p-4 bg-gradient-primary rounded-2xl w-fit mx-auto">
-                          <Users className="h-12 w-12 text-primary-foreground" />
-                        </div>
-                        <div className="space-y-2">
-                          <h3 className="text-lg font-medium">{t('empty.noTeamsFound')}</h3>
-                          <p className="text-muted-foreground leading-relaxed">
-                            {t('empty.adjustSearchCriteria')}
-                          </p>
-                        </div>
-                        <Button className="bg-primary hover:bg-primary/90 hover-lift hover-glow" asChild>
-                          <Link href="/teams/create">
-                            <Plus className="w-4 h-4 mr-2" />
-                            {t('createTeam')}
-                          </Link>
-                        </Button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {filteredTeams.map((team, index) => (
-                        <div
-                          key={team.id}
-                          className="animate-scale-in"
-                          style={{ animationDelay: `${index * 0.1}s` }}
-                        >
-                          <div className="group relative glass border border-primary/10 hover:border-primary/30 rounded-2xl p-6 hover-lift hover-glow transition-all duration-500 overflow-hidden">
-                            {/* 背景渐变效果 */}
-                            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 rounded-2xl" />
+              {/* 所有团队标签页 */}
+              <TabsContent value="all" className="mt-4">
+                {loading ? (
+                  <div className="text-center py-12">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-3" />
+                    <p className="text-sm text-muted-foreground">{t('loading.teams')}</p>
+                  </div>
+                ) : error ? (
+                  <Card className="border-red-200 bg-red-50 dark:bg-red-950/20">
+                    <CardContent className="p-6 text-center">
+                      <Users className="h-12 w-12 text-red-500 mx-auto mb-3" />
+                      <p className="text-red-800 dark:text-red-200 mb-4">{error}</p>
+                      <Button onClick={loadTeams} size="sm">
+                        {t('actions.retry')}
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ) : filteredTeams.length === 0 ? (
+                  <Card>
+                    <CardContent className="p-12 text-center">
+                      <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <h3 className="text-base font-medium mb-2">{t('empty.noTeamsFound')}</h3>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        {t('empty.adjustSearchCriteria')}
+                      </p>
+                      <Button size="sm" asChild>
+                        <Link href="/teams/create">
+                          <Plus className="w-4 h-4 mr-2" />
+                          {t('createTeam')}
+                        </Link>
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  /* 紧凑团队网格 - 4列布局 - Flat Design 2.0 */
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {filteredTeams.map((team, index) => (
+                      <Link key={team.id} href={`/teams/${team.id}`}>
+                        <Card className="h-[200px] border-border/50 hover:border-primary/50 hover:shadow-lg transition-all duration-300 hover-lift group cursor-pointer">
+                          <CardHeader className="pb-2 pt-3 px-3">
+                            {/* 状态徽章 + 标题 */}
+                            <div className="flex items-start justify-between gap-2 mb-2">
+                              <div className="flex-1 min-w-0">
+                                <CardTitle className="text-sm font-semibold line-clamp-1 leading-tight group-hover:text-primary transition-colors">
+                                  {team.name}
+                                </CardTitle>
+                              </div>
+                              {getStatusBadge(team.status)}
+                            </div>
                             
-                            <div className="space-y-4">
-                              {/* 团队头部信息 */}
-                              <div className="flex items-start justify-between">
-                                <div className="flex-1 space-y-2">
-                                  <h3 className="text-lg font-bold group-hover:text-primary transition-colors line-clamp-1">
-                                    {team.name}
-                                  </h3>
-                                  <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-                                    {team.description}
-                                  </p>
-                                </div>
-                                <div className="ml-3">
-                                  {getStatusBadge(team.status)}
-                                </div>
-                              </div>
+                            {/* 黑客松标签 */}
+                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                              <Calendar className="h-3 w-3" />
+                              <span className="truncate">{team.hackathon?.title || t('unknownHackathon')}</span>
+                            </div>
+                          </CardHeader>
 
-                              {/* 黑客松信息 */}
-                              <div className="flex items-center gap-2 p-2 glass rounded-xl border border-primary/10">
-                                <Calendar className="h-4 w-4 text-primary" />
-                                <span className="text-sm font-medium text-foreground">
-                                  {team.hackathon?.title || t('unknownHackathon')}
-                                </span>
-                              </div>
+                          <CardContent className="px-3 pb-3 pt-1 space-y-2">
+                            {/* 描述 */}
+                            <p className="text-xs text-muted-foreground line-clamp-2 leading-tight">
+                              {team.description}
+                            </p>
 
-                              {/* 成员信息和角色 */}
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2 p-2 glass rounded-xl border border-primary/10">
-                                  <Users className="h-4 w-4 text-primary" />
-                                  <span className="text-sm font-medium">
-                                    {t('memberCount', { current: team._count?.members || 0, max: team.maxMembers })}
-                                  </span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  {user && user.id === team.leader?.id ? (
-                                    <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-0">
-                                      <Crown className="w-3 h-3 mr-1" />
-                                      {t('roleLeader')}
-                                    </Badge>
-                                  ) : (
-                                    <Badge variant="outline" className="border-primary/30">
-                                      {t('roleRecruiting')}
-                                    </Badge>
+                            {/* 成员头像 - 重叠显示最多5个 */}
+                            {team.members && team.members.length > 0 && (
+                              <div className="flex items-center gap-2">
+                                <div className="flex -space-x-2">
+                                  {team.members.slice(0, 5).map((member, idx) => (
+                                    <Avatar key={member.id} className="w-6 h-6 ring-2 ring-background">
+                                      <AvatarImage src={member.avatarUrl || "/placeholder.svg"} />
+                                      <AvatarFallback className="text-xs bg-gradient-primary text-primary-foreground">
+                                        {member.username?.[0]?.toUpperCase()}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                  ))}
+                                  {team.members.length > 5 && (
+                                    <div className="w-6 h-6 rounded-full bg-muted border-2 border-background flex items-center justify-center">
+                                      <span className="text-xs text-muted-foreground">+{team.members.length - 5}</span>
+                                    </div>
                                   )}
                                 </div>
+                                <span className="text-xs text-muted-foreground">
+                                  {team._count?.members || 0}/{team.maxMembers}
+                                </span>
                               </div>
+                            )}
 
-                              {/* 成员头像展示 */}
-                              {team.members && team.members.length > 0 && (
-                                <div className="flex items-center gap-2">
-                                  <span className="text-sm text-muted-foreground">{t('members')}:</span>
-                                  <div className="flex -space-x-2">
-                                    {team.members.slice(0, 4).map((member, idx) => (
-                                      <Avatar key={member.id} className="w-8 h-8 ring-2 ring-background">
-                                        <AvatarImage src={member.avatarUrl || "/placeholder.svg"} />
-                                        <AvatarFallback className="text-xs bg-gradient-primary text-primary-foreground">
-                                          {member.username?.[0]?.toUpperCase()}
-                                        </AvatarFallback>
-                                      </Avatar>
-                                    ))}
-                                    {team.members.length > 4 && (
-                                      <div className="w-8 h-8 rounded-full bg-muted border-2 border-background flex items-center justify-center">
-                                        <span className="text-xs text-muted-foreground">+{team.members.length - 4}</span>
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                              )}
-
-                              {/* 操作按钮 */}
-                              <div className="flex gap-2 pt-2">
-                                <Button variant="outline" size="sm" className="flex-1 glass hover-lift border-primary/30" asChild>
-                                  <Link href={`/teams/${team.id}`}>
-                                    <Activity className="h-4 w-4 mr-2" />
-                                    {t('actions.viewDetails')}
-                                  </Link>
+                            {/* 底部：角色标签 + 操作按钮 */}
+                            <div className="flex items-center justify-between pt-1">
+                              <div>
+                                {user && user.id === team.leader?.id ? (
+                                  <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-0 text-xs h-5 px-1.5">
+                                    <Crown className="w-3 h-3 mr-0.5" />
+                                    Leader
+                                  </Badge>
+                                ) : null}
+                              </div>
+                              
+                              {user && user.id !== team.leader?.id && (
+                                <Button 
+                                  size="sm" 
+                                  onClick={(e) => {
+                                    e.preventDefault()
+                                    handleJoinTeam(team)
+                                  }}
+                                  disabled={joiningTeams.has(team.id)}
+                                  className="bg-primary hover:bg-primary/90 h-6 text-xs px-2"
+                                >
+                                  {joiningTeams.has(team.id) ? (
+                                    <Loader2 className="h-3 w-3 animate-spin" />
+                                  ) : (
+                                    <>
+                                      <UserPlus className="h-3 w-3 mr-1" />
+                                      Apply
+                                    </>
+                                  )}
                                 </Button>
-                                {user && user.id !== team.leader?.id && (
-                                  <Button 
-                                    size="sm" 
-                                    onClick={() => handleJoinTeam(team)}
-                                    disabled={joiningTeams.has(team.id)}
-                                    className="bg-primary hover:bg-primary/90 hover-lift hover-glow"
-                                  >
-                                    {joiningTeams.has(team.id) ? (
-                                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                    ) : (
-                                      <UserPlus className="h-4 w-4 mr-2" />
-                                    )}
-                                    {t('actions.applyToJoin')}
-                                  </Button>
-                                )}
-                              </div>
+                              )}
                             </div>
-
-                            {/* 装饰性边框光效 */}
-                            <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/20 via-secondary/20 to-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 animate-pulse-slow" />
-                          </div>
-                        </div>
-                      ))}
+                          </CardContent>
+                        </Card>
+                      </Link>
+                    ))}
                     </div>
                   )}
                 </TabsContent>
@@ -963,7 +870,6 @@ export default function TeamsPage() {
           <div className="absolute bottom-20 right-10 w-1.5 h-1.5 bg-primary/40 rounded-full animate-pulse-slow" style={{ animationDelay: '5s' }} />
           <div className="absolute bottom-32 left-1/4 w-1 h-1 bg-secondary/30 rounded-full animate-pulse-slow" style={{ animationDelay: '6s' }} />
         </div>
-      </div>
 
       {/* 现代化申请加入团队弹窗 */}
       <Dialog open={showJoinDialog} onOpenChange={setShowJoinDialog}>
@@ -981,7 +887,7 @@ export default function TeamsPage() {
                 <div>
                   <h3 className="text-xl font-bold text-gradient">{t('joinDialog.title')}</h3>
                   <p className="text-muted-foreground">
-                    {selectedTeam && t('joinDialog.description', { teamName: selectedTeam.name })}
+                    {selectedTeam ? t('joinDialog.description', { teamName: selectedTeam.name }) : ''}
                   </p>
                 </div>
               </div>
@@ -994,10 +900,10 @@ export default function TeamsPage() {
                       <Users className="w-5 h-5 text-primary-foreground" />
                     </div>
                     <div>
-                      <h4 className="font-semibold">{selectedTeam.name}</h4>
-                      <p className="text-sm text-muted-foreground">{selectedTeam.description}</p>
+                      <h4 className="font-semibold">{selectedTeam!.name}</h4>
+                      <p className="text-sm text-muted-foreground">{selectedTeam!.description}</p>
                     </div>
-                    {getStatusBadge(selectedTeam.status)}
+                    {getStatusBadge(selectedTeam!.status)}
                   </div>
                 </div>
               )}
@@ -1053,17 +959,17 @@ export default function TeamsPage() {
               <Button
                 variant="outline"
                 onClick={() => setShowJoinDialog(false)}
-                disabled={selectedTeam ? joiningTeams.has(selectedTeam.id) : false}
+                disabled={selectedTeam ? joiningTeams.has(selectedTeam!.id) : true}
                 className="glass hover-lift border-primary/30"
               >
                 {t('actions.cancel')}
               </Button>
               <Button
                 onClick={handleSubmitApplication}
-                disabled={selectedTeam ? joiningTeams.has(selectedTeam.id) : false}
+                disabled={!selectedTeam || (selectedTeam && joiningTeams.has(selectedTeam!.id))}
                 className="bg-primary hover:bg-primary/90 hover-lift hover-glow"
               >
-                {selectedTeam && joiningTeams.has(selectedTeam.id) ? (
+                {selectedTeam && joiningTeams.has(selectedTeam!.id) ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                     {t('loading.submitting')}

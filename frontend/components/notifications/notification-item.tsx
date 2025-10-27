@@ -190,131 +190,100 @@ export function NotificationItem({
   }
 
   return (
-    <Card className={`${
+    <Card className={`border-border/50 hover:border-primary/50 hover:shadow-md transition-all duration-300 hover-lift ${
       !notification.read 
-        ? 'border-blue-200 bg-blue-50 dark:bg-blue-950/20' 
+        ? 'border-l-4 border-l-blue-500 bg-blue-50/30 dark:bg-blue-950/10' 
         : ''
     }`}>
-      <CardContent className="p-6">
-        <div className="flex items-start justify-between">
-          <div className="flex items-start gap-4 flex-1">
-            <div className="flex flex-col items-center gap-2">
-              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-muted">
-                <span className="text-2xl">{getNotificationIcon(notification.type)}</span>
-              </div>
-              {getPriorityIcon()}
+      <CardContent className="p-3">
+        <div className="flex items-center justify-between gap-3">
+          {/* 左侧：图标+内容 */}
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            {/* 图标 */}
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-muted/50 shrink-0">
+              <span className="text-base">{getNotificationIcon(notification.type)}</span>
             </div>
             
-            <div className="flex-1 space-y-3">
-              <div className="flex items-center gap-3">
-                <h3 className="text-lg font-semibold">{notification.title}</h3>
+            {/* 内容 */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-0.5">
+                <h4 className="text-sm font-semibold truncate">{notification.title}</h4>
                 {!notification.read && (
-                  <Badge variant="default" className="text-xs">
-                    新消息
-                  </Badge>
+                  <div className="h-1.5 w-1.5 rounded-full bg-blue-500 shrink-0" />
                 )}
-                <Badge variant="outline" className="text-xs capitalize">
-                  {notification.category}
-                </Badge>
+                {notification.priority === 'high' && (
+                  <AlertCircle className="h-3 w-3 text-red-500 shrink-0" />
+                )}
               </div>
               
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="text-xs text-muted-foreground line-clamp-1 mb-1">
                 {notification.message}
               </p>
               
-              <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4" />
+              <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <Clock className="h-3 w-3" />
                   {formatNotificationTime(notification.createdAt)}
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
                   {getCategoryIcon()}
                   <span className="capitalize">{notification.category}</span>
                 </div>
-                <Badge 
-                  variant="outline" 
-                  className={`text-xs ${getNotificationColor(notification.priority)}`}
-                >
-                  {notification.priority === 'high' ? '高优先级' : 
-                   notification.priority === 'medium' ? '中优先级' : '低优先级'}
-                </Badge>
-              </div>
-
-              {/* 团队邀请的详细信息 */}
-              {notification.type === 'team_invite' && notification.data && (
-                <div className="p-4 bg-muted rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage src="/placeholder.svg" />
-                      <AvatarFallback>
-                        {notification.data.inviterId?.[0]?.toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-medium">{notification.data.teamName}</p>
-                      <p className="text-sm text-muted-foreground">
-                        来自 {notification.data.inviterId} 的邀请
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* 操作按钮区域 */}
-              <div className="flex items-center gap-3 pt-2">
-                {notification.actionUrl && (
-                  <Button variant="outline" size="sm" asChild>
-                    <Link href={notification.actionUrl}>
-                      <ExternalLink className="h-4 w-4 mr-2" />
-                      {notification.actionLabel || '查看详情'}
-                    </Link>
-                  </Button>
-                )}
-
-                {notification.type === 'team_invite' && !notification.read && (
-                  <>
-                    <Button
-                      size="sm"
-                      disabled={isProcessing}
-                      onClick={handleAcceptInvite}
-                    >
-                      {isProcessing ? '处理中...' : '接受邀请'}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      disabled={isProcessing}
-                      onClick={handleRejectInvite}
-                    >
-                      拒绝
-                    </Button>
-                  </>
-                )}
-
-                <div className="flex-1" />
-
-                {!notification.read && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onMarkAsRead(notification.id)}
-                  >
-                    <Check className="h-4 w-4 mr-2" />
-                    标记已读
-                  </Button>
-                )}
-
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-muted-foreground hover:text-destructive"
-                  onClick={() => onDelete(notification.id)}
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  删除
-                </Button>
               </div>
             </div>
+          </div>
+
+          {/* 右侧：操作按钮 */}
+          <div className="flex items-center gap-1 shrink-0">
+            {notification.type === 'team_invite' && !notification.read && (
+              <>
+                <Button
+                  size="sm"
+                  disabled={isProcessing}
+                  onClick={handleAcceptInvite}
+                  className="h-7 text-xs px-2"
+                >
+                  {isProcessing ? '...' : '接受'}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={isProcessing}
+                  onClick={handleRejectInvite}
+                  className="h-7 text-xs px-2"
+                >
+                  拒绝
+                </Button>
+              </>
+            )}
+            
+            {notification.actionUrl && (
+              <Button variant="ghost" size="sm" className="h-7 w-7 p-0" asChild>
+                <Link href={notification.actionUrl}>
+                  <ExternalLink className="h-3 w-3" />
+                </Link>
+              </Button>
+            )}
+
+            {!notification.read && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 w-7 p-0"
+                onClick={() => onMarkAsRead(notification.id)}
+              >
+                <Check className="h-3 w-3" />
+              </Button>
+            )}
+            
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive"
+              onClick={() => onDelete(notification.id)}
+            >
+              <Trash2 className="h-3 w-3" />
+            </Button>
           </div>
         </div>
       </CardContent>

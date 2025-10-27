@@ -165,18 +165,6 @@ export function Header() {
                   <NotificationDropdown />
                 </div>
 
-                {/* Create Hackathon Button - Always visible when logged in */}
-                <Button 
-                  asChild
-                  className="hidden lg:flex items-center gap-1.5 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground px-4 py-2 rounded-lg hover-lift transition-all duration-300"
-                >
-                  <Link href="/hackathons/create">
-                    <Plus className="h-4 w-4" />
-                    <span className="text-sm font-medium">Create</span>
-                  </Link>
-                </Button>
-
-
                 {/* Enhanced User Menu */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
